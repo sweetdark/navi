@@ -1,0 +1,22 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resid.h"
+
+IDB_ZOOMIN                  BITMAP  DISCARDABLE    "res//zoomin.bmp"
+IDB_ZOOMOUT                 BITMAP  DISCARDABLE    "res//zoomout.bmp"
+IDB_COMPASS                 BITMAP  DISCARDABLE    "res//compass.bmp"
+IDB_CENTERMARK              BITMAP  DISCARDABLE    "res//centermark.bmp"
+IDB_DAYSKY                  BITMAP  DISCARDABLE    "res//daysky.bmp"
+IDB_NIGHTSKY                BITMAP  DISCARDABLE    "res//nightsky.bmp"
+IDB_DAWNSKY                 BITMAP  DISCARDABLE    "res//dawnsky.bmp"
+IDB_POI                     BITMAP  DISCARDABLE    "res//poi.bmp"
+IDB_ROUTEFLAG               BITMAP  DISCARDABLE    "res//routeflag.bmp"
+IDB_ROUTESTART              BITMAP  DISCARDABLE    "res//routestart.bmp"
+IDB_ROUTEWAY	            BITMAP  DISCARDABLE    "res//routeway.bmp"
+IDB_ROUTEEND                BITMAP  DISCARDABLE    "res//routeend.bmp"
+IDB_DOPLAN                  BITMAP  DISCARDABLE    "res//doplan.bmp"
+IDB_GPSCAR                  BITMAP  DISCARDABLE    "res//cars.bmp"
+IDB_DEMOSTART               BITMAP  DISCARDABLE    "res//demostart.bmp"
+IDB_DEMOSTOP                BITMAP  DISCARDABLE    "res//demostop.bmp"
+IDB_GUIDANCE                BITMAP  DISCARDABLE    "res//guidance.bmp"
+

@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "freetype.vcproj", "{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Pocket PC 2003 (ARMV4) = Debug|Pocket PC 2003 (ARMV4)
+		Debug|Smartphone 2003 (ARMV4) = Debug|Smartphone 2003 (ARMV4)
+		Debug|STANDARDSDK_500 (ARMV4I) = Debug|STANDARDSDK_500 (ARMV4I)
+		Debug|STANDARDSDK_500 (x86) = Debug|STANDARDSDK_500 (x86)
+		Debug|Win32 = Debug|Win32
+		Release|Pocket PC 2003 (ARMV4) = Release|Pocket PC 2003 (ARMV4)
+		Release|Smartphone 2003 (ARMV4) = Release|Smartphone 2003 (ARMV4)
+		Release|STANDARDSDK_500 (ARMV4I) = Release|STANDARDSDK_500 (ARMV4I)
+		Release|STANDARDSDK_500 (x86) = Release|STANDARDSDK_500 (x86)
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Debug|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Debug|Smartphone 2003 (ARMV4).ActiveCfg = Debug|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Debug|STANDARDSDK_500 (ARMV4I).ActiveCfg = Debug|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Debug|STANDARDSDK_500 (x86).ActiveCfg = Debug|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Debug|Win32.Build.0 = Debug|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Release|Pocket PC 2003 (ARMV4).ActiveCfg = Release|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Release|Smartphone 2003 (ARMV4).ActiveCfg = Release|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Release|STANDARDSDK_500 (ARMV4I).ActiveCfg = Release|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Release|STANDARDSDK_500 (x86).ActiveCfg = Release|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Release|Win32.ActiveCfg = Release|Win32
+		{B23A2B9E-0FA2-47D2-B140-3CC2E46C304B}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
