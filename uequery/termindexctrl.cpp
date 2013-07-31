@@ -265,26 +265,27 @@ namespace UeQuery
 				{
 					vecAcroStr.clear();
 					char *pchTempStr(oneRecord->m_uniName);
-					//
-					bool bTest(false);
-					CChWSpellingCtrl::GetChWSpellCtrl().GetAcronym(pchTempStr,vecAcroStr);
-					for (long k(0); k<vecAcroStr.size(); ++k)
-					{
-						pAcroTermIndex->InsertTermIndex(*iterDoc,vecAcroStr[k].c_str(),
-							oneRecord->m_addrCode);
-						//
-						if (!bTest && vecAcroStr[k].find('_')!=string::npos)
-						{
-							bTest = true;
-							TCHAR tchAcro[256],tchName[256];
-							stringBasic.Ascii2Chs(pchTempStr,tchName,256);
-							stringBasic.Ascii2Chs(vecAcroStr[k].c_str(),tchAcro,256);
-							//
-							pDataEntryCtrl->Log(_T("%s %s\n"),tchName,tchAcro);
-						}
-					}
-					pNameTermIndex->InsertTermIndex(*iterDoc,pchTempStr,oneRecord->m_addrCode);
-					//
+          if (pchTempStr!=0 && *pchTempStr)
+          {
+            bool bTest(false);
+            CChWSpellingCtrl::GetChWSpellCtrl().GetAcronym(pchTempStr,vecAcroStr);
+            for (long k(0); k<vecAcroStr.size(); ++k)
+            {
+              pAcroTermIndex->InsertTermIndex(*iterDoc,vecAcroStr[k].c_str(),
+                oneRecord->m_addrCode);
+              //
+              if (!bTest && vecAcroStr[k].find('_')!=string::npos)
+              {
+                bTest = true;
+                TCHAR tchAcro[256],tchName[256];
+                stringBasic.Ascii2Chs(pchTempStr,tchName,256);
+                stringBasic.Ascii2Chs(vecAcroStr[k].c_str(),tchAcro,256);
+                //
+                pDataEntryCtrl->Log(_T("%s %s\n"),tchName,tchAcro);
+              }
+            }
+            pNameTermIndex->InsertTermIndex(*iterDoc,pchTempStr,oneRecord->m_addrCode);
+          }
 					::free(oneRecord->m_uniName);
 					::free(oneRecord->m_asciiName);
 					::free(oneRecord->m_pchTelStr);
@@ -1248,6 +1249,10 @@ Test:
 				::memcpy(&code,chTermStr,sizeof(code));
 				AddTermInfo(code,pos);
 			}
+      else if (m_sql.m_bIsCheckHave)
+      {
+        return false;
+      }
 			pchTermSrc += pchTermSrc[0]>0?1:2;
 		}
 		return (m_queryTermCnt!=0);

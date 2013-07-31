@@ -8,6 +8,10 @@
 #include "querywrapper.h"
 #endif
 
+#ifndef _UEQUERY_TERMINDEXCTRL_H
+#include "uequery/termindexctrl.h"
+#endif
+
 #ifndef _UEGUI_MAPHOOK_H
 #include "maphook.h"
 #endif
@@ -120,8 +124,9 @@ void CRoadQueryListHook::MakeControls()
   for(int i=0, j=RoadQueryListHook_List1Btn; i<4; i++)
   {
     m_infoBtn[i].SetCenterElement(GetGuiElement(j++));
-    m_infoBtn[i].SetLabelElement(GetGuiElement(j++));
+    m_poiLabel[i].SetLabelElement(GetGuiElement(j++));
     m_infoBtn[i].SetIconElement(GetGuiElement(j++));
+    m_poiLabel[i].SetParent(this);
 
     m_AddrLabel[i].SetLabelElement(GetGuiElement(j++));
   }
@@ -187,8 +192,9 @@ short CRoadQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
       int listIndex = (ctrlType-RoadQueryListHook_List1Btn)/4;
       m_infoBtn[listIndex].MouseDown();
       m_AddrLabel[listIndex].MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_infoBtn[listIndex], m_AddrLabel[listIndex], m_crossBtn[listIndex]);
-      AddRenderUiControls(&m_interval[listIndex]);
+      m_poiLabel[listIndex].MouseDown();
+      MOUSEDONW_3RENDERCTRL(m_infoBtn[listIndex], m_AddrLabel[listIndex], m_poiLabel[listIndex]);
+      MOUSEDONW_2RENDERCTRL(m_interval[listIndex], m_crossBtn[listIndex]);
       
     } 
     else if (ctrlType >= RoadQueryListHook_List1CrossBtn && ctrlType <= RoadQueryListHook_List4CrossBtn)
@@ -280,6 +286,7 @@ short CRoadQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       int listIndex = (ctrlType-RoadQueryListHook_List1Btn)/4;
       m_infoBtn[listIndex].MouseUp();
       m_AddrLabel[listIndex].MouseUp();
+      m_poiLabel[listIndex].MouseUp();
       if(m_infoBtn[listIndex].IsEnable())
       {
         CAggHook::TurnTo(DHT_MapHook);
@@ -334,6 +341,8 @@ void CRoadQueryListHook::SearchForResult(const char* keyword)
 
 void CRoadQueryListHook::ResetResultList()
 {
+  unsigned char posBuffer[40];
+
   SQLRecord *oneRecord(0);
   m_pointList.clear();
   for (int i=0; i<4; ++i)
@@ -341,14 +350,28 @@ void CRoadQueryListHook::ResetResultList()
     if ((oneRecord = m_records.GetRecord(i))==0)
     {
       m_infoBtn[i].SetEnable(false);
-      m_infoBtn[i].SetCaption("");
+      m_poiLabel[i].SetCaption("");
       m_AddrLabel[i].SetCaption("");
       m_crossBtn[i].SetVisible(false);
       m_interval[i].SetVisible(false);
       continue;
     }
     m_infoBtn[i].SetEnable(true);
-    m_infoBtn[i].SetCaption(oneRecord->m_uniName);
+    m_poiLabel[i].SetCaption(oneRecord->m_uniName);
+    //因为下面把查询方式改成了交叉路口使关键字没有高亮, 这里再设置一次
+    int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
+    if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
+    {
+      CQueryWrapper::Get().SetQueryMode(UeQuery::IT_RoadAcro);
+    }
+    else
+    {
+      CQueryWrapper::Get().SetQueryMode(UeQuery::IT_RoadName);
+    }
+    SQLSentence sql = CQueryWrapper::Get().GetSQLSentence();
+    UeQuery::CTermIndexCtrl::GetKeyWordPosInRecord(oneRecord->m_uniName, sql, posBuffer);
+    m_poiLabel[i].SetFocusKey(posBuffer);
+
     m_crossBtn[i].SetVisible(true);
     m_interval[i].SetVisible(true);
 

@@ -2197,6 +2197,7 @@ inline unsigned int CUeVoice::PlaySpecial(short type, double speed, double distF
 
       // Record this special info code
       m_prePrompt = prompt;
+      m_prePrompt.m_infoCode = IVT_MeetDestination;
       return PEC_GuidanceOver;
     }
     else

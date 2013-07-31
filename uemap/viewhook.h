@@ -159,6 +159,9 @@ namespace UeMap
       DHT_QuerySettingHook          = 0x1024,
       DHT_VoiceSettingHook          = 0x1028,
       DHT_SoundMenuHook             = 0x1029,
+      DHT_OtherSystemSettingHook    = 0x1030,
+      DHT_NaviMapSettingHook        = 0x1031,
+      DHT_VersionInfoHook           = 0x1032,
 
 	    //找地方界面
 	    DHT_QueryMenuHook             = 0x1050,

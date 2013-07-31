@@ -1,6 +1,7 @@
 #include "systemsettinghook.h"
 #include "systemlefthook.h"
 #include "navigationlefthook.h"
+#include "versioninfohook.h"
 using namespace UeGui;
 
 CSystemSettingHook::CSystemSettingHook()
@@ -19,6 +20,14 @@ CSystemSettingHook::~CSystemSettingHook()
   {
     delete m_systemLeftSide;
   }
+  if (m_navigationLeftSide)
+  {
+    delete m_navigationLeftSide;
+  }
+  if (m_versionInfo)
+  {
+    delete m_versionInfo;
+  }
 }
 
 void CSystemSettingHook::Init()
@@ -29,6 +38,9 @@ void CSystemSettingHook::Init()
 
   m_navigationLeftSide = new CNavigationLeftHook();
   AddChildHook(CViewHook::DHT_NavigationLeftHook, m_navigationLeftSide);
+
+  m_versionInfo = new CVersionInfoHook();
+  AddChildHook(CViewHook::DHT_VersionInfoHook, m_versionInfo);
 }
 
 
@@ -157,18 +169,21 @@ void CSystemSettingHook::SwitchTabPage(unsigned short type)
     {
       m_systemLeftSide->Show(true);
       m_navigationLeftSide->Show(false);
+      m_versionInfo->Show(false);
     }
     break;
   case kNavigationSetting:
     {
       m_systemLeftSide->Show(false);
       m_navigationLeftSide->Show(true);
+      m_versionInfo->Show(false);
     }
     break;
   case kVersionInfo:
     {
       m_systemLeftSide->Show(false);
       m_navigationLeftSide->Show(false);
+      m_versionInfo->Show(true);
     }
     break;
   default:

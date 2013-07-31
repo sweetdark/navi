@@ -91,7 +91,7 @@ short CRoundSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
     } 
     else
     {
-      return CMenuBackgroundHook::MouseUp(scrPoint);
+      return CMenuBackgroundHook::MouseDown(scrPoint);
       break;
     }
   }
@@ -134,10 +134,10 @@ short CRoundSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_listBtn[index].MouseUp();
       if (m_listBtn[index].IsEnable())
       {
-        m_pCurItemCtrl->GetLeve3Item(m_vecListItem[index].m_uCode,m_vecQueryListItem);
-        //暂时处理
-        TCodeEntry item = *(m_pCurItemCtrl->GetItemByCode(m_vecQueryListItem[1].m_uCode));
-        CQueryWrapper::Get().SetQueryKindInfo(item);
+        //m_pCurItemCtrl->GetLeve3Item(m_vecListItem[index].m_uCode,m_vecQueryListItem);
+        ////暂时处理
+        //TCodeEntry item = *(m_pCurItemCtrl->GetItemByCode(m_vecQueryListItem[1].m_uCode));
+        CQueryWrapper::Get().SetQueryKindInfo(m_vecListItem[index]);
 
         CAggHook::TurnTo(DHT_TypeNoDistQueryListHook);
       }

@@ -11,7 +11,7 @@
 
 //#include "uilabel.h"
 #include "uibutton.h"
-//#include "uiradiobutton.h"
+#include "uiradiobutton.h"
 //#include "uicheckbutton.h"
 
 namespace UeGui
@@ -51,6 +51,10 @@ namespace UeGui
 
     virtual bool operator ()();
 
+    void ReadSetting();
+
+    void UpdateSettings();
+
   protected:
     virtual tstring GetBinaryFileName();
 
@@ -59,13 +63,17 @@ namespace UeGui
     void MakeControls();
 
   private:
-    CUiBitButton m_autoModeBtnCtrl;
+    /// 地图模式-自动切换
+    CUiRadioButton m_autoModeBtnCtrl;
     CUiButton m_autoModeLableCtrl;
-    CUiBitButton m_dayModeBtnCtrl;
+    /// 地图模式-白天模式
+    CUiRadioButton m_dayModeBtnCtrl;
     CUiButton m_dayModeLableCtrl;
     CUiButton m_mapModeLableCtrl;
-    CUiBitButton m_nightModeBtnCtrl;
+    /// 地图模式-夜晚模式
+    CUiRadioButton m_nightModeBtnCtrl;
     CUiButton m_nigthModeLableCtrl;
+    
   };
 }
 #endif

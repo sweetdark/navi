@@ -454,6 +454,53 @@ namespace UeQuery
 		}
 		return false;
 	}
+  void CRoadEntryCtrl::LoadRoadName(map<string,long> &roadNameMap)
+  {
+    const CPathBasic &pathBasic = CPathBasic::Get();
+    const CFileBasic &fileBasic = CFileBasic::Get();
+    const CStringBasic &stringBasic = CStringBasic::Get();
+    //
+    tstring tstrFileName;
+    CGridIndexCtrl::GetNameDataPath(tstrFileName);
+    //打开原来的grid.mj文件获取类型
+    tstrFileName += _T("uenames.dsx");
+    void *nameHandle = fileBasic.OpenFile(tstrFileName, CFileBasic::UE_FILE_READ);
+    assert(nameHandle && fileBasic.IsValidHandle(nameHandle));
+    if(!fileBasic.IsValidHandle(nameHandle))
+    {
+      return;
+    }
+    fileBasic.SeekFile(nameHandle, 0, CFileBasic::UE_SEEK_END);
+    int endPos = fileBasic.TellFilePos(nameHandle);
+    fileBasic.SeekFile(nameHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+    int curPos = fileBasic.TellFilePos(nameHandle);
+    //
+    long nameLen(0);
+    long nameOffset(0);
+    char nameStr[256] = {};
+    while(curPos < endPos)
+    {
+      //记录当前的偏移信息
+      nameOffset = curPos;
+
+      // Name length
+      int count = 1;
+      void *ptr = &nameLen;
+      fileBasic.ReadFile(nameHandle, &ptr, sizeof(unsigned char), count);
+
+      // Name content
+      ptr = nameStr;
+      fileBasic.ReadFile(nameHandle, &ptr,nameLen,count);
+
+      // Next name
+      curPos = fileBasic.TellFilePos(nameHandle);
+
+      nameLen = nameStr[0];
+      nameStr[nameLen+1] = 0;
+      roadNameMap.insert(map<string,long>::value_type(nameStr+1,nameOffset));
+    }
+    fileBasic.CloseFile(nameHandle);
+  }
 	unsigned CRoadEntryCtrl::Close(void)
 	{
 		if (m_pDistCodeCtrl!=0)
@@ -620,6 +667,10 @@ namespace UeQuery
 					GetDistCode(vertice,vertexCount,vecDistCode);
 					//
 					long nameOffset(oneLink->GetNameOffset());
+          //
+          char chTempStr[256];
+          unsigned char uStrLen(0);
+          GetRoadEntryNameByOffset(nameOffset,chTempStr,uStrLen);
 					std::set<long>::iterator iterCodeInfo(vecDistCode.begin());
 					for (; iterCodeInfo!=vecDistCode.end(); ++iterCodeInfo)
 					{
@@ -741,9 +792,15 @@ namespace UeQuery
 		CDistIndex::TDistEntry indexEntry,*pIndexEntry(0);
 		char filterData[CCrossIndexExtend::MAXACROENTRY],*pTempBuf(filterData);
 		CCrossIndexExtend::CrossBodyEntry crossData,*pCrossData(&crossData);
-		char chTempStr[256];
-		TCHAR tchTempStr[256];
+		char chTempStr1[256];
+    char chTempStr2[256];
+		TCHAR tchTempStr1[256];
+    TCHAR tchTempStr2[256];
 		unsigned char nameLen;
+    map<string,long> roadNameMap;
+    LoadRoadName(roadNameMap);
+
+
 		for (int j(0); j<indexCount; ++j,indexOffset+=sizeof(indexEntry))
 		{
 			pIndexEntry = &indexEntry;
@@ -767,30 +824,52 @@ namespace UeQuery
 			{
 				fileBasic.SeekFile(pCrossFile,filterOffset,CFileBasic::UE_SEEK_BEGIN);
 				fileBasic.ReadFile(pCrossFile,(void **)&pTempBuf,sizeof(filterData),count);
+        //
+        ::strupr(filterData);
+        std::string strTemp(filterData);
+        int offset(strTemp.find('-')+1);
 				if (filterData[0]<'0' || filterData[0]>'9')
 				{
-					CStringBasic::Get().Ascii2Chs(filterData,tchTempStr,256);
-					Log(_T("交叉口名称信息出错,%s\n"),tchTempStr);
-					Log(_T("=====================================\n"));
-					continue;
+          strTemp = strTemp.erase(offset-1,strTemp.length());
+          if (roadNameMap.find(strTemp)==roadNameMap.end())
+          {
+            CStringBasic::Get().Ascii2Chs(filterData,tchTempStr1,256);
+            Log(_T("交叉口名称信息出错,%s\n"),tchTempStr1);
+            Log(_T("=====================================\n"));
+            continue;
+          }
+          else
+          {
+            nameOffset1 = roadNameMap[strTemp];
+          }
 				}
-				nameOffset1 = ::atoi(filterData);
+        else
+        {
+          nameOffset1 = ::atoi(filterData);
+        }
 				//
-				std::string strTemp(filterData);
-				int offset(strTemp.find('-')+1);
 				if (filterData[offset]<'0' || filterData[offset]>'9')
 				{
-					CStringBasic::Get().Ascii2Chs(filterData,tchTempStr,256);
-					Log(_T("交叉口名称信息出错,%s\n"),tchTempStr);
-					Log(_T("=====================================\n"));
-					continue;
+          if (roadNameMap.find(filterData+offset)==roadNameMap.end())
+          {
+            CStringBasic::Get().Ascii2Chs(filterData,tchTempStr1,256);
+            Log(_T("交叉口名称信息出错,%s\n"),tchTempStr1);
+            Log(_T("=====================================\n"));
+            continue;
+          }
+          else
+          {
+            nameOffset1 = roadNameMap[filterData+offset];
+          }
 				}
-				nameOffset2 = ::atoi(filterData+offset);
-
+        else
+        {
+          nameOffset2 = ::atoi(filterData+offset);
+        }
 				//
 				fileBasic.SeekFile(pCrossFile,crossOffset,CFileBasic::UE_SEEK_BEGIN);
 				fileBasic.ReadFile(pCrossFile,(void **)&pCrossData,sizeof(crossData),count);
-				//
+        //
 				if ((distCode=CCodeIndexCtrl::GetDistCode(crossData.m_x,
 					crossData.m_y))==-1)
 				{
@@ -798,7 +877,7 @@ namespace UeQuery
 				}
 				bool bError(false);
 				if (!CCodeIndexCtrl::GetDistCodeCtrl().GetItemNameByCode(distCode,
-					chTempStr,false))
+					chTempStr1,false))
 				{
 					bError = true;
 					Log(_T("distCode=%x 获取地域名称失败\n"),distCode);
@@ -811,33 +890,35 @@ namespace UeQuery
 					Log(_T("=====================================\n"));
 					continue;
 				}
-				//判断该区域是否有相关的道路
-				defCityRoadList::iterator iterCRInfo(iterRCInfo->second->find(nameOffset1));
-				//
-				if (!GetRoadEntryNameByOffset(nameOffset1,chTempStr,nameLen))
-				{
-					bError = true;
-					Log(_T("nameoffset=%x 获取道路名称失败\n"),
-						nameOffset1,tchTempStr,nameLen);
-				}
-				//
-				if (iterCRInfo==iterRCInfo->second->end())
-				{
-					CStringBasic::Get().Ascii2Chs(chTempStr,tchTempStr,256);
-					Log(_T("distCode=%x 该区域中不存在: %s 的信息\n"),
-						distCode,tchTempStr);
-					Log(_T("=====================================\n"));
-					continue;
-				}
+        //两条道路至少有一条道路在该区域中
+        //判断该区域是否有相关的道路
+        defCityRoadList::iterator iterCRInfo1(iterRCInfo->second->find(nameOffset1));
+        defCityRoadList::iterator iterCRInfo2(iterRCInfo->second->find(nameOffset2));
+        //
+        if (iterCRInfo1==iterRCInfo->second->end() && iterCRInfo2==iterRCInfo->second->end())
+        {
+          //
+          if (!GetRoadEntryNameByOffset(nameOffset1,chTempStr1,nameLen))
+          {
+            bError = true;
+            Log(_T("nameoffset=%x 获取道路名称失败\n"),nameOffset1);
+          }
+          if (!GetRoadEntryNameByOffset(nameOffset2,chTempStr2,nameLen))
+          {
+            bError = true;
+            Log(_T("nameoffset=%x 获取道路名称失败\n"),nameOffset2);
+          }
+          CStringBasic::Get().Ascii2Chs(chTempStr1,tchTempStr1,256);
+          CStringBasic::Get().Ascii2Chs(chTempStr2,tchTempStr2,256);
+          Log(_T("distCode=%x 组成交叉口的两条道路(%s，%s)都不在该区域中\n"),
+            distCode,tchTempStr1,tchTempStr2);
+          Log(_T("=====================================\n"));
+          continue;
+        }
 				if (bError)
 				{
 					Log(_T("=====================================\n"));
 				}
-#if 0 //可以放松，因为有可能那条路级别很低
-				iterCRInfo = iterRCInfo->second->find(nameOffset2);
-				if (iterCRInfo==iterRCInfo->second->end())
-					continue;
-#endif
 				std::vector<TCrossEntry> *pCrossList(0);
 				defCCityList::iterator iterRCity(crossCityList.find(distCode));
 				if (iterRCity!=crossCityList.end())

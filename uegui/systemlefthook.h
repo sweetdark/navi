@@ -17,6 +17,10 @@
 namespace UeGui
 {
   class CMapSettingHook;
+  class CCarSettingHook;
+  class CVoiceSettingHook;
+  class COtherSystemSettingHook;
+
   class UEGUI_CLASS CSystemLeftHook : public CAggHook
   {
     //只用于作为CSystemSettingHook的子hook
@@ -25,6 +29,8 @@ namespace UeGui
     CSystemLeftHook();
 
     virtual ~CSystemLeftHook();
+
+    void SwitchTabPage(unsigned short type);
 
   public:
     enum systemlefthookCtrlType
@@ -57,6 +63,9 @@ namespace UeGui
     void MakeControls();
   private:
     CMapSettingHook *m_mapSetting;
+    CCarSettingHook *m_carSetting;
+    CVoiceSettingHook *m_soundSetting;
+    COtherSystemSettingHook *m_otherSetting;
 
   private:
     CUiButton m_carSettingBtnCtrl;

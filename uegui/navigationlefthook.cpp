@@ -1,9 +1,13 @@
 #include "navigationlefthook.h"
+#include "navimapsettinghook.h"
 using namespace UeGui;
 
 CNavigationLeftHook::CNavigationLeftHook()
 {
   MakeGUI();
+  m_naviMapSetting = new CNaviMapSettingHook();
+  m_naviMapSetting->Show(true);
+  AddChildHook(DHT_NaviMapSettingHook, m_naviMapSetting);
 }
 
 CNavigationLeftHook::~CNavigationLeftHook()
@@ -11,6 +15,10 @@ CNavigationLeftHook::~CNavigationLeftHook()
   m_elements.clear();
   m_ctrlNames.clear();
   m_imageNames.clear();
+  if (m_naviMapSetting)
+  {
+    delete m_naviMapSetting;
+  }
 }
 
 void CNavigationLeftHook::MakeGUI()
@@ -90,6 +98,7 @@ short CNavigationLeftHook::MouseUp(CGeoPoint<short> &scrPoint)
   case navigationlefthook_MapNavigationBtn:
     {
       m_mapNavigationBtnCtrl.MouseUp();
+      SwitchTabPage(navigationlefthook_MapNavigationBtn);
     }
     break;
   case navigationlefthook_PromptSettingBtn:
@@ -120,4 +129,17 @@ bool CNavigationLeftHook::operator ()()
 {
   return false;
 }
-
+void CNavigationLeftHook::SwitchTabPage(unsigned short type)
+{
+  switch(type)
+  {
+  case navigationlefthook_MapNavigationBtn:
+    {
+      m_naviMapSetting->Show(true);
+    }
+    break;
+  default:
+    assert(false);
+    break;
+  }
+}

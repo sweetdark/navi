@@ -185,6 +185,25 @@ namespace UeQuery
 				pNewPoiEntry->m_telOffset = oldPoiEntry.m_teleNumber;
 				pNewPoiEntry->m_nameOffset = oldPoiEntry.m_nameOffset;
 				pNewPoiEntry->m_addrOffset = oldPoiEntry.m_addrOffset;
+        //
+        char distStr[256] = {};
+        if (!(CCodeIndexCtrl::GetDistCodeCtrl().GetItemNameByCode(oldPoiEntry.m_addrCode,
+          distStr)) || distStr[0]==0)
+        {
+          Log(_T("The %u Poi's addrCode error,%x,%x,%x,%x,%x,%x\r\n"),i,oldPoiEntry.m_x,
+            oldPoiEntry.m_y,oldPoiEntry.m_addrCode,oldPoiEntry.m_teleNumber,
+            oldPoiEntry.m_nameOffset,oldPoiEntry.m_addrOffset);
+          ::free(pNewPoiEntry);
+          continue;
+        }
+        if (oldPoiEntry.m_nameOffset==-1)
+        {
+          Log(_T("The %u Poi's nameOffset error,%x,%x,%x,%x,%x,%x\r\n"),i,oldPoiEntry.m_x,
+            oldPoiEntry.m_y,oldPoiEntry.m_addrCode,oldPoiEntry.m_teleNumber,
+            oldPoiEntry.m_nameOffset,oldPoiEntry.m_addrOffset);
+          ::free(pNewPoiEntry);
+          continue;
+        }
 				//
 #if 0
 				bool bFound(false);

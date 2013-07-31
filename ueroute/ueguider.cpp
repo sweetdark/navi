@@ -1683,7 +1683,7 @@ unsigned int CUeGuider::PushIndicator(PlannedLink &curLink, PlannedLink &nextLin
           // ...
           short cLinks = 0;
           short turnOrder = 0;
-          if(m_plannedDist < 500000. )
+          //if(m_plannedDist < 500000. )
           {
             // When getting detailed & correct topo description, infoCode = -1 will means it is an outlet from main road to ramp or IC or JC
             // this info code will play role when guiding user to right outlet

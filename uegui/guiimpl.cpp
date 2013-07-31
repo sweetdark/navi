@@ -557,10 +557,10 @@ void CGuiImpl::MakeHooks()
   view->UpdateProgress();
 
   //系统设置界面里的语音设置界面
-  viewHook = new CVoiceSettingHook();
-  viewHook->SetHelpers(net, view, route, gps, query);
-  viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_VoiceSettingHook, viewHook);
+  //viewHook = new CVoiceSettingHook();
+  //viewHook->SetHelpers(net, view, route, gps, query);
+  //viewHook->LoadGUI();  
+  //view->AddHook(CViewHook::DHT_VoiceSettingHook, viewHook);
 
   ////旧Hook需要移除掉
   //viewHook = new CQueryCrossHook();
@@ -575,11 +575,11 @@ void CGuiImpl::MakeHooks()
   view->AddHook(CViewHook::DHT_SystemSettingHook,viewHook);
 
   //系统设置界面里的自车图标界面
-  viewHook = new CCarSettingHook();
-  viewHook->SetHelpers(net,view,route,gps,query);
-  //切换界面时再动态加载
-  //viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_CarSettingHook,viewHook);
+  //viewHook = new CCarSettingHook();
+  //viewHook->SetHelpers(net,view,route,gps,query);
+  ////切换界面时再动态加载
+  ////viewHook->LoadGUI();  
+  //view->AddHook(CViewHook::DHT_CarSettingHook,viewHook);
 
   //系统设置界面里的时间校准界面
   viewHook = new CTimeSettingHook();

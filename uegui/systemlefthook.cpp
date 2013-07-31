@@ -1,5 +1,8 @@
 #include "systemlefthook.h"
 #include "mapsettinghook.h"
+#include "carsettinghook.h"
+#include "voicesettinghook.h"
+#include "othersystemsettinghook.h"
 using namespace UeGui;
 
 CSystemLeftHook::CSystemLeftHook()
@@ -7,7 +10,17 @@ CSystemLeftHook::CSystemLeftHook()
   MakeGUI();
   m_mapSetting = new CMapSettingHook();
   m_mapSetting->Show(true);
+  m_mapSetting->ReadSetting();
+  m_carSetting = new CCarSettingHook();
+  m_carSetting->Show(false);
+  m_soundSetting = new CVoiceSettingHook();
+  m_soundSetting->Show(false);
+  m_otherSetting = new COtherSystemSettingHook;
+  m_otherSetting->Show(false);
   AddChildHook(DHT_MapSettingHook, m_mapSetting);
+  AddChildHook(DHT_CarSettingHook, m_carSetting);
+  AddChildHook(DHT_VoiceSettingHook, m_soundSetting);
+  AddChildHook(DHT_OtherSystemSettingHook, m_otherSetting);
 }
 
 
@@ -26,6 +39,18 @@ CSystemLeftHook::~CSystemLeftHook()
   if (m_mapSetting)
   {
     delete m_mapSetting;
+  }
+  if (m_carSetting)
+  {
+    delete m_carSetting;
+  }
+  if (m_soundSetting)
+  {
+    delete m_soundSetting;
+  }
+  if (m_otherSetting)
+  {
+    delete m_otherSetting;
   }
 }
 
@@ -107,21 +132,25 @@ short CSystemLeftHook::MouseUp(CGeoPoint<short> &scrPoint)
   case systemlefthook_CarSettingBtn:
     {
       m_carSettingBtnCtrl.MouseUp();
+      SwitchTabPage(systemlefthook_CarSettingBtn);
     }
     break;
   case systemlefthook_MapModeBtn:
     {
       m_mapModeBtnCtrl.MouseUp();
+      SwitchTabPage(systemlefthook_MapModeBtn);
     }
     break;
   case systemlefthook_OtherBtn:
     {
       m_otherBtnCtrl.MouseUp();
+      SwitchTabPage(systemlefthook_OtherBtn);
     }
     break;
   case systemlefthook_SoundSettingBtn:
     {
       m_soundSettingBtnCtrl.MouseUp();
+      SwitchTabPage(systemlefthook_SoundSettingBtn);
     }
     break;
   default:
@@ -142,4 +171,44 @@ bool CSystemLeftHook::operator ()()
 {
   return false;
 }
-
+void CSystemLeftHook::SwitchTabPage(unsigned short type)
+{
+  switch (type)
+  {
+  case systemlefthook_MapModeBtn:
+    {
+      m_mapSetting->Show(true);
+      m_mapSetting->ReadSetting();
+      m_carSetting->Show(false);
+      m_soundSetting->Show(false);
+      m_otherSetting->Show(false);
+    }
+    break;
+  case  systemlefthook_CarSettingBtn:
+    {
+      m_carSetting->Show(true);
+      m_mapSetting->Show(false);
+      m_soundSetting->Show(false);
+      m_otherSetting->Show(false);
+    }
+    break;
+  case systemlefthook_SoundSettingBtn:
+    {
+      m_soundSetting->Show(true);
+      m_mapSetting->Show(false);
+      m_carSetting->Show(false);
+      m_otherSetting->Show(false);
+    }
+    break;
+  case systemlefthook_OtherBtn:
+    {
+      m_otherSetting->Show(true);
+      m_mapSetting->Show(false);
+      m_carSetting->Show(false);
+      m_soundSetting->Show(false);
+    }
+  default:
+    assert(false);
+    break;
+  }
+}

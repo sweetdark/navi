@@ -112,6 +112,8 @@ namespace UeGui
       HistoryInformationHook_LabelSeparator1,
       HistoryInformationHook_LabelSeparator2,
 
+      HistoryInformationHook_OperatePicFirst,
+      HistoryInformationHook_OperatePicSecond,
       HistoryInformationHook_ClearCenter,
       HistoryInformationHook_End
     };

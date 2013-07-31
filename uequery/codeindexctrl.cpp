@@ -196,7 +196,7 @@ namespace UeQuery
 			if (vecSecStr.size()<3)
 				continue;
 			//
-      ::memset(&item,0xff,sizeof(item));
+      ::memset(&item,0,sizeof(item));
 			::strncpy(item.m_chName,vecSecStr[2],TCodeEntry::g_uMaxNameNum);
 			//
 			if (::strncmp(item.m_chName,"ÊÐÏ½Çø",6)==0
@@ -246,7 +246,7 @@ namespace UeQuery
     long i(0);
     std::vector<string>::iterator iterInfo(vecComItem.begin());
     for (; iterInfo!=vecComItem.end() 
-      && i<(m_codeMode==CM_KINDMODE?g_maxComKindCode:g_maxComDistCode); ++iterInfo,++i)
+      && i<(m_codeMode==CM_KINDMODE?g_maxComKindCode:g_maxComDistCode); ++iterInfo)
     {
       unsigned code(-1);
       for (int j(0); j<vecCodeList.size(); ++j)
@@ -259,6 +259,7 @@ namespace UeQuery
       }
       if (code!=-1)
       {
+        ++i;
         fileBasic.WriteFile(m_pIndexFileHandle,&code,sizeof(code),1);
       }
     }

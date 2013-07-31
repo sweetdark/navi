@@ -26,8 +26,14 @@ void CTypeNoDistQueryListHook::Load()
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
   queryWrapper.GetQueryKindName(m_typeSelectBtn.GetCaption());
   //默认查找当前位置周边
-  m_queryType = RoundQueryType::CurPos;
+  m_queryType = RoundQueryType::MapCenter;
+  SetFocusBtn();
   SearchForResult();
+
+  //暂时设置为不可用
+  m_curPosBtn.SetEnable(false);
+  m_endPointBtn.SetEnable(false);
+  m_routeBtn.SetEnable(false);
 }
 
 void CTypeNoDistQueryListHook::UnLoad()
@@ -42,6 +48,10 @@ void CTypeNoDistQueryListHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_CurPosBtn,	"CurPosBtn"));
   m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_EndPointBtn,	"EndPointBtn"));
   m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_RouteBtn,	"RouteBtn"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_MapCenterFocusBtn,	"MapCenterFocusBtn"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_CurPosFocusBtn,	"CurPosFocusBtn"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_EndPointFocusBtn,	"EndPointFocusBtn"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_RouteFocusBtn,	"RouteFocusBtn"));
   m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_Bar,	"Bar"));
 
   m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List1Btn,	"List1Btn"));
@@ -89,6 +99,11 @@ void CTypeNoDistQueryListHook::MakeControls()
   m_curPosBtn.SetCenterElement(GetGuiElement(TypeNoDistQueryListHook_CurPosBtn));
   m_endPointBtn.SetCenterElement(GetGuiElement(TypeNoDistQueryListHook_EndPointBtn));
   m_routeBtn.SetCenterElement(GetGuiElement(TypeNoDistQueryListHook_RouteBtn));
+
+  m_mapCenterFocusBtn.SetCenterElement(GetGuiElement(TypeNoDistQueryListHook_MapCenterFocusBtn));
+  m_curPosFocusBtn.SetCenterElement(GetGuiElement(TypeNoDistQueryListHook_CurPosFocusBtn));
+  m_endPointFocusBtn.SetCenterElement(GetGuiElement(TypeNoDistQueryListHook_EndPointFocusBtn));
+  m_routeFocusBtn.SetCenterElement(GetGuiElement(TypeNoDistQueryListHook_RouteFocusBtn));
 
   m_typeSelectBtn.SetCenterElement(GetGuiElement(TypeNoDistQueryListHook_TypeSelectBtn));
   m_typeSelectBtn.SetIconElement(GetGuiElement(TypeNoDistQueryListHook_TypeSelectBtnIcon));
@@ -144,6 +159,30 @@ short CTypeNoDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_routeBtn.MouseDown();
       AddRenderUiControls(&m_routeBtn);
+    }
+    break;
+  case TypeNoDistQueryListHook_MapCenterFocusBtn:
+    {
+      m_mapCenterFocusBtn.MouseDown();
+      AddRenderUiControls(&m_mapCenterFocusBtn);
+    }
+    break;
+  case TypeNoDistQueryListHook_CurPosFocusBtn:
+    {
+      m_curPosFocusBtn.MouseDown();
+      AddRenderUiControls(&m_curPosFocusBtn);
+    }
+    break;
+  case TypeNoDistQueryListHook_EndPointFocusBtn:
+    {
+      m_endPointFocusBtn.MouseDown();
+      AddRenderUiControls(&m_endPointFocusBtn);
+    }
+    break;
+  case TypeNoDistQueryListHook_RouteFocusBtn:
+    {
+      m_routeFocusBtn.MouseDown();
+      AddRenderUiControls(&m_routeFocusBtn);
     }
     break;
   case TypeNoDistQueryListHook_TypeSelectBtn:
@@ -215,6 +254,7 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_mapCenterBtn.IsEnable())
       {
         m_queryType = RoundQueryType::MapCenter;
+        SetFocusBtn();
         SearchForResult();
       }
     }
@@ -225,6 +265,7 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_curPosBtn.IsEnable())
       {
         m_queryType = RoundQueryType::CurPos;
+        SetFocusBtn();
         SearchForResult();
       }
     }
@@ -235,6 +276,7 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_endPointBtn.IsEnable())
       {
         m_queryType = RoundQueryType::EndPoint;
+        SetFocusBtn();
         SearchForResult();
       }
     }
@@ -245,8 +287,29 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_routeBtn.IsEnable())
       {
         m_queryType = RoundQueryType::Route;
+        SetFocusBtn();
         SearchForResult();
       }
+    }
+    break;
+  case TypeNoDistQueryListHook_MapCenterFocusBtn:
+    {
+      m_mapCenterFocusBtn.MouseUp();
+    }
+    break;
+  case TypeNoDistQueryListHook_CurPosFocusBtn:
+    {
+      m_curPosFocusBtn.MouseUp();
+    }
+    break;
+  case TypeNoDistQueryListHook_EndPointFocusBtn:
+    {
+      m_endPointFocusBtn.MouseUp();
+    }
+    break;
+  case TypeNoDistQueryListHook_RouteFocusBtn:
+    {
+      m_routeFocusBtn.MouseUp();
     }
     break;
   case TypeNoDistQueryListHook_TypeSelectBtn:
@@ -254,7 +317,7 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
   case TypeNoDistQueryListHook_TypeSelectBtnLabel:
     {
       m_typeSelectBtn.MouseUp();
-      //CAggHook::TurnTo(DHT_TypeNoDistSelectionHook);
+      CAggHook::TurnTo(DHT_TypeNoDistSelectionHook);
     }
     break;
   case TypeNoDistQueryListHook_RadiusSelectBtn:
@@ -312,6 +375,30 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
   }
   m_isNeedRefesh = true;
   return ctrlType;
+}
+
+void CTypeNoDistQueryListHook::SetFocusBtn()
+{
+  m_mapCenterFocusBtn.SetVisible(false);
+  m_curPosFocusBtn.SetVisible(false);
+  m_routeFocusBtn.SetVisible(false);
+  m_endPointFocusBtn.SetVisible(false);
+
+  switch (m_queryType)
+  {
+  case MapCenter:
+    m_mapCenterFocusBtn.SetVisible(true);
+    break;
+  case CurPos:
+    m_curPosFocusBtn.SetVisible(true);
+    break;
+  case Route:
+    m_routeFocusBtn.SetVisible(true);
+    break;
+  case EndPoint:
+    m_endPointFocusBtn.SetVisible(true);
+    break;
+  }
 }
 
 void CTypeNoDistQueryListHook::SearchForResult()

@@ -302,10 +302,10 @@ short CTypeInDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_subInfoBtn[listIndex].IsEnable())
       {
         int index = listIndex + m_subPageController.GetPageStartPosition() - 1;
-        m_pCurItemCtrl->GetLeve3Item(m_vecSubListItem[index].m_uCode,m_vecQueryListItem);
-        //暂时处理
-        TCodeEntry item = *(m_pCurItemCtrl->GetItemByCode(m_vecQueryListItem[1].m_uCode));
-        CQueryWrapper::Get().SetQueryKindInfo(item);
+        //m_pCurItemCtrl->GetLeve3Item(m_vecSubListItem[index].m_uCode,m_vecQueryListItem);
+        ////暂时处理
+        //TCodeEntry item = *(m_pCurItemCtrl->GetItemByCode(m_vecQueryListItem[1].m_uCode));
+        CQueryWrapper::Get().SetQueryKindInfo(m_vecSubListItem[index]);
 
         CAggHook::TurnTo(DHT_TypeInDistQueryListHook);
       }

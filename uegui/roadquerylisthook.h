@@ -107,6 +107,7 @@ namespace UeGui
     CUiButton m_poiBtn;
     CUiButton m_routeBtn;
     CUiBitButton m_infoBtn[4];
+    CUiLabel m_poiLabel[4];
     CUiButton m_crossBtn[4];
     CUiLabel m_AddrLabel[4];
     CUiButton m_interval[4];

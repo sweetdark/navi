@@ -379,7 +379,7 @@ namespace UeQuery
       }
       return bIsSame;
 		}
-    //线路上的点数(起点、终点、经由点的数目,最多5个)
+    //线路上的点数
     long m_routePosCnt;
     HistoryRecordEntry m_routePos[MAXROUTEPOSCNT];
 		//

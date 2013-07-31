@@ -117,6 +117,7 @@ namespace UeQuery
 		//设置所需要的结果索引/编号，填充名称
 		virtual bool GetEntryName(long docIdx,long nameLen,char *pchNameBuffer);
 	private:
+    void LoadRoadName(map<string,long> &roadNameMap);
 		#pragma pack(1)
 		struct TIndexHead
 		{

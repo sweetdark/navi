@@ -33,6 +33,10 @@ namespace UeGui
       TypeNoDistQueryListHook_CurPosBtn,
       TypeNoDistQueryListHook_EndPointBtn,
       TypeNoDistQueryListHook_RouteBtn,
+      TypeNoDistQueryListHook_MapCenterFocusBtn,
+      TypeNoDistQueryListHook_CurPosFocusBtn,
+      TypeNoDistQueryListHook_EndPointFocusBtn,
+      TypeNoDistQueryListHook_RouteFocusBtn,
       TypeNoDistQueryListHook_Bar,
 
       TypeNoDistQueryListHook_List1Btn,
@@ -95,6 +99,8 @@ namespace UeGui
 
     void MakeControls();
 
+    void SetFocusBtn();
+
     void SearchForResult();
 
     void ResetResultList();
@@ -104,6 +110,11 @@ namespace UeGui
     CUiButton m_curPosBtn;
     CUiButton m_endPointBtn;
     CUiButton m_routeBtn;
+
+    CUiButton m_mapCenterFocusBtn;
+    CUiButton m_curPosFocusBtn;
+    CUiButton m_endPointFocusBtn;
+    CUiButton m_routeFocusBtn;
 
     CUiBitButton m_typeSelectBtn;
     CUiBitButton m_radiusSelectBtn;

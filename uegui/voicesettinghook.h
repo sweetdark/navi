@@ -26,62 +26,25 @@ namespace UeGui
 
   class UEGUI_CLASS CVoiceSettingHook : public CAggHook
   {
+    friend class CSystemLeftHook;
+
+    CVoiceSettingHook();
+
+    virtual ~CVoiceSettingHook();
   public:
     enum VoiceSettingHookCtrlType
     {
       VoiceSettingHook_Begin = 0,
-      VoiceSettingHook_BackButton,
-      VoiceSettingHook_GotoMapBtn,
-      VoiceSettingHook_BackGround,
-      VoiceSettingHook_BackGroundText,
-      VoiceSettingHook_PromptToneText,
-      VoiceSettingHook_VolumeIcon,
-      VoiceSettingHook_VolumeText,
-
-      VoiceSettingHook_DynamicVolumeCtrlCenter,
-      VoiceSettingHook_DynamicVolumeCtrlIcon,
-      VoiceSettingHook_DynamicVolumeCtrlLeft,
-      VoiceSettingHook_DynamicVolumeCtrlRight,
-
-      VoiceSettingHook_KeytoneCtrlCenter,
-      VoiceSettingHook_KeytoneCtrlIcon,
-      VoiceSettingHook_KeytoneCtrlLeft,
-      VoiceSettingHook_KeytoneCtrlRight,
-
-      VoiceSettingHook_SilenceCtrlCenter,
-      VoiceSettingHook_SilenceCtrlIcon,
-      VoiceSettingHook_SilenceCtrlLeft,
-      VoiceSettingHook_SilenceCtrlRight,
-
-      VoiceSettingHook_VolumeFiveCtrlDown,
-      VoiceSettingHook_VolumeFiveCtrlUp,
-      VoiceSettingHook_VolumeFourCtrlDown,
-      VoiceSettingHook_VolumeFourCtrlUp,
-      VoiceSettingHook_VolumeOneCtrlDown,
-      VoiceSettingHook_VolumeOneCtrlUp,
-      VoiceSettingHook_VolumeSevenCtrlDown,
-      VoiceSettingHook_VolumeSevenCtrlUp,
-      VoiceSettingHook_VolumeSixCtrlDown,
-      VoiceSettingHook_VolumeSixCtrlUp,    
-      VoiceSettingHook_VolumeThreeCtrlDown,
-      VoiceSettingHook_VolumeThreeCtrlUp,
-      VoiceSettingHook_VolumeTwoCtrlDown,
-      VoiceSettingHook_VolumeTwoCtrlUp,
-
-      VoiceSettingHook_AuditionCtrlCenter,
-      VoiceSettingHook_AuditionCtrlLeft,
-      VoiceSettingHook_AuditionCtrlRight,
-
-      VoiceSettingHook_DialectCtrlCenter,
-
-      VoiceSettingHook_DialectCtrlLeft,
-      VoiceSettingHook_DialectCtrlLeftCenter,
-      VoiceSettingHook_DialectCtrlLeftCenterIcon,
-
-      VoiceSettingHook_DialectCtrlRight,
-      VoiceSettingHook_DialectCtrlRightCenter,
-      VoiceSettingHook_DialectCtrlRightCenterIcon,
-
+      VoiceSettingHook_Voicelabel,
+      VoiceSettingHook_DynamicVoiceBtn,
+      VoiceSettingHook_DynamicVoiceLabel,
+      VoiceSettingHook_DynamicVoiceIcon,
+      VoiceSettingHook_TestListenBtn,
+      VoiceSettingHook_VoiceLeftBtn,
+      VoiceSettingHook_VoiceLeftIcon,
+      VoiceSettingHook_VoiceRightBtn,
+      VoiceSettingHook_VoiceRightIcon,
+      VoiceSettingHook_VoiceCenterBtn,
       VoiceSettingHook_End
     };
 
@@ -98,10 +61,6 @@ namespace UeGui
     typedef DialectMap::iterator DialectMap_itr;
     typedef DialectMap::const_iterator DialectMap_citr;
 
-    CVoiceSettingHook();
-
-    virtual ~CVoiceSettingHook();
-
     virtual void MakeGUI();
 
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
@@ -110,7 +69,7 @@ namespace UeGui
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual void Load();
+    //virtual void Load();
 
     virtual bool operator ()();
 
@@ -136,25 +95,13 @@ namespace UeGui
     void SetControls(bool isEnable);//控件的是否可用
 
   private:
-    CUiButton m_gotoMapBtnCtrl;
-    CUiButton m_backButtonCtrl;
-    CUiButton m_volumeIconCtrl;
-    CUiButton m_volume1Ctrl;
-    CUiButton m_volume2Ctrl;
-    CUiButton m_volume3Ctrl;
-    CUiButton m_volume4Ctrl;
-    CUiButton m_volume5Ctrl;
-    CUiButton m_volume6Ctrl;
-    CUiButton m_volume7Ctrl;
-    CUiButton m_auditionCtrl;
-    CUiButton m_dialectCtrl;
-    CUiButton m_dialectCtrlLeft;
-    CUiButton m_dialectCtrlRight;
-    CUiButton m_keytoneBtn;
-    CUiButton m_dynamicVolumeBtn;
-    CUiCheckButton m_silenceBtn;
-    CUiCheckButton m_keytoneCheckBtn;
-    CUiCheckButton m_dynamicVolumeCheckBtn;
+    CUiLabel m_voiceLabelCtrl;
+    CUiBitButton m_dynamicVoiceCtrl;
+    CUiLabel m_dynamicVoiceLabelCtrl;
+    CUiBitButton m_testListenCtrl;
+    CUiBitButton m_voiceLeftCtrl;
+    CUiBitButton m_voiceRightCtrl;
+    CUiBitButton m_voiceCenterCtrl;
 
   private:
     DialectMap m_dialectMap;//方言

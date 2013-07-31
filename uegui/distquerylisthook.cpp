@@ -8,6 +8,10 @@
 #include "querywrapper.h"
 #endif
 
+#ifndef _UEQUERY_TERMINDEXCTRL_H
+#include "uequery/termindexctrl.h"
+#endif
+
 #ifndef _UEGUI_MAPHOOK_H
 #include "maphook.h"
 #endif
@@ -16,7 +20,7 @@ using namespace UeGui;
 
 CDistQueryListHook::CDistQueryListHook()
 {
-  m_strTitle = "";
+  m_strTitle = "请选择一条记录";
   m_vecHookFile.push_back(_T("distquerylisthook.bin"));
 }
 
@@ -98,8 +102,9 @@ void CDistQueryListHook::MakeControls()
   for (int i=0, j=DistQueryListHook_List1Btn; i<7; i++)
   {
     m_infoBtn[i].SetCenterElement(GetGuiElement(j++));
-    m_infoBtn[i].SetLabelElement(GetGuiElement(j++));
+    m_distLabel[i].SetLabelElement(GetGuiElement(j++));
     m_infoBtn[i].SetIconElement(GetGuiElement(j++));
+    m_distLabel[i].SetParent(this);
   }
 
   for (int i=0, j=DistQueryListHook_List1DistBtn; i<7; i++)
@@ -132,7 +137,8 @@ short CDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       int listIndex = (ctrlType-DistQueryListHook_List1Btn)/3;
       m_infoBtn[listIndex].MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_infoBtn[listIndex], m_distBtn[listIndex]);
+      m_distLabel[listIndex].MouseDown();
+      MOUSEDONW_3RENDERCTRL(m_infoBtn[listIndex], m_distLabel[listIndex], m_distBtn[listIndex]);
     } 
     else if (ctrlType >= DistQueryListHook_List1DistBtn && ctrlType <= DistQueryListHook_List7DistBtn)
     {
@@ -192,6 +198,7 @@ short CDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       int listIndex = (ctrlType-DistQueryListHook_List1Btn)/3;
       m_infoBtn[listIndex].MouseUp();
+      m_distLabel[listIndex].MouseUp();
       if (m_infoBtn[listIndex].IsEnable())
       {
         CAggHook::TurnTo(DHT_MapHook);
@@ -265,6 +272,8 @@ void CDistQueryListHook::SearchForResult(const char* keyword)
 
 void CDistQueryListHook::ResetResultList()
 {
+  unsigned char posBuffer[40];
+  
   SQLRecord *oneRecord(0);
   m_pointList.clear();
   for (int i=0; i<7; ++i)
@@ -272,12 +281,16 @@ void CDistQueryListHook::ResetResultList()
     if ((oneRecord = m_records.GetRecord(i))==0)
     {
       m_infoBtn[i].SetEnable(false);
-      m_infoBtn[i].SetCaption("");
+      m_distLabel[i].SetCaption("");
       m_distBtn[i].SetVisible(false);
+      posBuffer[0] = 0xff;
       continue;
     }
     m_infoBtn[i].SetEnable(true);
-    m_infoBtn[i].SetCaption(oneRecord->m_uniName);
+    m_distLabel[i].SetCaption(oneRecord->m_uniName);
+    SQLSentence sql = CQueryWrapper::Get().GetSQLSentence();
+    UeQuery::CTermIndexCtrl::GetKeyWordPosInRecord(oneRecord->m_uniName, sql, posBuffer);
+    m_distLabel[i].SetFocusKey(posBuffer);
     m_distBtn[i].SetVisible(true);
 
     if (!(oneRecord->m_addrCode&0x00ffff))

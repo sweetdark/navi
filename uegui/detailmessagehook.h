@@ -5,6 +5,11 @@
 #include "uegui.h"
 #endif
 
+#ifndef __Q_CODE_H__
+#include "QCode.h"
+#pragma comment(lib, "QCode.lib")
+#endif
+
 #include "userdatawrapper.h"
 #include "menubackgroundhook.h"
 #include "guibasic.h"
@@ -16,6 +21,7 @@ namespace UeGui
   class UEGUI_CLASS CDetailMessageHook : public CMenuBackgroundHook
   {
   public:
+    const static int QCODE_LENGTH = 9;
     enum DetailMessageHookCtrlType
     {
       DetailMessageHook_Begin = MenuBackgroundHook_End,
@@ -37,17 +43,7 @@ namespace UeGui
       DetailMessageHook_AddressBook,
       DetailMessageHook_End
     };
-    enum CommonPointType
-    {
-      CT_None = 0,
-      CT_HOME,
-      CT_COMPANY,
-      CT_POINTONE,
-      CT_POINTTWO,
-      CT_POINTTHREE,
-      CT_End,
-    };
-
+    
     CDetailMessageHook();
 
     virtual ~CDetailMessageHook();
@@ -72,6 +68,19 @@ namespace UeGui
     * \brief 设置数据
     **/
     void SetDetailInfoData(const DetailInfo& data);
+  public:
+    /**
+    * \brief 常用点保存回调函数
+    **/
+    static void OnSaveUsuallyRecord(CAggHook* sender, ModalResultType modalResult);
+    /**
+    * \brief 保存常用点数据
+    **/
+    int SaveUsuallyRecord(UsuallyRecordType type);
+    /**
+    * \brief 读取要保存的常用点类型
+    **/
+    UsuallyRecordType GetUsuallyRecordType();
   protected:
 
     virtual void MakeNames();
@@ -82,7 +91,9 @@ namespace UeGui
     //保存数据到地址簿
     void SaveToAddressBook();
     //保存到常用点
-    void SaveToCommonPoint(short pointType);
+    void SaveToUsuallyRecord(UsuallyRecordType type);
+    //读取提示消息
+    const char* GetUsuallyRecordMsgInfo(UsuallyRecordType type);
     //设为开机位置
     void SaveToSysStartPosition();
   private:
@@ -100,9 +111,12 @@ namespace UeGui
     CUiButton m_bootPositionBtn;
     //详情信息
     DetailInfo m_detailInfo;
+    //Q码
+    unsigned short m_QCode[QCODE_LENGTH];
     //用户数据接口
     const CUserDataWrapper& m_userDataWrapper;
-    //CUsuallyFile m_cFile;
+    //要保存的常用点类型
+    UsuallyRecordType m_saveUsuallyRecordType;
   };
 }
 #endif

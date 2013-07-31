@@ -95,6 +95,7 @@ namespace UeGui
   private:
     CUiBitButton m_infoBtn[7];
     CUiButton m_distBtn[7];
+    CUiLabel m_distLabel[7];
 
     CUiBitButton m_pageUpBtn;
     CUiBitButton m_pageDownBtn;

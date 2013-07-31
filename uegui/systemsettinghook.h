@@ -16,6 +16,7 @@ namespace UeGui
 {
   class CSystemLeftHook;
   class CNavigationLeftHook;
+  class CVersionInfoHook;
 
   class UEGUI_CLASS CSystemSettingHook : public CMenuBackgroundHook
   {
@@ -62,13 +63,13 @@ namespace UeGui
 
   private:
     CSystemLeftHook *m_systemLeftSide;
-
     CNavigationLeftHook *m_navigationLeftSide;
+    CVersionInfoHook* m_versionInfo;
 
   private:
     CUiButton m_initBtnCtrl;
     CUiButton m_labelBackroundCtrl;
-    CUiButton m_navigationBtnCtrl;
+    CUiBitButton m_navigationBtnCtrl;
     CUiButton m_separator1Ctrl;
     CUiButton m_separator2Ctrl;
     CUiButton m_systemBtnCtrl;

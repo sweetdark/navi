@@ -1,4 +1,5 @@
 #include "mapsettinghook.h"
+#include "guisetting.h"
 using namespace UeGui;
 
 CMapSettingHook::CMapSettingHook()
@@ -61,40 +62,26 @@ short CMapSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
   {
   case mapsettinghook_AutoModeBtn:
   case mapsettinghook_AutoModeBtnIcon:
-    {
-      m_autoModeBtnCtrl.MouseDown();
-    }
-    break;
   case mapsettinghook_AutoModeLable:
     {
-      m_autoModeLableCtrl.MouseDown();
+      m_autoModeBtnCtrl.MouseDown();
+      AddRenderUiControls(&m_autoModeBtnCtrl);
     }
     break;
   case mapsettinghook_DayModeBtn:
   case mapsettinghook_DayModeBtnIcon:
-    {
-      m_dayModeBtnCtrl.MouseDown();
-    }
-    break;
   case mapsettinghook_DayModeLable:
     {
-      m_dayModeLableCtrl.MouseDown();
-    }
-    break;
-  case mapsettinghook_MapModeLable:
-    {
-      m_mapModeLableCtrl.MouseDown();
+      m_dayModeBtnCtrl.MouseDown();
+      AddRenderUiControls(&m_dayModeBtnCtrl);
     }
     break;
   case mapsettinghook_NightModeBtn:
   case mapsettinghook_NightModeBtnIcon:
-    {
-      m_nightModeBtnCtrl.MouseDown();
-    }
-    break;
   case mapsettinghook_NigthModeLable:
     {
-      m_nigthModeLableCtrl.MouseDown();
+      m_nightModeBtnCtrl.MouseDown();
+      AddRenderUiControls(&m_nightModeBtnCtrl);
     }
     break;
   default:
@@ -102,7 +89,6 @@ short CMapSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
     assert(false);
     break;
   }
-
   if (m_isNeedRefesh)
   {
     Refresh();
@@ -123,40 +109,41 @@ short CMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
   {
   case mapsettinghook_AutoModeBtn:
   case mapsettinghook_AutoModeBtnIcon:
-    {
-      m_autoModeBtnCtrl.MouseUp();
-    }
-    break;
   case mapsettinghook_AutoModeLable:
     {
-      m_autoModeLableCtrl.MouseUp();
+      m_autoModeBtnCtrl.MouseUp();
+      if (ctrlType ==m_downElementType)
+      {
+        m_dayModeBtnCtrl.SetCheck(false);
+        m_nightModeBtnCtrl.SetCheck(false);
+        UpdateSettings();
+      }
     }
     break;
   case mapsettinghook_DayModeBtn:
   case mapsettinghook_DayModeBtnIcon:
-    {
-      m_dayModeBtnCtrl.MouseUp();
-    }
-    break;
   case mapsettinghook_DayModeLable:
     {
-      m_dayModeLableCtrl.MouseUp();
-    }
-    break;
-  case mapsettinghook_MapModeLable:
-    {
-      m_mapModeLableCtrl.MouseUp();
+      m_dayModeBtnCtrl.MouseUp();
+      if (ctrlType ==m_downElementType)
+      {
+        m_autoModeBtnCtrl.SetCheck(false);
+        m_nightModeBtnCtrl.SetCheck(false);
+        UpdateSettings();
+      }
     }
     break;
   case mapsettinghook_NightModeBtn:
   case mapsettinghook_NightModeBtnIcon:
-    {
-      m_nightModeBtnCtrl.MouseUp();
-    }
-    break;
   case mapsettinghook_NigthModeLable:
     {
-      m_nigthModeLableCtrl.MouseUp();
+      m_nightModeBtnCtrl.MouseUp();
+      if (ctrlType ==m_downElementType)
+      {
+        m_autoModeBtnCtrl.SetCheck(false);
+        m_dayModeBtnCtrl.SetCheck(false);
+        UpdateSettings();
+      }
     }
     break;
   default:
@@ -177,4 +164,49 @@ bool CMapSettingHook::operator ()()
 {
   return false;
 }
-
+void CMapSettingHook::ReadSetting()
+{
+  CGuiSettings* ueSettings = CGuiSettings::GetGuiSettings();
+  if (ueSettings)
+  {  
+    /// 设置地图模式
+    if (ueSettings->GetMapModel() == ViewSettings::MM_Atuo)
+    {
+      m_dayModeBtnCtrl.SetCheck(false);
+      m_nightModeBtnCtrl.SetCheck(false);
+      m_autoModeBtnCtrl.SetCheck(true);
+    }
+    else if(ueSettings->GetMapModel() == ViewSettings::MM_DayTime)
+    {
+      m_dayModeBtnCtrl.SetCheck(true);
+      m_nightModeBtnCtrl.SetCheck(false);
+      m_autoModeBtnCtrl.SetCheck(false);
+    }
+    else if(ueSettings->GetMapModel() == ViewSettings::MM_Night)
+   {
+      m_dayModeBtnCtrl.SetCheck(false);
+      m_nightModeBtnCtrl.SetCheck(true);
+      m_autoModeBtnCtrl.SetCheck(false);
+    }
+  }
+}
+void CMapSettingHook::UpdateSettings()
+{
+  CGuiSettings* ueSettings = CGuiSettings::GetGuiSettings();
+  if (ueSettings)
+  {  
+    /// 设置地图模式
+    if (m_dayModeBtnCtrl.Checked())
+    {
+      ueSettings->SetMapModel(ViewSettings::MM_DayTime);
+    }
+    if (m_nightModeBtnCtrl.Checked())
+    {
+      ueSettings->SetMapModel(ViewSettings::MM_Night);
+    }
+    if (m_autoModeBtnCtrl.Checked())
+    {
+      ueSettings->SetMapModel(ViewSettings::MM_Atuo);
+    }
+  }
+}

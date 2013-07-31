@@ -6,6 +6,7 @@ using namespace UeGui;
 
 CCarSettingHook::CCarSettingHook()
 {
+  MakeGUI();
 }
 
 CCarSettingHook::~CCarSettingHook()
@@ -30,10 +31,6 @@ tstring CCarSettingHook::GetBinaryFileName()
 void CCarSettingHook::MakeNames()
 {
   m_ctrlNames.erase(m_ctrlNames.begin(), m_ctrlNames.end());
-  m_ctrlNames.insert(GuiName::value_type(CarSettingHook_CarSettingBackGround,	"CarSettingBackGround"));
-  m_ctrlNames.insert(GuiName::value_type(CarSettingHook_CarSettingText,	"CarSettingText"));
-  m_ctrlNames.insert(GuiName::value_type(CarSettingHook_GotoMapBtn,	"GotoMapBtn"));
-  m_ctrlNames.insert(GuiName::value_type(CarSettingHook_BackButton,	"BackButton"));
   m_ctrlNames.insert(GuiName::value_type(CarSettingHook_IconOne,	"IconOne"));
   m_ctrlNames.insert(GuiName::value_type(CarSettingHook_IconTwo,	"IconTwo"));
   m_ctrlNames.insert(GuiName::value_type(CarSettingHook_IconThree,	"IconThree"));
@@ -60,9 +57,6 @@ void CCarSettingHook::MakeNames()
 
 void CCarSettingHook::MakeControls()
 {
-  m_backButtonCtrl.SetCenterElement(GetGuiElement(CarSettingHook_BackButton));
-  m_gotoMapBtnCtrl.SetCenterElement(GetGuiElement(CarSettingHook_GotoMapBtn));
-
   m_rCarIcon1.SetCenterElement(GetGuiElement(CarSettingHook_IconOne));
   m_rCarIcon1.SetIconElement(GetGuiElement(CarSettingHook_IconOnePick));
   m_rCarIcon2.SetCenterElement(GetGuiElement(CarSettingHook_IconTwo));
@@ -85,80 +79,70 @@ void CCarSettingHook::MakeControls()
   m_rCarIcon10.SetIconElement(GetGuiElement(CarSettingHook_IconTenPick));
 }
 
-void CCarSettingHook::Load()
-{
-  CGuiSettings* ueSetting = CGuiSettings::GetGuiSettings();
-  if(ueSetting)
-  {    
-    ClearSelection();
-    selected_CarIcon = static_cast<unsigned short>(ueSetting->GetCarIcon());
-    if (selected_CarIcon == GetCarIcon(m_rCarIcon1.GetCenterElement()))
-    {
-      m_3dCarIcon = m_rCarIcon1.GetCenterElement()->m_bkDisabled;
-      m_rCarIcon1.SetCheck(true);
-    } 
-    else if (selected_CarIcon == GetCarIcon(m_rCarIcon2.GetCenterElement()))
-    {
-      m_3dCarIcon = m_rCarIcon2.GetCenterElement()->m_bkDisabled;
-      m_rCarIcon2.SetCheck(true);
-    }
-    else if (selected_CarIcon == GetCarIcon(m_rCarIcon3.GetCenterElement()))
-    {
-      m_3dCarIcon = m_rCarIcon3.GetCenterElement()->m_bkDisabled;
-      m_rCarIcon3.SetCheck(true);
-    }
-    else if (selected_CarIcon == GetCarIcon(m_rCarIcon4.GetCenterElement()))
-    {
-      m_3dCarIcon = m_rCarIcon4.GetCenterElement()->m_bkDisabled;
-      m_rCarIcon4.SetCheck(true);
-    }
-    else if (selected_CarIcon == GetCarIcon(m_rCarIcon5.GetCenterElement()))
-    {
-      m_3dCarIcon = m_rCarIcon5.GetCenterElement()->m_bkDisabled;
-      m_rCarIcon5.SetCheck(true);
-    }
-    else if (selected_CarIcon == GetCarIcon(m_rCarIcon6.GetCenterElement()))
-    {
-      m_3dCarIcon = m_rCarIcon6.GetCenterElement()->m_bkDisabled;
-      m_rCarIcon6.SetCheck(true);
-    }
-    else if (selected_CarIcon == GetCarIcon(m_rCarIcon7.GetCenterElement()))
-    {
-      m_3dCarIcon = m_rCarIcon7.GetCenterElement()->m_bkDisabled;
-      m_rCarIcon7.SetCheck(true);
-    }
-    else if (selected_CarIcon == GetCarIcon(m_rCarIcon8.GetCenterElement()))
-    {
-      m_3dCarIcon = m_rCarIcon8.GetCenterElement()->m_bkDisabled;
-      m_rCarIcon8.SetCheck(true);
-    }
-    else if (selected_CarIcon == GetCarIcon(m_rCarIcon9.GetCenterElement()))
-    {
-      m_3dCarIcon = m_rCarIcon9.GetCenterElement()->m_bkDisabled;
-      m_rCarIcon9.SetCheck(true);
-    }
-    else if (selected_CarIcon == GetCarIcon(m_rCarIcon10.GetCenterElement()))
-    {
-      m_3dCarIcon = m_rCarIcon10.GetCenterElement()->m_bkDisabled;
-      m_rCarIcon10.SetCheck(true);
-    }
-  }
-}
+//void CCarSettingHook::Load()
+//{
+//  CGuiSettings* ueSetting = CGuiSettings::GetGuiSettings();
+//  if(ueSetting)
+//  {    
+//    ClearSelection();
+//    selected_CarIcon = static_cast<unsigned short>(ueSetting->GetCarIcon());
+//    if (selected_CarIcon == GetCarIcon(m_rCarIcon1.GetCenterElement()))
+//    {
+//      m_3dCarIcon = m_rCarIcon1.GetCenterElement()->m_bkDisabled;
+//      m_rCarIcon1.SetCheck(true);
+//    } 
+//    else if (selected_CarIcon == GetCarIcon(m_rCarIcon2.GetCenterElement()))
+//    {
+//      m_3dCarIcon = m_rCarIcon2.GetCenterElement()->m_bkDisabled;
+//      m_rCarIcon2.SetCheck(true);
+//    }
+//    else if (selected_CarIcon == GetCarIcon(m_rCarIcon3.GetCenterElement()))
+//    {
+//      m_3dCarIcon = m_rCarIcon3.GetCenterElement()->m_bkDisabled;
+//      m_rCarIcon3.SetCheck(true);
+//    }
+//    else if (selected_CarIcon == GetCarIcon(m_rCarIcon4.GetCenterElement()))
+//    {
+//      m_3dCarIcon = m_rCarIcon4.GetCenterElement()->m_bkDisabled;
+//      m_rCarIcon4.SetCheck(true);
+//    }
+//    else if (selected_CarIcon == GetCarIcon(m_rCarIcon5.GetCenterElement()))
+//    {
+//      m_3dCarIcon = m_rCarIcon5.GetCenterElement()->m_bkDisabled;
+//      m_rCarIcon5.SetCheck(true);
+//    }
+//    else if (selected_CarIcon == GetCarIcon(m_rCarIcon6.GetCenterElement()))
+//    {
+//      m_3dCarIcon = m_rCarIcon6.GetCenterElement()->m_bkDisabled;
+//      m_rCarIcon6.SetCheck(true);
+//    }
+//    else if (selected_CarIcon == GetCarIcon(m_rCarIcon7.GetCenterElement()))
+//    {
+//      m_3dCarIcon = m_rCarIcon7.GetCenterElement()->m_bkDisabled;
+//      m_rCarIcon7.SetCheck(true);
+//    }
+//    else if (selected_CarIcon == GetCarIcon(m_rCarIcon8.GetCenterElement()))
+//    {
+//      m_3dCarIcon = m_rCarIcon8.GetCenterElement()->m_bkDisabled;
+//      m_rCarIcon8.SetCheck(true);
+//    }
+//    else if (selected_CarIcon == GetCarIcon(m_rCarIcon9.GetCenterElement()))
+//    {
+//      m_3dCarIcon = m_rCarIcon9.GetCenterElement()->m_bkDisabled;
+//      m_rCarIcon9.SetCheck(true);
+//    }
+//    else if (selected_CarIcon == GetCarIcon(m_rCarIcon10.GetCenterElement()))
+//    {
+//      m_3dCarIcon = m_rCarIcon10.GetCenterElement()->m_bkDisabled;
+//      m_rCarIcon10.SetCheck(true);
+//    }
+//  }
+//}
 short CCarSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
 {
   short ctrlType = CAggHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
-  case CarSettingHook_BackButton:
-    {
-      m_backButtonCtrl.MouseDown();
-    }
-    break;
-  case CarSettingHook_GotoMapBtn:
-    {
-      m_gotoMapBtnCtrl.MouseDown();
-    }
-    break;
   case CarSettingHook_IconEight:
   case CarSettingHook_IconEightPick:
     {
@@ -242,31 +226,6 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
-  case CarSettingHook_BackButton:
-    {
-      if(ctrlType == m_downElementType)
-      {
-        /*CViewHook::m_prevHookType = CViewHook::DHT_VoiceSettingHook;
-        CViewHook::m_curHookType = CViewHook::DHT_SystemSettingHook;*/
-        CAggHook::Return();
-        SaveSetting();
-      }
-      m_backButtonCtrl.MouseUp();
-    }
-    break;
-  case CarSettingHook_GotoMapBtn:
-    {
-      if(ctrlType == m_downElementType)
-      {
-        /*CViewHook::m_prevHookType=CViewHook::m_curHookType;
-        CViewHook::m_curHookType=CViewHook::DHT_MapHook;*/
-        CAggHook::GoToMapHook();
-        ((CAggHook *)m_view->GetHook(CViewHook::DHT_MapHook))->ComeBack();
-        SaveSetting();
-      }
-      m_gotoMapBtnCtrl.MouseUp();
-    }
-    break;
   case CarSettingHook_IconEight:
   case CarSettingHook_IconEightPick:
     {
@@ -411,5 +370,64 @@ unsigned short UeGui::CCarSettingHook::GetCarIcon( GuiElement* carElement )
   else
   {
     return 0;
+  }
+}
+void CCarSettingHook::ReadSetting()
+{
+  CGuiSettings* ueSetting = CGuiSettings::GetGuiSettings();
+  if(ueSetting)
+  {    
+    ClearSelection();
+    selected_CarIcon = static_cast<unsigned short>(ueSetting->GetCarIcon());
+    if (selected_CarIcon == GetCarIcon(m_rCarIcon1.GetCenterElement()))
+    {
+      m_3dCarIcon = Default3DCarIcon;
+      m_rCarIcon1.SetCheck(true);
+    } 
+    else if (selected_CarIcon == GetCarIcon(m_rCarIcon2.GetCenterElement()))
+    {
+      m_3dCarIcon = Default3DCarIcon + 1;
+      m_rCarIcon2.SetCheck(true);
+    }
+    else if (selected_CarIcon == GetCarIcon(m_rCarIcon3.GetCenterElement()))
+    {
+      m_3dCarIcon = Default3DCarIcon + 2;
+      m_rCarIcon3.SetCheck(true);
+    }
+    else if (selected_CarIcon == GetCarIcon(m_rCarIcon4.GetCenterElement()))
+    {
+      m_3dCarIcon = Default3DCarIcon + 3;
+      m_rCarIcon4.SetCheck(true);
+    }
+    else if (selected_CarIcon == GetCarIcon(m_rCarIcon5.GetCenterElement()))
+    {
+      m_3dCarIcon = Default3DCarIcon + 4;
+      m_rCarIcon5.SetCheck(true);
+    }
+    else if (selected_CarIcon == GetCarIcon(m_rCarIcon6.GetCenterElement()))
+    {
+      m_3dCarIcon = Default3DCarIcon + 5;
+      m_rCarIcon6.SetCheck(true);
+    }
+    else if (selected_CarIcon == GetCarIcon(m_rCarIcon7.GetCenterElement()))
+    {
+      m_3dCarIcon = Default3DCarIcon + 6;
+      m_rCarIcon7.SetCheck(true);
+    }
+    else if (selected_CarIcon == GetCarIcon(m_rCarIcon8.GetCenterElement()))
+    {
+      m_3dCarIcon = Default3DCarIcon + 7;
+      m_rCarIcon8.SetCheck(true);
+    }
+    else if (selected_CarIcon == GetCarIcon(m_rCarIcon9.GetCenterElement()))
+    {
+      m_3dCarIcon = Default3DCarIcon + 8;
+      m_rCarIcon9.SetCheck(true);
+    }
+    else if (selected_CarIcon == GetCarIcon(m_rCarIcon10.GetCenterElement()))
+    {
+      m_3dCarIcon = Default3DCarIcon + 9;
+      m_rCarIcon10.SetCheck(true);
+    }
   }
 }

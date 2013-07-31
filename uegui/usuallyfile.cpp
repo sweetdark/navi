@@ -195,10 +195,10 @@ bool CUsuallyFile::IsUsuallyExist(UsuallyRecordType type)
   GetRecord(type, &record);
   if(record.IsValid())
   {
-    return false;
+    return true;
   }
   else
   {
-    return true;
+    return false;
   }
 }

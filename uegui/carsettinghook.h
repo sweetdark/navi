@@ -16,14 +16,15 @@ namespace UeGui
 {
   class UEGUI_CLASS CCarSettingHook : public CAggHook
   {
+    friend class CSystemLeftHook;
+  
+    CCarSettingHook();
+
+    virtual ~CCarSettingHook();
   public:
     enum CarSettingHookCtrlType
     {
       CarSettingHook_Begin = 0,
-      CarSettingHook_CarSettingBackGround,
-      CarSettingHook_CarSettingText,
-      CarSettingHook_GotoMapBtn,
-      CarSettingHook_BackButton,
       CarSettingHook_IconOne,
       CarSettingHook_IconTwo,
       CarSettingHook_IconThree,
@@ -49,9 +50,7 @@ namespace UeGui
       CarSettingHook_End
     };
 
-    CCarSettingHook();
-
-    virtual ~CCarSettingHook();
+    
 
     virtual void MakeGUI();
 
@@ -63,7 +62,7 @@ namespace UeGui
 
     virtual bool operator ()();
     
-    virtual void Load();
+    //virtual void Load();
 
   protected:
     virtual tstring GetBinaryFileName();
@@ -77,6 +76,8 @@ namespace UeGui
     unsigned short GetCarIcon(GuiElement* carElement);
     //±£¥Ê…Ë÷√
     void SaveSetting();
+
+    void ReadSetting();
   private:
     unsigned short selected_CarIcon;
     unsigned short m_3dCarIcon;
@@ -92,38 +93,18 @@ namespace UeGui
     CUiRadioButton m_rCarIcon9;
     CUiRadioButton m_rCarIcon10;
 
-    CUiButton m_backButtonCtrl;
-    CUiButton m_gotoMapBtnCtrl;
-
-    CUiButton m_iconEightCtrl;
-    CUiButton m_iconEightPickCtrl;
-
-    CUiButton m_iconFiveCtrl;
-    CUiButton m_iconFivePickCtrl;
-
-    CUiButton m_iconFourCtrl;
-    CUiButton m_iconFourPickCtrl;
-
-    CUiButton m_iconNineCtrl;
-    CUiButton m_iconNinePickCtrl;
-
-    CUiButton m_iconOneCtrl;
     CUiButton m_iconOnePickCtrl;
-
-    CUiButton m_iconSevenCtrl;
-    CUiButton m_iconSevenPickCtrl;
-
-    CUiButton m_iconSixCtrl;
-    CUiButton m_iconSixPickCtrl;
-
-    CUiButton m_iconTenCtrl;
-    CUiButton m_iconTenPickCtrl;
-
-    CUiButton m_iconThreeCtrl;
-    CUiButton m_iconThreePickCtrl;
-
-    CUiButton m_iconTwoCtrl;
     CUiButton m_iconTwoPickCtrl;
+    CUiButton m_iconThreePickCtrl;
+    CUiButton m_iconFourPickCtrl;
+    CUiButton m_iconFivePickCtrl;
+    CUiButton m_iconSixPickCtrl;
+    CUiButton m_iconSevenPickCtrl;
+    CUiButton m_iconEightPickCtrl;
+    CUiButton m_iconNinePickCtrl;  
+    CUiButton m_iconTenPickCtrl;
+    
+    
   };
 }
 #endif

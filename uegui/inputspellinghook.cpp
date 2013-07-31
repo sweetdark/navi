@@ -50,6 +50,7 @@ void CInputSpellingHook::Init()
 void CInputSpellingHook::Load()
 {
   m_curSpellingCursor = 0;
+  m_posBuffer[0] = 0xff;
   InitKeyBoard();
   SetCursorPosX(m_iCurCursorIndex);
 
@@ -151,7 +152,10 @@ void CInputSpellingHook::MakeControls()
     m_inputCode[i].SetCenterElement(GetGuiElement(j));
 
   for(int i=0, j=InputSpellingHook_AssociateBtn1; j<=InputSpellingHook_AssociateBtn6; i++, j++)
+  {
     m_associateBtn[i].SetCenterElement(GetGuiElement(j));
+    m_associateBtn[i].SetParent(this);
+  }
 
   m_pWordCursor = GetGuiElement(InputSpellingHook_WordSeparation);
 
@@ -322,6 +326,7 @@ short CInputSpellingHook::MouseUp(CGeoPoint<short> &scrPoint)
         if (m_curSpellingCursor != 0)
         {
           m_curSpellingCursor = 0;
+          m_posBuffer[0] = 0xff;
           m_vecWordsBuf.clear();
           InitKeyBoard();
           ResetSpellingToBtns(8);
@@ -392,6 +397,8 @@ short CInputSpellingHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_inputCode[tempcode].MouseUp();
       if(m_inputCode[tempcode].IsEnable())
       {
+        m_posBuffer[m_curSpellingCursor] = m_curSpellingCursor;
+        m_posBuffer[m_curSpellingCursor+1] = 0xff;
         ResetSpellingToBtns(tempcode);
         SetKeyBoardBtnsEnable();
         m_curSpellingCursor++;
@@ -600,6 +607,10 @@ void CInputSpellingHook::SetAssociateBtnLabels()
   {
     m_associateBtn[i].SetEnable(true);
     m_associateBtn[i].SetCaption(m_vecWordsBuf[j].c_str());
+    if (!m_isWordsReady)
+    {
+      m_associateBtn[i].SetFocusKey(m_posBuffer);
+    }
   }
   m_pageLeftBtn.SetEnable(m_iCurWordIndex!=0);
   //
@@ -672,6 +683,7 @@ void CInputSpellingHook::ResetSpellingWordToBtns(const char *pchSpelling)
 {
   //ÖØÖÃ
   m_curSpellingCursor = 0;
+  m_posBuffer[0] = 0xff;
   m_iCurWordIndex = 0;
   m_vecWordsBuf.clear();
   //
