@@ -291,9 +291,8 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
   }
   //读取当前规划状态
   short planState = m_routeWrapper.GetPlanState();
-
-  //
-  if (bExpand)
+  //执行展开或者收缩
+  if (m_expandStatus)
   {
     //展开菜单
     m_expandBtn.SetVisible(false);
@@ -315,6 +314,8 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
       mapHook->ShowDetailBtn1(true);
       mapHook->ShowDetailBtn2(false);
       mapHook->ShowGuideInfoBtn(false);
+      mapHook->ShowTimeBtn(true);
+      mapHook->ShowCompass(false);
 
       if ((UeRoute::PS_RealGuidance == planState) && (UeMap::VM_Guidance == viewMode))
       {
@@ -330,6 +331,12 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
         mapHook->ShowSetDestPointBtn(true);
         mapHook->ShowFixedPostionBtn(true);
       }
+      //如果路口放大图显示，则隐藏时间按钮
+      if ((UeRoute::PS_RealGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+      {
+        mapHook->ShowDetailBtn1(false);
+        mapHook->ShowTimeBtn(false);
+      }
       //开启界面切换定时器
       mapHook->RestarGuiTimer();
     }
@@ -341,7 +348,20 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     else
     {
       m_routeOpe.SetVisible(false);
-    }    
+    }
+
+    //如果路口放大图显示，则隐藏菜单
+    if ((UeRoute::PS_RealGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+    {
+      m_closeBtn.SetVisible(false);
+      m_functionBtn.SetVisible(false);
+      m_shortcutBtn.SetVisible(false);
+      m_aroundBtn.SetVisible(false);
+      m_searchBtn.SetVisible(false);
+      m_delimiter1.SetVisible(false);
+      m_delimiter2.SetVisible(false);
+      m_delimiter3.SetVisible(false);
+    }
   }
   else
   {
@@ -360,34 +380,47 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     //设置主界面控件状态
     if (m_parentHook)
     {
-
       CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
       mapHook->ShowMinimizeBtn(false);
       mapHook->ShowAddElecEyeBtn(true);
       mapHook->ShowDetailBtn1(false);
-      mapHook->ShowDetailBtn2(false);
-      mapHook->ShowGuideInfoBtn(true);
       if (VM_Browse == viewMode)
       {
         mapHook->ShowMapAzimuthBtn(true);
         mapHook->ShowMapScalingBtn(true);
         mapHook->ShowSetDestPointBtn(true);
         mapHook->ShowFixedPostionBtn(true);
+        mapHook->ShowDetailBtn2(true);
+        mapHook->ShowGuideInfoBtn(false);
       }
       else
       {
+        mapHook->ShowCompass(true);
         mapHook->ShowMapAzimuthBtn(false);
         mapHook->ShowMapScalingBtn(false);
         mapHook->ShowSetDestPointBtn(false);
         mapHook->ShowFixedPostionBtn(false);
+        mapHook->ShowDetailBtn2(false);
+        mapHook->ShowGuideInfoBtn(true);
+      }
+      //如果路口放大图显示，则隐藏时间按钮
+      if ((UeRoute::PS_RealGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+      {
+        mapHook->ShowGuideInfoBtn(false);
+        mapHook->ShowTimeBtn(false);
       }
       //开启界面切换定时器
       mapHook->CloseGuiTimer();
     }
+    //如果路口放大图显示，则隐藏菜单
+    if ((UeRoute::PS_RealGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+    {
+      m_expandBtn.SetVisible(false);
+    }
   }
 }
 
-void UeGui::CMapMainMenuHook::Update()
+void UeGui::CMapMainMenuHook::Update( short type )
 {
-
+  ExpandMenu(m_expandStatus);
 }

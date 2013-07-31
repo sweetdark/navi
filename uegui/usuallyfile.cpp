@@ -185,4 +185,20 @@ bool CUsuallyFile::IsRecordInFile(UsuallyRecord* pfr)
       return true;
     }
   }
-  return false;}
+  return false;
+}
+
+
+bool CUsuallyFile::IsUsuallyExist(UsuallyRecordType type)
+{
+  UsuallyRecord record;
+  GetRecord(type, &record);
+  if(record.IsValid())
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+}

@@ -168,6 +168,10 @@ namespace UeGui
     */
     virtual void Init();
     /**
+    * \brief 更新Hook
+    */
+    virtual void Update(short type);
+    /**
     * 计时器
     **/
     virtual void Timer();
@@ -248,10 +252,6 @@ namespace UeGui
     * \brief 概览路线
     */
     void OverviewRoute();
-    /**
-    * \brief 更新引导信息图文提示
-    */
-    void FillGuidanceInfo();
   public:
     /**
     * \brief 隐藏当前窗口所有按钮控件
@@ -298,6 +298,10 @@ namespace UeGui
     */
     void ShowTimeBtn(bool show = true);
     /**
+    * \brief 显示和隐藏指南针
+    */
+    void ShowCompass(bool show = true);
+    /**
     * \brief 隐藏窗口
     */
     void MinMize();
@@ -317,6 +321,10 @@ namespace UeGui
     * \brief 打开搜索菜单
     */
     void OpenSearchMenu();
+    /**
+    * \brief 打开详情菜单
+    */
+    void OpenDetailHook();
     /**
     * \brief 切换地图方向
     */
@@ -362,6 +370,14 @@ namespace UeGui
     * \brief 关闭界面切换定时器
     */
     void CloseGuiTimer();
+    /**
+    * \brief 显示路口放大图
+    */
+    void ShowGuideView();
+    /**
+    * \brief 是否处于指南针状态
+    */
+    bool IsShowCompass();
   protected:
     /**
     * \brief 返回皮肤配置文件名称
@@ -428,6 +444,10 @@ namespace UeGui
     * \brief 清空外部传入的查询列表数据
     */
     void ClearQueryPointList();
+    /**
+    * \brief 更新引导信息图文提示
+    */
+    void FillGuidanceInfo();
   private:
     //主页：最小化
     CUiBitButton m_miniMizeBtn;    
@@ -510,7 +530,8 @@ namespace UeGui
     short m_guiTimerInterval;
     //当前选择的规划方式类型
     MethodType m_curPlanmethodType;
-
+    //是否显示指南针
+    bool m_bIsCompassShown;
 
   //////////////////////////////////////////////////////////////////////////
   //旧代码
@@ -617,10 +638,6 @@ namespace UeGui
     * \brief 设置多路径规划方式
     */
     void SetMultiMethodType(MethodType methodType){};
-    /**
-    * \brief 是否处于指南针状态
-    */
-    bool IsShowCompass(){return false;};
     /**
     * \brief 更新倒计时状态
     */

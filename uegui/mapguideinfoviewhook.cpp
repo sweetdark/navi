@@ -34,7 +34,7 @@ void UeGui::CMapGuideInfoViewHook::Show( bool show /*= true */ )
   CAggHook::Show(show);
   if (show)
   {
-    Update();
+    Update(0);
   }
 }
 
@@ -234,7 +234,8 @@ short CMapGuideInfoViewHook::MouseUp(CGeoPoint<short> &scrPoint)
   return ctrlType;
 }
 
-void UeGui::CMapGuideInfoViewHook::Update()
+
+void UeGui::CMapGuideInfoViewHook::Update( short type )
 {
   //根据导航状态更新当前导航图标的显示
   GuidanceStatus dirInfo;
@@ -371,6 +372,7 @@ void UeGui::CMapGuideInfoViewHook::Update()
     }
 
     m_routeInfoBtn.SetCaption(roadName);
+    m_routeInfoBtn.SetVisible(true);
  
     // 显示路口放大图及指引图标
     // 当前路口
@@ -426,14 +428,24 @@ void UeGui::CMapGuideInfoViewHook::Update()
     }
   }
 
-  //显示路口放大图
-  if (m_viewWrapper.IsNeedRenderGuidanceView() && !m_viewWrapper.IsGuidanceViewShown())
+  //如果当前显示路口放大图
+  if (m_viewWrapper.IsGuidanceViewShown())
   {
-    m_shwoGuideViewBtn.SetVisible(true);
+    m_shwoGuideViewBtn.SetVisible(false);
+    m_routeInfoBtn.SetVisible(false);
+    ShowCurGuidanceIcon(false);
+    ShowNextGuidanceIcon(false);
   }
   else
   {
-    m_shwoGuideViewBtn.SetVisible(false);
+    if (m_viewWrapper.IsNeedRenderGuidanceView())
+    {
+      m_shwoGuideViewBtn.SetVisible(true);
+    }
+    else
+    {
+      m_shwoGuideViewBtn.SetVisible(false);
+    }
   }
 }
 
@@ -754,5 +766,9 @@ void UeGui::CMapGuideInfoViewHook::ShowPromptIcon( bool isShow, unsigned char in
 
 void UeGui::CMapGuideInfoViewHook::ShowGuideView()
 {
-  m_viewWrapper.ShowGuidanceView();
+  if (m_parentHook)
+  {
+    CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
+    mapHook->ShowGuideView();
+  }
 }

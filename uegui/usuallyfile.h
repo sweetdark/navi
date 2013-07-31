@@ -10,6 +10,17 @@
 #define FAVORITECOUNT 5
 namespace UeGui
 {
+  enum UsuallyRecordType
+  {
+    RT_begin=0,
+    RT_HOME,
+    RT_COMPANY,
+    RT_ONE,
+    RT_TWO,
+    RT_THREE,
+    RT_end
+  };
+
   struct UsuallyRecord
   {
     const static int MAXFAVORITES = 256;
@@ -38,27 +49,22 @@ namespace UeGui
   public:
     CUsuallyFile();
     ~CUsuallyFile();
-    enum RecordType
-    {
-      RT_begin=0,
-      RT_HOME,
-      RT_COMPANY,
-      RT_ONE,
-      RT_TWO,
-      RT_THREE,
-      RT_end
-    };
   public:
     bool IsRecordInFile(UsuallyRecord* pfr);
     int UpdateRecord(int n , UsuallyRecord* pfr);
     int RemoveRecord(int n);
     int GetRecord(int n , UsuallyRecord* pfr);
     int GetRecordCount();
+    bool IsUsuallyExist(UsuallyRecordType type);
+   
+  private:
+    void AddRecord(UsuallyRecord &record);
+
   private:
     tstring m_fileName;
     const UeBase::CFileBasic &m_fileBasic;
     const UeBase::CPathBasic &m_pathBasic;
-    void AddRecord(UsuallyRecord &record);
+    
   };
 }
 #endif

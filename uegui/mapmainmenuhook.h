@@ -62,6 +62,10 @@ namespace UeGui
     * \设置当前hook是否显示
     */
     virtual void Show( bool show = true );
+    /**
+    * \brief 更新Hook
+    */
+    virtual void Update(short type);
     /*
     * 设置父类hook
     */
@@ -70,10 +74,6 @@ namespace UeGui
     * 展开和收缩菜单
     */
     void ExpandMenu(bool bExpand = true);
-    /*
-    * 更新菜单
-    */
-    void Update();
   protected:
     /**
     * \brief 返回皮肤配置文件名称

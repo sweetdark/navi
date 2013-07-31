@@ -11,6 +11,7 @@
 
 #include "uibutton.h"
 #include "routewrapper.h"
+#include "viewwrapper.h"
 
 namespace UeGui
 {
@@ -62,6 +63,10 @@ namespace UeGui
     * \设置当前hook是否显示
     */
     virtual void Show( bool show = true );
+    /**
+    * \brief 更新Hook
+    */
+    virtual void Update(short type);
     /*
     * 设置父类hook
     */
@@ -70,10 +75,6 @@ namespace UeGui
     * 展开和收缩菜单
     */
     void ExpandMenu(bool bExpand = true);
-    /*
-    * 更新菜单
-    */
-    void Update();
 
     /*
     * 初始化模拟导航信息
@@ -129,6 +130,9 @@ namespace UeGui
     CUiButton m_delimiter1;
     CUiButton m_delimiter2;
     CUiButton m_delimiter3;
+  private:
+    //地图访问接口
+    CViewWrapper& m_viewWrapper;
     //路径规划访问接口
     CRouteWrapper& m_routeWrapper;
     //模拟导航状态

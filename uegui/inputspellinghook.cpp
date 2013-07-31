@@ -53,6 +53,7 @@ void CInputSpellingHook::Load()
   InitKeyBoard();
   SetCursorPosX(m_iCurCursorIndex);
 
+  CQueryWrapper::Get().SetDefaultQueryKind();
   SetQueryMode();
   GetAssociateThing();
 }

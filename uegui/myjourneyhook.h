@@ -109,6 +109,9 @@ namespace UeGui
 
     virtual void Load();
 
+    //添加行程数据
+    bool AddJourneyData(const char *journeyName, unsigned int routeType, const POIDataList &poiList);
+
   protected:
 
     virtual void MakeNames();
@@ -116,6 +119,8 @@ namespace UeGui
     void MakeControls();
 
   private:
+    void SwitchPageBtnVisble();
+
     void InitRowCtrlList();
 
     void ShowCurPageJourneyData();

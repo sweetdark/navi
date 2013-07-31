@@ -125,15 +125,22 @@ namespace UeGui
     * \brief 生成GUI信息
     */
     virtual void MakeGUI();
+
     /**
     * \brief 初始化hook信息
     */
     virtual void Init();
 
     /**
+    * \brief 更新Hook
+    */
+    virtual void Update(short type);
+
+    /**
     * \brief 显示界面之前的数据准备
     */
     virtual void Load();
+
     /**
     * \brief 切换界面时释放数据
     **/

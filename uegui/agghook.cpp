@@ -467,6 +467,12 @@ void UeGui::CAggHook::Init()
   return;
 }
 
+void UeGui::CAggHook::Update( short type )
+{
+  // 虚函数，如果有需要，由子类去实现
+  return;
+}
+
 void UeGui::CAggHook::Load()
 {
   // 虚函数，如果有需要，由子类去实现
@@ -990,7 +996,6 @@ void CAggHook::Refresh(short type)
     ClearRenderElements();
   }
 }
-
 
 void CAggHook::SetPath(TCHAR* path)
 {

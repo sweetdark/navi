@@ -274,17 +274,21 @@ void UeGui::CUiBitButton::MouseMove()
 
 void UeGui::CUiBitButton::SetCaption( const char* caption )
 {
-  if (m_labelElement)
+  if (caption)
   {
-    if (caption)
+    if (m_labelElement)
     {
       strcpy(m_labelElement->m_label, caption);
-    }
-    else
+    } 
+    else if (GetCenterElement())
     {
-      ClearCaption();
+      strcpy(GetCenterElement()->m_label, caption);
     }
-  }  
+  }
+  else
+  {
+    ClearCaption();
+  }
 }
 
 char* UeGui::CUiBitButton::GetCaption()
@@ -292,6 +296,10 @@ char* UeGui::CUiBitButton::GetCaption()
   if (m_labelElement)
   {
     return m_labelElement->m_label;
+  }
+  else if (GetCenterElement())
+  {
+    return GetCenterElement()->m_label;
   }
   else
   {
@@ -305,6 +313,10 @@ void UeGui::CUiBitButton::ClearCaption()
   {
     memset(m_labelElement->m_label, 0, sizeof(m_labelElement->m_label));
   }  
+  if (GetCenterElement())
+  {
+    memset(GetCenterElement()->m_label, 0, sizeof(m_labelElement->m_label));
+  }
 }
 
 void UeGui::CUiBitButton::SetEnable( bool value )

@@ -23,6 +23,8 @@ CTypeInDistSelectionHook::~CTypeInDistSelectionHook()
 
 void CTypeInDistSelectionHook::Load()
 {
+  m_distSwitchBtn.SetCaption(CQueryWrapper::Get().GetQueryAdmName());
+
   m_pCurItemCtrl = &CCodeIndexCtrl::GetKindCodeCtrl();
   m_pCurItemCtrl->GetLeve1Item(m_vecMainListItem);
   m_pCurItemCtrl->GetComItem(m_vecSubListItem);
@@ -122,42 +124,49 @@ short CTypeInDistSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
   case TypeInDistSelectionHook_DistSwitchBtn:
     {
       m_distSwitchBtn.MouseDown();
+      AddRenderUiControls(&m_distSwitchBtn);
     }
     break;
   case TypeInDistSelectionHook_DistSelectBtn:
   case TypeInDistSelectionHook_DistSelectBtnIcon:
     {
       m_distSelectBtn.MouseDown();
+      AddRenderUiControls(&m_distSelectBtn);
     }
     break;
   case TypeInDistSelectionHook_MainPageUpBtn:
   case TypeInDistSelectionHook_MainPageUpIcon:
     {
       m_mainPageUpBtn.MouseDown();
+      AddRenderUiControls(&m_mainPageUpBtn);
     }
     break;
   case TypeInDistSelectionHook_MainPageDownBtn:
   case TypeInDistSelectionHook_MainPageDownIcon:
     {
       m_mainPageDownBtn.MouseDown();
+      AddRenderUiControls(&m_mainPageDownBtn);
     }
     break;
   case TypeInDistSelectionHook_SubPageUpBtn:
   case TypeInDistSelectionHook_SubPageUpIcon:
     {
       m_subPageUpBtn.MouseDown();
+      AddRenderUiControls(&m_subPageUpBtn);
     }
     break;
   case TypeInDistSelectionHook_SubPageDownBtn:
   case TypeInDistSelectionHook_SubPageDownIcon:
     {
       m_subPageDownBtn.MouseDown();
+      AddRenderUiControls(&m_subPageDownBtn);
     }
     break;
   case TypeInDistSelectionHook_MainListComBtn:
   case TypeInDistSelectionHook_MainListBtnMarkCom:
     {
       m_comInfoBtn.MouseDown();
+      AddRenderUiControls(&m_comInfoBtn);
     }
     break;
   default:
@@ -165,11 +174,13 @@ short CTypeInDistSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       int listIndex = (ctrlType-TypeInDistSelectionHook_MainList1Btn)/2;
       m_mainInfoBtn[listIndex].MouseDown();
+      AddRenderUiControls(&m_mainInfoBtn[listIndex]);
     } 
     else if (ctrlType >= TypeInDistSelectionHook_SubList1Btn && ctrlType <= TypeInDistSelectionHook_SubList5Btn)
     {
       int listIndex = ctrlType-TypeInDistSelectionHook_SubList1Btn;
       m_subInfoBtn[listIndex].MouseDown();
+      AddRenderUiControls(&m_subInfoBtn[listIndex]);
     } 
     else
     {
@@ -290,7 +301,7 @@ short CTypeInDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_subInfoBtn[listIndex].MouseUp();
       if (m_subInfoBtn[listIndex].IsEnable())
       {
-        int index = listIndex + m_subPageController.GetPageStartPosition();
+        int index = listIndex + m_subPageController.GetPageStartPosition() - 1;
         m_pCurItemCtrl->GetLeve3Item(m_vecSubListItem[index].m_uCode,m_vecQueryListItem);
         //ÔÝÊ±´¦Àí
         TCodeEntry item = *(m_pCurItemCtrl->GetItemByCode(m_vecQueryListItem[1].m_uCode));
@@ -352,6 +363,11 @@ void CTypeInDistSelectionHook::ShowMainItemList()
     m_mainPageUpBtn.SetEnable(true);
     m_mainPageDownBtn.SetEnable(false);
   }
+  else
+  {
+    m_mainPageUpBtn.SetEnable(true);
+    m_mainPageDownBtn.SetEnable(true);
+  }
 }
 
 void CTypeInDistSelectionHook::ShowSubItemList()
@@ -391,6 +407,11 @@ void CTypeInDistSelectionHook::ShowSubItemList()
   {
     m_subPageUpBtn.SetEnable(true);
     m_subPageDownBtn.SetEnable(false);
+  }
+  else
+  {
+    m_subPageUpBtn.SetEnable(true);
+    m_subPageDownBtn.SetEnable(true);
   }
 }
 

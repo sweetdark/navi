@@ -838,9 +838,9 @@ void UeGui::CHistoryInformationHook::DoSelectRecord( RowTag row )
           ::strcpy(pointInfo.m_name, name);
           resultList.push_back(pointInfo);
         }  
-        m_userWrapper.DisconnectHistoryRecord();      
-        mapHook->SetPickPos(resultList, dataIndex);
-        TurnTo(DHT_MapHook);
+        m_userWrapper.DisconnectHistoryRecord();   
+        TurnTo(DHT_MapHook);   
+        mapHook->SetPickPos(resultList, dataIndex);        
       }     
       break;
     }
@@ -911,6 +911,7 @@ void UeGui::CHistoryInformationHook::DoEditRecord( RowTag row )
       CDetailEditHook editHook;
       CDetailEditEvent editEvent(this,DHT_HistoryInformationHook);
       editHook.ShowDetailEditHook(&data,editEvent);
+      editHook.DoRecordPosition(dataIndex);
       TurnTo(DHT_DetailEditHook);
       break;
     }
@@ -992,7 +993,7 @@ void UeGui::CHistoryInformationHook::ActivatePage( PageTag page )
 
   //记录当前活动页ID
   m_avtivePageIndex = page;
-  //ChangeOperatorCtrlIcon(page);
+  ChangeOperatorCtrlIcon(page);
   switch (page)
   {
   case kPageHisRecord :

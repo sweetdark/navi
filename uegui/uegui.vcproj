@@ -1547,6 +1547,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\roundselectionhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\roundselectionhook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\routeoperationhook.cpp"
 				>
 			</File>
@@ -1576,6 +1584,14 @@
 			</File>
 			<File
 				RelativePath=".\typeindistselectionhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\typenodistselectionhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\typenodistselectionhook.h"
 				>
 			</File>
 			<File
@@ -1668,6 +1684,14 @@
 			</File>
 			<File
 				RelativePath=".\typeindistquerylisthook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\typenodistquerylisthook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\typenodistquerylisthook.h"
 				>
 			</File>
 		</Filter>

@@ -447,11 +447,11 @@ void CNaviSettingHook::ClearAllData()
   userWrapper.RemoveAllHistoryRecord();
 
   CUsuallyFile favorite;
-  favorite.RemoveRecord(CUsuallyFile::RT_HOME);
-  favorite.RemoveRecord(CUsuallyFile::RT_COMPANY);
-  favorite.RemoveRecord(CUsuallyFile::RT_ONE);
-  favorite.RemoveRecord(CUsuallyFile::RT_TWO);
-  favorite.RemoveRecord(CUsuallyFile::RT_THREE);
+  favorite.RemoveRecord(RT_HOME);
+  favorite.RemoveRecord(RT_COMPANY);
+  favorite.RemoveRecord(RT_ONE);
+  favorite.RemoveRecord(RT_TWO);
+  favorite.RemoveRecord(RT_THREE);
 
   userWrapper.RemoveAllJourney();
 }

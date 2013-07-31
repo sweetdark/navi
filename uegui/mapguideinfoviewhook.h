@@ -113,14 +113,14 @@ namespace UeGui
     * \设置当前hook是否显示
     */
     virtual void Show( bool show = true );
+    /**
+    * \brief 更新Hook
+    */
+    virtual void Update(short type);
     /*
     * 设置父类hook
     */
     void SetParentHook(CAggHook* parentHook);
-    /*
-    * 更新菜单
-    */
-    void Update();
 
   protected:
     virtual tstring GetBinaryFileName();
@@ -138,7 +138,7 @@ namespace UeGui
     */
     bool ChangeElementIcon(GuiElement* destElement, GuiElement* srcElement);
     /**
-    * \brief 显示路口转向图控件
+    * \brief 显示指定路口转向图控件
     */
     void ShowGuidanceIconCtrl(CUiBitButton &iconCtrl, bool isShown = true);
     /**
@@ -157,7 +157,7 @@ namespace UeGui
     */
     void ShowPromptIcon(bool isShow, unsigned char infoCode = 0, double distance = 0);
     /**
-    * \brief 显示路口放大图    
+    * \brief 显示路口放大图
     */
     void ShowGuideView();
   private:

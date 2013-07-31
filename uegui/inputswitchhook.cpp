@@ -301,6 +301,8 @@ char* CInputSwitchHook::GetKeyWord()
     return ((CInputCharHook *)m_view->GetHook(DHT_InputCharHook))->GetKeyWord();
   case IM_HandMethod:
     return ((CInputHandHook *)m_view->GetHook(DHT_InputHandHook))->GetKeyWord();
+  default:
+    return m_keyword;
   }
 }
 

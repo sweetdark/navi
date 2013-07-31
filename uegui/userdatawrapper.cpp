@@ -26,6 +26,16 @@ const CUserDataWrapper& CUserDataWrapper::Get()
 CUserDataWrapper::CUserDataWrapper() : m_view(IView::GetView()), m_route(IRoute::GetRoute()),
 m_query(IQuery::GetQuery()),m_net(IRoadNetwork::GetNetwork())
 {
+  m_usuallyFile = new CUsuallyFile();
+}
+
+CUserDataWrapper::~CUserDataWrapper()
+{
+  if (m_usuallyFile)
+  {
+    delete m_usuallyFile;
+    m_usuallyFile = NULL;
+  }
 }
 
 int CUserDataWrapper::GetHistoryRecordCount() const
@@ -214,6 +224,27 @@ bool CUserDataWrapper::AddJourneyData(const char *journeyName, unsigned int rout
   return journeyWrapper.AddJourneyData(journeyName, routeType, poiList);
 }
 
+
+void CUserDataWrapper::RemoveUsually(UsuallyRecordType n)
+{
+  m_usuallyFile->RemoveRecord(n);
+}
+
+int CUserDataWrapper::GetUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record)
+{
+  return m_usuallyFile->GetRecord(n, record);
+}
+
+int CUserDataWrapper::UpdateUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record)
+{
+  return m_usuallyFile->UpdateRecord(n, record);
+}
+
+bool CUserDataWrapper::IsUsuallyExist(UsuallyRecordType type)
+{
+  return m_usuallyFile->IsUsuallyExist(type);
+}
+
 void CUserDataWrapper::SetAddrName(const PlanPosition& planPos, char *addrName) const
 {
   if (addrName)
@@ -350,7 +381,7 @@ void CUserDataWrapper::HistoryRoutePlan(int dataIndex) const
       if (mapHook)
       {
 //        CAggHook::TurnToHook(CViewHook::DHT_MapHook);
-        mapHook->SwitchToRoutePlanReadyGUI();
+        mapHook->OverviewRoute();
         m_view->Refresh();
       }
     }

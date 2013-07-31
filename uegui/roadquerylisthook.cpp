@@ -406,10 +406,5 @@ void CRoadQueryListHook::DoDistSwitchCallBack(const SQLRecord *pResult)
   codeEntry.m_uCode = pResult->m_addrCode;
   ::strcpy(codeEntry.m_chName, pResult->m_asciiName);
   CQueryWrapper::Get().SetQueryAdmInfo(codeEntry);
-  m_distSwitchBtn.SetCaption(codeEntry.m_chName);
-  char* keyword = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetKeyWord();
-  if (keyword != NULL)
-  {
-    SearchForResult(keyword);
-  }
+  Load();
 }

@@ -5,86 +5,52 @@
 #include "uegui.h"
 #endif
 
-#ifndef _UEGUI_AGGHOOK_H
-#include "agghook.h"
-#endif
-
-#ifndef __Q_CODE_H__
-#include "QCode.h"
-#pragma comment(lib,"QCode.lib")
-#endif
-
+#include "userdatawrapper.h"
+#include "menubackgroundhook.h"
+#include "guibasic.h"
+#include "uilabel.h"
 #include "uibutton.h"
-#include "usuallyfile.h"
 
 namespace UeGui
 {
-  class UEGUI_CLASS CDetailMessageHook : public CAggHook
+  class UEGUI_CLASS CDetailMessageHook : public CMenuBackgroundHook
   {
   public:
-    enum CommonType
-    {
-      CT_begin=0,
-      CT_HOME,
-      CT_COMPANY,
-      CT_ONE,
-      CT_TWO,
-      CT_THREE,
-      CT_End,
-    };
     enum DetailMessageHookCtrlType
     {
-      DetailMessageHook_Begin = 0,
-      DetailMessageHook_AddressInfoLabel,
+      DetailMessageHook_Begin = MenuBackgroundHook_End,
+      DetailMessageHook_TitleLabel,
       DetailMessageHook_AddressLabel,
-      DetailMessageHook_BlackGround,
-      DetailMessageHook_CommonlyUsed1,
-      DetailMessageHook_CommonlyUsed1Left,
-      DetailMessageHook_CommonlyUsed1Right,
-      DetailMessageHook_CommonlyUsed2,
-      DetailMessageHook_CommonlyUsed2Left,
-      DetailMessageHook_CommonlyUsed2Right,
-      DetailMessageHook_CommonlyUsed3,
-      DetailMessageHook_CommonlyUsed3Left,
-      DetailMessageHook_CommonlyUsed3Right,
-      DetailMessageHook_Company,
-      DetailMessageHook_CompanyLeft,
-      DetailMessageHook_CompanyRight,
-      //一行显示
-      DetailMessageHook_HeadInfoLabel,
-      //两行显示
-      DetailMessageHook_HeadInfoLabel1,
-      DetailMessageHook_HeadInfoLabel2,
+      DetailMessageHook_AddressInfoLabel,
+      DetailMessageHook_PhoneLabel,
+      DetailMessageHook_PhoneInfoLabel,
+      DetailMessageHook_CodeLabel,
+      DetailMessageHook_CodeInfoLabel,
+      DetailMessageHook_SaveLabel,
       DetailMessageHook_Home,
-      DetailMessageHook_HomeLeft,
-      DetailMessageHook_HomeRight,
-      DetailMessageHook_QCodeInfoLabel,
-      DetailMessageHook_QCodeLabel,
-      DetailMessageHook_SaveInfo,
-      DetailMessageHook_SaveInfoLeft,
-      DetailMessageHook_SaveInfoRight,
-      DetailMessageHook_SetCommonlyUsed,
-      DetailMessageHook_SetCommonlyUsedLeft,
-      DetailMessageHook_SetCommonlyUsedRight,
-      DetailMessageHook_TelephoneInfoLabel,
-      DetailMessageHook_TelephoneLabel,
-      DetailMessageHook_MessageBoxBtn,
-      DetailMessageHook_MessageBoxText,
-      DetailMessageHook_RejectCtrlCenter,
-      DetailMessageHook_RejectCtrlLeft,
-      DetailMessageHook_RejectCtrlRight,
-      DetailMessageHook_AcceptCtrlCenter,
-      DetailMessageHook_AcceptCtrlLeft,
-      DetailMessageHook_AcceptCtrlRight,
-      DetailMessageHook_IconTip,
+      DetailMessageHook_Company,
+      DetailMessageHook_FavoratePosition1,
+      DetailMessageHook_FavoratePosition2,
+      DetailMessageHook_FavoratePosition3,
+      DetailMessageHook_AvoidArea,
+      DetailMessageHook_BootPosition,
+      DetailMessageHook_AddressBook,
       DetailMessageHook_End
+    };
+    enum CommonPointType
+    {
+      CT_None = 0,
+      CT_HOME,
+      CT_COMPANY,
+      CT_POINTONE,
+      CT_POINTTWO,
+      CT_POINTTHREE,
+      CT_End,
     };
 
     CDetailMessageHook();
 
     virtual ~CDetailMessageHook();
-
-    virtual void MakeGUI();
 
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
@@ -92,89 +58,51 @@ namespace UeGui
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual bool operator ()();
+    /**
+    * \brief 显示界面之前的数据准备
+    */
+    virtual void Load();
 
-    virtual void Init();
+    /**
+    * \brief 切换界面时释放数据
+    **/
+    virtual void UnLoad();
 
-    //定时器
-    virtual void Timer();
+    /**
+    * \brief 设置数据
+    **/
+    void SetDetailInfoData(const DetailInfo& data);
   protected:
-    virtual tstring GetBinaryFileName();
 
     virtual void MakeNames();
 
     void MakeControls();
 
   private:
-
-    CUiButton m_commonlyUsed1Ctrl;
-    CUiButton m_commonlyUsed2Ctrl;
-    CUiButton m_commonlyUsed3Ctrl;
-    CUiButton m_companyCtrl;
-    CUiButton m_homeCtrl;
-
-    CUiButton m_addressInfoLabelCtrl;
-    CUiButton m_telephoneInfoLabelCtrl;
-    CUiButton m_qCodeInfoLabelCtrl;
-
-    CUiButton m_saveInfoCtrl;
-    CUiButton m_setCommonlyUsedCtrl;
-    
-    CUiBitButton m_messageBoxBtnCtrl;
-    CUiButton m_messageBoxTextCtrl;
-    CUiButton m_rejectCtrl;
-    CUiButton m_acceptCtrl;
-
-  public:
-    typedef struct DetailInfo
-    {
-      //名称
-      char name[256];
-      //地址
-      char address[1024];
-      //电话
-      char telephone[256];
-      //位置信息
-      CGeoPoint<long> position;
-    } stDetailInfo;
-
-    //信息
-    stDetailInfo m_detailInfo;
-    void SetDetailInfo(stDetailInfo* pDetailInfo);
-
-    void AsMsgBox(stDetailInfo detailInfo);
+    //保存数据到地址簿
+    void SaveToAddressBook();
+    //保存到常用点
+    void SaveToCommonPoint(short pointType);
+    //设为开机位置
+    void SaveToSysStartPosition();
   private:
-    /**
-    * \brief 设置常用点模块可用性
-    */
-    void SetCommonlyUsedVisiable(bool isVisiabled);
-    /**
-    * \brief 设置保存操作模块可用性
-    */
-    void SetSaveControlVisiable(bool isVisiabled);
-
-    void SetDetailEditHookDate();
-
-    bool SetMessageVisble(bool value,CommonType type);
-
-    bool IsCommonExist(CommonType type);
-
-    void SetFavoFileContent(CommonType type);
-
-    CommonType m_cType;
-
-    CUsuallyFile m_cFile;
-
-    double dX;
-    double dY;
-    unsigned short pCode[9];
-    int nCode;
-
-    //是否需要计时
-    bool needCountDown;
-    //倒计时值
-    int m_statusBarTimeInterval;
-    const static int STATUSBAR_TIMEINTERVAL = 6; //单位秒
+    CUiLabel m_titleLabel;
+    CUiLabel m_addressInfoLabel;
+    CUiLabel m_phoneInfoLabel;
+    CUiLabel m_codeInfoLabel;
+    CUiButton m_addressBookBtn;
+    CUiButton m_homeBtn;
+    CUiButton m_companyBtn;
+    CUiButton m_favoratePosition1Btn;
+    CUiButton m_favoratePosition2Btn;
+    CUiButton m_favoratePosition3Btn;
+    CUiButton m_avoidAreaBtn;
+    CUiButton m_bootPositionBtn;
+    //详情信息
+    DetailInfo m_detailInfo;
+    //用户数据接口
+    const CUserDataWrapper& m_userDataWrapper;
+    //CUsuallyFile m_cFile;
   };
 }
 #endif

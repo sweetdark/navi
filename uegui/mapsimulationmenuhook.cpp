@@ -4,7 +4,7 @@
 using namespace UeGui;
 
 CMapSimulationMenuHook::CMapSimulationMenuHook() : m_parentHook(NULL), m_routeWrapper(CRouteWrapper::Get()),
- m_speedIndex(0), m_simulationStatus(false), m_expandStatus(false)
+m_viewWrapper(CViewWrapper::Get()), m_speedIndex(0), m_simulationStatus(false), m_expandStatus(false)
 {
   //地图界面渲染完成后不需要释放图片资源，提高效率
   m_needReleasePic = false;
@@ -218,16 +218,20 @@ short CMapSimulationMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_simulationStatus)
       {
         //暂停模拟导航
-        m_routeWrapper.PauseDemo();
-        m_simulationStatus = false;
-        ResetSpeedBtnCaption();
+        if (UeRoute::PEC_Success == m_routeWrapper.PauseDemo())
+        {
+          m_simulationStatus = false;
+          ResetSpeedBtnCaption();
+        }
       }
       else
       {
         //继续模拟导航
-        m_routeWrapper.ResumeDemo(0);
-        m_simulationStatus = true;
-        ResetSpeedBtnCaption();
+        if (UeRoute::PEC_Success == m_routeWrapper.ResumeDemo(0))
+        {
+          m_simulationStatus = true;
+          ResetSpeedBtnCaption();
+        }        
       }
     }
     break;
@@ -265,7 +269,8 @@ void UeGui::CMapSimulationMenuHook::SetParentHook( CAggHook* parentHook )
 void UeGui::CMapSimulationMenuHook::ExpandMenu( bool bExpand /*= true*/ )
 {
   m_expandStatus = bExpand;
-
+  //读取当前规划状态
+  short planState = m_routeWrapper.GetPlanState();
   if (bExpand)
   {
     //展开菜单
@@ -292,9 +297,31 @@ void UeGui::CMapSimulationMenuHook::ExpandMenu( bool bExpand /*= true*/ )
       mapHook->ShowAddElecEyeBtn(false); 
       mapHook->ShowSetDestPointBtn(false);
       mapHook->ShowFixedPostionBtn(false);
+      mapHook->ShowCompass(false);
+      //如果路口放大图显示，则隐藏时间按钮
+      if ((UeRoute::PS_DemoGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+      {
+        mapHook->ShowDetailBtn1(false);
+        mapHook->ShowTimeBtn(false);
+      }
       //开启界面切换定时器
       mapHook->RestarGuiTimer();
-    }  
+    }
+
+    //如果路口放大图显示，则隐藏菜单
+    if ((UeRoute::PS_DemoGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+    {
+      m_expandBtn.SetVisible(false);
+      m_closeBtn.SetVisible(false);
+      m_slowlyDownBtn.SetVisible(false);
+      m_speedLevelBtn.SetVisible(false);
+      m_speedUpBtn.SetVisible(false);
+      m_pauseBtn.SetVisible(false);    
+      m_delimiter1.SetVisible(false);
+      m_delimiter2.SetVisible(false);
+      m_delimiter3.SetVisible(false);
+      m_stopSimulation.SetVisible(false);
+    }
   }
   else
   {
@@ -322,15 +349,27 @@ void UeGui::CMapSimulationMenuHook::ExpandMenu( bool bExpand /*= true*/ )
       mapHook->ShowMapScalingBtn(false);
       mapHook->ShowSetDestPointBtn(false);
       mapHook->ShowFixedPostionBtn(false);
+      mapHook->ShowCompass(true);
+      //如果路口放大图显示，则隐藏时间按钮
+      if ((UeRoute::PS_DemoGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+      {
+        mapHook->ShowGuideInfoBtn(false);
+        mapHook->ShowTimeBtn(false);
+      }
       //开启界面切换定时器
       mapHook->CloseGuiTimer();
+    }
+    //如果路口放大图显示，则隐藏菜单
+    if ((UeRoute::PS_DemoGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+    {
+      m_expandBtn.SetVisible(false);
     }
   }
 }
 
-void UeGui::CMapSimulationMenuHook::Update()
+void UeGui::CMapSimulationMenuHook::Update( short type )
 {
-
+  ExpandMenu(m_expandStatus);
 }
 
 void UeGui::CMapSimulationMenuHook::ReseSimulation()

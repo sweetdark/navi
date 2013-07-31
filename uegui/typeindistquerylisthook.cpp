@@ -4,7 +4,9 @@
 #include "querywrapper.h"
 #endif
 
-#include "typeindistselectionhook.h"
+#include "maphook.h"
+
+#include "districtselectionhook.h"
 
 using namespace UeGui;
 
@@ -26,21 +28,12 @@ void CTypeInDistQueryListHook::Load()
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
   m_distSwitchBtn.SetCaption(queryWrapper.GetQueryAdmName());
   queryWrapper.GetQueryKindName(m_typeSelectBtn.GetCaption());
+  SearchForResult();
+}
 
-  //暂时设为搜索地图中心点附近
-  CGeoPoint<long> geoCurPos;
-  m_view->GetScreenCenter(geoCurPos);
-
-  CQueryWrapper::Get().SetQueryMode(UeQuery::IndexType::IT_NearByPos);
-  queryWrapper.SetMaxQueryRecordNum(500);
-  queryWrapper.SetRoundQueryRadius(RADIUS07);
-  queryWrapper.SetCenterPosOfRound(geoCurPos);
-  m_pRecord = queryWrapper.DoQueryGetRecord();
-  if (m_pRecord!=0)
-  {
-    m_pRecord->AdjustRecordDirection(geoCurPos);
-  }
-  ResetResultList();
+void CTypeInDistQueryListHook::UnLoad()
+{
+  CQueryWrapper::Get().SetDefaultQueryKind();
 }
 
 void CTypeInDistQueryListHook::MakeNames()
@@ -85,6 +78,7 @@ void CTypeInDistQueryListHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_DistSelectBtnIcon,	"DistSelectBtnIcon"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_TypeSelectBtnIcon,	"TypeSelectBtnIcon"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_TypeSelectBtn,	"TypeSelectBtn"));
+  m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_TypeSelectBtnLabel,	"TypeSelectBtnLabel"));
 }
 
 void CTypeInDistQueryListHook::MakeControls()
@@ -95,7 +89,8 @@ void CTypeInDistQueryListHook::MakeControls()
   m_distSelectBtn.SetIconElement(GetGuiElement(TypeInDistQueryListHook_DistSelectBtnIcon));
 
   m_typeSelectBtn.SetCenterElement(GetGuiElement(TypeInDistQueryListHook_TypeSelectBtn));
- // m_typeSelectBtn.SetIconElement(GetGuiElement(TypeInDistQueryListHook_TypeSelectBtnIcon));
+  m_typeSelectBtn.SetIconElement(GetGuiElement(TypeInDistQueryListHook_TypeSelectBtnIcon));
+  m_typeSelectBtn.SetLabelElement(GetGuiElement(TypeInDistQueryListHook_TypeSelectBtnLabel));
 
   m_pageDownBtn.SetCenterElement(GetGuiElement(TypeInDistQueryListHook_PageDownBtn));
   m_pageDownBtn.SetIconElement(GetGuiElement(TypeInDistQueryListHook_PageDownBtnIcon));
@@ -124,30 +119,36 @@ short CTypeInDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
   case TypeInDistQueryListHook_DistSwitchBtn:
     {
       m_distSwitchBtn.MouseDown();
+      AddRenderUiControls(&m_distSwitchBtn);
     }
     break;
   case TypeInDistQueryListHook_DistSelectBtn:
   case TypeInDistQueryListHook_DistSelectBtnIcon:
     {
       m_distSelectBtn.MouseDown();
+      AddRenderUiControls(&m_distSelectBtn);
     }
     break;
   case TypeInDistQueryListHook_TypeSelectBtn:
   case TypeInDistQueryListHook_TypeSelectBtnIcon:
+  case TypeInDistQueryListHook_TypeSelectBtnLabel:
     {
       m_typeSelectBtn.MouseDown();
+      AddRenderUiControls(&m_typeSelectBtn);
     }
     break;
   case TypeInDistQueryListHook_PageDownBtn:
   case TypeInDistQueryListHook_PageDownBtnIcon:
     {
       m_pageDownBtn.MouseDown();
+      AddRenderUiControls(&m_pageDownBtn);
     }
     break;
   case TypeInDistQueryListHook_PageUpBtn:
   case TypeInDistQueryListHook_PageUpBtnIcon:
     {
       m_pageUpBtn.MouseDown();
+      AddRenderUiControls(&m_pageUpBtn);
     }
     break;
   default:
@@ -156,6 +157,7 @@ short CTypeInDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
       int index = (ctrlType-TypeInDistQueryListHook_List1Btn)/4;
       m_InfoBtn[index].MouseDown();
       m_AddrLabel[index].MouseDown();
+      MOUSEDONW_2RENDERCTRL(m_InfoBtn[index], m_AddrLabel[index]);
     } 
     else
     {
@@ -185,6 +187,12 @@ short CTypeInDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
   case TypeInDistQueryListHook_DistSwitchBtn:
     {
       m_distSwitchBtn.MouseUp();
+      CDistrictSelectionHook* hook = (CDistrictSelectionHook*)m_view->GetHook(DHT_DistrictSelectionHook);
+      if (hook)
+      {
+        hook->SetCallBackFun(this, DistSwitchCallBack);
+      }
+      TurnTo(DHT_DistrictSelectionHook);
     }
     break;
   case TypeInDistQueryListHook_DistSelectBtn:
@@ -195,20 +203,32 @@ short CTypeInDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
     break;
   case TypeInDistQueryListHook_TypeSelectBtn:
   case TypeInDistQueryListHook_TypeSelectBtnIcon:
+  case TypeInDistQueryListHook_TypeSelectBtnLabel:
     {
       m_typeSelectBtn.MouseUp();
+      CAggHook::TurnTo(DHT_TypeNoDistSelectionHook);
     }
     break;
   case TypeInDistQueryListHook_PageDownBtn:
   case TypeInDistQueryListHook_PageDownBtnIcon:
     {
       m_pageDownBtn.MouseUp();
+      if(m_pageDownBtn.IsEnable())
+      {
+        m_pRecord->Down();
+        ResetResultList();
+      }
     }
     break;
   case TypeInDistQueryListHook_PageUpBtn:
   case TypeInDistQueryListHook_PageUpBtnIcon:
     {
       m_pageUpBtn.MouseUp();
+      if(m_pageUpBtn.IsEnable())
+      {
+        m_pRecord->Up();
+        ResetResultList();
+      }
     }
     break;
   default:
@@ -217,6 +237,12 @@ short CTypeInDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       int index = (ctrlType-TypeInDistQueryListHook_List1Btn)/4;
       m_InfoBtn[index].MouseUp();
       m_AddrLabel[index].MouseUp();
+      if(m_InfoBtn[index].IsEnable())
+      {
+        CAggHook::TurnTo(DHT_MapHook);
+        CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
+        pMapHook->SetPickPos(m_pointList, index);
+      }
     } 
     else
     {
@@ -233,10 +259,50 @@ short CTypeInDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
   return ctrlType;
 }
 
+void CTypeInDistQueryListHook::SearchForResult()
+{
+  //暂时处理，暂时设为搜索该行政区中心点周边10公里
+  CQueryWrapper &queryWrapper(CQueryWrapper::Get());
+  CGeoPoint<long> geoCurPos;
+  SQLRecord m_record;
+  m_record.m_x = -1;
+  m_record.m_addrCode = queryWrapper.GetSQLSentence().m_addrOne;
+  const SQLRecord *pAdmCenterPoi(queryWrapper.GetAdmCenterPoi(&m_record));
+  geoCurPos.m_x = pAdmCenterPoi->m_x;
+  geoCurPos.m_y = pAdmCenterPoi->m_y;
+
+  queryWrapper.SetQueryMode(UeQuery::IndexType::IT_NearByPos);
+  queryWrapper.SetMaxQueryRecordNum(500);
+  queryWrapper.SetRoundQueryRadius(RADIUS07);
+  queryWrapper.SetCenterPosOfRound(geoCurPos);
+  m_pRecord = queryWrapper.DoQueryGetRecord();
+
+  ResetResultList();
+  Refresh();
+  return;
+}
+
 void CTypeInDistQueryListHook::ResetResultList()
 {
   SQLRecord *oneRecord(0);
   m_pointList.clear();
+
+  if (m_pRecord == NULL)
+  {
+    for (int i=0; i<5; ++i)
+    {
+      m_InfoBtn[i].SetEnable(false);
+      m_InfoBtn[i].SetCaption("");
+      m_AddrLabel[i].SetCaption("");
+    }
+    m_pageUpBtn.SetEnable(false);
+    m_pageDownBtn.SetEnable(false);
+    m_curPageInfo.SetCaption("0");
+    m_totalPageInfo.SetCaption("0");
+
+    return;
+  }
+
   for (int i=0; i<5; ++i)
   {
     if ((oneRecord = m_pRecord->GetRecord(i))==0)
@@ -268,4 +334,21 @@ void CTypeInDistQueryListHook::ResetResultList()
   ::sprintf(totalPage,"%d",m_pRecord->GetTotalPage());
   m_curPageInfo.SetCaption(curPage);
   m_totalPageInfo.SetCaption(totalPage);
+}
+
+void CTypeInDistQueryListHook::DistSwitchCallBack(void *pDoCallBackObj,const SQLRecord *pResult)
+{
+  if (pDoCallBackObj)
+  {
+    ((CTypeInDistQueryListHook *)pDoCallBackObj)->DoDistSwitchCallBack(pResult);
+  }
+}
+
+void CTypeInDistQueryListHook::DoDistSwitchCallBack(const SQLRecord *pResult)
+{
+  TCodeEntry codeEntry;
+  codeEntry.m_uCode = pResult->m_addrCode;
+  ::strcpy(codeEntry.m_chName, pResult->m_asciiName);
+  CQueryWrapper::Get().SetQueryAdmInfo(codeEntry);
+  Load();
 }

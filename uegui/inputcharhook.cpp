@@ -54,6 +54,7 @@ void CInputCharHook::Init()
 
 void CInputCharHook::Load()
 {
+  CQueryWrapper::Get().SetDefaultQueryKind();
   SetQueryMode();
   GetAssociateThing();
 }

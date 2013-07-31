@@ -2,6 +2,7 @@
 #include "routewrapper.h"
 #include "maphook.h"
 #include "messagedialoghook.h"
+#include "myjourneyhook.h"
 using namespace UeGui;
 
 CRouteOperationHook::CRouteOperationHook()
@@ -332,6 +333,9 @@ short CRouteOperationHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_eighthBtnBackgroundCtrl.MouseUp();
       m_saveJurneyBtnCtrl.MouseUp();
+      GetRouteData();
+      char* test = "rout";
+      SaveJourneyData(test);
     }
     break;
   default:
@@ -450,4 +454,102 @@ void CRouteOperationHook::OnClickNavigation()
     m_view->Refresh();
     m_isNeedRefesh = false;
   }
+}
+void UeGui::CRouteOperationHook::SaveJourneyData( const char* journeyName )
+{
+  CMessageDialogEvent dialogEvent;
+  dialogEvent.m_senderHookType = CViewHook::DHT_RouteOperationHook;
+  dialogEvent.m_senderHook = this;
+
+  if ((NULL == journeyName) || (0 == ::strlen(journeyName)))
+  {
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "行程名称不能为空 !", dialogEvent);
+    //TODO: 暂时先用Sleep，将来要移除掉，定时功能由消息框自己完成
+    Sleep(1000);
+    CMessageDialogHook::CloseMessageDialog();
+    return;
+  }
+  if (0 == m_POIList.size())
+  {
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "行程路线不能为空 !", dialogEvent);
+    Sleep(1000);
+    CMessageDialogHook::CloseMessageDialog();
+    return;
+  }
+
+  //调用我的行程管理hook接口
+  CMyJourneyHook* myJourneyHook = (CMyJourneyHook*)m_view->GetHook(DHT_MyJourneyHook);
+  if (myJourneyHook)
+  {
+    myJourneyHook->AddJourneyData(journeyName, m_routeType, m_POIList);
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "数据保存成功 !", dialogEvent);
+    Sleep(1000);
+    CMessageDialogHook::CloseMessageDialog();
+  }
+  //switch (m_windowModel)
+  //{
+  //case WAppendModel :
+  //  {
+  //    //调用我的行程管理hook接口
+  //    CMyJourneyHook* myJourneyHook = (CMyJourneyHook*)m_view->GetHook(DHT_MyJourneyHook);
+  //    if (myJourneyHook)
+  //    {
+  //      myJourneyHook->AddJourneyData(journeyName, m_routeType, m_POIList);
+  //      CMessageDialogHook::ShowMessageDialog(MB_NONE, "数据保存成功 !", dialogEvent);
+  //      Sleep(1000);
+  //      CMessageDialogHook::CloseMessageDialog();
+  //    }
+  //    break;
+  //  }
+  //case WEditModel :
+  //  {
+  //    ::strcpy(m_JourneyName,journeyName);
+  //    break;
+  //  }
+  //default:
+  //  {
+  //    assert(false);
+  //    break;
+  //  }
+  //}
+}
+void UeGui::CRouteOperationHook::GetRouteData()
+{
+  m_POIList.clear();
+  //获取起点
+  POIItem startPos;
+  startPos.m_type = UeRoute::PT_Start;
+  m_route->GetPosition(startPos);
+  if(startPos.m_type != UeRoute::PT_Invalid)
+  {
+    m_POIList.push_back(startPos);
+  }
+  //获取中间经由点
+  int posCount = m_route->GetPosCount();
+  if(posCount > 2)
+  {
+    POIItem midPos;
+    midPos.m_type = UeRoute::PT_Middle;
+    for(int i = 1; i < posCount - 1; i++)
+    {
+      m_route->GetPosition(midPos, i);
+      if(midPos.m_type != UeRoute::PT_Invalid)
+      {
+        m_POIList.push_back(midPos);
+      }
+    }
+  }
+  //获取终点
+  POIItem endPos;
+  endPos.m_type = UeRoute::PT_End;
+  m_route->GetPosition(endPos);
+  if(endPos.m_type != UeRoute::PT_Invalid)
+  {
+    m_POIList.push_back(endPos);
+  }
+  SetRouteType(m_route->GetMethod());
+}
+void UeGui::CRouteOperationHook::SetRouteType( unsigned int routeType )
+{  
+  m_routeType = routeType;
 }
