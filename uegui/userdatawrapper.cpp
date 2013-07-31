@@ -225,22 +225,22 @@ bool CUserDataWrapper::AddJourneyData(const char *journeyName, unsigned int rout
 }
 
 
-void CUserDataWrapper::RemoveUsually(UsuallyRecordType n)
+void CUserDataWrapper::RemoveUsually(UsuallyRecordType n) const
 {
   m_usuallyFile->RemoveRecord(n);
 }
 
-int CUserDataWrapper::GetUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record)
+int CUserDataWrapper::GetUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record) const
 {
   return m_usuallyFile->GetRecord(n, record);
 }
 
-int CUserDataWrapper::UpdateUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record)
+int CUserDataWrapper::UpdateUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record) const
 {
   return m_usuallyFile->UpdateRecord(n, record);
 }
 
-bool CUserDataWrapper::IsUsuallyExist(UsuallyRecordType type)
+bool CUserDataWrapper::IsUsuallyExist(UsuallyRecordType type) const
 {
   return m_usuallyFile->IsUsuallyExist(type);
 }

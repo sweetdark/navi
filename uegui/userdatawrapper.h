@@ -110,13 +110,13 @@ namespace UeGui
     bool AddJourneyData(const char *journeyName, unsigned int routeType, const POIDataList &poiList) const;
 
     //移除常用点
-    void RemoveUsually(UsuallyRecordType n);
+    void RemoveUsually(UsuallyRecordType n) const;
     //获取常用点
-    int GetUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record);
+    int GetUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record) const;
     //更新常用点
-    int UpdateUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record);
+    int UpdateUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record) const;
     //判断该类型的常用点是否存在
-    bool IsUsuallyExist(UsuallyRecordType type);
+    bool IsUsuallyExist(UsuallyRecordType type) const;
 
     //判断路线是否已经存在
     bool CheckHistoryRouteExists(const RecentEntry& newEntry) const;
