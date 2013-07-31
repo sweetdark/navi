@@ -71,13 +71,14 @@ void CEagleView::OnDraw(short style)
   m_canvas.PrepareForSelection();
   
   CGeoRect<short> scrExtent = CGeoRect<short>(0,0,0,0);
-  
-  for(unsigned int i = 0; i < m_viewImpl->GetLayerSize(m_curScaleLevel); i++)
+  int scale = m_mapping.GetMapLayout().m_scale;
+
+  for(unsigned int i = 0; i < m_viewImpl->GetLayerSize(scale); i++)
   {
-    m_viewImpl->m_layers[m_curScaleLevel][i]->Draw(m_type, &stackDC, scrExtent, curDC->m_clipBox, false);
+    m_viewImpl->m_layers[scale][i]->Draw(m_type, &stackDC, scrExtent, curDC->m_clipBox, false);
   }
 
-  m_canvas.RenderBasic(m_mapping.GetMapLayout().m_scale, false, false, false);
+  m_canvas.RenderBasic(m_curScaleLevel, false, false, false);
   
   int bitsPerPixel = ::GetDeviceCaps(dc, BITSPIXEL);
   if(bitsPerPixel >= SYSTEM_BPP)

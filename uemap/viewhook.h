@@ -159,6 +159,9 @@ namespace UeMap
       DHT_QuerySettingHook          = 0x1024,
       DHT_VoiceSettingHook          = 0x1028,
       DHT_SoundMenuHook             = 0x1029,
+      DHT_OtherSystemSettingHook    = 0x1030,
+      DHT_NaviMapSettingHook        = 0x1031,
+      DHT_VersionInfoHook           = 0x1032,
 
 	    //找地方界面
 	    DHT_QueryMenuHook             = 0x1050,
@@ -313,10 +316,14 @@ namespace UeMap
       DHT_SystemLeftHook              = 0x1304,
       //系统设置左边栏
       DHT_NavigationLeftHook          = 0x1305,
-      //类型和区域选择界面
+      //类型选择界面
       DHT_TypeInDistSelectionHook     = 0x1306,
-      //类型和区域检索的界面
-      DHT_TypeInDistQueryListHook     = 0x1307,
+      DHT_TypeNoDistSelectionHook     = 0x1307,
+      //类型检索列表界面
+      DHT_TypeInDistQueryListHook     = 0x1308,
+      DHT_TypeNoDistQueryListHook     = 0x1309,
+      //周边类型选择界面
+      DHT_RoundSelectionHook          = 0x130A,
       DHT_Outside					            = 0x2010,
     };
 

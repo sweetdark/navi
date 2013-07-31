@@ -842,6 +842,12 @@ namespace UeMap
     bool IsNeedShowEagle();
 
     void EraseGuidanceView();
+
+    void InitGuidanceView(const CViewState *curView);
+
+    ScreenLayout GetHalfScreenLayout(bool isPerspective);
+
+    void ShowEagle(CViewState *curView);
   protected:
     // Belonged window
     void *m_wnd;
@@ -946,6 +952,8 @@ namespace UeMap
     short m_laneWidth;
     //车道信息的高度
     short m_laneHeight;
+    //
+    short m_overViewScale;
   private:
     //图层是否变化
     bool m_isMapLayoutChange;
@@ -957,6 +965,8 @@ namespace UeMap
     UeBase::ViewSettings m_viewSettings;
     //鹰眼图状态是否打开
     bool m_isEagleOn;
+
+    MapLayout m_eagleLayout;
   };
 }
 
