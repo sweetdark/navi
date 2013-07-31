@@ -77,6 +77,7 @@ namespace UeMap
   // Forward classes
   class CViewImpl;
   class CGuidanceView;
+  class CEagleView;
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///
@@ -321,6 +322,7 @@ namespace UeMap
     //
     static CAGGView *m_mainView;
     static CGuidanceView *m_guidanceView;
+    static CEagleView *m_eagleView;
   private:
     static bool m_isScrolling;
     

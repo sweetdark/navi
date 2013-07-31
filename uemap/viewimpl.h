@@ -100,6 +100,7 @@ namespace UeMap
     friend class CAGGView;
     friend class CImageView;
     friend class CGuidanceView;
+    friend class CEagleView;
 
     friend class CViewLayer;
     friend class CGroundLayer;
@@ -750,6 +751,8 @@ namespace UeMap
     * \brief 获得相应scaleLevel下的Layer的个数
     */
     unsigned int GetLayerSize(short scaleLevel);
+
+    void SetEagleState(bool isEagleOn);
   protected:
     /**
     * 开始显示系统加载进度
@@ -833,6 +836,12 @@ namespace UeMap
     * \brief 初始化地图状态
     **/
     void InitState();
+    /**
+    * \brief 是否需要显示鹰眼图
+    */
+    bool IsNeedShowEagle();
+
+    void EraseGuidanceView();
   protected:
     // Belonged window
     void *m_wnd;
@@ -946,6 +955,8 @@ namespace UeMap
     bool m_isScallingMapLock;
     //地图设置
     UeBase::ViewSettings m_viewSettings;
+    //鹰眼图状态是否打开
+    bool m_isEagleOn;
   };
 }
 

@@ -56,6 +56,7 @@
 #include "ueroute\routebasic.h"
 
 #include "ueroute\ueguider.h" 
+#include "eagleview.h"
 
 using namespace UeMap;
 using namespace UeBase;
@@ -76,7 +77,7 @@ CViewImpl::CViewImpl() : m_wnd(0), m_layoutSchema(LS_Full), m_idleOP(IOP_Cursor 
 m_pathBasic(CPathBasic::Get()), m_fileBasic(CFileBasic::Get()), m_stringBasic(CStringBasic::Get()), 
 m_isReadyForOperation(true), m_sidePicCode(-1), m_sidePicType(-1), m_sideArrowCode(-1), m_isDrawSidePic(false), 
 m_picWndHandle(0), m_sampleID(0), m_isDrawPlanLayer(true), m_carIcon(0), m_3DCarIcon(0), m_compassIcon(0), m_compassIndicatorIcon(0),
-m_isProductActivation(false), m_needShowGuidanceView(true),m_isMapLayoutChange(false), m_bubbleIcon(0),m_isScallingMapLock(false)
+m_isProductActivation(false), m_needShowGuidanceView(true),m_isMapLayoutChange(false), m_bubbleIcon(0),m_isScallingMapLock(false),m_isEagleOn(false)
 {
   m_carInfo.m_curPos.m_x = 11639142;
   m_carInfo.m_curPos.m_y = 3991655;
@@ -603,23 +604,17 @@ void CViewImpl::SetViewPort(CViewState *curView, const MapLayout &mapLayout, sho
   {
   case LS_Full:
     {
+      if (!IsNeedShowEagle())
+      {
+        EraseState(VT_Eagle);
+        ScreenLayout layout = m_scrLayout;
+        curView->SetScrLayout(layout);
+        curView->SetMapLayout(mapLayout);
+      }
       // Erase guidance view
-      CGuidanceView *guidanceView = dynamic_cast<CGuidanceView *>(GetState(VT_Guidance));
-      if(guidanceView)
-      {
-        guidanceView->m_distForSnd = -1;
-        guidanceView->m_orderForSnd = -1;
-      }
-      {
-        CGuidanceView::m_curIndicator = CGuidanceView::m_curPair = 0;
-        CGuidanceView::m_curRecord = 0;
-        //IQuery::GetQuery()->Release();   //导致切换视图，查询的记录空了。 bug:查地名选记录。切换视图，返回再选记录崩溃。
-      }
-      EraseState(VT_Guidance);
+      EraseGuidanceView();
       // Full screen for main view
-      ScreenLayout layout = m_scrLayout;
-      curView->SetScrLayout(layout);
-      curView->SetMapLayout(mapLayout);
+      
     }
     break;
   case LS_Fix_Split:
@@ -645,19 +640,7 @@ void CViewImpl::SetViewPort(CViewState *curView, const MapLayout &mapLayout, sho
       }
       curView->SetScrLayout(scrLayout);
       curView->SetMapLayout(mapLayout);
-
       //
-      CViewState *guidanceView = GetState(VT_Guidance);
-      if (!guidanceView)
-      {
-        bool isLand = (GetScrMode() == SM_Land) ? true : false;
-        guidanceView = CAGGView::GetState(VT_Guidance, isLand, this);
-        assert(guidanceView);
-
-        guidanceView->m_style = VS_Floating;
-        m_views.push_back(guidanceView);
-      }
-      assert(guidanceView);
 
       // TODO:
       // The size should be configed by one CFG file
@@ -675,7 +658,34 @@ void CViewImpl::SetViewPort(CViewState *curView, const MapLayout &mapLayout, sho
         scrLayout.m_extent.m_minY = 2 * m_scrLayout.m_extent.Height() / 4; 
         scrLayout.m_extent.m_maxY = (curView->m_type == VT_Perspective) ? m_scrLayout.m_extent.Height() * (CAGGView::m_scaleY) : m_scrLayout.m_extent.Height();
       }
+      CViewState *guidanceView = GetState(VT_Guidance);
+      if (!guidanceView)
+      {
+        bool isLand = (GetScrMode() == SM_Land) ? true : false;
+        guidanceView = CAGGView::GetState(VT_Guidance, isLand, this);
+        assert(guidanceView);
+
+        guidanceView->m_style = VS_Floating;
+        m_views.push_back(guidanceView);
+      }
+      assert(guidanceView);
       guidanceView->SetScrLayout(scrLayout);
+
+
+      if (IsNeedShowEagle())
+      {
+        CViewState *eagleView = GetState(VT_Eagle);
+        if (!eagleView)
+        {
+          bool isLand = (GetScrMode() == SM_Land) ? true : false;
+          eagleView = CAGGView::GetState(VT_Eagle, isLand, this);
+          assert(guidanceView);
+
+          eagleView->m_style = VS_Floating;
+          m_views.push_back(eagleView);
+        }
+        eagleView->SetScrLayout(scrLayout);
+      }
     }
     break;
   case LS_Docable:
@@ -2422,7 +2432,6 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
   CGuidanceView *guidanceView = dynamic_cast<CGuidanceView *>(GetState(VT_Guidance));
   guidanceView->m_drawType = CGuidanceView::DT_Cross;
 
-  // According to current distance ...
   if ((rt != PEC_Success && (m_layoutSchema == LS_Split || m_layoutSchema == LS_Fix_Split)) || 
       (rt == UeRoute::PEC_Success && dirInfo.m_curDistForSnd  > 500 && m_layoutSchema == LS_Split || m_layoutSchema == LS_Fix_Split))
   {
@@ -2492,16 +2501,16 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
           guidanceView->m_curScaleLevel = 1; //路口放大图的比例尺
           guidanceView->SetMapLayout(mapLayout);
         }
-        //else
-        //{
-        //  //
-        //  MapLayout mapLayout = guidanceView->m_mapping.m_mapLayout;
-        //  if (mapLayout.m_angle != m_carInfo.m_headingDegree)
-        //  {
-        //    mapLayout.m_angle = m_carInfo.m_headingDegree;
-        //    guidanceView->SetMapLayout(mapLayout);
-        //  }
-        //}
+        else
+        {
+          //
+          MapLayout mapLayout = guidanceView->m_mapping.m_mapLayout;
+          if (mapLayout.m_angle != m_carInfo.m_headingDegree)
+          {
+            mapLayout.m_angle = m_carInfo.m_headingDegree;
+            guidanceView->SetMapLayout(mapLayout);
+          }
+        }
       }
     }
   }
@@ -2887,11 +2896,11 @@ void UeMap::CViewImpl::CloseGuidanceView()
   {
     //如果用户自己关闭路口放大图后，则当前路口放大图不再显示
     m_needShowGuidanceView = false;
-
-    GuidanceStatus dirInfo;
+    //QJW 还有鹰眼图
+    /*GuidanceStatus dirInfo;
     unsigned int rt = IRoute::GetRoute()->GetCurrent(dirInfo);
     curView = ZoomInFull(curView, dirInfo);
-    IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
+    IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);*/
   }
 }
 
@@ -3397,4 +3406,30 @@ void CViewImpl::InitState()
 unsigned int CViewImpl::GetLayerSize(short scaleLevel)
 {
   return m_layers[scaleLevel].size();
+}
+
+void CViewImpl::SetEagleState(bool isEagleOn)
+{
+  m_isEagleOn = isEagleOn;
+}
+
+bool CViewImpl::IsNeedShowEagle()
+{
+  bool hasRoute = IRoute::GetRoute()->GetPlanState() != PS_None;
+  bool isGuidanceMode = MainState()->GetViewOpeMode() == VM_Guidance;
+  bool isHasGuidancheView = GetState(VT_Guidance) == NULL;
+  return hasRoute && isGuidanceMode && m_isEagleOn && !isHasGuidancheView;
+}
+
+void CViewImpl::EraseGuidanceView()
+{
+  CGuidanceView *guidanceView = dynamic_cast<CGuidanceView *>(GetState(VT_Guidance));
+  if(guidanceView)
+  {
+    guidanceView->m_distForSnd = -1;
+    guidanceView->m_orderForSnd = -1;
+    CGuidanceView::m_curIndicator = CGuidanceView::m_curPair = 0;
+    CGuidanceView::m_curRecord = 0;
+    EraseState(VT_Guidance);
+  }
 }

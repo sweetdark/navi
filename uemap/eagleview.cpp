@@ -27,7 +27,7 @@ void CEagleView::SetScrLayout(const ScreenLayout &layout)
   // Different Y positions
   scrLayout.m_width = layout.m_extent.m_maxX - layout.m_extent.m_minX;
   scrLayout.m_height = layout.m_extent.m_maxY - layout.m_extent.m_minY;
-  if(m_viewImpl->MainState()->m_type == VT_Perspective)
+  if(m_viewImpl->MainState()->GetViewType() == VT_Perspective)
   {
     scrLayout.m_base.m_x = scrLayout.m_width / 2;
     scrLayout.m_base.m_y = scrLayout.m_extent.m_minY  + static_cast<int>(scrLayout.m_extent.Height() / CAGGView::GetScaleY() / 2);
@@ -74,10 +74,10 @@ void CEagleView::OnDraw(short style)
   
   for(unsigned int i = 0; i < m_viewImpl->GetLayerSize(m_curScaleLevel); i++)
   {
-    m_viewImpl->GetLayer(m_curScaleLevel, i)->Draw(m_type, &stackDC, scrExtent, curDC->m_clipBox, false);
+    m_viewImpl->m_layers[m_curScaleLevel][i]->Draw(m_type, &stackDC, scrExtent, curDC->m_clipBox, false);
   }
 
-  m_canvas.RenderBasic(m_curScaleLevel, false, false, false);
+  m_canvas.RenderBasic(m_mapping.GetMapLayout().m_scale, false, false, false);
   
   int bitsPerPixel = ::GetDeviceCaps(dc, BITSPIXEL);
   if(bitsPerPixel >= SYSTEM_BPP)

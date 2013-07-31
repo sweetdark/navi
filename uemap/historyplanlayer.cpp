@@ -85,7 +85,7 @@ void CHistoryPlanLayer::Draw(short type, const CViewDC *viewDC, CGeoRect<short> 
 
 	//
 	CGeoRect<int> clipExtent;
-	if(type == VT_Guidance)
+	if(type == VT_Guidance || type == VT_Eagle)
 	{
 		clipExtent.m_minX = 20;
 		clipExtent.m_maxX = curView->m_mapping.m_scrLayout.m_extent.Width() - 20;

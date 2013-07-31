@@ -466,6 +466,11 @@ namespace UeMap
     * \brief Ë¢ÐÂÍ¼²ãÊý¾Ý
     */
    virtual void RefreshLayerData();
+
+   unsigned int GetViewType()
+   {
+     return m_type;
+   }
   protected:
     //
     //

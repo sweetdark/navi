@@ -681,6 +681,10 @@ namespace UeMap
     * 解锁路口放大                                                                
     */
     void UnLockScalling();
+    /**
+    * \brief 设置鹰眼图是否打开
+    */
+    void SetEagleState(bool isEagleOn);
   private:
     // one view implementation against different OS(s)
     CViewImpl *m_viewImpl;
