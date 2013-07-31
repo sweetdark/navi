@@ -93,6 +93,8 @@ void CHistoryInformationHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(HistoryInformationHook_LabelSeparator1,	"LabelSeparator1"));
   m_ctrlNames.insert(GuiName::value_type(HistoryInformationHook_LabelSeparator2,	"LabelSeparator2"));
 
+  m_ctrlNames.insert(GuiName::value_type(HistoryInformationHook_OperatePicFirst,	"EditPicFirst"));
+  m_ctrlNames.insert(GuiName::value_type(HistoryInformationHook_OperatePicSecond,	"EditPicSecond"));
   m_ctrlNames.insert(GuiName::value_type(HistoryInformationHook_ClearCenter,	"ClearCenter"));
 }
 
@@ -825,9 +827,7 @@ void UeGui::CHistoryInformationHook::DoSelectRecord( RowTag row )
         m_userWrapper.ConnectToHistoryRecord();             
         PointList resultList;
         PointInfo pointInfo;     
-        int mstart = m_pageTurning.GetPageStartPosition() - 1;
-        int mend = m_pageTurning.GetPageEndPosition();
-        for (int i = mstart; i < mend; ++i)
+        for (int i = 0; i < m_pageTurning.GetPageEndPosition(); ++i)
         {     
           const HistoryRecordEntry *tempEntry = m_userWrapper.GetHistoryRecord(i); 
           HistoryRecordEntry curEntry;
@@ -838,9 +838,9 @@ void UeGui::CHistoryInformationHook::DoSelectRecord( RowTag row )
           ::strcpy(pointInfo.m_name, name);
           resultList.push_back(pointInfo);
         }  
-        m_userWrapper.DisconnectHistoryRecord();      
-        mapHook->SetPickPos(resultList, dataIndex);
-        TurnTo(DHT_MapHook);
+        m_userWrapper.DisconnectHistoryRecord();   
+        TurnTo(DHT_MapHook);   
+        mapHook->SetPickPos(resultList, dataIndex);        
       }     
       break;
     }
@@ -900,7 +900,7 @@ void UeGui::CHistoryInformationHook::DoEditRecord( RowTag row )
   {
   case kPageHisRecord :
     {
-      unsigned int dataIndex = GetDataIndex(m_selectRow);
+      /*unsigned int dataIndex = GetDataIndex(m_selectRow);
       m_userWrapper.ConnectToHistoryRecord();
       const HistoryRecordEntry *curEntry = m_userWrapper.GetHistoryRecord(dataIndex);
       EditData data;
@@ -911,7 +911,8 @@ void UeGui::CHistoryInformationHook::DoEditRecord( RowTag row )
       CDetailEditHook editHook;
       CDetailEditEvent editEvent(this,DHT_HistoryInformationHook);
       editHook.ShowDetailEditHook(&data,editEvent);
-      TurnTo(DHT_DetailEditHook);
+      editHook.DoRecordPosition(dataIndex);
+      TurnTo(DHT_DetailEditHook);*/
       break;
     }
   case kPageHisTrajectory : 
@@ -992,7 +993,7 @@ void UeGui::CHistoryInformationHook::ActivatePage( PageTag page )
 
   //记录当前活动页ID
   m_avtivePageIndex = page;
-  //ChangeOperatorCtrlIcon(page);
+  ChangeOperatorCtrlIcon(page);
   switch (page)
   {
   case kPageHisRecord :
@@ -1080,10 +1081,12 @@ void UeGui::CHistoryInformationHook::ChangeOperatorCtrlIcon( PageTag page )
   {
   case kPageHisRecord :
     {
+      iconElement = GetGuiElement(HistoryInformationHook_OperatePicFirst);
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI1Icon), iconElement);
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI2Icon), iconElement);
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI3Icon), iconElement);
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI4Icon), iconElement);
+      ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI5Icon), iconElement);
       break;
     }
   case kPageHisTrajectory : 
@@ -1092,15 +1095,18 @@ void UeGui::CHistoryInformationHook::ChangeOperatorCtrlIcon( PageTag page )
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI2Icon), iconElement);
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI3Icon), iconElement);
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI4Icon), iconElement);
+      ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI5Icon), iconElement);
 
       break;
     }
   case kPageHisRoute :
     {
+      iconElement = GetGuiElement(HistoryInformationHook_OperatePicSecond);
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI1Icon), iconElement);
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI2Icon), iconElement);
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI3Icon), iconElement);
       ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI4Icon), iconElement);
+      ChangeCtrlIcon(GetGuiElement(HistoryInformationHook_OperatePOI5Icon), iconElement);
       break;
     }
   }

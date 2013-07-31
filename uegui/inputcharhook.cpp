@@ -54,6 +54,7 @@ void CInputCharHook::Init()
 
 void CInputCharHook::Load()
 {
+  CQueryWrapper::Get().SetDefaultQueryKind();
   SetQueryMode();
   GetAssociateThing();
 }
@@ -592,7 +593,7 @@ bool CInputCharHook::GetAssociateThing()
 
   //
   CUeRecord *pRecordVec(0);
-  queryWrapper.SetMaxQueryRecordNum(20);
+  queryWrapper.SetMaxQueryRecordNum(12);
   pRecordVec = queryWrapper.DoQueryGetRecord();
 
   if ((pRecordVec==0 || pRecordVec->GetCount())

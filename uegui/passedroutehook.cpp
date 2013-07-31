@@ -367,7 +367,7 @@ short CPassedRouteHook::MouseUp(CGeoPoint<short> &scrPoint)
   case passedroutehook_RowUpArrowBtn:
   case passedroutehook_RowUpBtn:
     {
-      if (m_rowUpBtnCtrl.IsEnable())
+      if (!m_pageController.IsFirstPage())
       {
         m_rowUpBtnCtrl.MouseUp();
         m_pageController.PreviousPage();
@@ -383,7 +383,7 @@ short CPassedRouteHook::MouseUp(CGeoPoint<short> &scrPoint)
   case passedroutehook_RowDownArrowBtn:
   case passedroutehook_RowDownBtn:
     {
-      if (m_rowDownBtnCtrl.IsEnable())
+      if (!m_pageController.IsLastPage())
       {
         m_rowDownBtnCtrl.MouseUp();
         m_pageController.NextPage();

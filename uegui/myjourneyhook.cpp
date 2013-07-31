@@ -1,5 +1,6 @@
 #include "myjourneyhook.h"
 #include "messagedialoghook.h"
+#include "myjourneywrapper.h"
 
 using namespace UeGui;
 
@@ -149,142 +150,166 @@ short CMyJourneyHook::MouseDown(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
-  case myjourneyhook_BottomBack:
-    {
-      m_bottomBackCtrl.MouseDown();
-    }
-    break;
   case myjourneyhook_ClearCenter:
     {
       m_clearCenterCtrl.MouseDown();
-    }
-    break;
-  case myjourneyhook_CurrentPageInfor:
-    {
-      m_currentPageInforCtrl.MouseDown();
+      AddRenderUiControls(&m_clearCenterCtrl);
     }
     break;
   case myjourneyhook_DeleteJourney1Btn:
   case myjourneyhook_DeleteJourney1BtnIcon:
     {
       m_deleteJourney1BtnCtrl.MouseDown();
+      if (!m_deleteJourney1BtnCtrl.IsEnable())
+      {
+        m_isNeedRefesh = false;
+        break;        
+      }
+      AddRenderUiControls(&m_deleteJourney1BtnCtrl);
     }
     break;
   case myjourneyhook_DeleteJourney2Btn:
   case myjourneyhook_DeleteJourney2BtnIcon:
     {
       m_deleteJourney2BtnCtrl.MouseDown();
+      if (!m_deleteJourney2BtnCtrl.IsEnable())
+      {
+        m_isNeedRefesh = false;
+        break;        
+      }
+      AddRenderUiControls(&m_deleteJourney2BtnCtrl);
     }
     break;
   case myjourneyhook_DeleteJourney3Btn:
   case myjourneyhook_DeleteJourney3BtnIcon:
     {
       m_deleteJourney3BtnCtrl.MouseDown();
+      if (!m_deleteJourney3BtnCtrl.IsEnable())
+      {
+        m_isNeedRefesh = false;
+        break;        
+      }
+      AddRenderUiControls(&m_deleteJourney3BtnCtrl);
     }
     break;
   case myjourneyhook_DeleteJourney4Btn:
   case myjourneyhook_DeleteJourney4BtnIcon:
     {
       m_deleteJourney4BtnCtrl.MouseDown();
+      if (!m_deleteJourney4BtnCtrl.IsEnable())
+      {
+        m_isNeedRefesh = false;
+        break;        
+      }
+      AddRenderUiControls(&m_deleteJourney4BtnCtrl);
     }
     break;
   case myjourneyhook_DeleteJourney5Btn:
   case myjourneyhook_DeleteJourney5BtnIcon:
     {
       m_deleteJourney5BtnCtrl.MouseDown();
+      if (!m_deleteJourney5BtnCtrl.IsEnable())
+      {
+        m_isNeedRefesh = false;
+        break;        
+      }
+      AddRenderUiControls(&m_deleteJourney5BtnCtrl);
     }
     break;
   case myjourneyhook_DeleteJourney6Btn:
   case myjourneyhook_DeleteJourney6BtnIcon:
     {
       m_deleteJourney6BtnCtrl.MouseDown();
-    }
-    break;
-  case myjourneyhook_Journey1Name:
-    {
-      m_journey1NameCtrl.MouseDown();
-    }
-    break;
-  case myjourneyhook_Journey2Name:
-    {
-      m_journey2NameCtrl.MouseDown();
-    }
-    break;
-  case myjourneyhook_Journey3Name:
-    {
-      m_journey3NameCtrl.MouseDown();
-    }
-    break;
-  case myjourneyhook_Journey4Name:
-    {
-      m_journey4NameCtrl.MouseDown();
-    }
-    break;
-  case myjourneyhook_Journey5Name:
-    {
-      m_journey5NameCtrl.MouseDown();
-    }
-    break;
-  case myjourneyhook_Journey6Name:
-    {
-      m_journey6NameCtrl.MouseDown();
+      if (!m_deleteJourney6BtnCtrl.IsEnable())
+      {
+        m_isNeedRefesh = false;
+        break;        
+      }
+      AddRenderUiControls(&m_deleteJourney6BtnCtrl);
     }
     break;
   case myjourneyhook_NextPage:
   case myjourneyhook_NextPageIcon:
     {
       m_nextPageCtrl.MouseDown();
-    }
-    break;
-  case myjourneyhook_PageCenter:
-    {
-      m_pageCenterCtrl.MouseDown();
-    }
-    break;
-  case myjourneyhook_PageSeparator:
-    {
-      m_pageSeparatorCtrl.MouseDown();
+      if (!m_nextPageCtrl.IsEnable())
+      {
+        m_isNeedRefesh = false;
+        break;        
+      }
+      AddRenderUiControls(&m_nextPageCtrl);
     }
     break;
   case myjourneyhook_PreviousPage:
   case myjourneyhook_PreviousPageIcon:
     {
       m_previousPageCtrl.MouseDown();
+      if (!m_previousPageCtrl.IsEnable())
+      {
+        m_isNeedRefesh = false;
+        break;        
+      }
+      AddRenderUiControls(&m_previousPageCtrl);
     }
     break;
   case myjourneyhook_Row1Center:
+  case myjourneyhook_Journey1Name:
     {
       m_row1CenterCtrl.MouseDown();
+      m_journey1NameCtrl.MouseDown();
+      AddRenderUiControls(&m_row1CenterCtrl);
+      AddRenderUiControls(&m_journey1NameCtrl);
+      AddRenderUiControls(&m_deleteJourney1BtnCtrl);
     }
     break;
   case myjourneyhook_Row2Center:
+  case myjourneyhook_Journey2Name:
     {
       m_row2CenterCtrl.MouseDown();
+      m_journey2NameCtrl.MouseDown();
+      AddRenderUiControls(&m_row2CenterCtrl);
+      AddRenderUiControls(&m_journey2NameCtrl);
+      AddRenderUiControls(&m_deleteJourney2BtnCtrl);
     }
     break;
   case myjourneyhook_Row3Center:
+  case myjourneyhook_Journey3Name:
     {
       m_row3CenterCtrl.MouseDown();
+      m_journey3NameCtrl.MouseDown();
+      AddRenderUiControls(&m_row3CenterCtrl);
+      AddRenderUiControls(&m_journey3NameCtrl);
+      AddRenderUiControls(&m_deleteJourney3BtnCtrl);
     }
     break;
   case myjourneyhook_Row4Center:
+  case myjourneyhook_Journey4Name:
     {
       m_row4CenterCtrl.MouseDown();
+      m_journey4NameCtrl.MouseDown();
+      AddRenderUiControls(&m_row4CenterCtrl);
+      AddRenderUiControls(&m_journey4NameCtrl);
+      AddRenderUiControls(&m_deleteJourney4BtnCtrl);
     }
     break;
   case myjourneyhook_Row5Center:
+  case myjourneyhook_Journey5Name:
     {
       m_row5CenterCtrl.MouseDown();
+      m_journey5NameCtrl.MouseDown();
+      AddRenderUiControls(&m_row5CenterCtrl);
+      AddRenderUiControls(&m_journey5NameCtrl);
+      AddRenderUiControls(&m_deleteJourney5BtnCtrl);
     }
     break;
   case myjourneyhook_Row6Center:
+  case myjourneyhook_Journey6Name:
     {
       m_row6CenterCtrl.MouseDown();
-    }
-    break;
-  case myjourneyhook_TotalPageInfor:
-    {
-      m_totalPageInforCtrl.MouseDown();
+      m_journey6NameCtrl.MouseDown();
+      AddRenderUiControls(&m_row6CenterCtrl);
+      AddRenderUiControls(&m_journey6NameCtrl);
+      AddRenderUiControls(&m_deleteJourney6BtnCtrl);
     }
     break;
   default:
@@ -366,33 +391,45 @@ short CMyJourneyHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   case myjourneyhook_Journey1Name:
+  case myjourneyhook_Row1Center:
     {
       m_journey1NameCtrl.MouseUp();
+      m_row1CenterCtrl.MouseUp();
     }
     break;
   case myjourneyhook_Journey2Name:
+  case myjourneyhook_Row2Center:
     {
       m_journey2NameCtrl.MouseUp();
+      m_row2CenterCtrl.MouseUp();
     }
     break;
   case myjourneyhook_Journey3Name:
+  case myjourneyhook_Row3Center:
     {
       m_journey3NameCtrl.MouseUp();
+      m_row3CenterCtrl.MouseUp();
     }
     break;
   case myjourneyhook_Journey4Name:
+  case myjourneyhook_Row4Center: 
     {
       m_journey4NameCtrl.MouseUp();
+      m_row4CenterCtrl.MouseUp();
     }
     break;
   case myjourneyhook_Journey5Name:
+  case myjourneyhook_Row5Center:
     {
       m_journey5NameCtrl.MouseUp();
+      m_row5CenterCtrl.MouseUp();
     }
     break;
   case myjourneyhook_Journey6Name:
+  case myjourneyhook_Row6Center:
     {
       m_journey6NameCtrl.MouseUp();
+      m_row6CenterCtrl.MouseUp();
     }
     break;
   case myjourneyhook_NextPage:
@@ -409,16 +446,6 @@ short CMyJourneyHook::MouseUp(CGeoPoint<short> &scrPoint)
       }
     }
     break;
-  case myjourneyhook_PageCenter:
-    {
-      m_pageCenterCtrl.MouseUp();
-    }
-    break;
-  case myjourneyhook_PageSeparator:
-    {
-      m_pageSeparatorCtrl.MouseUp();
-    }
-    break;
   case myjourneyhook_PreviousPage:
   case myjourneyhook_PreviousPageIcon:
     {
@@ -431,41 +458,6 @@ short CMyJourneyHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_isNeedRefesh = false;
       }
-    }
-    break;
-  case myjourneyhook_Row1Center:
-    {
-      m_row1CenterCtrl.MouseUp();
-    }
-    break;
-  case myjourneyhook_Row2Center:
-    {
-      m_row2CenterCtrl.MouseUp();
-    }
-    break;
-  case myjourneyhook_Row3Center:
-    {
-      m_row3CenterCtrl.MouseUp();
-    }
-    break;
-  case myjourneyhook_Row4Center:
-    {
-      m_row4CenterCtrl.MouseUp();
-    }
-    break;
-  case myjourneyhook_Row5Center:
-    {
-      m_row5CenterCtrl.MouseUp();
-    }
-    break;
-  case myjourneyhook_Row6Center:
-    {
-      m_row6CenterCtrl.MouseUp();
-    }
-    break;
-  case myjourneyhook_TotalPageInfor:
-    {
-      m_totalPageInforCtrl.MouseUp();
     }
     break;
   default:
@@ -502,8 +494,31 @@ void CMyJourneyHook::ShowCurPageJourneyData()
   {
     ShowRowData(row, m_curPageJourneyDatas[row - 1].GetJourneyName());
   }
+  //设置清空按钮
+  if (m_curPageJourneyDatas.size())
+  {
+    m_clearCenterCtrl.SetEnable(true);
+  }
 }
-
+void CMyJourneyHook::SwitchPageBtnVisble()
+{
+  if (m_pageController.IsFirstPage())
+  {
+    m_previousPageCtrl.SetEnable(false);
+  }
+  else
+  {
+    m_previousPageCtrl.SetEnable(true);
+  }
+  if (m_pageController.IsLastPage())
+  {
+    m_nextPageCtrl.SetEnable(false);
+  }
+  else
+  {
+    m_nextPageCtrl.SetEnable(true);
+  }
+}
 void CMyJourneyHook::ShowRowData(unsigned int row, const char *jurneyName)
 {
   if (row >= kRowEnd)
@@ -519,6 +534,7 @@ void CMyJourneyHook::ClearAllRow()
   {
     first->Clear();
   }
+  m_clearCenterCtrl.SetEnable(false);
 }
 
 void CMyJourneyHook::InitRowCtrlList()
@@ -574,6 +590,7 @@ void CMyJourneyHook::PreviousPage()
 void CMyJourneyHook::UpdatePageInfo()
 {
   m_pageController.ShowPageInfo(&m_currentPageInforCtrl, &m_totalPageInforCtrl);
+  SwitchPageBtnVisble();
 }
 
 void CMyJourneyHook::OnClickDeleteBtn(unsigned int row)
@@ -629,3 +646,34 @@ void CMyJourneyHook::DeleteJourneyRecord()
   m_journeyWrapper.DeleteJourneyData(GetDataIndex(m_deleteRowNum));
   Load();
 }
+bool UeGui::CMyJourneyHook::AddJourneyData( const char *journeyName, unsigned int routeType, const POIDataList &poiList )
+{
+  if (journeyName)
+  {
+    std::string dataBuf;
+    CMyJourneyData myJourneyData;
+    myJourneyData.AddJourneyData(journeyName, routeType, poiList);    
+    myJourneyData.DataToString(dataBuf);
+
+    m_journeyWrapper.m_journeyFileReader->AddBlockData(dataBuf.c_str(), CFileBasic::UE_SEEK_BEGIN);
+
+    //控制数据量
+    if (m_journeyWrapper.m_maxSize > 0)
+    {
+      while (m_journeyWrapper.m_journeyFileReader->GetDataCount() > m_journeyWrapper.m_maxSize)
+      {
+        size_t dataIndex = m_journeyWrapper.m_journeyFileReader->GetDataCount() - 1;
+        m_journeyWrapper.m_journeyFileReader->RemoveBlockData(dataIndex);
+      }
+    }
+
+    //添加数据后重新修改翻页控制信息
+    m_pageController.SetTotal(m_journeyWrapper.m_journeyFileReader->GetDataCount());
+    m_pageController.Reset();
+    return true;
+  }
+  return false;
+}
+
+
+

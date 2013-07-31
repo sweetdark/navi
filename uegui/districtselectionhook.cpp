@@ -542,7 +542,7 @@ int CDistrictSelectionHook::DoClickListItem(int iItemIndex,TCodeEntry &item)
     break;
   case SECONDE_LEVEL:
     {
-      if (iItemIndex == UP_ONE_LEVEL)  
+      if (iItemIndex == UP_ONE_LEVEL_OPERATION)  
       {
         UpOneLevel();
       }
@@ -554,11 +554,11 @@ int CDistrictSelectionHook::DoClickListItem(int iItemIndex,TCodeEntry &item)
     break;
   case LAST_LEVEL:
     {
-      if (iItemIndex == UP_ONE_LEVEL)  
+      if (iItemIndex == UP_ONE_LEVEL_OPERATION)  
       {
         UpOneLevel();
       }
-      else if (iItemIndex == ALL_AREA)  
+      else if (iItemIndex == ALL_AREA_OPERATION)  
       {
         if (m_pCurItemCtrl)
         {
@@ -586,7 +586,7 @@ void CDistrictSelectionHook::UpOneLevel()
   if (m_itemLevel > TOP_LEVEL)
   {
     -- m_itemLevel;
-    m_preCode = m_vecListItem[UP_ONE_LEVEL].m_uCode;
+    m_preCode = m_vecListItem[UP_ONE_LEVEL_OPERATION].m_uCode;
     GetLevelItem();
 
     if (m_vecListItem.size() == 0 && m_itemLevel > TOP_LEVEL)
@@ -600,7 +600,7 @@ void CDistrictSelectionHook::UpOneLevel()
 
 void CDistrictSelectionHook::DownOneLevel(unsigned int itemIdex)
 {
-  if (m_itemLevel < LAST_LEVEL && itemIdex < m_vecListItem.size()-1)
+  if (m_itemLevel < LAST_LEVEL && itemIdex < m_vecListItem.size())
   {
     ++ m_itemLevel;
     m_preCode = m_vecListItem[itemIdex].m_uCode;

@@ -166,6 +166,11 @@ namespace UeRoute
     bool GetCurElecEye(EEyeProp &elecEye);
 
     /**
+    * \brief 取得距离当前需播报的电子眼
+    */
+    double GetCurElecEyeDist();
+
+    /**
     *
     */
     UeSound *GetBufs()
@@ -559,6 +564,7 @@ namespace UeRoute
     short m_eyeDistFlag;
     short m_trafficDistFlag;
     EEyeProp m_curElecEye;
+    double m_curElecEyeDist;
 
     //
     unsigned char m_velocityType;

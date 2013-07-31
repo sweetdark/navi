@@ -57,6 +57,18 @@ namespace UeGui
   typedef UeRoute::PlanPosition POIItem;
   typedef std::vector<POIItem> POIDataList;
 
+  struct DetailInfo
+  {
+    //名称
+    char m_name[MAX_NAME_LENGTH];
+    //地址
+    char m_address[MAX_NAME_LENGTH * 2];
+    //电话
+    char m_telephone[MAX_NAME_LENGTH];
+    //位置信息
+    CGeoPoint<long> m_position;
+  };
+
   enum MessageBoxType
   {
     MB_NONE,        //提示 窗口没有按钮

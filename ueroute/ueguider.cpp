@@ -1683,7 +1683,7 @@ unsigned int CUeGuider::PushIndicator(PlannedLink &curLink, PlannedLink &nextLin
           // ...
           short cLinks = 0;
           short turnOrder = 0;
-          if(m_plannedDist < 500000. )
+          //if(m_plannedDist < 500000. )
           {
             // When getting detailed & correct topo description, infoCode = -1 will means it is an outlet from main road to ramp or IC or JC
             // this info code will play role when guiding user to right outlet
@@ -3020,6 +3020,11 @@ inline unsigned int CUeGuider::GetCurrent(GuidanceStatus &dirInfo)
 inline bool CUeGuider::GetCurElecEye(EEyeProp &elecEye)
 {
   return m_voicer->GetCurElecEye(elecEye);
+}
+
+double UeRoute::CUeGuider::GetCurElecEyeDist()
+{
+ return m_voicer->GetCurElecEyeDist();
 }
 
 /**

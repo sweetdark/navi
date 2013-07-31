@@ -94,7 +94,7 @@ namespace UeGui
   private:
     tstring GetJourneyFilename();
 
-  private:
+    public:
     //我的行程最大数据量,根据设置读取
     unsigned int m_maxSize;
     //////////////////////////////////////////////////////////////////////////

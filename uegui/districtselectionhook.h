@@ -30,9 +30,9 @@ namespace UeGui
 
     enum Item_Operation
     {
-      UP_ONE_LEVEL = 0,
-      ALL_AREA,
-      OTHER,
+      UP_ONE_LEVEL_OPERATION = 0,
+      ALL_AREA_OPERATION,
+      OTHER_OPERATION,
     };
 
     static const unsigned char ITEMCOUNT = 16;

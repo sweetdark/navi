@@ -115,11 +115,12 @@ void CPoiQueryListHook::MakeControls()
 
   for(int i=0, j=PoiQueryListHook_List1Btn; i<4; i++)
   {
-    m_InfoBtn[i].SetCenterElement(GetGuiElement(j++));
-    m_InfoBtn[i].SetLabelElement(GetGuiElement(j++));
-    m_InfoBtn[i].SetIconElement(GetGuiElement(j++));
+    m_infoBtn[i].SetCenterElement(GetGuiElement(j++));
+    m_poiLabel[i].SetLabelElement(GetGuiElement(j++));
+    m_infoBtn[i].SetIconElement(GetGuiElement(j++));
+    m_poiLabel[i].SetParent(this);
 
-    m_AddrLabel[i].SetLabelElement(GetGuiElement(j++));
+    m_addrLabel[i].SetLabelElement(GetGuiElement(j++));
   }
 }
 
@@ -171,9 +172,10 @@ short CPoiQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
     if (ctrlType >= PoiQueryListHook_List1Btn && ctrlType <= PoiQueryListHook_List4PoiDistBox)
     {
       int index = (ctrlType-PoiQueryListHook_List1Btn)/4;
-      m_InfoBtn[index].MouseDown();
-      m_AddrLabel[index].MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_InfoBtn[index], m_AddrLabel[index]);
+      m_infoBtn[index].MouseDown();
+      m_addrLabel[index].MouseDown();
+      m_poiLabel[index].MouseDown();
+      MOUSEDONW_3RENDERCTRL(m_infoBtn[index], m_poiLabel[index], m_addrLabel[index]);
     } 
     else
     {
@@ -256,9 +258,10 @@ short CPoiQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
     if (ctrlType >= PoiQueryListHook_List1Btn && ctrlType <= PoiQueryListHook_List4PoiDistBox)
     {
       int index = (ctrlType-PoiQueryListHook_List1Btn)/4;
-      m_InfoBtn[index].MouseUp();
-      m_AddrLabel[index].MouseUp();
-      if(m_InfoBtn[index].IsEnable())
+      m_infoBtn[index].MouseUp();
+      m_addrLabel[index].MouseUp();
+      m_poiLabel[index].MouseUp();
+      if(m_infoBtn[index].IsEnable())
       {
         CAggHook::TurnTo(DHT_MapHook);
         CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
@@ -285,7 +288,7 @@ void CPoiQueryListHook::SearchForResult(const char* keyword)
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
   queryWrapper.SetAssociateNextWord(0);
   //暂时设为20条
-  queryWrapper.SetMaxQueryRecordNum(20);
+  queryWrapper.SetMaxQueryRecordNum(500);
   queryWrapper.SetQueryKeyword(keyword);
   CUeRecord *pRecordVec(queryWrapper.DoQueryGetRecord());
  
@@ -305,22 +308,27 @@ void CPoiQueryListHook::SearchForResult(const char* keyword)
 
 void CPoiQueryListHook::ResetResultList()
 {
+  unsigned char posBuffer[40];
+
   SQLRecord *oneRecord(0);
   m_pointList.clear();
   for (int i=0; i<4; ++i)
   {
     if ((oneRecord = m_records.GetRecord(i))==0)
     {
-      m_InfoBtn[i].SetEnable(false);
-      m_InfoBtn[i].SetCaption("");
-      m_AddrLabel[i].SetCaption("");
+      m_infoBtn[i].SetEnable(false);
+      m_poiLabel[i].SetCaption("");
+      m_addrLabel[i].SetCaption("");
       continue;
     }
-    m_InfoBtn[i].SetEnable(true);
-    m_InfoBtn[i].SetCaption(oneRecord->m_uniName);
+    m_infoBtn[i].SetEnable(true);
+    m_poiLabel[i].SetCaption(oneRecord->m_uniName);
+    SQLSentence sql = CQueryWrapper::Get().GetSQLSentence();
+    UeQuery::CTermIndexCtrl::GetKeyWordPosInRecord(oneRecord->m_uniName, sql, posBuffer);
+    m_poiLabel[i].SetFocusKey(posBuffer);
 
     CCodeIndexCtrl::GetDistCodeCtrl().GetItemNameByCode(oneRecord->m_addrCode,
-      m_AddrLabel[i].GetCaption());
+      m_addrLabel[i].GetCaption());
 
     PointInfo pointInfo;
     pointInfo.m_point.m_x = oneRecord->m_x;
@@ -354,10 +362,5 @@ void CPoiQueryListHook::DoDistSwitchCallBack(const SQLRecord *pResult)
   codeEntry.m_uCode = pResult->m_addrCode;
   ::strcpy(codeEntry.m_chName, pResult->m_asciiName);
   CQueryWrapper::Get().SetQueryAdmInfo(codeEntry);
-  m_distSwitchBtn.SetCaption(codeEntry.m_chName);
-  char* keyword = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetKeyWord();
-  if (keyword != NULL)
-  {
-    SearchForResult(keyword);
-  }
+  Load();
 }

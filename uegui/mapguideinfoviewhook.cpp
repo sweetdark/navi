@@ -6,7 +6,7 @@
 using namespace UeGui;
 
 CMapGuideInfoViewHook::CMapGuideInfoViewHook() : m_parentHook(NULL), m_routeWrapper(CRouteWrapper::Get()),
-m_viewWrapper(CViewWrapper::Get())
+m_viewWrapper(CViewWrapper::Get()), m_promptDistBarWidth(0)
 {
   //地图界面渲染完成后不需要释放图片资源，提高效率
   m_needReleasePic = false;
@@ -34,7 +34,7 @@ void UeGui::CMapGuideInfoViewHook::Show( bool show /*= true */ )
   CAggHook::Show(show);
   if (show)
   {
-    Update();
+    Update(0);
   }
 }
 
@@ -126,7 +126,7 @@ void CMapGuideInfoViewHook::MakeControls()
   m_nextDirectionBoard.SetIconElement(GetGuiElement(MapGuideInfoViewHook_NextDirectionBoardIcon));
   m_promptBtn.SetCenterElement(GetGuiElement(MapGuideInfoViewHook_PromptBack));
   m_promptBtn.SetIconElement(GetGuiElement(MapGuideInfoViewHook_PromptIcon));
-  m_promptDistBar.SetLabelElement(GetGuiElement(MapGuideInfoViewHook_PromptDistBar));
+  m_promptDistBar.SetCenterElement(GetGuiElement(MapGuideInfoViewHook_PromptDistBar));
   m_highSpeedBoard1.SetCenterElement(GetGuiElement(MapGuideInfoViewHook_HighSpeedBoardBack1));
   m_highSpeedBoard1.SetLabelElement(GetGuiElement(MapGuideInfoViewHook_HighSpeedBoardNameLabel1));
   m_highSpeedBoard2.SetCenterElement(GetGuiElement(MapGuideInfoViewHook_HighSpeedBoardBack2));
@@ -141,6 +141,11 @@ void CMapGuideInfoViewHook::MakeControls()
   m_highSpeedBoardDistLabel3.SetLabelElement(GetGuiElement(MapGuideInfoViewHook_HighSpeedBoardDistLabel3));
   m_shwoGuideViewBtn.SetCenterElement(GetGuiElement(MapGuideInfoViewHook_ShowGuideViewBack));
   m_shwoGuideViewBtn.SetLabelElement(GetGuiElement(MapGuideInfoViewHook_ShowGuideViewLabel));
+  GuiElement* guiElement = m_promptDistBar.GetCenterElement();
+  if (guiElement)
+  {
+    m_promptDistBarWidth = guiElement->m_width;
+  }
 }
 
 void UeGui::CMapGuideInfoViewHook::SetParentHook( CAggHook* parentHook )
@@ -234,7 +239,8 @@ short CMapGuideInfoViewHook::MouseUp(CGeoPoint<short> &scrPoint)
   return ctrlType;
 }
 
-void UeGui::CMapGuideInfoViewHook::Update()
+
+void UeGui::CMapGuideInfoViewHook::Update( short type )
 {
   //根据导航状态更新当前导航图标的显示
   GuidanceStatus dirInfo;
@@ -245,10 +251,12 @@ void UeGui::CMapGuideInfoViewHook::Update()
   }
 
   //显示电子眼
-  EEyeProp eyeProp; 
-  if (m_routeWrapper.GetCurElecEye(eyeProp))
+  EEyeProp eyeProp;
+  double distance = 0.0;
+  if (m_routeWrapper.GetCurElecEye(eyeProp, distance))
   {
-    ShowPromptIcon(true);
+    ShowPromptIcon(true, &eyeProp);
+    UpdatePromptDistance(distance);
   }
   else
   {
@@ -371,6 +379,7 @@ void UeGui::CMapGuideInfoViewHook::Update()
     }
 
     m_routeInfoBtn.SetCaption(roadName);
+    m_routeInfoBtn.SetVisible(true);
  
     // 显示路口放大图及指引图标
     // 当前路口
@@ -426,14 +435,24 @@ void UeGui::CMapGuideInfoViewHook::Update()
     }
   }
 
-  //显示路口放大图
-  if (m_viewWrapper.IsNeedRenderGuidanceView() && !m_viewWrapper.IsGuidanceViewShown())
+  //如果当前显示路口放大图
+  if (m_viewWrapper.IsGuidanceViewShown())
   {
-    m_shwoGuideViewBtn.SetVisible(true);
+    m_shwoGuideViewBtn.SetVisible(false);
+    m_routeInfoBtn.SetVisible(false);
+    ShowCurGuidanceIcon(false);
+    ShowNextGuidanceIcon(false);
   }
   else
   {
-    m_shwoGuideViewBtn.SetVisible(false);
+    if (m_viewWrapper.IsNeedRenderGuidanceView())
+    {
+      m_shwoGuideViewBtn.SetVisible(true);
+    }
+    else
+    {
+      m_shwoGuideViewBtn.SetVisible(false);
+    }
   }
 }
 
@@ -736,14 +755,101 @@ void UeGui::CMapGuideInfoViewHook::ShowNextGuidanceIcon( bool isShow, int sndCod
   }
 }
 
-void UeGui::CMapGuideInfoViewHook::ShowPromptIcon( bool isShow, unsigned char infoCode /*= 0*/, double distance /*= 0*/ )
+void UeGui::CMapGuideInfoViewHook::ShowPromptIcon( bool isShow, EEyeProp* eyeProp /*= NULL*/ )
 {
   if (isShow)
   {
-    //先只显示电子眼
-    ChangeElementIcon(m_promptBtn.GetIconElement(), GetGuiElement(MapGuideInfoViewHook_IconType3_12));
-    //m_promptBtn.SetVisible(true);
-    //m_promptDistBar.SetVisible(true);
+    if (eyeProp)
+    {
+      short promptElementType = MapGuideInfoViewHook_Begin;
+      switch (eyeProp->m_type)
+      {
+      case UeRoute::TVT_TrafficLights:
+        {
+          //红绿灯
+          promptElementType = MapGuideInfoViewHook_IconType3_13;
+          break;
+        }
+      case UeRoute::TVT_SpeedLimit:
+        {
+          //限速
+          if (eyeProp->m_speed <= 25)
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_1;
+          }
+          else if ((eyeProp->m_speed > 25) && (eyeProp->m_speed <= 35))
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_2;
+          }
+          else if ((eyeProp->m_speed > 35) && (eyeProp->m_speed <= 45))
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_3;
+          }
+          else if ((eyeProp->m_speed > 45) && (eyeProp->m_speed <= 55))
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_4;
+          }
+          else if ((eyeProp->m_speed > 55) && (eyeProp->m_speed <= 65))
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_5;
+          }
+          else if ((eyeProp->m_speed > 65) && (eyeProp->m_speed <= 75))
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_6;
+          }
+          else if ((eyeProp->m_speed > 75) && (eyeProp->m_speed <= 85))
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_7;
+          }
+          else if ((eyeProp->m_speed > 85) && (eyeProp->m_speed <= 95))
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_8;
+          }
+          else if ((eyeProp->m_speed > 95) && (eyeProp->m_speed <= 105))
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_9;
+          }
+          else if ((eyeProp->m_speed > 105) && (eyeProp->m_speed <= 115))
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_10;
+          }
+          else
+          {
+            promptElementType = MapGuideInfoViewHook_IconType3_11;
+          }
+          break;
+        }
+      case UeRoute::TVT_NormalCamera:
+      case UeRoute::TVT_InTunnel:
+      case UeRoute::TVT_TunnelPort:
+        {
+          //电子眼
+          promptElementType = MapGuideInfoViewHook_IconType3_12;
+          break;
+        }
+      default:
+        {
+          return;
+        }
+      }
+      if (MapGuideInfoViewHook_Begin != promptElementType)
+      {
+        //先只显示电子眼
+        ChangeElementIcon(m_promptBtn.GetIconElement(), GetGuiElement(promptElementType));
+        m_promptBtn.SetVisible(true);
+        m_promptDistBar.SetVisible(true);
+      }
+      else
+      {
+        m_promptBtn.SetVisible(false);
+        m_promptDistBar.SetVisible(false);
+      }
+    }
+    else
+    {
+      m_promptBtn.SetVisible(false);
+      m_promptDistBar.SetVisible(false);
+    }
   }
   else
   {
@@ -752,7 +858,34 @@ void UeGui::CMapGuideInfoViewHook::ShowPromptIcon( bool isShow, unsigned char in
   }
 }
 
+void UeGui::CMapGuideInfoViewHook::UpdatePromptDistance( double distance /*= 0*/ )
+{
+  int promptDist = distance;
+  if (promptDist < 0)
+  {
+    promptDist = 0;
+  }
+  if (promptDist > MAX_PROPMT_DISTANCE)
+  {
+    promptDist = MAX_PROPMT_DISTANCE;
+  }
+  GuiElement* guiElement = m_promptDistBar.GetCenterElement();
+  if (guiElement)
+  {
+    int progress = (m_promptDistBarWidth * promptDist) / MAX_PROPMT_DISTANCE;
+    if (progress <= 0)
+    {
+      progress = 1;
+    }
+    guiElement->m_width = progress;
+  }
+}
+
 void UeGui::CMapGuideInfoViewHook::ShowGuideView()
 {
-  m_viewWrapper.ShowGuidanceView();
+  if (m_parentHook)
+  {
+    CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
+    mapHook->ShowGuideView();
+  }
 }

@@ -38,9 +38,8 @@ void CInputAcronymHook::Init()
 
 void CInputAcronymHook::Load()
 {
-
+  CQueryWrapper::Get().SetDefaultQueryKind();
   SetQueryMode();
-
 }
 
 void CInputAcronymHook::MakeNames()

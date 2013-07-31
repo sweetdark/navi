@@ -80,6 +80,8 @@ short CMessageDialogHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       needRefresh = true;
       m_affirmButton.MouseDown();
+      AddRenderUiControls(&m_affirmButton);
+      
     }
     break;
   case MessageDialogHook_CancelButtonCenter:
@@ -88,6 +90,7 @@ short CMessageDialogHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       needRefresh = true;
       m_cancelButton.MouseDown();
+      AddRenderUiControls(&m_cancelButton);
     }
     break;
   case MessageDialogHook_AffirmButton2Left:
@@ -97,6 +100,7 @@ short CMessageDialogHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       needRefresh = true;
       m_affirmButton2.MouseDown();
+      AddRenderUiControls(&m_affirmButton2);
     }
     break;
   }

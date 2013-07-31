@@ -1211,6 +1211,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\navimapsettinghook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\navimapsettinghook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\navisettinghook.cpp"
 				>
 			</File>
@@ -1224,6 +1232,14 @@
 			</File>
 			<File
 				RelativePath=".\operationhelphook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\othersystemsettinghook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\othersystemsettinghook.h"
 				>
 			</File>
 			<File
@@ -1344,6 +1360,14 @@
 			</File>
 			<File
 				RelativePath=".\userinfohook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\versioninfohook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\versioninfohook.h"
 				>
 			</File>
 			<File
@@ -1547,6 +1571,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\roundselectionhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\roundselectionhook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\routeoperationhook.cpp"
 				>
 			</File>
@@ -1576,6 +1608,14 @@
 			</File>
 			<File
 				RelativePath=".\typeindistselectionhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\typenodistselectionhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\typenodistselectionhook.h"
 				>
 			</File>
 			<File
@@ -1668,6 +1708,14 @@
 			</File>
 			<File
 				RelativePath=".\typeindistquerylisthook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\typenodistquerylisthook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\typenodistquerylisthook.h"
 				>
 			</File>
 		</Filter>

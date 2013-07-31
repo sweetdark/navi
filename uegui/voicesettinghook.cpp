@@ -9,6 +9,7 @@ using namespace UeGui;
 
 CVoiceSettingHook::CVoiceSettingHook()
 {
+  MakeGUI();
 }
 
 CVoiceSettingHook::~CVoiceSettingHook()
@@ -39,63 +40,63 @@ void CVoiceSettingHook::MakeGUI()
   }
 }
 
-void CVoiceSettingHook::Load()
-{
-  //获取系统设置  
-  CGuiSettings* setting= CGuiSettings::GetGuiSettings();
-  if (setting->IsLoudSpeakerMute())
-  {
-    m_silenceBtn.SetCheck(true);
-    SetVolumeBar(0);
-  }
-  else
-  {
-    m_silenceBtn.SetCheck(false);        
-    SetVolumeBar(setting->GetVoice());
-  }
-
-  //设置语言
-  m_initDialectType = (DialectType)setting->GetLanguage();
-  m_route->GetGuider()->SetRole((UETTS_Role)m_initDialectType);
-  m_dialectCtrl.SetCaption(m_dialectMap[m_initDialectType].c_str());
-
-  //设置按键音
-  unsigned char value = setting->GetVoicePrompt();
-  if((value & SystemSettings::VT_KeyVoice) > 0)
-  {
-    m_keytoneCheckBtn.SetCheck(true);
-    m_isKeytoneCheck = true;
-  } 
-  else
-  {
-    m_keytoneCheckBtn.SetCheck(false);
-    m_isKeytoneCheck = false;
-  }
-
-  //设置动态音
-  if ((value & SystemSettings::VT_DynamicVoice) > 0)
-  {
-    m_dynamicVolumeCheckBtn.SetCheck(true);
-    m_isDynamicVolumeCheck = true;
-  } 
-  else
-  {
-    m_dynamicVolumeCheckBtn.SetCheck(false);
-    m_isDynamicVolumeCheck = false;
-  }
-
-  //判断是否静音
-  if (setting->IsLoudSpeakerMute())
-  {
-    m_silenceBtn.SetCheck(true);
-    SetControls(false);//控件不能用
-  }
-  else
-  {
-    m_silenceBtn.SetCheck(false);
-    SetControls(true);
-  }
-}
+//void CVoiceSettingHook::Load()
+//{
+//  //获取系统设置  
+//  CGuiSettings* setting= CGuiSettings::GetGuiSettings();
+//  if (setting->IsLoudSpeakerMute())
+//  {
+//    m_silenceBtn.SetCheck(true);
+//    SetVolumeBar(0);
+//  }
+//  else
+//  {
+//    m_silenceBtn.SetCheck(false);        
+//    SetVolumeBar(setting->GetVoice());
+//  }
+//
+//  //设置语言
+//  m_initDialectType = (DialectType)setting->GetLanguage();
+//  m_route->GetGuider()->SetRole((UETTS_Role)m_initDialectType);
+//  m_dialectCtrl.SetCaption(m_dialectMap[m_initDialectType].c_str());
+//
+//  //设置按键音
+//  unsigned char value = setting->GetVoicePrompt();
+//  if((value & SystemSettings::VT_KeyVoice) > 0)
+//  {
+//    m_keytoneCheckBtn.SetCheck(true);
+//    m_isKeytoneCheck = true;
+//  } 
+//  else
+//  {
+//    m_keytoneCheckBtn.SetCheck(false);
+//    m_isKeytoneCheck = false;
+//  }
+//
+//  //设置动态音
+//  if ((value & SystemSettings::VT_DynamicVoice) > 0)
+//  {
+//    m_dynamicVolumeCheckBtn.SetCheck(true);
+//    m_isDynamicVolumeCheck = true;
+//  } 
+//  else
+//  {
+//    m_dynamicVolumeCheckBtn.SetCheck(false);
+//    m_isDynamicVolumeCheck = false;
+//  }
+//
+//  //判断是否静音
+//  if (setting->IsLoudSpeakerMute())
+//  {
+//    m_silenceBtn.SetCheck(true);
+//    SetControls(false);//控件不能用
+//  }
+//  else
+//  {
+//    m_silenceBtn.SetCheck(false);
+//    SetControls(true);
+//  }
+//}
 tstring CVoiceSettingHook::GetBinaryFileName()
 {
   return _T("voicesettinghook.bin");
@@ -104,114 +105,30 @@ tstring CVoiceSettingHook::GetBinaryFileName()
 void CVoiceSettingHook::MakeNames()
 {
   m_ctrlNames.erase(m_ctrlNames.begin(), m_ctrlNames.end());
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_GotoMapBtn,	"GotoMapBtn"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_BackButton,	"BackButton"));
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_BackGround,	"BackGround"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_BackGroundText,	"BackGroundText"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeIcon,	"VolumeIcon"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeText,	"VolumeText"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_PromptToneText,	"PromptToneText"));
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeOneCtrlDown,	"VolumeOneCtrlDown"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeTwoCtrlDown,	"VolumeTwoCtrlDown"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeThreeCtrlDown,	"VolumeThreeCtrlDown"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeFourCtrlDown,	"VolumeFourCtrlDown"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeFiveCtrlDown,	"VolumeFiveCtrlDown"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeSixCtrlDown,	"VolumeSixCtrlDown"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeSevenCtrlDown,	"VolumeSevenCtrlDown"));
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeOneCtrlUp,	"VolumeOneCtrlUp"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeTwoCtrlUp,	"VolumeTwoCtrlUp"));  
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeThreeCtrlUp,	"VolumeThreeCtrlUp"));  
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeFourCtrlUp,	"VolumeFourCtrlUp")); 
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeFiveCtrlUp,	"VolumeFiveCtrlUp")); 
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeSixCtrlUp,	"VolumeSixCtrlUp")); 
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VolumeSevenCtrlUp,	"VolumeSevenCtrlUp"));
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_AuditionCtrlCenter,	"AuditionCtrlCenter"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_AuditionCtrlLeft,	"AuditionCtrlLeft"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_AuditionCtrlRight,	"AuditionCtrlRight"));
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DialectCtrlCenter,	"DialectCtrlCenter"));
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DialectCtrlLeft,	"DialectCtrlLeft"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DialectCtrlLeftCenter,	"DialectCtrlLeftCenter"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DialectCtrlLeftCenterIcon,	"DialectCtrlLeftCenterIcon"));
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DialectCtrlRight,	"DialectCtrlRight"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DialectCtrlRightCenter,	"DialectCtrlRightCenter"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DialectCtrlRightCenterIcon,	"DialectCtrlRightCenterIcon"));
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DynamicVolumeCtrlCenter,	"DynamicVolumeCtrlCenter"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DynamicVolumeCtrlIcon,	"DynamicVolumeCtrlIcon"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DynamicVolumeCtrlLeft,	"DynamicVolumeCtrlLeft"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DynamicVolumeCtrlRight,	"DynamicVolumeCtrlRight"));
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_KeytoneCtrlCenter,	"KeytoneCtrlCenter"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_KeytoneCtrlIcon,	"KeytoneCtrlIcon"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_KeytoneCtrlLeft,	"KeytoneCtrlLeft"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_KeytoneCtrlRight,	"KeytoneCtrlRight"));
-
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_SilenceCtrlCenter,	"SilenceCtrlCenter"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_SilenceCtrlIcon,	"SilenceCtrlIcon"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_SilenceCtrlLeft,	"SilenceCtrlLeft"));
-  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_SilenceCtrlRight,	"SilenceCtrlRight"));
+  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_Voicelabel,	"VoiceLabel"));
+  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DynamicVoiceBtn,	"DynamicVoiceBtn"));
+  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DynamicVoiceIcon,	"DynamicVoiceIcon"));
+  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_DynamicVoiceLabel,	"DynamicVoiceLabel"));
+  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_TestListenBtn,	"TestListenBtn"));
+  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VoiceLeftBtn,	"VoiceLeftBtn"));
+  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VoiceLeftIcon,	"VoiceLeftIcon"));
+  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VoiceCenterBtn,	"VoiceCenterBtn"));
+  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VoiceRightBtn,	"VoiceRightBtn"));
+  m_ctrlNames.insert(GuiName::value_type(VoiceSettingHook_VoiceRightIcon,	"VoiceRightIcon"));
 }
 
 void CVoiceSettingHook::MakeControls()
 {
-  m_gotoMapBtnCtrl.SetCenterElement(GetGuiElement(VoiceSettingHook_GotoMapBtn));
-  m_backButtonCtrl.SetCenterElement(GetGuiElement(VoiceSettingHook_BackButton));
-  //音量控制
-  m_volume1Ctrl.SetLeftElement(GetGuiElement(VoiceSettingHook_VolumeOneCtrlDown));
-  m_volume1Ctrl.SetRightElement(GetGuiElement(VoiceSettingHook_VolumeOneCtrlUp));
-  m_volume2Ctrl.SetLeftElement(GetGuiElement(VoiceSettingHook_VolumeTwoCtrlDown));
-  m_volume2Ctrl.SetRightElement(GetGuiElement(VoiceSettingHook_VolumeTwoCtrlUp));
-  m_volume3Ctrl.SetLeftElement(GetGuiElement(VoiceSettingHook_VolumeThreeCtrlDown));
-  m_volume3Ctrl.SetRightElement(GetGuiElement(VoiceSettingHook_VolumeThreeCtrlUp));
-  m_volume4Ctrl.SetLeftElement(GetGuiElement(VoiceSettingHook_VolumeFourCtrlDown));
-  m_volume4Ctrl.SetRightElement(GetGuiElement(VoiceSettingHook_VolumeFourCtrlUp));
-  m_volume5Ctrl.SetLeftElement(GetGuiElement(VoiceSettingHook_VolumeFiveCtrlDown));
-  m_volume5Ctrl.SetRightElement(GetGuiElement(VoiceSettingHook_VolumeFiveCtrlUp));
-  m_volume6Ctrl.SetLeftElement(GetGuiElement(VoiceSettingHook_VolumeSixCtrlDown));
-  m_volume6Ctrl.SetRightElement(GetGuiElement(VoiceSettingHook_VolumeSixCtrlUp));
-  m_volume7Ctrl.SetLeftElement(GetGuiElement(VoiceSettingHook_VolumeSevenCtrlDown));
-  m_volume7Ctrl.SetRightElement(GetGuiElement(VoiceSettingHook_VolumeSevenCtrlUp));
-  //音量图标
-  m_volumeIconCtrl.SetCenterElement(GetGuiElement(VoiceSettingHook_VolumeIcon));
-  //静音
-  m_silenceBtn.SetCenterElement(GetGuiElement(VoiceSettingHook_SilenceCtrlCenter));
-  m_silenceBtn.SetIconElement(GetGuiElement(VoiceSettingHook_SilenceCtrlIcon));
-  m_silenceBtn.SetLeftElement(GetGuiElement(VoiceSettingHook_SilenceCtrlLeft));
-  m_silenceBtn.SetRightElement(GetGuiElement(VoiceSettingHook_SilenceCtrlRight));
-  //启用动态音
-  m_dynamicVolumeBtn.SetCenterElement(GetGuiElement(VoiceSettingHook_DynamicVolumeCtrlCenter));
-  m_dynamicVolumeBtn.SetLeftElement(GetGuiElement(VoiceSettingHook_DynamicVolumeCtrlLeft));
-  m_dynamicVolumeBtn.SetRightElement(GetGuiElement(VoiceSettingHook_DynamicVolumeCtrlRight));
-  //动态音复选框
-  m_dynamicVolumeCheckBtn.SetIconElement(GetGuiElement(VoiceSettingHook_DynamicVolumeCtrlIcon));
-  //启用按键音黑色
-  m_keytoneBtn.SetCenterElement(GetGuiElement(VoiceSettingHook_KeytoneCtrlCenter));
-  m_keytoneBtn.SetLeftElement(GetGuiElement(VoiceSettingHook_KeytoneCtrlLeft));
-  m_keytoneBtn.SetRightElement(GetGuiElement(VoiceSettingHook_KeytoneCtrlRight));
-  //按键音复选框
-  m_keytoneCheckBtn.SetIconElement(GetGuiElement(VoiceSettingHook_KeytoneCtrlIcon));
-  //试听
-  m_auditionCtrl.SetCenterElement(GetGuiElement(VoiceSettingHook_AuditionCtrlCenter));
-  m_auditionCtrl.SetLeftElement(GetGuiElement(VoiceSettingHook_AuditionCtrlLeft));
-  m_auditionCtrl.SetRightElement(GetGuiElement(VoiceSettingHook_AuditionCtrlRight));
-  //选择方言
-  m_dialectCtrl.SetCenterElement(GetGuiElement(VoiceSettingHook_DialectCtrlCenter));
-  //选择语言前一个按钮
-  m_dialectCtrlLeft.SetLeftElement(GetGuiElement(VoiceSettingHook_DialectCtrlLeft));
-  m_dialectCtrlLeft.SetCenterElement(GetGuiElement(VoiceSettingHook_DialectCtrlLeftCenter));
-  m_dialectCtrlLeft.SetRightElement(GetGuiElement(VoiceSettingHook_DialectCtrlLeftCenterIcon));
-  //选择语言下一个按钮
-  m_dialectCtrlRight.SetRightElement(GetGuiElement(VoiceSettingHook_DialectCtrlRight));
-  m_dialectCtrlRight.SetCenterElement(GetGuiElement(VoiceSettingHook_DialectCtrlRightCenter));
-  m_dialectCtrlRight.SetLeftElement(GetGuiElement(VoiceSettingHook_DialectCtrlRightCenterIcon));
+  m_voiceLabelCtrl.SetLabelElement(GetGuiElement(VoiceSettingHook_Voicelabel));
+  m_dynamicVoiceLabelCtrl.SetLabelElement(GetGuiElement(VoiceSettingHook_DynamicVoiceLabel));
+  m_dynamicVoiceCtrl.SetCenterElement(GetGuiElement(VoiceSettingHook_DynamicVoiceBtn));
+  m_dynamicVoiceCtrl.SetIconElement(GetGuiElement(VoiceSettingHook_DynamicVoiceIcon));
+  m_testListenCtrl.SetCenterElement(GetGuiElement(VoiceSettingHook_TestListenBtn));
+  m_voiceLeftCtrl.SetCenterElement(GetGuiElement(VoiceSettingHook_VoiceLeftBtn));
+  m_voiceLeftCtrl.SetIconElement(GetGuiElement(VoiceSettingHook_VoiceLeftIcon));
+  m_voiceRightCtrl.SetCenterElement(GetGuiElement(VoiceSettingHook_VoiceRightBtn));
+  m_voiceRightCtrl.SetIconElement(GetGuiElement(VoiceSettingHook_VoiceRightIcon));
+  m_voiceCenterCtrl.SetCenterElement(GetGuiElement(VoiceSettingHook_VoiceCenterBtn));
 }
 
 CVoiceSettingHook::DialectType& operator++ (CVoiceSettingHook::DialectType& dt)
@@ -244,62 +161,29 @@ short CVoiceSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
   short downElementType = CAggHook::MouseDown(scrPoint);
   switch(downElementType)
   {
-  case VoiceSettingHook_GotoMapBtn:
+  case VoiceSettingHook_DynamicVoiceBtn:
+  case VoiceSettingHook_DynamicVoiceIcon:
+  case VoiceSettingHook_DynamicVoiceLabel:
     {
-      m_gotoMapBtnCtrl.MouseDown();
+      m_dynamicVoiceCtrl.MouseDown();
+      m_dynamicVoiceLabelCtrl.MouseDown();
     }
     break;
-  case VoiceSettingHook_BackButton:
+  case VoiceSettingHook_VoiceLeftBtn:
+  case VoiceSettingHook_VoiceLeftIcon:
     {
-      m_backButtonCtrl.MouseDown();
+      m_voiceLeftCtrl.MouseDown();
     }
     break;
-  case VoiceSettingHook_AuditionCtrlCenter:
-  case VoiceSettingHook_AuditionCtrlLeft:
-  case VoiceSettingHook_AuditionCtrlRight:
+  case VoiceSettingHook_VoiceRightBtn:
+  case VoiceSettingHook_VoiceRightIcon:
     {
-      m_auditionCtrl.MouseDown();
+      m_voiceRightCtrl.MouseDown();
     }
     break;
-  case VoiceSettingHook_KeytoneCtrlCenter:
-  case VoiceSettingHook_KeytoneCtrlIcon:
-  case VoiceSettingHook_KeytoneCtrlLeft:
-  case VoiceSettingHook_KeytoneCtrlRight:
+  case VoiceSettingHook_TestListenBtn:
     {
-      m_keytoneBtn.MouseDown();
-      //m_keytoneCheckBtn.MouseDown();
-    }
-    break;
-  case VoiceSettingHook_DynamicVolumeCtrlCenter:
-  case VoiceSettingHook_DynamicVolumeCtrlIcon:
-  case VoiceSettingHook_DynamicVolumeCtrlLeft:
-  case VoiceSettingHook_DynamicVolumeCtrlRight:
-    {
-      m_dynamicVolumeBtn.MouseDown();
-      //m_dynamicVolumeCheckBtn.MouseDown();
-    }
-    break;
-  case VoiceSettingHook_DialectCtrlLeft:
-  case VoiceSettingHook_DialectCtrlLeftCenter:
-  case VoiceSettingHook_DialectCtrlLeftCenterIcon:
-    {
-      m_dialectCtrlLeft.MouseDown();
-    }
-    break;
-  case VoiceSettingHook_DialectCtrlRight:
-  case VoiceSettingHook_DialectCtrlRightCenter:
-  case VoiceSettingHook_DialectCtrlRightCenterIcon:
-    {
-      m_dialectCtrlRight.MouseDown();
-    }
-    break;
-  case VoiceSettingHook_SilenceCtrlCenter:
-  case VoiceSettingHook_SilenceCtrlIcon:
-  case VoiceSettingHook_SilenceCtrlLeft:
-  case VoiceSettingHook_SilenceCtrlRight:
-    {
-      m_silenceBtn.MouseDown();
-      AddRenderUiControls(&m_silenceBtn);
+      m_testListenCtrl.MouseDown();
     }
     break;
   default:
@@ -326,246 +210,33 @@ short CVoiceSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
 {
   short upElementType = CAggHook::MouseUp(scrPoint);
   CGuiSettings* setting = CGuiSettings::GetGuiSettings();
-  bool canSet = (upElementType == m_downElementType) && (!m_silenceBtn.Checked());
+  //bool canSet = (upElementType == m_downElementType) && (!m_silenceBtn.Checked());
 
   switch(upElementType)
   {
-  case VoiceSettingHook_GotoMapBtn:
+  case VoiceSettingHook_DynamicVoiceBtn:
+  case VoiceSettingHook_DynamicVoiceIcon:
+  case VoiceSettingHook_DynamicVoiceLabel:
     {
-      if(upElementType == m_downElementType)
-      {
-        /*CViewHook::m_prevHookType=CViewHook::m_curHookType;
-        CViewHook::m_curHookType=CViewHook::DHT_MapHook;*/
-        CAggHook::GoToMapHook();
-        ((CAggHook *)m_view->GetHook(CViewHook::DHT_MapHook))->ComeBack();
-        SaveSetting();
-      }
-      m_gotoMapBtnCtrl.MouseUp();
+      m_dynamicVoiceCtrl.MouseDown();
+      m_dynamicVoiceLabelCtrl.MouseDown();
     }
     break;
-  case VoiceSettingHook_BackButton:
+  case VoiceSettingHook_VoiceLeftBtn:
+  case VoiceSettingHook_VoiceLeftIcon:
     {
-      if(upElementType == m_downElementType)
-      {
-        /*CViewHook::m_prevHookType = CViewHook::DHT_VoiceSettingHook;
-        CViewHook::m_curHookType = CViewHook::DHT_SystemSettingHook;*/
-        CAggHook::Return();
-        SaveSetting();
-        ((CAggHook*)m_view->GetHook(CViewHook::m_curHookType))->DynamicShow();
-      }
-      m_backButtonCtrl.MouseUp();
+      m_voiceLeftCtrl.MouseDown();
     }
     break;
-  case VoiceSettingHook_VolumeOneCtrlDown:
-  case VoiceSettingHook_VolumeOneCtrlUp:
+  case VoiceSettingHook_VoiceRightBtn:
+  case VoiceSettingHook_VoiceRightIcon:
     {
-      if (canSet)
-      {
-        SetVolumeBar(1);
-        SaveSoundSetting(1);
-      }
-      break;
+      m_voiceRightCtrl.MouseDown();
     }
-  case VoiceSettingHook_VolumeTwoCtrlDown:
-  case VoiceSettingHook_VolumeTwoCtrlUp:
+    break;
+  case VoiceSettingHook_TestListenBtn:
     {
-      if (canSet)
-      {
-        SetVolumeBar(2);
-        SaveSoundSetting(2);
-      }
-      break;
-    }
-  case VoiceSettingHook_VolumeThreeCtrlDown:
-  case VoiceSettingHook_VolumeThreeCtrlUp:
-    {
-      if (canSet)
-      {
-        SetVolumeBar(3);
-        SaveSoundSetting(3);
-      }
-      break;
-    }
-  case VoiceSettingHook_VolumeFourCtrlDown:
-  case VoiceSettingHook_VolumeFourCtrlUp:
-    {
-
-      if (canSet)
-      {
-        SetVolumeBar(4);
-        SaveSoundSetting(4);
-      }
-      break;
-    }
-  case VoiceSettingHook_VolumeFiveCtrlDown:
-  case VoiceSettingHook_VolumeFiveCtrlUp:
-    {
-
-      if (canSet)
-      {
-        SetVolumeBar(5);
-        SaveSoundSetting(5);
-      }
-      break;
-    }
-  case VoiceSettingHook_VolumeSixCtrlDown:
-  case VoiceSettingHook_VolumeSixCtrlUp:
-    {
-      if (canSet)
-      {
-        SetVolumeBar(6);
-        SaveSoundSetting(6);
-      }
-      break;
-    }
-  case VoiceSettingHook_VolumeSevenCtrlDown:
-  case VoiceSettingHook_VolumeSevenCtrlUp:
-    {
-      if (canSet)
-      {
-        SetVolumeBar(7);
-        SaveSoundSetting(7);
-      }
-      break;
-    }
-  case VoiceSettingHook_AuditionCtrlCenter:
-  case VoiceSettingHook_AuditionCtrlLeft:
-  case VoiceSettingHook_AuditionCtrlRight:
-    {
-      //试音
-      if (canSet)
-      {
-        m_auditionCtrl.MouseUp();
-        PlaySounds();
-      }
-      break;
-    }
-  case VoiceSettingHook_KeytoneCtrlCenter:
-  case VoiceSettingHook_KeytoneCtrlIcon:
-  case VoiceSettingHook_KeytoneCtrlLeft:
-  case VoiceSettingHook_KeytoneCtrlRight:
-    {
-      //启用按键音
-      if (canSet)
-      {
-        m_keytoneBtn.MouseUp();
-        if (m_isKeytoneCheck)
-        {
-          m_keytoneCheckBtn.SetCheck(false);
-          m_isKeytoneCheck = false;
-        } 
-        else
-        {
-          m_keytoneCheckBtn.SetCheck(true);
-          m_isKeytoneCheck = true;
-        }
-      }
-      break;
-    }
-  case VoiceSettingHook_DynamicVolumeCtrlCenter:
-  case VoiceSettingHook_DynamicVolumeCtrlIcon:
-  case VoiceSettingHook_DynamicVolumeCtrlLeft:
-  case VoiceSettingHook_DynamicVolumeCtrlRight:
-    {
-      //启用动态语音
-      if (canSet)
-      {
-        m_dynamicVolumeBtn.MouseUp();
-        if (m_isDynamicVolumeCheck)
-        {
-          m_dynamicVolumeCheckBtn.SetCheck(false);
-          m_isDynamicVolumeCheck = false;
-        } 
-        else
-        {
-          m_dynamicVolumeCheckBtn.SetCheck(true);
-          m_isDynamicVolumeCheck = true;
-        }
-      }
-      break;
-    }
-  case VoiceSettingHook_DialectCtrlLeft:
-  case VoiceSettingHook_DialectCtrlLeftCenter:
-  case VoiceSettingHook_DialectCtrlLeftCenterIcon:
-    {
-      //选择语言前一个按钮
-      if (canSet)
-      {
-        if (m_initDialectType == DialectMandarinWoman)
-        {
-          m_dialectCtrlLeft.SetEnable(false);
-          break;
-        }
-        else
-        {
-          --m_initDialectType;
-          m_dialectCtrlRight.SetEnable(true);
-          m_dialectCtrlLeft.MouseUp();
-          m_dialectCtrl.SetCaption(m_dialectMap[m_initDialectType].c_str());
-          m_route->GetGuider()->SetRole((UETTS_Role)m_initDialectType);
-          if (m_initDialectType == DialectMandarinWoman)
-          {
-            m_dialectCtrlLeft.SetEnable(false);
-            break;
-          }
-        }
-      } 
-      break;
-    }
-  case VoiceSettingHook_DialectCtrlRight:
-  case VoiceSettingHook_DialectCtrlRightCenter:
-  case VoiceSettingHook_DialectCtrlRightCenterIcon:
-    {
-      //选择语言下一个按钮
-      if (canSet)
-      {
-        if (m_initDialectType == DialectTaiWan)
-        {
-          m_dialectCtrlRight.SetEnable(false);
-          break;
-        }
-        else
-        {
-          ++m_initDialectType;
-          m_dialectCtrlLeft.SetEnable(true);
-          m_dialectCtrlRight.MouseUp();
-          m_dialectCtrl.SetCaption(m_dialectMap[m_initDialectType].c_str());
-          m_route->GetGuider()->SetRole((UETTS_Role)m_initDialectType);
-          if (m_initDialectType == DialectTaiWan)
-          {
-            m_dialectCtrlRight.SetEnable(false);
-            break;
-          }
-        }
-      } 
-      break;
-    }
-  case VoiceSettingHook_SilenceCtrlCenter:
-  case VoiceSettingHook_SilenceCtrlIcon:
-  case VoiceSettingHook_SilenceCtrlLeft:
-  case VoiceSettingHook_SilenceCtrlRight:
-    {
-      //静音
-      m_silenceBtn.MouseUp();
-      if (upElementType == m_downElementType)
-      {
-        CGuiSettings* setting = CGuiSettings::GetGuiSettings();
-        unsigned short volume = setting->GetVoice();
-
-        if (m_silenceBtn.Checked())
-        {
-          //控件不可能用
-          SetControls(false);
-          SetVolumeBar(0);
-          SaveSoundSetting(volume, true);     
-        }
-        else
-        {
-          SetControls(true);
-          SetVolumeBar(volume); 
-          SaveSoundSetting(volume, false); 
-        }
-      }
+      m_testListenCtrl.MouseDown();
     }
     break;
   default:
@@ -601,39 +272,39 @@ void CVoiceSettingHook::Set_VDialect()
 
 void CVoiceSettingHook::SaveSetting()
 {
-  CGuiSettings* settingIO= CGuiSettings::GetGuiSettings();
-  if(settingIO) {
-    CMapHook* mapHook = dynamic_cast<CMapHook*>(m_view->GetHook(DHT_MapHook));
-    //设置静音
-    if(m_silenceBtn.Checked()) 
-    {
-      settingIO->SetIsLoudSpeakerMute(true);  //静音
-      mapHook->SetSlience(true);
-    }
-    else
-    {
-      settingIO->SetIsLoudSpeakerMute(false);  //非静音
-      mapHook->SetSlience(false);
-    }
+  //CGuiSettings* settingIO= CGuiSettings::GetGuiSettings();
+  //if(settingIO) {
+  //  CMapHook* mapHook = dynamic_cast<CMapHook*>(m_view->GetHook(DHT_MapHook));
+  //  //设置静音
+  //  if(m_silenceBtn.Checked()) 
+  //  {
+  //    settingIO->SetIsLoudSpeakerMute(true);  //静音
+  //    mapHook->SetSlience(true);
+  //  }
+  //  else
+  //  {
+  //    settingIO->SetIsLoudSpeakerMute(false);  //非静音
+  //    mapHook->SetSlience(false);
+  //  }
 
-    //设置按键音和动态音
-    unsigned char value = 0;
-    if (m_keytoneCheckBtn.Checked())
-    {
-      value |= SystemSettings::VT_KeyVoice;
-    }
-    if (m_dynamicVolumeCheckBtn.Checked())
-    {
-      value |= SystemSettings::VT_DynamicVoice;
-    }
-    settingIO->SetVoicePrompt(value);
+  //  //设置按键音和动态音
+  //  unsigned char value = 0;
+  //  if (m_keytoneCheckBtn.Checked())
+  //  {
+  //    value |= SystemSettings::VT_KeyVoice;
+  //  }
+  //  if (m_dynamicVolumeCheckBtn.Checked())
+  //  {
+  //    value |= SystemSettings::VT_DynamicVoice;
+  //  }
+  //  settingIO->SetVoicePrompt(value);
 
-    //设置语言
-    settingIO->SetLanguage(m_initDialectType);
-    m_route->GetGuider()->SetRole((UETTS_Role)m_initDialectType);
+  //  //设置语言
+  //  settingIO->SetLanguage(m_initDialectType);
+  //  m_route->GetGuider()->SetRole((UETTS_Role)m_initDialectType);
 
-    settingIO->SaveAllSettings();
-  }
+  //  settingIO->SaveAllSettings();
+  //}
 }
 
 void CVoiceSettingHook::PlaySounds() 
@@ -662,7 +333,7 @@ void UeGui::CVoiceSettingHook::SetVolumeBar( int soundSize )
 
 void UeGui::CVoiceSettingHook::ChangeVolumeBarStatus( unsigned short id, bool status )
 {
-  switch (id)
+  /*switch (id)
   {
   case 1 :
     {
@@ -703,7 +374,7 @@ void UeGui::CVoiceSettingHook::ChangeVolumeBarStatus( unsigned short id, bool st
     {
       break;
     }
-  }
+  }*/
 }
 
 void UeGui::CVoiceSettingHook::SaveSoundSetting( int soundSize, bool isLoudSpeakerMute )
@@ -727,7 +398,7 @@ void UeGui::CVoiceSettingHook::SaveSoundSetting( int soundSize, bool isLoudSpeak
 
 void UeGui::CVoiceSettingHook::SetControls( bool isEnable )
 {
-  m_volumeIconCtrl.SetEnable(isEnable);
+  /*m_volumeIconCtrl.SetEnable(isEnable);
   m_keytoneBtn.SetEnable(isEnable);
   m_keytoneCheckBtn.SetEnable(isEnable);
   m_dynamicVolumeBtn.SetEnable(isEnable);
@@ -744,5 +415,5 @@ void UeGui::CVoiceSettingHook::SetControls( bool isEnable )
   if (m_initDialectType == DialectTaiWan)
   {
     m_dialectCtrlRight.SetEnable(false);
-  }
+  }*/
 }

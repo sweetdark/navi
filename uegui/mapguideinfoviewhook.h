@@ -21,6 +21,7 @@ namespace UeGui
   class UEGUI_CLASS CMapGuideInfoViewHook : public CAggHook
   {
   public:
+    const static int MAX_PROPMT_DISTANCE = 500;
     enum MapGuideInfoViewHookCtrlType
     {
       MapGuideInfoViewHook_Begin = 0,
@@ -113,14 +114,14 @@ namespace UeGui
     * \设置当前hook是否显示
     */
     virtual void Show( bool show = true );
+    /**
+    * \brief 更新Hook
+    */
+    virtual void Update(short type);
     /*
     * 设置父类hook
     */
     void SetParentHook(CAggHook* parentHook);
-    /*
-    * 更新菜单
-    */
-    void Update();
 
   protected:
     virtual tstring GetBinaryFileName();
@@ -138,7 +139,7 @@ namespace UeGui
     */
     bool ChangeElementIcon(GuiElement* destElement, GuiElement* srcElement);
     /**
-    * \brief 显示路口转向图控件
+    * \brief 显示指定路口转向图控件
     */
     void ShowGuidanceIconCtrl(CUiBitButton &iconCtrl, bool isShown = true);
     /**
@@ -155,9 +156,14 @@ namespace UeGui
     * \brief 显示红绿灯、电子眼、限速图标等
     * \param isShow 显示还是隐藏
     */
-    void ShowPromptIcon(bool isShow, unsigned char infoCode = 0, double distance = 0);
+    void ShowPromptIcon(bool isShow, EEyeProp* eyeProp = NULL);
     /**
-    * \brief 显示路口放大图    
+    * \brief 更新红绿灯、电子眼、限速图标等提示距离
+    * \param distance 当前提示距离
+    */
+    void UpdatePromptDistance(double distance = 0);
+    /**
+    * \brief 显示路口放大图
     */
     void ShowGuideView();
   private:
@@ -172,7 +178,7 @@ namespace UeGui
     //红路灯和限速提醒图标
     CUiBitButton m_promptBtn;
     //提醒距离
-    CUiLabel m_promptDistBar;
+    CUiButton m_promptDistBar;
     //高速看板
     CUiBitButton m_highSpeedBoard1;
     CUiLabel m_highSpeedBoardTypeLabel1;
@@ -187,7 +193,10 @@ namespace UeGui
     CUiBitButton m_shwoGuideViewBtn;
     //路径规划访问接口
     CRouteWrapper& m_routeWrapper;
+    //地图访问接口
     CViewWrapper& m_viewWrapper;
+    //距离提示进度条的长度
+    int m_promptDistBarWidth;
   };
 }
 #endif

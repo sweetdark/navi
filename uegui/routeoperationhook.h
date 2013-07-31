@@ -22,6 +22,7 @@ namespace UeGui
   class UEGUI_CLASS CRouteOperationHook : public CMenuBackgroundHook
   {
   public:
+    const static int kMAXNAME = 128;
     enum RouteOperationHookCtrlType
     {
       RouteOperationHook_Begin = MenuBackgroundHook_End,
@@ -70,6 +71,11 @@ namespace UeGui
 
     virtual void Load();
 
+    //保存行程数据
+    void SaveJourneyData(const char* journeyName);
+    //设置路线类型，这个类型不只包括高速优先，推荐，最短，还包括规避类型
+    void SetRouteType(unsigned int routeType);
+
   protected:
 
     //初始化控件名称
@@ -78,6 +84,9 @@ namespace UeGui
     virtual void MakeControls(void);
 
   private:
+    //获取路线数据
+    void GetRouteData();
+
     bool IsRealGuiding();
 
     bool IsDemoGuiding();
@@ -113,6 +122,13 @@ namespace UeGui
     CUiButton m_firstBtnBackgroundCtrl;
     CUiButton m_fourthBtnBackgroundCtrl;
     CUiBitButton m_stopNavigationBtnCtrl;
+
+    //行程名称
+    char m_JourneyName[kMAXNAME];
+    //路线类型:推荐路线,高速优先,最短路径,经济路线
+    unsigned int m_routeType;
+    //路线的经由点下标0为起点，目前加上起点和终点总共不超过6个经由点。
+    POIDataList m_POIList;
   };
 }
 #endif

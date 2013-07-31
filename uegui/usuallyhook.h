@@ -9,6 +9,7 @@
 
 //#include "uilabel.h"
 #include "uibutton.h"
+#include "usuallyfile.h"
 //#include "uiradiobutton.h"
 //#include "uicheckbutton.h"
 

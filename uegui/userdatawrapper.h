@@ -18,6 +18,8 @@ using namespace UeMap;
 
 using namespace UeModel;
 
+#include "usuallyfile.h"
+
 
 
 #define  USERDATA_LIB (CUserDataWrapper::Get())
@@ -76,7 +78,7 @@ namespace UeGui
 
   public:
 
-    ~CUserDataWrapper() {}
+    ~CUserDataWrapper();
 
     static const CUserDataWrapper& Get();
     /*
@@ -106,6 +108,15 @@ namespace UeGui
 
     //添加行程数据
     bool AddJourneyData(const char *journeyName, unsigned int routeType, const POIDataList &poiList) const;
+
+    //移除常用点
+    void RemoveUsually(UsuallyRecordType n) const;
+    //获取常用点
+    int GetUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record) const;
+    //更新常用点
+    int UpdateUsuallyRecord(UsuallyRecordType n , UsuallyRecord* record) const;
+    //判断该类型的常用点是否存在
+    bool IsUsuallyExist(UsuallyRecordType type) const;
 
     //判断路线是否已经存在
     bool CheckHistoryRouteExists(const RecentEntry& newEntry) const;
@@ -194,6 +205,7 @@ namespace UeGui
     UeRoute::IRoute *m_route;
     UeQuery::IQuery *m_query;
     UeModel::IRoadNetwork *m_net;
+    CUsuallyFile *m_usuallyFile;
     static CUserDataWrapper m_userDataWrapper;
 
     UeQuery::SQLSetting setting;

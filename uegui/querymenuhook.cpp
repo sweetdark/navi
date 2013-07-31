@@ -203,6 +203,7 @@ short CQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case QueryMenuHook_RoundSearchLabel:
     {
       m_roundSearchBtn.MouseUp();
+      CAggHook::TurnTo(DHT_RoundSelectionHook);
     }
     break;
   case QueryMenuHook_FifthBtnBackground:

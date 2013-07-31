@@ -23,6 +23,8 @@ CTypeInDistSelectionHook::~CTypeInDistSelectionHook()
 
 void CTypeInDistSelectionHook::Load()
 {
+  m_distSwitchBtn.SetCaption(CQueryWrapper::Get().GetQueryAdmName());
+
   m_pCurItemCtrl = &CCodeIndexCtrl::GetKindCodeCtrl();
   m_pCurItemCtrl->GetLeve1Item(m_vecMainListItem);
   m_pCurItemCtrl->GetComItem(m_vecSubListItem);
@@ -32,6 +34,11 @@ void CTypeInDistSelectionHook::Load()
   
   m_subPageController.SetTotal(m_vecSubListItem.size());
   m_subPageController.SetQuantityOfOnePage(5);
+
+  //默认选中常用分类
+  m_comInfoBtn.SetEnable(false);
+  m_index = -1;
+  ShowFocusBtn();
 
   ShowMainItemList();
   ShowSubItemList();
@@ -85,7 +92,7 @@ void CTypeInDistSelectionHook::MakeControls()
   m_distSelectBtn.SetIconElement(GetGuiElement(TypeInDistSelectionHook_DistSelectBtnIcon));
 
   m_comInfoBtn.SetCenterElement(GetGuiElement(TypeInDistSelectionHook_MainListComBtn));
- // m_comInfoBtn.SetIconElement(GetGuiElement(TypeInDistSelectionHook_MainListBtnMarkCom));
+  m_comInfoBtn.SetIconElement(GetGuiElement(TypeInDistSelectionHook_MainListBtnMarkCom));
 
   m_mainPageUpBtn.SetCenterElement(GetGuiElement(TypeInDistSelectionHook_MainPageUpBtn));
   m_mainPageUpBtn.SetIconElement(GetGuiElement(TypeInDistSelectionHook_MainPageUpIcon));
@@ -105,7 +112,7 @@ void CTypeInDistSelectionHook::MakeControls()
   for (int i=0, j=TypeInDistSelectionHook_MainList1Btn; i<4; i++)
   {
     m_mainInfoBtn[i].SetCenterElement(GetGuiElement(j++));
-    j++;
+    m_mainInfoBtn[i].SetIconElement(GetGuiElement(j++));
   }
 
   for (int i=0, j=TypeInDistSelectionHook_SubList1Btn; i<5; i++)
@@ -122,42 +129,49 @@ short CTypeInDistSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
   case TypeInDistSelectionHook_DistSwitchBtn:
     {
       m_distSwitchBtn.MouseDown();
+      AddRenderUiControls(&m_distSwitchBtn);
     }
     break;
   case TypeInDistSelectionHook_DistSelectBtn:
   case TypeInDistSelectionHook_DistSelectBtnIcon:
     {
       m_distSelectBtn.MouseDown();
+      AddRenderUiControls(&m_distSelectBtn);
     }
     break;
   case TypeInDistSelectionHook_MainPageUpBtn:
   case TypeInDistSelectionHook_MainPageUpIcon:
     {
       m_mainPageUpBtn.MouseDown();
+      AddRenderUiControls(&m_mainPageUpBtn);
     }
     break;
   case TypeInDistSelectionHook_MainPageDownBtn:
   case TypeInDistSelectionHook_MainPageDownIcon:
     {
       m_mainPageDownBtn.MouseDown();
+      AddRenderUiControls(&m_mainPageDownBtn);
     }
     break;
   case TypeInDistSelectionHook_SubPageUpBtn:
   case TypeInDistSelectionHook_SubPageUpIcon:
     {
       m_subPageUpBtn.MouseDown();
+      AddRenderUiControls(&m_subPageUpBtn);
     }
     break;
   case TypeInDistSelectionHook_SubPageDownBtn:
   case TypeInDistSelectionHook_SubPageDownIcon:
     {
       m_subPageDownBtn.MouseDown();
+      AddRenderUiControls(&m_subPageDownBtn);
     }
     break;
   case TypeInDistSelectionHook_MainListComBtn:
   case TypeInDistSelectionHook_MainListBtnMarkCom:
     {
       m_comInfoBtn.MouseDown();
+      AddRenderUiControls(&m_comInfoBtn);
     }
     break;
   default:
@@ -165,11 +179,13 @@ short CTypeInDistSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       int listIndex = (ctrlType-TypeInDistSelectionHook_MainList1Btn)/2;
       m_mainInfoBtn[listIndex].MouseDown();
+      AddRenderUiControls(&m_mainInfoBtn[listIndex]);
     } 
     else if (ctrlType >= TypeInDistSelectionHook_SubList1Btn && ctrlType <= TypeInDistSelectionHook_SubList5Btn)
     {
       int listIndex = ctrlType-TypeInDistSelectionHook_SubList1Btn;
       m_subInfoBtn[listIndex].MouseDown();
+      AddRenderUiControls(&m_subInfoBtn[listIndex]);
     } 
     else
     {
@@ -220,6 +236,7 @@ short CTypeInDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_mainPageUpBtn.IsEnable())
       {
         m_mainPageController.PreviousPage();
+        ShowFocusBtn();
         ShowMainItemList();
       }
     }
@@ -231,6 +248,7 @@ short CTypeInDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_mainPageDownBtn.IsEnable())
       {
         m_mainPageController.NextPage();
+        ShowFocusBtn();
         ShowMainItemList();
       }
     }
@@ -263,6 +281,8 @@ short CTypeInDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_comInfoBtn.MouseUp();
       m_pCurItemCtrl->GetComItem(m_vecSubListItem);
       m_subPageController.SetTotal(m_vecSubListItem.size());
+      m_index = -1;
+      ShowFocusBtn();
       ShowSubItemList();
     }
     break;
@@ -271,16 +291,17 @@ short CTypeInDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       int listIndex = (ctrlType-TypeInDistSelectionHook_MainList1Btn)/2;
       m_mainInfoBtn[listIndex].MouseUp();
-      if (m_mainInfoBtn[listIndex].IsEnable())
+      if (::strcmp(m_mainInfoBtn[listIndex].GetCaption(), ""))
       {
-        int index = listIndex + m_mainPageController.GetPageStartPosition();
-        m_pCurItemCtrl->GetLeve2Item(m_vecMainListItem[index].m_uCode,m_vecSubListItem);
+        m_index = listIndex + m_mainPageController.GetPageStartPosition();
+        m_pCurItemCtrl->GetLeve2Item(m_vecMainListItem[m_index].m_uCode,m_vecSubListItem);
         //暂时处理
         std::vector<TCodeEntry>::iterator iter = m_vecSubListItem.begin();
         m_vecSubListItem.erase(iter); //返回上一级
         m_vecSubListItem.erase(iter); //全部
         //
         m_subPageController.SetTotal(m_vecSubListItem.size());
+        ShowFocusBtn();
         ShowSubItemList();
       }
     } 
@@ -290,11 +311,11 @@ short CTypeInDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_subInfoBtn[listIndex].MouseUp();
       if (m_subInfoBtn[listIndex].IsEnable())
       {
-        int index = listIndex + m_subPageController.GetPageStartPosition();
-        m_pCurItemCtrl->GetLeve3Item(m_vecSubListItem[index].m_uCode,m_vecQueryListItem);
-        //暂时处理
-        TCodeEntry item = *(m_pCurItemCtrl->GetItemByCode(m_vecQueryListItem[1].m_uCode));
-        CQueryWrapper::Get().SetQueryKindInfo(item);
+        int index = listIndex + m_subPageController.GetPageStartPosition() - 1;
+        //m_pCurItemCtrl->GetLeve3Item(m_vecSubListItem[index].m_uCode,m_vecQueryListItem);
+        ////暂时处理
+        //TCodeEntry item = *(m_pCurItemCtrl->GetItemByCode(m_vecQueryListItem[1].m_uCode));
+        CQueryWrapper::Get().SetQueryKindInfo(m_vecSubListItem[index]);
 
         CAggHook::TurnTo(DHT_TypeInDistQueryListHook);
       }
@@ -323,7 +344,7 @@ void CTypeInDistSelectionHook::ShowMainItemList()
   for (int i = firstItemIndx; i < m_vecMainListItem.size(); ++i)
   {
     m_mainInfoBtn[itemIndex].SetCaption(m_vecMainListItem[i].m_chName);
-    m_mainInfoBtn[itemIndex].SetEnable(true);
+    //m_mainInfoBtn[itemIndex].SetEnable(true);
     itemIndex++;
 
     if (itemIndex >= 4)
@@ -333,7 +354,7 @@ void CTypeInDistSelectionHook::ShowMainItemList()
   }
   for (int i = itemIndex; i < 4; ++i)
   {
-    m_mainInfoBtn[i].SetEnable(false);
+    //m_mainInfoBtn[i].SetEnable(false);
     m_mainInfoBtn[i].ClearCaption();
   }
 
@@ -351,6 +372,11 @@ void CTypeInDistSelectionHook::ShowMainItemList()
   {
     m_mainPageUpBtn.SetEnable(true);
     m_mainPageDownBtn.SetEnable(false);
+  }
+  else
+  {
+    m_mainPageUpBtn.SetEnable(true);
+    m_mainPageDownBtn.SetEnable(true);
   }
 }
 
@@ -391,6 +417,34 @@ void CTypeInDistSelectionHook::ShowSubItemList()
   {
     m_subPageUpBtn.SetEnable(true);
     m_subPageDownBtn.SetEnable(false);
+  }
+  else
+  {
+    m_subPageUpBtn.SetEnable(true);
+    m_subPageDownBtn.SetEnable(true);
+  }
+}
+
+void CTypeInDistSelectionHook::ShowFocusBtn()
+{
+  m_comInfoBtn.SetEnable(true);
+  for (int i=0; i<4; i++)
+  {
+    m_mainInfoBtn[i].SetEnable(true);
+  }
+
+  if (m_index == -1)
+  {
+    m_comInfoBtn.SetEnable(false);
+    return;
+  }
+  else
+  {
+    int index = m_index - m_mainPageController.GetPageStartPosition();
+    if (index > -1 && index < 4)
+    {
+      m_mainInfoBtn[index].SetEnable(false);
+    }
   }
 }
 

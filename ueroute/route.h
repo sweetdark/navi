@@ -487,6 +487,11 @@ namespace UeRoute
     bool GetCurElecEye(EEyeProp &elecEye);
 
     /**
+    * \brief 取得距离当前需播报的电子眼
+    */
+    double GetCurElecEyeDist();
+
+    /**
     * \brief 获得起、终点的矩形范围
     */
     void GetExtent(CGeoRect<long> &curExtent);

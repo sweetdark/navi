@@ -16,6 +16,7 @@
 
 namespace UeGui
 {
+  class CNaviMapSettingHook;
   class UEGUI_CLASS CNavigationLeftHook : public CAggHook
   {
     //只用于作为CSystemSettingHook的子hook
@@ -24,6 +25,8 @@ namespace UeGui
     CNavigationLeftHook();
 
     virtual ~CNavigationLeftHook();
+
+    void SwitchTabPage(unsigned short type);
   public:
     enum navigationlefthookCtrlType
     {
@@ -47,9 +50,8 @@ namespace UeGui
 
     virtual bool operator ()();
 
-
-
   protected:
+    
     virtual tstring GetBinaryFileName();
 
     virtual void MakeNames();
@@ -57,6 +59,7 @@ namespace UeGui
     void MakeControls();
 
   private:
+    CNaviMapSettingHook* m_naviMapSetting;
     CUiButton m_mapNavigationBtnCtrl;
     CUiButton m_promptSettingBtnCtrl;
     CUiButton m_routeSettingBtnCtrl;

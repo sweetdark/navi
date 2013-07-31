@@ -159,6 +159,8 @@ namespace UeGui
 
     //目前输入到拼音组合的第几个字母
     int m_curSpellingCursor;
+    //用于记录输入过的字母变色
+    unsigned char m_posBuffer[10];
   };
 }
 #endif

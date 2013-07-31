@@ -47,6 +47,7 @@ void CInputHandHook::Init()
 
 void CInputHandHook::Load()
 {
+  CQueryWrapper::Get().SetDefaultQueryKind();
   SetQueryMode();
   GetAssociateThing();
 }

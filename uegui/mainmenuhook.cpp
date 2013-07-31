@@ -235,7 +235,7 @@ short CMainMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case mainmenuhook_SettingLabel:
     {
       m_settingBackgroundCtrl.MouseUp();
-      //TurnTo(DHT_SystemSettingHook);
+      TurnTo(DHT_SystemSettingHook);
     }
     break;
   default:

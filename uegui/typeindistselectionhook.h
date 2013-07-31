@@ -92,6 +92,8 @@ namespace UeGui
 
     void ShowSubItemList();
 
+    void ShowFocusBtn();
+
   private:
     static void DistSwitchCallBack(void *pDoCallBackObj, const SQLRecord *pResult);
 
@@ -101,8 +103,8 @@ namespace UeGui
     CUiButton m_distSwitchBtn;
     CUiBitButton m_distSelectBtn;
 
-    CUiButton m_comInfoBtn;
-    CUiButton m_mainInfoBtn[4];
+    CUiBitButton m_comInfoBtn;
+    CUiBitButton m_mainInfoBtn[4];
     CUiButton m_subInfoBtn[5];
 
     CUiBitButton m_mainPageUpBtn;
@@ -123,6 +125,8 @@ namespace UeGui
 
     CPageController m_mainPageController;
     CPageController m_subPageController;
+    //用于显示当前选中的选项
+    int m_index;
   };
 }
 #endif

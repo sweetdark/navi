@@ -657,6 +657,7 @@ unsigned int CUeVoice::PlayVoice(short type, double speed, double distForSnd)
       {
         m_curElecEye.Invalid();
         m_eyeDistFlag = 0;
+        m_curElecEyeDist = 0;
         PlayEyeOffVoice();
       }
 
@@ -962,6 +963,7 @@ bool CUeVoice::PlayElecEye(double dist, int parcelIdx, int linkIdx, int trafficF
   {
     m_sides = new CUeSideProps;
   }
+  m_curElecEyeDist = 0.0;
   CMemVector eyes(sizeof(EEyeProp));
   int direction = GetTrafficDirection(trafficFlow);
   unsigned char rt = m_sides->GetTrafficSign(SVT_EEye, parcelIdx, linkIdx, direction, eyes);
@@ -1005,6 +1007,7 @@ bool CUeVoice::PlayElecEye(double dist, int parcelIdx, int linkIdx, int trafficF
         if(distForSnd > -10 && distForSnd < minDist)
         {
           minDist = distForSnd;
+          m_curElecEyeDist = minDist;
           curElecEye = pEye;
           isFound = true;
         }
@@ -1022,7 +1025,7 @@ bool CUeVoice::PlayElecEye(double dist, int parcelIdx, int linkIdx, int trafficF
     if(!isFound && m_curElecEye.IsValid())
     {
       m_curElecEye.Invalid();
-      m_eyeDistFlag = 0;
+      m_eyeDistFlag = 0;      
       PlayEyeOffVoice();
     }
     if(isFound && m_curElecEye != *curElecEye)
@@ -1049,6 +1052,15 @@ bool CUeVoice::GetCurElecEye(EEyeProp &elecEye)
   }
 
   return false;
+}
+
+double UeRoute::CUeVoice::GetCurElecEyeDist()
+{
+  if (m_curElecEye.IsValid())
+  {
+    return m_curElecEyeDist;
+  }
+  return 0.0;
 }
 
 /**
@@ -2197,6 +2209,7 @@ inline unsigned int CUeVoice::PlaySpecial(short type, double speed, double distF
 
       // Record this special info code
       m_prePrompt = prompt;
+      m_prePrompt.m_infoCode = IVT_MeetDestination;
       return PEC_GuidanceOver;
     }
     else
@@ -2967,6 +2980,7 @@ void CUeVoice::PlaySideSigns(double distForSnd, double speed, const GuidanceIndi
     //}
   }
 
+  m_curElecEyeDist = 0.0;
   bool isHighway = curIndicator->m_roadClass == RC_MotorWay ? true : false;
   if(curIndicator->m_snd.m_sideCode & SVT_EEye)
   {
@@ -2988,6 +3002,7 @@ void CUeVoice::PlaySideSigns(double distForSnd, double speed, const GuidanceIndi
         if(dist > -10 && dist < minDist)
         {
           minDist = dist;
+          m_curElecEyeDist = minDist;
           curElecEye = pEye;
           isEyeFound = true;
         }
@@ -3015,6 +3030,7 @@ void CUeVoice::PlaySideSigns(double distForSnd, double speed, const GuidanceIndi
           if(dist > -10 && dist < minDist)
           {
             minDist = dist;
+            m_curElecEyeDist = dist;
             curElecEye = pEye;
             isEyeFound = true;
           }

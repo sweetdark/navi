@@ -85,7 +85,9 @@
 #include "ddtupdateservicehook.h"
 #include "guidanceviewhook.h"
 #include "districtselectionhook.h"
+#include "roundselectionhook.h"
 #include "typeindistselectionhook.h"
+#include "typenodistselectionhook.h"
 
 #include "inputswitchhook.h"
 #include "inputspellinghook.h"
@@ -101,6 +103,7 @@
 #include "routetypeswitchhook.h"
 #include "usuallyhook.h"
 #include "typeindistquerylisthook.h"
+#include "typenodistquerylisthook.h"
 #include "fastoperationhook.h"
 
 #if __FOR_FPC__
@@ -178,58 +181,29 @@ void UeGui::CGuiImpl::Timer()
 *
 */
 void CGuiImpl::Update(short type, void *para)
-{
-  CMapHook *mapHook = (CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook));
+{  
   switch(type)
   {
   case CViewHook::UHT_SwitchTo2D:
-    {
-      mapHook->SwitchState(false);
-    }
-    break;
   case CViewHook::UHT_SwitchTo3D:
-    {
-      mapHook->SwitchState(true);
-    }
-    break;
-  case CViewHook::UHT_FillGpsInfo:
-    {
-      //mapHook->FillGpsInfo();
-    }
-    break;
   case CViewHook::UHT_ForRealGuidance:
-    {
-      mapHook->MoveToRealGuidanceGUI();
-    }
-    break;
   case CViewHook::UHT_ForDemoGuidance:
-    {
-      mapHook->MoveToDemoGuidanceGUI();
-    }
-    break;
   case CViewHook::UHT_FillGuidanceInfo:
+  case CViewHook::UHT_FillGpsInfo:
+  case CViewHook::UHT_UpdateMapHook:
+  case CViewHook::UHT_SplitMapHook:
+  case CViewHook::UHT_UpdateLocationMapHook:
     {
-      mapHook->FillGuidanceInfo();
+      CMapHook *mapHook = (CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook));
+      if (mapHook)
+      {
+        mapHook->Update(type);
+      }
     }
     break;
   case CViewHook::UHT_UpdateGPSHook:
     {
       ((CGpsHook*)(m_view->GetHook(CViewHook::DHT_GPSHook)))->Update();
-    }
-    break;
-  case CViewHook::UHT_UpdateMapHook:
-    {
-      ((CMapHook*)(m_view->GetHook(CViewHook::DHT_MapHook)))->MoveToFullGui();
-    }
-    break;
-  case CViewHook::UHT_SplitMapHook:
-    {
-      ((CMapHook*)(m_view->GetHook(CViewHook::DHT_MapHook)))->MoveToSplitGui();
-    }
-    break;
-  case CViewHook::UHT_UpdateCountDown:
-    {
-      ((CMapHook*)(m_view->GetHook(CViewHook::DHT_MapHook)))->UpdateCountDown();
     }
     break;
   case CViewHook::UHT_UpdateKeyboardHook:
@@ -241,11 +215,6 @@ void CGuiImpl::Update(short type, void *para)
       //hnc?????????
       //((CKeyboardHook *)m_view->GetHook(CViewHook::DHT_KeyboardHook))->DoHandWriting(curTime);
       ((CInputHandHook *)m_view->GetHook(CViewHook::m_curHookType))->DoHandWriting(curTime);
-    }
-    break;
-  case CViewHook::UHT_UpdateLocationMapHook:
-    {
-      mapHook->RefershLocationInfo();
     }
     break;
   case CViewHook::UHT_ForBlockCmd:
@@ -462,11 +431,21 @@ void CGuiImpl::MakeHooks()
   viewHook->SetHelpers(net, view, route, gps, query);
   viewHook->LoadGUI();  
   view->AddHook(CViewHook::DHT_DistrictSelectionHook, viewHook);
+  //周边选择界面
+  viewHook = new CRoundSelectionHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();  
+  view->AddHook(CViewHook::DHT_RoundSelectionHook, viewHook);
   //分类选择界面
   viewHook = new CTypeInDistSelectionHook();
   viewHook->SetHelpers(net, view, route, gps, query);
   viewHook->LoadGUI();  
   view->AddHook(CViewHook::DHT_TypeInDistSelectionHook, viewHook);
+  //分类选择界面
+  viewHook = new CTypeNoDistSelectionHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();  
+  view->AddHook(CViewHook::DHT_TypeNoDistSelectionHook, viewHook);
   //主菜单界面
   viewHook = new CMainMenuHook();
   viewHook->SetHelpers(net, view, route, gps, query);
@@ -578,10 +557,10 @@ void CGuiImpl::MakeHooks()
   view->UpdateProgress();
 
   //系统设置界面里的语音设置界面
-  viewHook = new CVoiceSettingHook();
-  viewHook->SetHelpers(net, view, route, gps, query);
-  viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_VoiceSettingHook, viewHook);
+  //viewHook = new CVoiceSettingHook();
+  //viewHook->SetHelpers(net, view, route, gps, query);
+  //viewHook->LoadGUI();  
+  //view->AddHook(CViewHook::DHT_VoiceSettingHook, viewHook);
 
   ////旧Hook需要移除掉
   //viewHook = new CQueryCrossHook();
@@ -596,11 +575,11 @@ void CGuiImpl::MakeHooks()
   view->AddHook(CViewHook::DHT_SystemSettingHook,viewHook);
 
   //系统设置界面里的自车图标界面
-  viewHook = new CCarSettingHook();
-  viewHook->SetHelpers(net,view,route,gps,query);
-  //切换界面时再动态加载
-  //viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_CarSettingHook,viewHook);
+  //viewHook = new CCarSettingHook();
+  //viewHook->SetHelpers(net,view,route,gps,query);
+  ////切换界面时再动态加载
+  ////viewHook->LoadGUI();  
+  //view->AddHook(CViewHook::DHT_CarSettingHook,viewHook);
 
   //系统设置界面里的时间校准界面
   viewHook = new CTimeSettingHook();
@@ -798,6 +777,12 @@ void CGuiImpl::MakeHooks()
   //切换界面时再动态加载
   //viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_TypeInDistQueryListHook,viewHook);
+
+  viewHook = new CTypeNoDistQueryListHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  //切换界面时再动态加载
+  //viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_TypeNoDistQueryListHook,viewHook);
 
   //地址簿
   viewHook = new CMyAddressBookHook();

@@ -61,6 +61,7 @@ namespace UeGui
       TypeInDistQueryListHook_DistSelectBtnIcon,
       TypeInDistQueryListHook_TypeSelectBtnIcon,
       TypeInDistQueryListHook_TypeSelectBtn,
+      TypeInDistQueryListHook_TypeSelectBtnLabel,
       TypeInDistQueryListHook_End
     };
 
@@ -76,13 +77,22 @@ namespace UeGui
 
     virtual void Load();
 
+    virtual void UnLoad();
+
   protected:
 
     virtual void MakeNames();
 
     void MakeControls();
 
+    void SearchForResult();
+
     void ResetResultList();
+
+  private:
+    static void DistSwitchCallBack(void *pDoCallBackObj, const SQLRecord *pResult);
+
+    void DoDistSwitchCallBack(const SQLRecord *pResult);
 
   private:
     CUiButton m_distSwitchBtn;
