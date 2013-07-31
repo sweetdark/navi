@@ -221,6 +221,8 @@ namespace UeMap
     */
     virtual void RefreshLayerData();
 
+    static const double GetScaleY();
+
   private:
     //
     //

@@ -1933,6 +1933,16 @@ inline CViewLayer *CViewImpl::GetLayer(int scale, int type)
   return 0;
 }
 
+inline CViewLayer *CViewImpl::GetLayer(int scale, unsigned int index)
+{
+  if(m_layers.find(scale) != m_layers.end())
+  {
+    return m_layers[scale][index];
+  }
+
+  return 0;
+}
+
 /**
 *
 */
@@ -3382,4 +3392,9 @@ void CViewImpl::InitState()
   {
     SetState(VT_Heading);
   }
+}
+
+unsigned int CViewImpl::GetLayerSize(short scaleLevel)
+{
+  return m_layers[scaleLevel].size();
 }

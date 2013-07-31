@@ -77,7 +77,6 @@ bool CAGGView::m_isScrolling = false;
 
 static HandleType sThreadHandle = 0;
 
-
 unsigned int __stdcall ScrollMapThread(void *param)
 {
   while (CAGGView::IsScrolling())
@@ -1566,4 +1565,9 @@ void CAGGView::RefreshLayerData()
   {
     m_viewImpl->m_layers[scale][i]->Draw(m_type, &stackDC, scrExtent, curDC->m_clipBox, isRotated);
   }
+}
+
+const double CAGGView::GetScaleY()
+{
+  return m_scaleY;
 }

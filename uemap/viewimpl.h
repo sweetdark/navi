@@ -236,7 +236,7 @@ namespace UeMap
     virtual bool FocusOn(short type);
 
     /**
-    * 根据点来确定当前选取的是哪个视图，并返回当前选择的视图类型
+    * 根据点来确定当前选取的是哪个视图，把该视图放到容器最前面，并返回当前选择的视图类型
     */
     virtual unsigned int FocusOn(const CGeoPoint<short> &scrPoint);
 
@@ -568,6 +568,13 @@ namespace UeMap
     *
     **/
     virtual CViewLayer *GetLayer(int scale, int type);
+    
+    /**
+    * \brief 获取相应比例尺下的layer
+    * \param 比例尺
+    * \param index
+    */
+    CViewLayer *GetLayer(int scale, unsigned int index);
 
     /**
     *
@@ -739,6 +746,10 @@ namespace UeMap
     * 解锁路口放大                                                                
     */
     void UnLockScalling();
+    /**
+    * \brief 获得相应scaleLevel下的Layer的个数
+    */
+    unsigned int GetLayerSize(short scaleLevel);
   protected:
     /**
     * 开始显示系统加载进度

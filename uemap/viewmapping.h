@@ -78,7 +78,16 @@ namespace UeMap
     friend class CCapHook;
     friend class CFPCLayer;
 #endif
+  public:
+    const MapLayout& GetMapLayout()
+    {
+      return m_mapLayout;
+    }
 
+    const ScreenLayout& GetScrLayout()
+    {
+      return m_scrLayout;
+    }
   protected:
     //
     //
@@ -97,7 +106,7 @@ namespace UeMap
     {
     }
 
-  protected:
+  public:
     //
     //
     //
