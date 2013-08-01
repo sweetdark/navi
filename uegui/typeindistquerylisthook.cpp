@@ -157,7 +157,7 @@ short CTypeInDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
       int index = (ctrlType-TypeInDistQueryListHook_List1Btn)/4;
       m_InfoBtn[index].MouseDown();
       m_AddrLabel[index].MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_InfoBtn[index], m_AddrLabel[index]);
+      MOUSEDOWN_2RENDERCTRL(m_InfoBtn[index], m_AddrLabel[index]);
     } 
     else
     {

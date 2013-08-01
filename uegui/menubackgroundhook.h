@@ -15,10 +15,10 @@
 //#include "uicheckbutton.h"
 
 //用于mousedown时局部刷新的宏，使用方式如下:
-//MOUSEDONW_3RENDERCTRL(m_display3DBackgroundCtrl, m_display3DBtnCtrl, m_display3DLableCtrl)
+//MOUSEDOWN_3RENDERCTRL(m_display3DBackgroundCtrl, m_display3DBtnCtrl, m_display3DLableCtrl)
 //PS: 结尾要加分号，因为是函数调用。
 //此宏定义支持一次传三个控件名
-#define MOUSEDONW_3RENDERCTRL(ctrl1, ctrl2, ctrl3) \
+#define MOUSEDOWN_3RENDERCTRL(ctrl1, ctrl2, ctrl3) \
   do                                               \
   {                                                \
     AddRenderUiControls(&##ctrl1##);               \
@@ -27,7 +27,7 @@
   } while (0)
 
 //此宏定义支持一次传两个控件名
-#define MOUSEDONW_2RENDERCTRL(ctrl1, ctrl2)       \
+#define MOUSEDOWN_2RENDERCTRL(ctrl1, ctrl2)       \
   do                                              \
   {                                               \
     AddRenderUiControls(&##ctrl1##);              \
@@ -35,7 +35,7 @@
   } while (0)
 
 //此宏定义支持一次传一个控件名
-#define MOUSEDONW_1RENDERCTRL(ctrl1)              \
+#define MOUSEDOWN_1RENDERCTRL(ctrl1)              \
   do                                              \
   {                                               \
     AddRenderUiControls(&##ctrl1##);              \

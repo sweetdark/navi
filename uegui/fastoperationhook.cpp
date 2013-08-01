@@ -75,7 +75,7 @@ short CFastOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
   case fastoperationhook_BackTrackLable:
     {
       m_backTrackBtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_backTrackBtnCtrl, m_backTrackLableCtrl);
+      MOUSEDOWN_2RENDERCTRL(m_backTrackBtnCtrl, m_backTrackLableCtrl);
     }
     break;
   case fastoperationhook_ElecEyeBtn:
@@ -83,7 +83,7 @@ short CFastOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
   case fastoperationhook_ElecEyeLable:
     {
       m_elecEyeBtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_elecEyeBtnCtrl, m_elecEyeLableCtrl);
+      MOUSEDOWN_2RENDERCTRL(m_elecEyeBtnCtrl, m_elecEyeLableCtrl);
     }
     break;
   case fastoperationhook_FavouritBtn:
@@ -91,7 +91,7 @@ short CFastOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
   case fastoperationhook_FavouritLable:
     {
       m_favouritBtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_favouritBtnCtrl, m_favouritLableCtrl);
+      MOUSEDOWN_2RENDERCTRL(m_favouritBtnCtrl, m_favouritLableCtrl);
     }
     break;
   case fastoperationhook_QMarkBtn:
@@ -99,7 +99,7 @@ short CFastOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
   case fastoperationhook_QMarkLable:
     {
       m_qMarkBtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_qMarkBtnCtrl, m_qMarkLableCtrl);
+      MOUSEDOWN_2RENDERCTRL(m_qMarkBtnCtrl, m_qMarkLableCtrl);
     }
     break;
   default:

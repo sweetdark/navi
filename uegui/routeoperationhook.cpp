@@ -94,7 +94,7 @@ short CRouteOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
   case RouteOperationHook_StopNavigationBtn:
     {
       m_firstBtnBackgroundCtrl.MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_firstBtnBackgroundCtrl, m_startNavigationBtnCtrl, m_stopNavigationBtnCtrl);
+      MOUSEDOWN_3RENDERCTRL(m_firstBtnBackgroundCtrl, m_startNavigationBtnCtrl, m_stopNavigationBtnCtrl);
     }
     break;
   case RouteOperationHook_PassedRouteBtn:
@@ -105,7 +105,7 @@ short CRouteOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
       {
         m_secondBtnBackgroundCtrl.MouseDown();
         m_passedRouteBtnCtrl.MouseDown();
-        MOUSEDONW_2RENDERCTRL(m_secondBtnBackgroundCtrl, m_passedRouteBtnCtrl);
+        MOUSEDOWN_2RENDERCTRL(m_secondBtnBackgroundCtrl, m_passedRouteBtnCtrl);
       }
       else
       {
@@ -119,7 +119,7 @@ short CRouteOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_thirdBtnBackgroundCtrl.MouseDown();
       m_routeTypeBtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_thirdBtnBackgroundCtrl, m_routeTypeBtnCtrl);
+      MOUSEDOWN_2RENDERCTRL(m_thirdBtnBackgroundCtrl, m_routeTypeBtnCtrl);
     }
     break;
   case RouteOperationHook_NexDestinationLable:
@@ -130,7 +130,7 @@ short CRouteOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
       {
         m_fourthBtnBackgroundCtrl.MouseDown();
         m_nextDestinationBtnCtrl.MouseDown();
-        MOUSEDONW_2RENDERCTRL(m_fourthBtnBackgroundCtrl, m_nextDestinationBtnCtrl);
+        MOUSEDOWN_2RENDERCTRL(m_fourthBtnBackgroundCtrl, m_nextDestinationBtnCtrl);
       }
       else
       {
@@ -145,7 +145,7 @@ short CRouteOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_fifthBtnBackgroundCtrl.MouseDown();
       m_overViewRouteBtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_fifthBtnBackgroundCtrl, m_overViewRouteBtnCtrl);
+      MOUSEDOWN_2RENDERCTRL(m_fifthBtnBackgroundCtrl, m_overViewRouteBtnCtrl);
     }
     break;
   case RouteOperationHook_DeleteRouteBtn:
@@ -154,7 +154,7 @@ short CRouteOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_sixthBtnBackgroundCtrl.MouseDown();
       m_deleteRouteBtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_sixthBtnBackgroundCtrl, m_deleteRouteBtnCtrl);
+      MOUSEDOWN_2RENDERCTRL(m_sixthBtnBackgroundCtrl, m_deleteRouteBtnCtrl);
     }
     break;
   case RouteOperationHook_DemoGuidanceBtn:
@@ -165,7 +165,7 @@ short CRouteOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
       {
         m_seventhBtnBackgroundCtrl.MouseDown();
         m_demoGuidanceBtnCtrl.MouseDown();
-        MOUSEDONW_2RENDERCTRL(m_seventhBtnBackgroundCtrl, m_demoGuidanceBtnCtrl);
+        MOUSEDOWN_2RENDERCTRL(m_seventhBtnBackgroundCtrl, m_demoGuidanceBtnCtrl);
       }
       else
       {
@@ -179,7 +179,7 @@ short CRouteOperationHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_eighthBtnBackgroundCtrl.MouseDown();
       m_saveJurneyBtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_eighthBtnBackgroundCtrl, m_saveJurneyBtnCtrl);
+      MOUSEDOWN_2RENDERCTRL(m_eighthBtnBackgroundCtrl, m_saveJurneyBtnCtrl);
     }
     break;
   default:

@@ -138,7 +138,7 @@ short CDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
       int listIndex = (ctrlType-DistQueryListHook_List1Btn)/3;
       m_infoBtn[listIndex].MouseDown();
       m_distLabel[listIndex].MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_infoBtn[listIndex], m_distLabel[listIndex], m_distBtn[listIndex]);
+      MOUSEDOWN_3RENDERCTRL(m_infoBtn[listIndex], m_distLabel[listIndex], m_distBtn[listIndex]);
     } 
     else if (ctrlType >= DistQueryListHook_List1DistBtn && ctrlType <= DistQueryListHook_List7DistBtn)
     {

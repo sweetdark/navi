@@ -193,8 +193,8 @@ short CRoadQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
       m_infoBtn[listIndex].MouseDown();
       m_AddrLabel[listIndex].MouseDown();
       m_poiLabel[listIndex].MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_infoBtn[listIndex], m_AddrLabel[listIndex], m_poiLabel[listIndex]);
-      MOUSEDONW_2RENDERCTRL(m_interval[listIndex], m_crossBtn[listIndex]);
+      MOUSEDOWN_3RENDERCTRL(m_infoBtn[listIndex], m_AddrLabel[listIndex], m_poiLabel[listIndex]);
+      MOUSEDOWN_2RENDERCTRL(m_interval[listIndex], m_crossBtn[listIndex]);
       
     } 
     else if (ctrlType >= RoadQueryListHook_List1CrossBtn && ctrlType <= RoadQueryListHook_List4CrossBtn)

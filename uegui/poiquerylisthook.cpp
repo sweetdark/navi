@@ -175,7 +175,7 @@ short CPoiQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
       m_infoBtn[index].MouseDown();
       m_addrLabel[index].MouseDown();
       m_poiLabel[index].MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_infoBtn[index], m_poiLabel[index], m_addrLabel[index]);
+      MOUSEDOWN_3RENDERCTRL(m_infoBtn[index], m_poiLabel[index], m_addrLabel[index]);
     } 
     else
     {

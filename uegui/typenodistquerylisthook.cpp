@@ -233,7 +233,7 @@ short CTypeNoDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
       int index = (ctrlType-TypeNoDistQueryListHook_List1Btn)/4;
       m_infoBtn[index].MouseDown();
       m_addrLabel[index].MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_infoBtn[index], m_addrLabel[index]);
+      MOUSEDOWN_2RENDERCTRL(m_infoBtn[index], m_addrLabel[index]);
     } 
     else
     {

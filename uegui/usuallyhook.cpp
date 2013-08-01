@@ -137,106 +137,166 @@ short CUsuallyHook::MouseDown(CGeoPoint<short> &scrPoint)
   case usuallyhook_DeleteFavourit1Btn:
   case usuallyhook_DeleteFavourit1BtnIcon:
     {
-      m_deleteFavourit1BtnCtrl.MouseDown();
+      if (IsNeedRefresh(m_deleteFavourit1BtnCtrl))
+      {
+        m_deleteFavourit1BtnCtrl.MouseDown();
+        MOUSEDOWN_1RENDERCTRL(m_deleteFavourit1BtnCtrl);
+      }
     }
     break;
   case usuallyhook_DeleteFavourit2Btn:
   case usuallyhook_DeleteFavourit2BtnIcon:
     {
-      m_deleteFavourit2BtnCtrl.MouseDown();
+      if (IsNeedRefresh(m_deleteFavourit2BtnCtrl))
+      {
+        m_deleteFavourit2BtnCtrl.MouseDown();
+        MOUSEDOWN_1RENDERCTRL(m_deleteFavourit2BtnCtrl);
+      }
     }
     break;
   case usuallyhook_DeleteFavourit3Btn:
   case usuallyhook_DeleteFavourit3BtnIcon:
     {
-      m_deleteFavourit3BtnCtrl.MouseDown();
+      if (IsNeedRefresh(m_deleteFavourit3BtnCtrl))
+      {
+        m_deleteFavourit3BtnCtrl.MouseDown();
+        MOUSEDOWN_1RENDERCTRL(m_deleteFavourit3BtnCtrl);
+      }
     }
     break;
   case usuallyhook_DeleteHomeBtn:
   case usuallyhook_DeleteHomeBtnIcon:
     {
-      m_deleteHomeBtnCtrl.MouseDown();
+      if (IsNeedRefresh(m_deleteHomeBtnCtrl))
+      {
+        m_deleteHomeBtnCtrl.MouseDown();
+        MOUSEDOWN_1RENDERCTRL(m_deleteHomeBtnCtrl);
+      }
     }
     break;
   case usuallyhook_DeleteWorkBtn:
   case usuallyhook_DeleteWorkBtnIcon:
     {
-      m_deleteWorkBtnCtrl.MouseDown();
+      if (IsNeedRefresh(m_deleteWorkBtnCtrl))
+      {
+        m_deleteWorkBtnCtrl.MouseDown();
+        MOUSEDOWN_1RENDERCTRL(m_deleteWorkBtnCtrl);
+      }
     }
     break;
   case usuallyhook_EditFavourit1Btn:
   case usuallyhook_EditFavourit1BtnIcon:
     {
-      m_editFavourit1BtnCtrl.MouseDown();
+      if (IsNeedRefresh(m_editFavourit1BtnCtrl))
+      {
+        m_editFavourit1BtnCtrl.MouseDown();
+        MOUSEDOWN_1RENDERCTRL(m_editFavourit1BtnCtrl);
+      }
     }
     break;
   case usuallyhook_EditFavourit2Btn:
   case usuallyhook_EditFavourit2BtnIcon:
     {
-      m_editFavourit2BtnCtrl.MouseDown();
+      if (IsNeedRefresh(m_editFavourit2BtnCtrl))
+      {
+        m_editFavourit2BtnCtrl.MouseDown();
+        MOUSEDOWN_1RENDERCTRL(m_editFavourit2BtnCtrl);
+      }
     }
     break;
   case usuallyhook_EditFavourit3Btn:
   case usuallyhook_EditFavourit3BtnIcon:
     {
-      m_editFavourit3BtnCtrl.MouseDown();
+      if (IsNeedRefresh(m_editFavourit3BtnCtrl))
+      {
+        m_editFavourit3BtnCtrl.MouseDown();
+        MOUSEDOWN_1RENDERCTRL(m_editFavourit3BtnCtrl);
+      }
     }
     break;
   case usuallyhook_EditHomeBtn:
   case usuallyhook_EditHomeBtnIcon:
     {
-      m_editHomeBtnCtrl.MouseDown();
+      if (IsNeedRefresh(m_editHomeBtnCtrl))
+      {
+        m_editHomeBtnCtrl.MouseDown();
+        MOUSEDOWN_1RENDERCTRL(m_editHomeBtnCtrl);
+      }
     }
     break;
   case usuallyhook_EditWorkBtn:
   case usuallyhook_EditWorkBtnIcon:
     {
-      m_editWorkBtnCtrl.MouseDown();
+      if (IsNeedRefresh(m_editWorkBtnCtrl))
+      {
+        m_editWorkBtnCtrl.MouseDown();
+        MOUSEDOWN_1RENDERCTRL(m_editWorkBtnCtrl);
+      }
     }
     break;
   case usuallyhook_Favourit1Btn:
   case usuallyhook_Favourit1BtnIcon:
   case usuallyhook_Favourit1Name:
     {
-      m_favourit1BtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_favourit1BtnCtrl, m_favourit1NameCtrl);
-      MOUSEDONW_2RENDERCTRL(m_editFavourit1BtnCtrl, m_deleteFavourit1BtnCtrl);
+      if (IsNeedRefresh(m_favourit1BtnCtrl))
+      {
+        m_favourit1BtnCtrl.MouseDown();
+        MOUSEDOWN_2RENDERCTRL(m_favourit1BtnCtrl, m_favourit1NameCtrl);
+        MOUSEDOWN_2RENDERCTRL(m_editFavourit1BtnCtrl, m_deleteFavourit1BtnCtrl);
+        AddRenderElements(GetGuiElement(usuallyhook_Split3));
+      }
     }
     break;
   case usuallyhook_Favourit2Btn:
   case usuallyhook_Favourit2BtnIcon:
   case usuallyhook_Favourit2Name:
     {
-      m_favourit2BtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_favourit2BtnCtrl, m_favourit2NameCtrl);
-      MOUSEDONW_2RENDERCTRL(m_editFavourit2BtnCtrl, m_deleteFavourit2BtnCtrl);
+      if (IsNeedRefresh(m_favourit2BtnCtrl))
+      {
+        m_favourit2BtnCtrl.MouseDown();
+        MOUSEDOWN_2RENDERCTRL(m_favourit2BtnCtrl, m_favourit2NameCtrl);
+        MOUSEDOWN_2RENDERCTRL(m_editFavourit2BtnCtrl, m_deleteFavourit2BtnCtrl);
+        AddRenderElements(GetGuiElement(usuallyhook_Split4));
+      }
     }
     break;
   case usuallyhook_Favourit3Btn:
   case usuallyhook_Favourit3BtnIcon:
   case usuallyhook_Favourit3Name:
     {
-      m_favourit3BtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_favourit3BtnCtrl, m_favourit3NameCtrl);
-      MOUSEDONW_2RENDERCTRL(m_editFavourit3BtnCtrl, m_deleteFavourit3BtnCtrl);
+      if (IsNeedRefresh(m_favourit3BtnCtrl))
+      {
+        m_favourit3BtnCtrl.MouseDown();
+        MOUSEDOWN_2RENDERCTRL(m_favourit3BtnCtrl, m_favourit3NameCtrl);
+        MOUSEDOWN_2RENDERCTRL(m_editFavourit3BtnCtrl, m_deleteFavourit3BtnCtrl);
+        AddRenderElements(GetGuiElement(usuallyhook_Split5));
+      }
     }
     break;
   case usuallyhook_HomeBtn:
   case usuallyhook_HomeBtnIcon:
   case usuallyhook_HomeName:
     {
-      m_homeBtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_homeBtnCtrl, m_homeNameCtrl);
-      MOUSEDONW_2RENDERCTRL(m_editHomeBtnCtrl, m_deleteHomeBtnCtrl);
+      if (IsNeedRefresh(m_homeBtnCtrl))
+      {
+        m_homeBtnCtrl.MouseDown();
+        MOUSEDOWN_2RENDERCTRL(m_homeBtnCtrl, m_homeNameCtrl);
+        MOUSEDOWN_2RENDERCTRL(m_editHomeBtnCtrl, m_deleteHomeBtnCtrl);
+        AddRenderElements(GetGuiElement(usuallyhook_Split1));
+      }
     }
     break;
   case usuallyhook_WorkBtn:
   case usuallyhook_WorkBtnIcon:
   case usuallyhook_WorkName:
     {
-      m_workBtnCtrl.MouseDown();
-      MOUSEDONW_2RENDERCTRL(m_workBtnCtrl, m_workNameCtrl);
-      MOUSEDONW_2RENDERCTRL(m_editWorkBtnCtrl, m_deleteWorkBtnCtrl);
+      if (IsNeedRefresh(m_workBtnCtrl))
+      {
+        m_workBtnCtrl.MouseDown();
+        MOUSEDOWN_2RENDERCTRL(m_workBtnCtrl, m_workNameCtrl);
+        MOUSEDOWN_2RENDERCTRL(m_editWorkBtnCtrl, m_deleteWorkBtnCtrl);
+        AddRenderElements(GetGuiElement(usuallyhook_Split2));
+      }
     }
     break;
   default:

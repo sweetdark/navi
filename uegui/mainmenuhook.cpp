@@ -92,7 +92,7 @@ short CMainMenuHook::MouseDown(CGeoPoint<short> &scrPoint)
   case mainmenuhook_AddressBookLable:
     {
       m_addressBookBackgroundCtrl.MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_addressBookBackgroundCtrl, m_addressBookBtnCtrl, m_addressBookLableCtrl);
+      MOUSEDOWN_3RENDERCTRL(m_addressBookBackgroundCtrl, m_addressBookBtnCtrl, m_addressBookLableCtrl);
     }
     break;
   case mainmenuhook_Display3DBackground:
@@ -100,7 +100,7 @@ short CMainMenuHook::MouseDown(CGeoPoint<short> &scrPoint)
   case mainmenuhook_Display3DLable:
     {
       m_display3DBackgroundCtrl.MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_display3DBackgroundCtrl, m_display3DBtnCtrl, m_display3DLableCtrl);
+      MOUSEDOWN_3RENDERCTRL(m_display3DBackgroundCtrl, m_display3DBtnCtrl, m_display3DLableCtrl);
     }
     break;
   case mainmenuhook_ExitBackground:
@@ -108,7 +108,7 @@ short CMainMenuHook::MouseDown(CGeoPoint<short> &scrPoint)
   case mainmenuhook_ExitLabel:
     {
       m_exitBackgroundCtrl.MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_exitBackgroundCtrl, m_exitBtnCtrl, m_exitLabelCtrl);
+      MOUSEDOWN_3RENDERCTRL(m_exitBackgroundCtrl, m_exitBtnCtrl, m_exitLabelCtrl);
       
     }
     break;
@@ -117,7 +117,7 @@ short CMainMenuHook::MouseDown(CGeoPoint<short> &scrPoint)
   case mainmenuhook_HistoryRecordLable:
     {
       m_historyRecordBackgroundCtrl.MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_historyRecordBackgroundCtrl, m_historyRecordBtnCtrl, m_historyRecordLableCtrl);
+      MOUSEDOWN_3RENDERCTRL(m_historyRecordBackgroundCtrl, m_historyRecordBtnCtrl, m_historyRecordLableCtrl);
     }
     break;
   case mainmenuhook_MyJourneyBackground:
@@ -125,7 +125,7 @@ short CMainMenuHook::MouseDown(CGeoPoint<short> &scrPoint)
   case mainmenuhook_MyJourneyLable:
     {
       m_myJourneyBackgroundCtrl.MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_myJourneyBackgroundCtrl, m_myJourneyBtnCtrl, m_myJourneyLableCtrl);
+      MOUSEDOWN_3RENDERCTRL(m_myJourneyBackgroundCtrl, m_myJourneyBtnCtrl, m_myJourneyLableCtrl);
     }
     break;
   case mainmenuhook_RoutePlanBackground:
@@ -133,7 +133,7 @@ short CMainMenuHook::MouseDown(CGeoPoint<short> &scrPoint)
   case mainmenuhook_RoutePlanLable:
     {
       m_routePlanBackgroundCtrl.MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_routePlanBackgroundCtrl, m_routePlanBtnCtrl, m_routePlanLableCtrl);
+      MOUSEDOWN_3RENDERCTRL(m_routePlanBackgroundCtrl, m_routePlanBtnCtrl, m_routePlanLableCtrl);
     }
     break;
   case mainmenuhook_ServeBackground:
@@ -141,7 +141,7 @@ short CMainMenuHook::MouseDown(CGeoPoint<short> &scrPoint)
   case mainmenuhook_ServeLable:
     {
       m_serveBackgroundCtrl.MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_serveBackgroundCtrl, m_serveBtnCtrl, m_serveLableCtrl);
+      MOUSEDOWN_3RENDERCTRL(m_serveBackgroundCtrl, m_serveBtnCtrl, m_serveLableCtrl);
     }
     break;
   case mainmenuhook_SettingBackground:
@@ -149,7 +149,7 @@ short CMainMenuHook::MouseDown(CGeoPoint<short> &scrPoint)
   case mainmenuhook_SettingLabel:
     {
       m_settingBackgroundCtrl.MouseDown();
-      MOUSEDONW_3RENDERCTRL(m_settingBackgroundCtrl, m_settingBtnCtrl, m_settingLabelCtrl);
+      MOUSEDOWN_3RENDERCTRL(m_settingBackgroundCtrl, m_settingBtnCtrl, m_settingLabelCtrl);
     }
     break;
   default:
