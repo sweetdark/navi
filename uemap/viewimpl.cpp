@@ -56,6 +56,7 @@
 #include "ueroute\routebasic.h"
 
 #include "ueroute\ueguider.h" 
+#include "eagleview.h"
 
 using namespace UeMap;
 using namespace UeBase;
@@ -76,7 +77,7 @@ CViewImpl::CViewImpl() : m_wnd(0), m_layoutSchema(LS_Full), m_idleOP(IOP_Cursor 
 m_pathBasic(CPathBasic::Get()), m_fileBasic(CFileBasic::Get()), m_stringBasic(CStringBasic::Get()), 
 m_isReadyForOperation(true), m_sidePicCode(-1), m_sidePicType(-1), m_sideArrowCode(-1), m_isDrawSidePic(false), 
 m_picWndHandle(0), m_sampleID(0), m_isDrawPlanLayer(true), m_carIcon(0), m_3DCarIcon(0), m_compassIcon(0), m_compassIndicatorIcon(0),
-m_isProductActivation(false), m_needShowGuidanceView(true),m_isMapLayoutChange(false), m_bubbleIcon(0),m_isScallingMapLock(false)
+m_isProductActivation(false), m_needShowGuidanceView(true),m_isMapLayoutChange(false), m_bubbleIcon(0),m_isScallingMapLock(false),m_isEagleOn(false)
 {
   m_carInfo.m_curPos.m_x = 11639142;
   m_carInfo.m_curPos.m_y = 3991655;
@@ -90,6 +91,7 @@ m_isProductActivation(false), m_needShowGuidanceView(true),m_isMapLayoutChange(f
   void *ptr = &m_viewSettings;
   int count = 1;
   settingIO.GetSettings(CUeSettingsIO::ST_View, &ptr, count);
+  m_overViewScale = 0;
 }
 
 /**
@@ -603,23 +605,15 @@ void CViewImpl::SetViewPort(CViewState *curView, const MapLayout &mapLayout, sho
   {
   case LS_Full:
     {
-      // Erase guidance view
-      CGuidanceView *guidanceView = dynamic_cast<CGuidanceView *>(GetState(VT_Guidance));
-      if(guidanceView)
-      {
-        guidanceView->m_distForSnd = -1;
-        guidanceView->m_orderForSnd = -1;
-      }
-      {
-        CGuidanceView::m_curIndicator = CGuidanceView::m_curPair = 0;
-        CGuidanceView::m_curRecord = 0;
-        //IQuery::GetQuery()->Release();   //导致切换视图，查询的记录空了。 bug:查地名选记录。切换视图，返回再选记录崩溃。
-      }
-      EraseState(VT_Guidance);
-      // Full screen for main view
+
+      EraseState(VT_Eagle);
       ScreenLayout layout = m_scrLayout;
       curView->SetScrLayout(layout);
       curView->SetMapLayout(mapLayout);
+
+      // Erase guidance view
+      EraseGuidanceView();
+      // Full screen for main view
     }
     break;
   case LS_Fix_Split:
@@ -645,37 +639,7 @@ void CViewImpl::SetViewPort(CViewState *curView, const MapLayout &mapLayout, sho
       }
       curView->SetScrLayout(scrLayout);
       curView->SetMapLayout(mapLayout);
-
       //
-      CViewState *guidanceView = GetState(VT_Guidance);
-      if (!guidanceView)
-      {
-        bool isLand = (GetScrMode() == SM_Land) ? true : false;
-        guidanceView = CAGGView::GetState(VT_Guidance, isLand, this);
-        assert(guidanceView);
-
-        guidanceView->m_style = VS_Floating;
-        m_views.push_back(guidanceView);
-      }
-      assert(guidanceView);
-
-      // TODO:
-      // The size should be configed by one CFG file
-      if(m_scrLayout.m_extent.Width() >= m_scrLayout.m_extent.Height())
-      {
-        scrLayout.m_extent.m_minX = 2 * m_scrLayout.m_extent.Width() / 4;
-        scrLayout.m_extent.m_maxX = m_scrLayout.m_extent.Width();
-        scrLayout.m_extent.m_minY = 0;
-        scrLayout.m_extent.m_maxY = (curView->m_type == VT_Perspective) ? m_scrLayout.m_extent.Height() * (CAGGView::m_scaleY) : m_scrLayout.m_extent.Height();
-      }
-      else
-      {
-        scrLayout.m_extent.m_minX = 0;
-        scrLayout.m_extent.m_maxX = m_scrLayout.m_extent.Width();
-        scrLayout.m_extent.m_minY = 2 * m_scrLayout.m_extent.Height() / 4; 
-        scrLayout.m_extent.m_maxY = (curView->m_type == VT_Perspective) ? m_scrLayout.m_extent.Height() * (CAGGView::m_scaleY) : m_scrLayout.m_extent.Height();
-      }
-      guidanceView->SetScrLayout(scrLayout);
     }
     break;
   case LS_Docable:
@@ -1933,6 +1897,16 @@ inline CViewLayer *CViewImpl::GetLayer(int scale, int type)
   return 0;
 }
 
+inline CViewLayer *CViewImpl::GetLayer(int scale, unsigned int index)
+{
+  if(m_layers.find(scale) != m_layers.end())
+  {
+    return m_layers[scale][index];
+  }
+
+  return 0;
+}
+
 /**
 *
 */
@@ -2146,7 +2120,7 @@ void CViewImpl::Update(short type)
   {
     // It let main view in maximum status but if current map hook is using QueryList or RouteList splitted window, it need
     // fixed view port
-    m_needShowGuidanceView = true;
+    //m_needShowGuidanceView = true;
     if(m_layoutSchema != LS_Full && m_layoutSchema != LS_Fix_Split)
     {
       const MapLayout &mapLayout = curView->GetMapLayout();
@@ -2259,11 +2233,16 @@ void CViewImpl::Update(short type)
     else
     {
       // 显示路口放大图
-      if (m_needRenderGuidanceView)        
+      if ((m_needRenderGuidanceView) && (VM_Guidance == GetViewOpeMode()))
       {
         if (m_needShowGuidanceView && !m_isScallingMapLock)
         {
           ZoomInCross(type, curView, dirInfo, rt);
+          IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_SplitMapHook);
+        }
+        else if (IsNeedShowEagle())
+        {
+          ShowEagle(curView, type);
           IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_SplitMapHook);
         }
         else
@@ -2277,6 +2256,12 @@ void CViewImpl::Update(short type)
           }
         }
       }
+      else if (IsNeedShowEagle())
+      {
+        m_needShowGuidanceView = true;
+        ShowEagle(curView, type);
+        IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_SplitMapHook);
+      }
       else
       {
         m_needShowGuidanceView = true;
@@ -2289,6 +2274,7 @@ void CViewImpl::Update(short type)
         }
       }
     }
+    
     return;
   }
   else if (type & ST_RenderCountDown)
@@ -2368,20 +2354,6 @@ CViewState *CViewImpl::ZoomInFull(CViewState *curView, GuidanceStatus &dirInfo)
     m_layoutSchema = LS_Full;
     SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
   }
-
-  //// 
-  //if(dirInfo.m_curDistForSnd < 200)
-  //{
-  //  curView->SwitchTo(1, m_carInfo.m_headingDegree);
-  //}
-  //else if(dirInfo.m_curDistForSnd < 1000)
-  //{
-  //  curView->SwitchTo(2, m_carInfo.m_headingDegree);
-  //}
-  //else //if(dirInfo.m_curDistForSnd < 5000)
-  //{
-  //  curView->SwitchTo(3, m_carInfo.m_headingDegree);
-  //}
   
   if (!m_isScallingMapLock)
   {
@@ -2401,18 +2373,21 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
 {
   // Prepare splitted view port and if it already in splitted mode, it no needs to ...
 
-  if(m_layoutSchema != LS_Split || m_layoutSchema != LS_Fix_Split)
+  /*if(m_layoutSchema != LS_Split || m_layoutSchema != LS_Fix_Split)
   {
     const MapLayout &mapLayout = curView->GetMapLayout();
     int curScaleLevel = curView->m_curScaleLevel;
     m_layoutSchema = ((type & ST_RenderPathes) && m_layoutSchema == LS_Full) ? LS_Full : LS_Split;
     SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
-  }
-
+  }*/
+  
+  ChangeViewPort(curView, type);
+  // TODO:
+  // The size should be configed by one CFG file
+  EraseState(VT_Eagle);
+  InitGuidanceView(curView);
   CGuidanceView *guidanceView = dynamic_cast<CGuidanceView *>(GetState(VT_Guidance));
-  guidanceView->m_drawType = CGuidanceView::DT_Cross;
-
-  // According to current distance ...
+  
   if ((rt != PEC_Success && (m_layoutSchema == LS_Split || m_layoutSchema == LS_Fix_Split)) || 
       (rt == UeRoute::PEC_Success && dirInfo.m_curDistForSnd  > 500 && m_layoutSchema == LS_Split || m_layoutSchema == LS_Fix_Split))
   {
@@ -2420,11 +2395,6 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
     const MapLayout &mapLayout = curView->GetMapLayout();
     int curScaleLevel = curView->m_curScaleLevel;
     m_layoutSchema = LS_Full;
-    if (guidanceView)
-    {
-      guidanceView->m_distForSnd = -1;
-      guidanceView->m_orderForSnd = -1;
-    }
     SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
 
     if (rt == UeRoute::PEC_Success)
@@ -2473,14 +2443,14 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
           mapLayout.m_angle = TWOPI + HALFPI - angle;
           //mapLayout的比例尺，与取的路网等数据有关
           mapLayout.m_scale = curView->m_scales[1];  
-
+          guidanceView->SetMapLayout(mapLayout);
           //
           guidanceView->m_distForSnd = dirInfo.m_curDistForSnd;
           guidanceView->m_orderForSnd = dirInfo.m_curOrderForSnd;
           CGuidanceView::m_curPair = dirInfo.m_curPair;
           CGuidanceView::m_curIndicator = dirInfo.m_curIndicator;
           guidanceView->m_curScaleLevel = 1; //路口放大图的比例尺
-          guidanceView->SetMapLayout(mapLayout);
+          
         }
         //else
         //{
@@ -2877,7 +2847,7 @@ void UeMap::CViewImpl::CloseGuidanceView()
   {
     //如果用户自己关闭路口放大图后，则当前路口放大图不再显示
     m_needShowGuidanceView = false;
-
+    //QJW 还有鹰眼图
     GuidanceStatus dirInfo;
     unsigned int rt = IRoute::GetRoute()->GetCurrent(dirInfo);
     curView = ZoomInFull(curView, dirInfo);
@@ -3074,6 +3044,7 @@ bool UeMap::CViewImpl::AutoScallingMap(bool isLock)
     CGeoPoint<short> endScrPos;
     mainView->Map2Scr(startPos.m_pos, startScrPos);
     mainView->Map2Scr(endPos.m_pos, endScrPos);
+    MapLayout layout = mainView->GetMapLayout();
     //TODO: 修改条件，判断起点、终点屏幕距离是否太近
     afterLevel = curLevel;
     while (startScrPos.m_x > 0 && startScrPos.m_y > 0 
@@ -3087,6 +3058,7 @@ bool UeMap::CViewImpl::AutoScallingMap(bool isLock)
       mainView->SwitchTo(afterLevel, 0);
       mainView->Map2Scr(startPos.m_pos, startScrPos);
       mainView->Map2Scr(endPos.m_pos, endScrPos);
+      layout = mainView->GetMapLayout();
     }
 
     while ( !IsAllPlanLineInScreen(route, mainView) )
@@ -3097,7 +3069,11 @@ bool UeMap::CViewImpl::AutoScallingMap(bool isLock)
         break;
       }
       mainView->SwitchTo(afterLevel, 0);
+      layout = mainView->GetMapLayout();
     }
+
+    m_overViewScale = afterLevel;
+    m_eagleLayout = mainView->GetMapLayout();
     //if (mainView)
     //{
     //  mainView->GetScale(afterLevel, curScale);
@@ -3381,5 +3357,109 @@ void CViewImpl::InitState()
   else if(m_viewSettings.m_stateModel == ViewSettings::MD_HeadMap)
   {
     SetState(VT_Heading);
+  }
+}
+
+unsigned int CViewImpl::GetLayerSize(short scaleLevel)
+{
+  return m_layers[scaleLevel].size();
+}
+
+void CViewImpl::SetEagleState(bool isEagleOn)
+{
+  m_isEagleOn = isEagleOn;
+}
+
+bool CViewImpl::IsNeedShowEagle()
+{
+  bool hasRoute = IRoute::GetRoute()->GetPlanState() != PS_None;
+  bool isGuidanceMode = MainState()->GetViewOpeMode() == VM_Guidance;
+  bool isNoGuidancheView = GetState(VT_Guidance) == NULL;
+  return hasRoute && isGuidanceMode && m_isEagleOn && isNoGuidancheView;
+}
+
+void CViewImpl::EraseGuidanceView()
+{
+  CGuidanceView *guidanceView = dynamic_cast<CGuidanceView *>(GetState(VT_Guidance));
+  if(guidanceView)
+  {
+    guidanceView->m_distForSnd = -1;
+    guidanceView->m_orderForSnd = -1;
+    CGuidanceView::m_curIndicator = CGuidanceView::m_curPair = 0;
+    CGuidanceView::m_curRecord = 0;
+    EraseState(VT_Guidance);
+  }
+}
+
+void CViewImpl::InitGuidanceView(const CViewState *curView)
+{
+  if (!curView)
+  {
+    return;
+  }
+  ScreenLayout scrLayout = GetHalfScreenLayout(curView->m_type == VT_Perspective);
+
+  CGuidanceView *guidanceView = dynamic_cast<CGuidanceView *>(GetState(VT_Guidance));
+  if (!guidanceView)
+  {
+    bool isLand = (GetScrMode() == SM_Land) ? true : false;
+    guidanceView = dynamic_cast<CGuidanceView *>(CAGGView::GetState(VT_Guidance, isLand, this));
+    assert(guidanceView);
+    guidanceView->m_style = VS_Floating;
+    guidanceView->SetScrLayout(scrLayout);
+    guidanceView->m_drawType = CGuidanceView::DT_Cross;
+    m_views.push_back(guidanceView);
+  }
+}
+
+ScreenLayout CViewImpl::GetHalfScreenLayout(bool isPerspective)
+{
+  ScreenLayout scrLayout = m_scrLayout;
+  if(m_scrLayout.m_extent.Width() >= m_scrLayout.m_extent.Height())
+  {
+    scrLayout.m_extent.m_minX = 2 * m_scrLayout.m_extent.Width() / 4;
+    scrLayout.m_extent.m_maxX = m_scrLayout.m_extent.Width();
+    scrLayout.m_extent.m_minY = 0;
+    scrLayout.m_extent.m_maxY = (isPerspective) ? m_scrLayout.m_extent.Height() * (CAGGView::m_scaleY) : m_scrLayout.m_extent.Height();
+  }
+  else
+  {
+    scrLayout.m_extent.m_minX = 0;
+    scrLayout.m_extent.m_maxX = m_scrLayout.m_extent.Width();
+    scrLayout.m_extent.m_minY = 2 * m_scrLayout.m_extent.Height() / 4; 
+    scrLayout.m_extent.m_maxY = (isPerspective) ? m_scrLayout.m_extent.Height() * (CAGGView::m_scaleY) : m_scrLayout.m_extent.Height();
+  }
+  return scrLayout;
+}
+
+void CViewImpl::ShowEagle(CViewState *curView, const short renderType)
+{
+  ChangeViewPort(curView, renderType);
+
+  ScreenLayout scrLayout = GetHalfScreenLayout(false);
+  CViewState *eagleView = GetState(VT_Eagle);
+  if (!eagleView)
+  {
+    bool isLand = (GetScrMode() == SM_Land) ? true : false;
+    eagleView = CAGGView::GetState(VT_Eagle, isLand, this);
+    eagleView->SetScrLayout(scrLayout);
+    //因为变成了半屏所以比例尺再加
+    eagleView->m_curScaleLevel = m_overViewScale + 1;
+    MapLayout mapLayout = m_eagleLayout;
+    mapLayout.m_angle = 0.0;
+    mapLayout.m_scale = curView->m_scales[eagleView->m_curScaleLevel];
+    eagleView->SetMapLayout(mapLayout);
+    m_views.push_back(eagleView);
+  }
+}
+
+void CViewImpl::ChangeViewPort(CViewState *curView, const short renderType)
+{
+  if(m_layoutSchema != LS_Split || m_layoutSchema != LS_Fix_Split)
+  {
+    const MapLayout &mapLayout = curView->GetMapLayout();
+    int curScaleLevel = curView->m_curScaleLevel;
+    m_layoutSchema = ((renderType & ST_RenderPathes) && m_layoutSchema == LS_Full) ? LS_Full : LS_Split;
+    SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
   }
 }

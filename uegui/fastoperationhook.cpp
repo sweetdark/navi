@@ -130,6 +130,7 @@ short CFastOperationHook::MouseUp(CGeoPoint<short> &scrPoint)
   case fastoperationhook_QMarkLable:
     {
       m_qMarkBtnCtrl.MouseUp();
+      TurnTo(DHT_QCodeInputHook);
     }
     break;
   case fastoperationhook_FavouritBtn:

@@ -169,9 +169,11 @@ void UeMap::CGuidanceView::DoDrawCross()
     short maxX = m_mapping.m_scrLayout.m_extent.m_maxX;
     short maxY = m_mapping.m_scrLayout.m_extent.m_maxY;
     // TODO: ...
-    // Should know the order of hooks
-    CGeoRect<short> excludeRect;
-    m_viewImpl->ExcludeRegions(dc, m_type, excludeRect);
+    // Should know the order of hooks  
+    //裁剪掉非当前类型的并且是VS_FLOAT的view的矩形边界.如果有鹰眼图则可能会有问题，鹰眼图也是VS_FLOAT而且区域与guidanceview相同。
+    //庆幸的是目前在容器中鹰眼图和放大图没有同时存在。
+    /*CGeoRect<short> excludeRect;
+    m_viewImpl->ExcludeRegions(dc, m_type, excludeRect);*/
 
     // TODO:
     // Decide which circumstance it only directly copy existing bitmap not follow below steps

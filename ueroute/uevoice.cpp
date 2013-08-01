@@ -657,6 +657,7 @@ unsigned int CUeVoice::PlayVoice(short type, double speed, double distForSnd)
       {
         m_curElecEye.Invalid();
         m_eyeDistFlag = 0;
+        m_curElecEyeDist = 0;
         PlayEyeOffVoice();
       }
 
@@ -732,8 +733,10 @@ unsigned int CUeVoice::PlayVoice(short type, double speed, double distForSnd)
   }
 
   // 2) When driving within 300M, it had better render below pictures
+  // TODO: if current road is highway, distForSnd should be larger than 300.
   if(distForSnd < 300)
   {
+    // TODO: Extract method.
     char prop[eSideEntry::MAXSIDEPROPLENGTH] = {0, };
     if(indicators[curOrder]->m_snd.m_sideCode & SVT_LaneInfo)
     {
@@ -812,17 +815,6 @@ unsigned int CUeVoice::PlayVoice(short type, double speed, double distForSnd)
     {
       ClearSideProp(SVT_RealCross);
     }
-
-    ////
-    //if(indicators[curOrder]->m_snd.m_sideCode & SVT_Advance)
-    //{
-    //	GetSideProp(SVT_Advance, indicators[curOrder], indicators[curOrder-1], prop);
-    //	PlayAdvance(prop);
-    //}
-    //else
-    //{
-    //	ClearSideProp(SVT_Advance);
-    //}
   }
   else
   {
@@ -844,9 +836,10 @@ unsigned int CUeVoice::PlayVoice(short type, double speed, double distForSnd)
     // Whether it is neccessary to play ...
     if((rt == PEC_TooLongPlay) && (distForSnd > 5000) && m_distFlag != IVT_WaitNext)
     {
+      // TODO: Extract Method.
       UeSound tmp;
       char ascii[256] = {0, };
-      wchar_t chs[256] = _T("在听到下条指令前请顺路行使");
+      wchar_t chs[256] = _T("在听到下条指令前请沿当前道路行使");
       int len = m_stringBasic.Chs2Ascii(chs, ascii, 256);
       tmp.Add(ascii, len, IVT_TTS);
       tmp.m_priority = 2;
@@ -926,6 +919,9 @@ unsigned int CUeVoice::PlayVoice(short type, double speed, double distForSnd)
           PlayRoadName(rt, curOrder, nameOffset, curOffset, prompt, snd, indicators);
         }
       }
+
+      // Play Remind SND
+      PlayRemind(prompt, snd);
     }
     else
     {
@@ -962,6 +958,7 @@ bool CUeVoice::PlayElecEye(double dist, int parcelIdx, int linkIdx, int trafficF
   {
     m_sides = new CUeSideProps;
   }
+  m_curElecEyeDist = 0.0;
   CMemVector eyes(sizeof(EEyeProp));
   int direction = GetTrafficDirection(trafficFlow);
   unsigned char rt = m_sides->GetTrafficSign(SVT_EEye, parcelIdx, linkIdx, direction, eyes);
@@ -1005,6 +1002,7 @@ bool CUeVoice::PlayElecEye(double dist, int parcelIdx, int linkIdx, int trafficF
         if(distForSnd > -10 && distForSnd < minDist)
         {
           minDist = distForSnd;
+          m_curElecEyeDist = minDist;
           curElecEye = pEye;
           isFound = true;
         }
@@ -1022,7 +1020,7 @@ bool CUeVoice::PlayElecEye(double dist, int parcelIdx, int linkIdx, int trafficF
     if(!isFound && m_curElecEye.IsValid())
     {
       m_curElecEye.Invalid();
-      m_eyeDistFlag = 0;
+      m_eyeDistFlag = 0;      
       PlayEyeOffVoice();
     }
     if(isFound && m_curElecEye != *curElecEye)
@@ -1049,6 +1047,15 @@ bool CUeVoice::GetCurElecEye(EEyeProp &elecEye)
   }
 
   return false;
+}
+
+double UeRoute::CUeVoice::GetCurElecEyeDist()
+{
+  if (m_curElecEye.IsValid())
+  {
+    return m_curElecEyeDist;
+  }
+  return 0.0;
 }
 
 /**
@@ -2968,6 +2975,7 @@ void CUeVoice::PlaySideSigns(double distForSnd, double speed, const GuidanceIndi
     //}
   }
 
+  m_curElecEyeDist = 0.0;
   bool isHighway = curIndicator->m_roadClass == RC_MotorWay ? true : false;
   if(curIndicator->m_snd.m_sideCode & SVT_EEye)
   {
@@ -2989,6 +2997,7 @@ void CUeVoice::PlaySideSigns(double distForSnd, double speed, const GuidanceIndi
         if(dist > -10 && dist < minDist)
         {
           minDist = dist;
+          m_curElecEyeDist = minDist;
           curElecEye = pEye;
           isEyeFound = true;
         }
@@ -3016,6 +3025,7 @@ void CUeVoice::PlaySideSigns(double distForSnd, double speed, const GuidanceIndi
           if(dist > -10 && dist < minDist)
           {
             minDist = dist;
+            m_curElecEyeDist = dist;
             curElecEye = pEye;
             isEyeFound = true;
           }
@@ -3474,9 +3484,27 @@ inline void CUeVoice::GetDistrictName(const CGeoPoint<long> &pos, char *distName
   IRoute::GetRoute()->GetMediator()->GetDistrictName(pos, distName);
 }
 
-/**
-* 
-*/
+void CUeVoice::PlayRemind(const SndPrompt &prompt, UeSound &snd)
+{
+  if(prompt.m_infoCode == IVT_EnterHW || prompt.m_infoCode == IVT_ExitHW
+    || prompt.m_infoCode == IVT_EnterMain || prompt.m_infoCode == IVT_EnterAux)
+  {
+    if(m_distFlag == IVT_1KM || m_distFlag == IVT_500M)
+    {
+      MakeTTS(IVT_RemindShiftLane, snd);
+    }
+  }
+
+  if(prompt.m_infoCode == IVT_EnterToll || prompt.m_infoCode == IVT_EnterBridge
+    || prompt.m_infoCode == IVT_EnterTunnel)
+  {
+    if(m_distFlag == IVT_1KM || m_distFlag == IVT_500M)
+    {
+      MakeTTS(IVT_RemindSlowDown, snd);
+    }
+  }
+}
+
 inline void CUeVoice::PlayAdvance(char *prop)
 {
   //

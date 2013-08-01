@@ -3022,6 +3022,11 @@ inline bool CUeGuider::GetCurElecEye(EEyeProp &elecEye)
   return m_voicer->GetCurElecEye(elecEye);
 }
 
+double UeRoute::CUeGuider::GetCurElecEyeDist()
+{
+ return m_voicer->GetCurElecEyeDist();
+}
+
 /**
 *
 **/

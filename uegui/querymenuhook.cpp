@@ -218,6 +218,7 @@ short CQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case QueryMenuHook_QCodeSearchLabel:
     {
       m_qCodeSearchBtn.MouseUp();
+      CAggHook::TurnTo(DHT_QCodeInputHook);
     }
     break;
   case QueryMenuHook_SeventhBtnBackground:

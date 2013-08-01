@@ -24,9 +24,10 @@ namespace UeGui
     enum RoundSelectionHookCtrlType
     {
       RoundSelectionHook_Begin = MenuBackgroundHook_End,
-      RoundSelectionHook_SwitchBtn,
-      RoundSelectionHook_SwitchBtnLabel,
-      RoundSelectionHook_SwitchBtnIcon,
+      RoundSelectionHook_TypeSelectLeftBtn,
+      RoundSelectionHook_TypeSelectRightBtn,
+      RoundSelectionHook_TypeSelectBtnLabel,
+      RoundSelectionHook_TypeSelectBtnIcon,
       RoundSelectionHook_List1CenterBtn,
       RoundSelectionHook_List2CenterBtn,
       RoundSelectionHook_List3CenterBtn,
@@ -54,6 +55,8 @@ namespace UeGui
 
     virtual void Load();
 
+    bool IsFromMap();
+
   protected:
 
     virtual void MakeNames();
@@ -63,13 +66,17 @@ namespace UeGui
     void PutItemToList();
 
   private:
-    CUiButton m_listBtn[11];
-    CUiButton m_comBtn;
+    CUiButton m_listBtn[12];
     CUiBitButton m_switchBtn;
 
     CCodeIndexCtrl *m_pCurItemCtrl;
     std::vector<TCodeEntry> m_vecListItem;
     std::vector<TCodeEntry> m_vecQueryListItem;
+    //判断是否从地图进入
+    //以此来决定搜索结果列表是优先显示地图中心周边还是当前位置周边
+    bool m_isFromMap;
+    //用于记录常用分类的个数, 最多11个, 最后一个放 更多分类 按钮
+    int m_comSize;
   };
 }
 #endif

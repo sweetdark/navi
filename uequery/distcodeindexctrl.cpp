@@ -117,7 +117,7 @@ namespace UeQuery
 	}
 	void CDistCodeIndexCtrl::GetIndexFileName(tstring &tstrFile) const
 	{
-		CGridIndexCtrl::GetDataPath(tstrFile);
+		CDataEntryCtrl::GetDataPath(tstrFile);
 		switch (m_codeMode)
 		{
 		case DM_POIMODE:

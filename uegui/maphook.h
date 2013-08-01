@@ -22,6 +22,7 @@
 #include "mapquerymenuhook.h"
 #include "maproutecalcmenuhook.h"
 #include "uequery\querybasic.h"
+#include "ueroute\routebasic.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -112,6 +113,22 @@ namespace UeGui
       MapHook_GuideInfoRightIcon,
       MapHook_GuideInfoRightLabe,
       MapHook_OtherIcon,
+      MapHook_ElecEyeBack,
+      MapHook_ElecEyeIcon,
+      MapHook_ElecEyeProgressBar,
+      MapHook_ElecEyeIconType_1,
+      MapHook_ElecEyeIconType_2,
+      MapHook_ElecEyeIconType_3,
+      MapHook_ElecEyeIconType_4,
+      MapHook_ElecEyeIconType_5,
+      MapHook_ElecEyeIconType_6,
+      MapHook_ElecEyeIconType_7,
+      MapHook_ElecEyeIconType_8,
+      MapHook_ElecEyeIconType_9,
+      MapHook_ElecEyeIconType_10,
+      MapHook_ElecEyeIconType_11,
+      MapHook_ElecEyeIconType_12,
+      MapHook_ElecEyeIconType_13,
       MapHook_End
     };
     //地图界面操作类型
@@ -302,6 +319,10 @@ namespace UeGui
     */
     void ShowCompass(bool show = true);
     /**
+    * \brief 显示和隐藏电子眼提示图标
+    */
+    void ShowElecEye(bool show = true);
+    /**
     * \brief 隐藏窗口
     */
     void MinMize();
@@ -371,6 +392,10 @@ namespace UeGui
     */
     void CloseGuiTimer();
     /**
+    * \brief 当前计时器计时完成
+    */
+    bool IsGuiTimerDown();
+    /**
     * \brief 显示路口放大图
     */
     void ShowGuideView();
@@ -378,6 +403,10 @@ namespace UeGui
     * \brief 是否处于指南针状态
     */
     bool IsShowCompass();
+    /**
+    * \brief 是否有电子眼提示
+    */
+    bool HaveElecEyePrompt();
   protected:
     /**
     * \brief 返回皮肤配置文件名称
@@ -448,6 +477,20 @@ namespace UeGui
     * \brief 更新引导信息图文提示
     */
     void FillGuidanceInfo();
+    /**
+    * \brief 电子眼
+    */
+    void UpdateElecEyeInfo();
+    /**
+    * \brief 更新红绿灯、电子眼、限速图标等提示距离
+    * \param distance 当前提示距离
+    */
+    bool UpdateElecIcon(UeRoute::EEyeProp& eyeProp);
+    /**
+    * \brief 更新红绿灯、电子眼、限速图标等提示距离
+    * \param distance 当前提示距离
+    */
+    void UpdateElecProgress(double distance = 0);
   private:
     //主页：最小化
     CUiBitButton m_miniMizeBtn;    
@@ -489,6 +532,8 @@ namespace UeGui
     //分割符
     CUiButton m_delimiter1;
     CUiButton m_delimiter2;
+    //电子眼提示图标
+    CUiBitButton m_elecEye;
   private:
     //当前路径规划方式
     PlanType m_planType;
@@ -532,6 +577,12 @@ namespace UeGui
     MethodType m_curPlanmethodType;
     //是否显示指南针
     bool m_bIsCompassShown;
+    //是否有电子眼提示
+    bool m_elecEyeStatus;
+    //电子眼提示进度条的长度
+    short m_elecProgressBarWidth;
+    //电子眼提示的最大距离
+    short m_elecMaxPromptDist;
 
   //////////////////////////////////////////////////////////////////////////
   //旧代码
@@ -689,10 +740,6 @@ namespace UeGui
     * \brief 路线概览
     **/
     void SwitchToRoutePlanReadyGUI(){};
-     /**
-    * \brief 是否显示电子眼
-    */
-    void ShowElecEye(bool isShown = false){};
     /**
     * \brief 是否打开多路径规划
     */

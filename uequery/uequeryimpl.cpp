@@ -4,6 +4,9 @@
 #ifndef _UEQUERY_QUERY_H
 #include "query.h"
 #endif
+#ifndef _UEQUERY_UEINDEX_H
+#include "ueindex.h"
+#endif
 #ifndef _UEQUERY_UERECORD_H
 #include "uerecord.h"
 #endif
@@ -72,6 +75,22 @@ namespace UeQuery
 		{
 			switch (m_sql.m_indexType)
 			{
+      case IT_Kind:
+        {
+          if (m_sql.m_bIsCheckHave)
+          {
+            return false;
+          }
+          CIndexCtrl *pDataEntryCtrl(0);
+          GetIndex(IT_NearByPos,pDataEntryCtrl);
+          //
+          if (uCount = DoFetchTermRecord(pQueryIndex,
+            reinterpret_cast<CGeo4TreIndexCtrl *>(pDataEntryCtrl)))
+          {
+            m_records->Sort(OT_Idx);
+          }
+        }
+        break;
 			case IT_PoiName:
 			case IT_PoiAcro:
 				{
@@ -354,6 +373,9 @@ namespace UeQuery
 				pUeIndex = new CTermIndexCtrl(true,TM_CITYACRO,
 					&CCodeIndexCtrl::GetDistCodeCtrl());
 				break;
+      case IT_Kind:
+        pUeIndex = CUeIndex::GetIndex(m_sql.m_indexType);
+        break;
 			default:
 				break;
 			}

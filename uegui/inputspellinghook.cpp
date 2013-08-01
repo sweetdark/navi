@@ -51,6 +51,7 @@ void CInputSpellingHook::Load()
 {
   m_curSpellingCursor = 0;
   m_posBuffer[0] = 0xff;
+  m_isWordsReady = false;
   InitKeyBoard();
   SetCursorPosX(m_iCurCursorIndex);
 
@@ -580,7 +581,7 @@ bool CInputSpellingHook::GetAssociateThing()
   
   //
   CUeRecord *pRecordVec(0);
-  queryWrapper.SetMaxQueryRecordNum(20);
+  queryWrapper.SetMaxQueryRecordNum(12);
   pRecordVec = queryWrapper.DoQueryGetRecord();
 
   if ((pRecordVec==0 || pRecordVec->GetCount())
@@ -610,6 +611,12 @@ void CInputSpellingHook::SetAssociateBtnLabels()
     if (!m_isWordsReady)
     {
       m_associateBtn[i].SetFocusKey(m_posBuffer);
+    }
+    else
+    {
+      unsigned char posBuffer[10];
+      posBuffer[0] = 0xff;
+      m_associateBtn[i].SetFocusKey(posBuffer);
     }
   }
   m_pageLeftBtn.SetEnable(m_iCurWordIndex!=0);

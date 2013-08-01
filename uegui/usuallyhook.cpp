@@ -199,6 +199,8 @@ short CUsuallyHook::MouseDown(CGeoPoint<short> &scrPoint)
   case usuallyhook_Favourit1Name:
     {
       m_favourit1BtnCtrl.MouseDown();
+      MOUSEDONW_2RENDERCTRL(m_favourit1BtnCtrl, m_favourit1NameCtrl);
+      MOUSEDONW_2RENDERCTRL(m_editFavourit1BtnCtrl, m_deleteFavourit1BtnCtrl);
     }
     break;
   case usuallyhook_Favourit2Btn:
@@ -206,6 +208,8 @@ short CUsuallyHook::MouseDown(CGeoPoint<short> &scrPoint)
   case usuallyhook_Favourit2Name:
     {
       m_favourit2BtnCtrl.MouseDown();
+      MOUSEDONW_2RENDERCTRL(m_favourit2BtnCtrl, m_favourit2NameCtrl);
+      MOUSEDONW_2RENDERCTRL(m_editFavourit2BtnCtrl, m_deleteFavourit2BtnCtrl);
     }
     break;
   case usuallyhook_Favourit3Btn:
@@ -213,6 +217,8 @@ short CUsuallyHook::MouseDown(CGeoPoint<short> &scrPoint)
   case usuallyhook_Favourit3Name:
     {
       m_favourit3BtnCtrl.MouseDown();
+      MOUSEDONW_2RENDERCTRL(m_favourit3BtnCtrl, m_favourit3NameCtrl);
+      MOUSEDONW_2RENDERCTRL(m_editFavourit3BtnCtrl, m_deleteFavourit3BtnCtrl);
     }
     break;
   case usuallyhook_HomeBtn:
@@ -220,6 +226,8 @@ short CUsuallyHook::MouseDown(CGeoPoint<short> &scrPoint)
   case usuallyhook_HomeName:
     {
       m_homeBtnCtrl.MouseDown();
+      MOUSEDONW_2RENDERCTRL(m_homeBtnCtrl, m_homeNameCtrl);
+      MOUSEDONW_2RENDERCTRL(m_editHomeBtnCtrl, m_deleteHomeBtnCtrl);
     }
     break;
   case usuallyhook_WorkBtn:
@@ -227,6 +235,8 @@ short CUsuallyHook::MouseDown(CGeoPoint<short> &scrPoint)
   case usuallyhook_WorkName:
     {
       m_workBtnCtrl.MouseDown();
+      MOUSEDONW_2RENDERCTRL(m_workBtnCtrl, m_workNameCtrl);
+      MOUSEDONW_2RENDERCTRL(m_editWorkBtnCtrl, m_deleteWorkBtnCtrl);
     }
     break;
   default:

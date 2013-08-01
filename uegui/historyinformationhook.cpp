@@ -827,9 +827,7 @@ void UeGui::CHistoryInformationHook::DoSelectRecord( RowTag row )
         m_userWrapper.ConnectToHistoryRecord();             
         PointList resultList;
         PointInfo pointInfo;     
-        int mstart = m_pageTurning.GetPageStartPosition() - 1;
-        int mend = m_pageTurning.GetPageEndPosition();
-        for (int i = mstart; i < mend; ++i)
+        for (int i = 0; i < m_pageTurning.GetPageEndPosition(); ++i)
         {     
           const HistoryRecordEntry *tempEntry = m_userWrapper.GetHistoryRecord(i); 
           HistoryRecordEntry curEntry;
@@ -902,7 +900,7 @@ void UeGui::CHistoryInformationHook::DoEditRecord( RowTag row )
   {
   case kPageHisRecord :
     {
-      unsigned int dataIndex = GetDataIndex(m_selectRow);
+      /*unsigned int dataIndex = GetDataIndex(m_selectRow);
       m_userWrapper.ConnectToHistoryRecord();
       const HistoryRecordEntry *curEntry = m_userWrapper.GetHistoryRecord(dataIndex);
       EditData data;
@@ -914,7 +912,7 @@ void UeGui::CHistoryInformationHook::DoEditRecord( RowTag row )
       CDetailEditEvent editEvent(this,DHT_HistoryInformationHook);
       editHook.ShowDetailEditHook(&data,editEvent);
       editHook.DoRecordPosition(dataIndex);
-      TurnTo(DHT_DetailEditHook);
+      TurnTo(DHT_DetailEditHook);*/
       break;
     }
   case kPageHisTrajectory : 

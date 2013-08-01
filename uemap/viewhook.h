@@ -324,6 +324,8 @@ namespace UeMap
       DHT_TypeNoDistQueryListHook     = 0x1309,
       //周边类型选择界面
       DHT_RoundSelectionHook          = 0x130A,
+      //Q码输入界面
+      DHT_QCodeInputHook              = 0x130B,
       DHT_Outside					            = 0x2010,
     };
 

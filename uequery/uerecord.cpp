@@ -81,8 +81,10 @@ unsigned int CUeRecord::Sort(short orderType)
 	switch (orderType)
 	{
 	case OT_Dist:
-		std::sort(m_results.begin(), m_results.end(), CompareDist);
+		std::sort(m_results.begin(), m_results.end(),CmpRecordPtrByDistance);
 		break;
+  case OT_Idx:
+    std::sort(m_results.begin(),m_results.end(),CmpRecordPtrByIdx);
 	default:
 		break;
 	}
@@ -272,7 +274,11 @@ void CUeRecord::PushBack(SQLRecord *oneRecord)
 	m_results.push_back(oneRecord);
 	SetDistplayNum(m_displayNum);
 }
-inline bool CUeRecord::CompareDist(const SQLRecord *first, const SQLRecord *second)
+inline bool CUeRecord::CmpRecordPtrByIdx(const SQLRecord *first, const SQLRecord *second)
+{
+  return first->m_idx<second->m_idx;
+}
+inline bool CUeRecord::CmpRecordPtrByDistance(const SQLRecord *first, const SQLRecord *second)
 {
 	return first->m_dist2th<second->m_dist2th;
 }

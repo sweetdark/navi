@@ -185,87 +185,6 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
-			OutputDirectory="$(SolutionDir)Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
-			IntermediateDirectory="Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				ExecutionBucket="7"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\include;..\..\..\include\freetype\include"
-				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;_DEBUG;DEBUG;_WINDOWS;_USRDLL;UEMAP_EXPORTS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
-				MinimalRebuild="true"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions=" /subsystem:windowsce,5.00"
-				AdditionalDependencies="aggd.lib hzrecog.lib"
-				OutputFile="..\..\..\outputs\winarm\uemapd.dll"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib\winarm"
-				GenerateDebugInformation="true"
-				SubSystem="0"
-				ImportLibrary="..\..\..\lib\winarm\uemapd.lib"
-				TargetMachine="0"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCCodeSignTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy .\uemap.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\aggcanvas.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\canvassetting.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewcanvas.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\wincanvas.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\pancommand.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\selectcommand.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\timercommand.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewcommand.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\aggstackdc.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewdc.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\windc.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\winstackdc.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\groundgate.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\groundlayer.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\networklayer.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\planlayer.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewlayer.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\aggview.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\guidanceview.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\imageview.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewmapping.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewstate.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\view.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewbasic.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewhook.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewimpl.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\winviewimpl.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\shplayer.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\maphook.h ..\..\..\include\uemap&#x0D;&#x0A;&#x0D;&#x0A;"
-			/>
-			<DeploymentTool
-				ForceDirty="-1"
-				RemoteDirectory=""
-				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
@@ -436,6 +355,87 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
+			OutputDirectory="$(SolutionDir)Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
+			IntermediateDirectory="Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\include\freetype\include"
+				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;_DEBUG;DEBUG;_WINDOWS;_USRDLL;UEMAP_EXPORTS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
+				MinimalRebuild="true"
+				RuntimeLibrary="1"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions=" /subsystem:windowsce,5.00"
+				AdditionalDependencies="aggd.lib hzrecog.lib"
+				OutputFile="..\..\..\outputs\winarm\uemapd.dll"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\..\lib\winarm"
+				GenerateDebugInformation="true"
+				SubSystem="0"
+				ImportLibrary="..\..\..\lib\winarm\uemapd.lib"
+				TargetMachine="0"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCCodeSignTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="copy .\uemap.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\aggcanvas.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\canvassetting.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewcanvas.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\wincanvas.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\pancommand.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\selectcommand.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\timercommand.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewcommand.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\aggstackdc.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewdc.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\windc.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\winstackdc.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\groundgate.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\groundlayer.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\networklayer.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\planlayer.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewlayer.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\aggview.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\guidanceview.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\imageview.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewmapping.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewstate.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\view.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewbasic.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewhook.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\viewimpl.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\winviewimpl.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\shplayer.h ..\..\..\include\uemap&#x0D;&#x0A;copy .\maphook.h ..\..\..\include\uemap&#x0D;&#x0A;&#x0D;&#x0A;"
+			/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
 			OutputDirectory="$(SolutionDir)Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
 			IntermediateDirectory="Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
@@ -576,6 +576,14 @@
 			</File>
 			<File
 				RelativePath=".\aggview.h"
+				>
+			</File>
+			<File
+				RelativePath=".\eagleview.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\eagleview.h"
 				>
 			</File>
 			<File

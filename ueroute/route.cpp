@@ -1301,6 +1301,11 @@ inline bool IRoute::GetCurElecEye(EEyeProp &elecEye)
   return m_guider->GetCurElecEye(elecEye);
 }
 
+double UeRoute::IRoute::GetCurElecEyeDist()
+{
+  return m_guider->GetCurElecEyeDist();
+}
+
 /**
 *
 */

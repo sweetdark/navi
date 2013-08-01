@@ -236,7 +236,7 @@ namespace UeMap
     virtual bool FocusOn(short type);
 
     /**
-    * 根据点来确定当前选取的是哪个视图，并返回当前选择的视图类型
+    * 根据点来确定当前选取的是哪个视图，把该视图放到容器最前面，并返回当前选择的视图类型
     */
     virtual unsigned int FocusOn(const CGeoPoint<short> &scrPoint);
 
@@ -568,6 +568,13 @@ namespace UeMap
     *
     **/
     virtual CViewLayer *GetLayer(int scale, int type);
+    
+    /**
+    * \brief 获取相应比例尺下的layer
+    * \param 比例尺
+    * \param index
+    */
+    CViewLayer *GetLayer(int scale, unsigned int index);
 
     /**
     *
@@ -739,6 +746,12 @@ namespace UeMap
     * 解锁路口放大                                                                
     */
     void UnLockScalling();
+    /**
+    * \brief 获得相应scaleLevel下的Layer的个数
+    */
+    unsigned int GetLayerSize(short scaleLevel);
+
+    void SetEagleState(bool isEagleOn);
   protected:
     /**
     * 开始显示系统加载进度
@@ -822,6 +835,20 @@ namespace UeMap
     * \brief 初始化地图状态
     **/
     void InitState();
+    /**
+    * \brief 是否需要显示鹰眼图
+    */
+    bool IsNeedShowEagle();
+
+    void EraseGuidanceView();
+
+    void InitGuidanceView(const CViewState *curView);
+
+    ScreenLayout GetHalfScreenLayout(bool isPerspective);
+
+    void ShowEagle(CViewState *curView, const short renderType);
+
+    void ChangeViewPort(CViewState *curView, const short renderType);
   protected:
     // Belonged window
     void *m_wnd;
@@ -926,6 +953,8 @@ namespace UeMap
     short m_laneWidth;
     //车道信息的高度
     short m_laneHeight;
+    //
+    short m_overViewScale;
   private:
     //图层是否变化
     bool m_isMapLayoutChange;
@@ -935,6 +964,10 @@ namespace UeMap
     bool m_isScallingMapLock;
     //地图设置
     UeBase::ViewSettings m_viewSettings;
+    //鹰眼图状态是否打开
+    bool m_isEagleOn;
+
+    MapLayout m_eagleLayout;
   };
 }
 

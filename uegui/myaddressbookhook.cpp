@@ -355,6 +355,7 @@ short CMyAddressBookHook::MouseDown(CGeoPoint<short> &scrPoint)
       AddRenderUiControls(&m_nameFiveCtrl);
       AddRenderUiControls(&m_deleteFiveCtrl);
       AddRenderUiControls(&m_editFiveCtrl);
+      AddRenderUiControls(&m_searchFiveCtrl);
       AddRenderElements(GetGuiElement(myaddressbookhook_SeparotorFive));
     }
     break;
@@ -367,6 +368,7 @@ short CMyAddressBookHook::MouseDown(CGeoPoint<short> &scrPoint)
       AddRenderUiControls(&m_nameFourCtrl);
       AddRenderUiControls(&m_deleteFourCtrl);
       AddRenderUiControls(&m_editFourCtrl);
+      AddRenderUiControls(&m_searchFourCtrl);
       AddRenderElements(GetGuiElement(myaddressbookhook_SeparotorFour));
     }
     break;
@@ -379,6 +381,7 @@ short CMyAddressBookHook::MouseDown(CGeoPoint<short> &scrPoint)
       AddRenderUiControls(&m_nameOneCtrl);
       AddRenderUiControls(&m_deleteOneCtrl);
       AddRenderUiControls(&m_editOneCtrl);
+      AddRenderUiControls(&m_searchOneCtrl);
       AddRenderElements(GetGuiElement(myaddressbookhook_SeparotorOne));
     }
     break;
@@ -391,6 +394,7 @@ short CMyAddressBookHook::MouseDown(CGeoPoint<short> &scrPoint)
       AddRenderUiControls(&m_nameSixCtrl);
       AddRenderUiControls(&m_deleteSixCtrl);
       AddRenderUiControls(&m_editSixCtrl);
+      AddRenderUiControls(&m_searchSixCtrl);
       AddRenderElements(GetGuiElement(myaddressbookhook_SeparotorSix));
     }
     break;
@@ -403,6 +407,7 @@ short CMyAddressBookHook::MouseDown(CGeoPoint<short> &scrPoint)
       AddRenderUiControls(&m_nameThreeCtrl);
       AddRenderUiControls(&m_deleteThreeCtrl);
       AddRenderUiControls(&m_editThreeCtrl);
+      AddRenderUiControls(&m_searchThreeCtrl);
       AddRenderElements(GetGuiElement(myaddressbookhook_SeparotorThree));
     }
     break;
@@ -415,6 +420,7 @@ short CMyAddressBookHook::MouseDown(CGeoPoint<short> &scrPoint)
       AddRenderUiControls(&m_nameTwoCtrl);
       AddRenderUiControls(&m_deleteTwoCtrl);
       AddRenderUiControls(&m_editTwoCtrl);
+      AddRenderUiControls(&m_searchTwoCtrl);
       AddRenderElements(GetGuiElement(myaddressbookhook_SeparotorTwo));
     }
     break;
@@ -516,11 +522,11 @@ short CMyAddressBookHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_editFiveCtrl.MouseUp();
       if (m_editFiveCtrl.IsEnable() && ctrlType == m_downElementType)
       {
-        m_recordType=ABHRT_FIVE;
+        /*m_recordType=ABHRT_FIVE;
         int currentPage = m_pageTurning.GetCurrentPage();
         CDetailEditHook::RecordPosition((currentPage-1)*6 + m_recordType - 1);
         OnEidt(this,ABHRT_FIVE,currentPage);
-        TurnTo(DHT_DetailEditHook);
+        TurnTo(DHT_DetailEditHook);*/
       }
     }
     break;
@@ -528,14 +534,14 @@ short CMyAddressBookHook::MouseUp(CGeoPoint<short> &scrPoint)
   case myaddressbookhook_EditFourIcon:
     {
       m_editFourCtrl.MouseUp();
-      if (m_editFourCtrl.IsEnable() && ctrlType == m_downElementType)
+      /*if (m_editFourCtrl.IsEnable() && ctrlType == m_downElementType)
       {
         m_recordType=ABHRT_FOUR;
         int currentPage = m_pageTurning.GetCurrentPage();
         CDetailEditHook::RecordPosition((currentPage-1)*6 + m_recordType - 1);
         OnEidt(this,ABHRT_FOUR,currentPage);
         TurnTo(DHT_DetailEditHook);
-      }
+      }*/
     }
     break;
   case myaddressbookhook_EditOne:
@@ -544,11 +550,11 @@ short CMyAddressBookHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_editOneCtrl.MouseUp();
       if (m_editOneCtrl.IsEnable() && ctrlType == m_downElementType)
       {
-        m_recordType=ABHRT_ONE;
+        /*m_recordType=ABHRT_ONE;
         int currentPage = m_pageTurning.GetCurrentPage();
         CDetailEditHook::RecordPosition((currentPage-1)*6 + m_recordType - 1);
         OnEidt(this,ABHRT_ONE,currentPage);
-        TurnTo(DHT_DetailEditHook);
+        TurnTo(DHT_DetailEditHook);*/
       }
     }
     break;
@@ -558,11 +564,11 @@ short CMyAddressBookHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_editSixCtrl.MouseUp();
       if (m_editSixCtrl.IsEnable() && ctrlType == m_downElementType)
       {
-        m_recordType=ABHRT_SIX;
+        /*m_recordType=ABHRT_SIX;
         int currentPage = m_pageTurning.GetCurrentPage();
         CDetailEditHook::RecordPosition((currentPage-1)*6 + m_recordType - 1);
         OnEidt(this,ABHRT_SIX,currentPage);
-        TurnTo(DHT_DetailEditHook);
+        TurnTo(DHT_DetailEditHook);*/
       }
     }
     break;
@@ -572,11 +578,11 @@ short CMyAddressBookHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_editThreeCtrl.MouseUp();
       if (m_editThreeCtrl.IsEnable() && ctrlType == m_downElementType)
       {
-        m_recordType=ABHRT_THREE;
+        /*m_recordType=ABHRT_THREE;
         int currentPage = m_pageTurning.GetCurrentPage();
         CDetailEditHook::RecordPosition((currentPage-1)*6 + m_recordType - 1);
         OnEidt(this,ABHRT_THREE,currentPage);
-        TurnTo(DHT_DetailEditHook);
+        TurnTo(DHT_DetailEditHook);*/
       }
     }
     break;
@@ -586,11 +592,11 @@ short CMyAddressBookHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_editTwoCtrl.MouseUp();
       if (m_editTwoCtrl.IsEnable() && ctrlType == m_downElementType)
       {
-        m_recordType=ABHRT_TWO;
+        /*m_recordType=ABHRT_TWO;
         int currentPage = m_pageTurning.GetCurrentPage();
         CDetailEditHook::RecordPosition((currentPage-1)*6 + m_recordType - 1);
         OnEidt(this,ABHRT_TWO,currentPage);
-        TurnTo(DHT_DetailEditHook);
+        TurnTo(DHT_DetailEditHook);*/
       }
     }
     break;
@@ -611,9 +617,10 @@ short CMyAddressBookHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_nextPageCtrl.IsEnable() && ctrlType == m_downElementType)
       {
         m_pageTurning.NextPage();
-        CleanAllRow();
-        SetAddressBookPageInfo();
+        CleanAllRow();        
         ListShowPage(m_pageTurning.GetCurrentPage());
+        setpagetext();
+        SwitchPageBtnVisble();
       }
     }
     break;
@@ -624,9 +631,10 @@ short CMyAddressBookHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_previousPageCtrl.IsEnable() && ctrlType == m_downElementType)
       {
         m_pageTurning.PreviousPage();
-        CleanAllRow();
-        SetAddressBookPageInfo();
+        CleanAllRow();        
         ListShowPage(m_pageTurning.GetCurrentPage());
+        setpagetext();
+        SwitchPageBtnVisble();
       }
     }
     break;
@@ -739,7 +747,7 @@ void CMyAddressBookHook::ListShowPage(int n)
       const FavoriteEntry* curEntry=m_userWrapper.GetFavorite(k);
       m_fvec.push_back(*curEntry);
     }
-    m_userWrapper.DisconnectFavorite();
+    m_userWrapper.DisconnectFavorite(); 
     FavoriteEntry ftmp;
     if(m_fvec.size()<EACHPAGECOUNT)
     {
@@ -870,8 +878,8 @@ void CMyAddressBookHook::SetAddressBookPageInfo()
   else
   {
     m_cleanButtonCtrl.SetEnable(true);
-    m_importButtonCtrl.SetEnable(true);
-    m_exportButtonCtrl.SetEnable(true);
+    /*m_importButtonCtrl.SetEnable(true);
+    m_exportButtonCtrl.SetEnable(true);*/
   }
   m_pageTurning.Clear();
   m_pageTurning.SetTotal(total);
@@ -1025,31 +1033,31 @@ void CMyAddressBookHook::RemoveSingleFavor()
 }
 void CMyAddressBookHook::GoToMapPosition(int n)
 {
-  //CGeoPoint<double> point;
-  CGeoPoint<long> point;
-  if(n >= 1 && n <= LIST_LEN && n <= m_totalData)
-  {
-    UeQuery::SQLSetting setting;
-    char name[128]={0};
+    PointList resultList;
+    PointInfo pointInfo; 
     CMapHook* maphook = (CMapHook *)m_view->GetHook(CViewHook::DHT_MapHook);
-    m_query->ConnectTo(UeQuery::DT_Favorite, setting);
-    const FavoriteEntry*  curEntry = m_query->GetFavorite(n - 1);
-    if (curEntry)
+    m_userWrapper.ConnectToFavorite();
+    if(n >= 1 && n <= LIST_LEN && n <= m_totalData)
     {
-      m_curEntry = *curEntry;
-      point.m_x = curEntry->m_x;
-      point.m_y = curEntry->m_y;
-      ::strcpy(name,(char*)curEntry->m_name);
-      //maphook->SetPickPos(point, (const char*)curEntry->m_name);
+      for (int i = 0; i < m_pageTurning.GetPageEndPosition(); ++i)
+      {
+      const FavoriteEntry *tempEntry = m_userWrapper.GetFavorite(i); 
+      FavoriteEntry curEntry;
+      ::memcpy(&curEntry, tempEntry, sizeof(FavoriteEntry));
+      const CGeoPoint<long> point(curEntry.m_x,curEntry.m_y);
+      char* name = reinterpret_cast<char*>(curEntry.m_name);  
+      pointInfo.m_point = point; 
+      ::strcpy(pointInfo.m_name, name);
+      resultList.push_back(pointInfo);
+      }
+    } 
+    else
+    {
+      assert(false);
     }
-    m_query->Disconnect(UeQuery::DT_Favorite);
-    maphook->GoToPosFromList(point,name);
-    //CViewHook::SkipToHook(CViewHook::DHT_MapHook);
-  }
-  else
-  {
-    assert(false);
-  }
+    m_userWrapper.DisconnectFavorite();
+    TurnTo(DHT_MapHook);
+    maphook->SetPickPos(resultList, n-1);  
 }
 int UeGui::CMyAddressBookHook::GetDataIndex( AddreessBookHookRecordType& row )
 {

@@ -166,6 +166,11 @@ namespace UeRoute
     bool GetCurElecEye(EEyeProp &elecEye);
 
     /**
+    * \brief 取得距离当前需播报的电子眼
+    */
+    double GetCurElecEyeDist();
+
+    /**
     *
     */
     UeSound *GetBufs()
@@ -505,7 +510,10 @@ namespace UeRoute
     */
     void GetDistrictName(const CGeoPoint<long> &pos, char *distName);
 
-
+    /**
+    * \brief 播报变换车道、减速慢行等提示
+    */
+    void PlayRemind(const SndPrompt &prompt, UeSound &snd);
 
   protected:
     //
@@ -559,6 +567,7 @@ namespace UeRoute
     short m_eyeDistFlag;
     short m_trafficDistFlag;
     EEyeProp m_curElecEye;
+    double m_curElecEyeDist;
 
     //
     unsigned char m_velocityType;

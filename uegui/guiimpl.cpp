@@ -105,6 +105,7 @@
 #include "typeindistquerylisthook.h"
 #include "typenodistquerylisthook.h"
 #include "fastoperationhook.h"
+#include "qcodeinputhook.h"
 
 #if __FOR_FPC__
 #include "caphook.h"
@@ -747,6 +748,11 @@ void CGuiImpl::MakeHooks()
   viewHook->SetHelpers(net,view,route,gps,query);
   viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_InputHandHook,viewHook);
+
+  viewHook = new CQCodeInputHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_QCodeInputHook,viewHook);
 
   viewHook = new CPoiQueryListHook();
   viewHook->SetHelpers(net,view,route,gps,query);

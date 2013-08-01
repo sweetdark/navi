@@ -354,6 +354,11 @@ namespace UeRoute
     bool GetCurElecEye(EEyeProp &elecEye);
 
     /**
+    * \brief 取得距离当前需播报的电子眼
+    */
+    double GetCurElecEyeDist();
+
+    /**
     *
     **/
     unsigned char GetEyeCode(const GuidanceIndicator *const curIndicator);

@@ -288,7 +288,7 @@ void CPoiQueryListHook::SearchForResult(const char* keyword)
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
   queryWrapper.SetAssociateNextWord(0);
   //暂时设为20条
-  queryWrapper.SetMaxQueryRecordNum(20);
+  queryWrapper.SetMaxQueryRecordNum(500);
   queryWrapper.SetQueryKeyword(keyword);
   CUeRecord *pRecordVec(queryWrapper.DoQueryGetRecord());
  

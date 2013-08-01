@@ -32,8 +32,6 @@ namespace UeGui
       MapGuideInfoViewHook_DistInfoLabel,
       MapGuideInfoViewHook_NextDirectionBoard,
       MapGuideInfoViewHook_NextDirectionBoardIcon,
-      MapGuideInfoViewHook_PromptBack,
-      MapGuideInfoViewHook_PromptIcon,
       MapGuideInfoViewHook_HighSpeedBoardBack1,
       MapGuideInfoViewHook_HighSpeedBoardNameLabel1,
       MapGuideInfoViewHook_HighSpeedBoardTypeLabel1,
@@ -46,7 +44,6 @@ namespace UeGui
       MapGuideInfoViewHook_HighSpeedBoardNameLabel3,
       MapGuideInfoViewHook_HighSpeedBoardTypeLabel3,
       MapGuideInfoViewHook_HighSpeedBoardDistLabel3,
-      MapGuideInfoViewHook_PromptDistBar,
       MapGuideInfoViewHook_ShowGuideViewBack,
       MapGuideInfoViewHook_ShowGuideViewLabel,
       MapGuideInfoViewHook_IconType1_1,
@@ -82,19 +79,6 @@ namespace UeGui
       MapGuideInfoViewHook_IconType2_26,
       MapGuideInfoViewHook_IconType2_27,
       MapGuideInfoViewHook_IconType2_28,
-      MapGuideInfoViewHook_IconType3_1,
-      MapGuideInfoViewHook_IconType3_2,
-      MapGuideInfoViewHook_IconType3_3,
-      MapGuideInfoViewHook_IconType3_4,
-      MapGuideInfoViewHook_IconType3_5,
-      MapGuideInfoViewHook_IconType3_6,
-      MapGuideInfoViewHook_IconType3_7,
-      MapGuideInfoViewHook_IconType3_8,
-      MapGuideInfoViewHook_IconType3_9,
-      MapGuideInfoViewHook_IconType3_10,
-      MapGuideInfoViewHook_IconType3_11,
-      MapGuideInfoViewHook_IconType3_12,
-      MapGuideInfoViewHook_IconType3_13,
       MapGuideInfoViewHook_End
     };
 
@@ -152,11 +136,6 @@ namespace UeGui
     */
     void ShowNextGuidanceIcon(bool isShow, int sndCode = 0);
     /**
-    * \brief 显示红绿灯、电子眼、限速图标等
-    * \param isShow 显示还是隐藏
-    */
-    void ShowPromptIcon(bool isShow, unsigned char infoCode = 0, double distance = 0);
-    /**
     * \brief 显示路口放大图
     */
     void ShowGuideView();
@@ -169,10 +148,6 @@ namespace UeGui
     CUiBitButton m_curDirectionBoard;
     //下一路口方向看板
     CUiBitButton m_nextDirectionBoard;
-    //红路灯和限速提醒图标
-    CUiBitButton m_promptBtn;
-    //提醒距离
-    CUiLabel m_promptDistBar;
     //高速看板
     CUiBitButton m_highSpeedBoard1;
     CUiLabel m_highSpeedBoardTypeLabel1;
@@ -187,6 +162,7 @@ namespace UeGui
     CUiBitButton m_shwoGuideViewBtn;
     //路径规划访问接口
     CRouteWrapper& m_routeWrapper;
+    //地图访问接口
     CViewWrapper& m_viewWrapper;
   };
 }

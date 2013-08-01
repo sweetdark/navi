@@ -288,21 +288,34 @@ void UeGui::CMapSimulationMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     if (m_parentHook)
     {
       CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
-      mapHook->ShowMinimizeBtn(true);      
-      mapHook->ShowMapAzimuthBtn(true);
-      mapHook->ShowMapScalingBtn(true);            
-      mapHook->ShowDetailBtn1(true);
+      mapHook->ShowMinimizeBtn();      
+      mapHook->ShowMapAzimuthBtn();
+      mapHook->ShowMapScalingBtn();
       mapHook->ShowDetailBtn2(false);
       mapHook->ShowGuideInfoBtn(false);
       mapHook->ShowAddElecEyeBtn(false); 
       mapHook->ShowSetDestPointBtn(false);
       mapHook->ShowFixedPostionBtn(false);
       mapHook->ShowCompass(false);
+      mapHook->ShowElecEye(false);
+      
       //如果路口放大图显示，则隐藏时间按钮
       if ((UeRoute::PS_DemoGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
       {
         mapHook->ShowDetailBtn1(false);
         mapHook->ShowTimeBtn(false);
+      }
+      else
+      {
+        mapHook->ShowDetailBtn1();
+        if (m_viewWrapper.IsNeedRenderGuidanceView())
+        {
+          mapHook->ShowTimeBtn(false);
+        }
+        else
+        {
+          mapHook->ShowTimeBtn();
+        }        
       }
       //开启界面切换定时器
       mapHook->RestarGuiTimer();
@@ -341,20 +354,41 @@ void UeGui::CMapSimulationMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     {
       CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
       mapHook->ShowMinimizeBtn(false);
-      mapHook->ShowAddElecEyeBtn(true);
+      mapHook->ShowAddElecEyeBtn();
       mapHook->ShowDetailBtn1(false);
       mapHook->ShowDetailBtn2(false);
-      mapHook->ShowGuideInfoBtn(true);
       mapHook->ShowMapAzimuthBtn(false);
       mapHook->ShowMapScalingBtn(false);
       mapHook->ShowSetDestPointBtn(false);
       mapHook->ShowFixedPostionBtn(false);
-      mapHook->ShowCompass(true);
+      //检查是否有电子眼提示
+      if (mapHook->HaveElecEyePrompt())
+      {
+        mapHook->ShowElecEye();
+        mapHook->ShowCompass(false);
+      }
+      else
+      {
+        mapHook->ShowElecEye(false);
+        mapHook->ShowCompass();
+      }      
       //如果路口放大图显示，则隐藏时间按钮
       if ((UeRoute::PS_DemoGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
       {
         mapHook->ShowGuideInfoBtn(false);
         mapHook->ShowTimeBtn(false);
+      }
+      else
+      {
+        mapHook->ShowGuideInfoBtn();
+        if (m_viewWrapper.IsNeedRenderGuidanceView())
+        {
+          mapHook->ShowTimeBtn(false);
+        }
+        else
+        {
+          mapHook->ShowTimeBtn();
+        }   
       }
       //开启界面切换定时器
       mapHook->CloseGuiTimer();
@@ -369,7 +403,108 @@ void UeGui::CMapSimulationMenuHook::ExpandMenu( bool bExpand /*= true*/ )
 
 void UeGui::CMapSimulationMenuHook::Update( short type )
 {
-  ExpandMenu(m_expandStatus);
+  //读取当前规划状态
+  short planState = m_routeWrapper.GetPlanState();
+  if (m_expandStatus)
+  {
+    //设置主界面控件状态
+    if (m_parentHook)
+    {
+      CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
+      //如果路口放大图显示，则隐藏时间按钮
+      if ((UeRoute::PS_DemoGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+      {
+        mapHook->ShowDetailBtn1(false);
+        mapHook->ShowTimeBtn(false);
+      }
+      else
+      {
+        mapHook->ShowDetailBtn1();
+        if (m_viewWrapper.IsNeedRenderGuidanceView())
+        {
+          mapHook->ShowTimeBtn(false);
+        }
+        else
+        {
+          mapHook->ShowTimeBtn();
+        } 
+      }
+    }
+
+    //如果路口放大图显示，则隐藏菜单
+    if ((UeRoute::PS_DemoGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+    {
+      m_expandBtn.SetVisible(false);
+      m_closeBtn.SetVisible(false);
+      m_slowlyDownBtn.SetVisible(false);
+      m_speedLevelBtn.SetVisible(false);
+      m_speedUpBtn.SetVisible(false);
+      m_pauseBtn.SetVisible(false);
+      m_delimiter1.SetVisible(false);
+      m_delimiter2.SetVisible(false);
+      m_delimiter3.SetVisible(false);
+      m_stopSimulation.SetVisible(false);
+    }
+    else
+    {
+      m_expandBtn.SetVisible(true);
+      m_closeBtn.SetVisible(true);
+      m_slowlyDownBtn.SetVisible(true);
+      m_speedLevelBtn.SetVisible(true);
+      m_speedUpBtn.SetVisible(true);
+      m_pauseBtn.SetVisible(true);
+      m_delimiter1.SetVisible(true);
+      m_delimiter2.SetVisible(true);
+      m_delimiter3.SetVisible(true);
+      m_stopSimulation.SetVisible(true);
+    }
+  }
+  else
+  {
+    //设置主界面控件状态
+    if (m_parentHook)
+    {
+      CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
+      //检查是否有电子眼提示
+      if (mapHook->HaveElecEyePrompt())
+      {
+        mapHook->ShowElecEye();
+        mapHook->ShowCompass(false);
+      }
+      else
+      {
+        mapHook->ShowElecEye(false);
+        mapHook->ShowCompass();
+      }      
+      //如果路口放大图显示，则隐藏时间按钮
+      if ((UeRoute::PS_DemoGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+      {
+        mapHook->ShowGuideInfoBtn(false);
+        mapHook->ShowTimeBtn(false);
+      }
+      else
+      {
+        mapHook->ShowGuideInfoBtn();
+        if (m_viewWrapper.IsNeedRenderGuidanceView())
+        {
+          mapHook->ShowTimeBtn(false);
+        }
+        else
+        {
+          mapHook->ShowTimeBtn();
+        } 
+      }
+    }
+    //如果路口放大图显示，则隐藏菜单
+    if ((UeRoute::PS_DemoGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+    {
+      m_expandBtn.SetVisible(false);
+    }
+    else
+    {
+      m_expandBtn.SetVisible(true);
+    }
+  }
 }
 
 void UeGui::CMapSimulationMenuHook::ReseSimulation()
@@ -387,6 +522,10 @@ void UeGui::CMapSimulationMenuHook::SlowlyDown()
   {
     m_speedIndex--;
     m_routeWrapper.ResumeDemo(-1 * m_speedList[m_speedIndex].m_speed);
+    if (!m_simulationStatus)
+    {
+      m_routeWrapper.PauseDemo();
+    }
     m_speedLevelBtn.SetCaption(m_speedList[m_speedIndex].m_speedText);
     ResetSpeedBtnStatus();
   }
@@ -398,6 +537,10 @@ void UeGui::CMapSimulationMenuHook::SpeedUp()
   {
     m_speedIndex++;
     m_routeWrapper.ResumeDemo(m_speedList[m_speedIndex].m_speed);
+    if (!m_simulationStatus)
+    {
+      m_routeWrapper.PauseDemo();
+    }
     m_speedLevelBtn.SetCaption(m_speedList[m_speedIndex].m_speedText);
     ResetSpeedBtnStatus();
   }

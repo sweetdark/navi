@@ -25,8 +25,104 @@
 #ifndef _UEQUERY_KINDINDEX_H
 #include "kindindex.h"
 #endif
+#ifndef _UEQUERY_DATAENTRYCTRL_H
+#include "dataentryctrl.h"
+#endif
+//////////////////////////////////////////////////////////////////////////
 namespace UeQuery
 {
+  bool CKindIndex::CreateKindIndex(CDataEntryCtrl *pDataEntryCtrl)
+  {
+    if (pDataEntryCtrl==0
+      || pDataEntryCtrl->Open()!=SQL_Success)
+      return false;
+    //
+    tstring tstrIndexFile;
+    CDataEntryCtrl::GetDataPath(tstrIndexFile);
+    tstrIndexFile += _T("kind.mj");
+    //
+    void *pKindIndexHandle = m_fileBasic.OpenFile(tstrIndexFile,CFileBasic::UE_FILE_WRITE);
+    if (!m_fileBasic.IsValidHandle(pKindIndexHandle))
+      return false;
+    //
+    SQLRecord *oneRecord(0);
+    std::vector<KindIndex> vecKindEntry;
+    for (long i(0); i<pDataEntryCtrl->GetDataCount(); ++i)
+    {
+      if (oneRecord = pDataEntryCtrl->FixRecord(i))
+      {
+        KindIndex poiIdx;
+        //
+        poiIdx.m_bodyIdx = i;
+        poiIdx.m_kind = pDataEntryCtrl->GetKind(i);
+        poiIdx.m_addrCode = pDataEntryCtrl->GetCode(oneRecord->m_addrCode);
+        vecKindEntry.push_back(poiIdx);
+        //
+        ::free(oneRecord->m_uniName);
+        ::free(oneRecord->m_asciiName);
+        ::free(oneRecord->m_pchTelStr);
+        ::free(oneRecord->m_pchAddrStr);
+        ::free(oneRecord);
+      }
+    }
+    //按类型与行政区域排序
+    std::sort(vecKindEntry.begin(),vecKindEntry.end(),CmpKindIndexEntry);
+    // Copyright information
+    m_fileBasic.WriteFile(pKindIndexHandle,DATA_HEAD,16,1);
+    // Version 
+    short ver = 1;
+    m_fileBasic.WriteFile(pKindIndexHandle,&ver,sizeof(short),1);
+    //预留给索引数目
+    long indexOffset(m_fileBasic.TellFilePos(pKindIndexHandle));
+    m_fileBasic.WriteFile(pKindIndexHandle,&indexOffset,4,1);
+    //记录poi数目
+    long poiCount(vecKindEntry.size());
+    m_fileBasic.WriteFile(pKindIndexHandle,&poiCount,4,1);
+    //开始写索引
+    long indexCount(0);
+    //
+    KindIndex kindIdx;
+    kindIdx.m_kind = -1;
+    kindIdx.m_addrCode = -1;
+    kindIdx.m_bodyIdx = 0;
+    //
+    for (std::vector<KindIndex>::iterator iterInfo(vecKindEntry.begin());
+      iterInfo!=vecKindEntry.end(); ++iterInfo,++kindIdx.m_bodyIdx)
+    {
+      if (kindIdx.m_kind!=iterInfo->m_kind
+        || kindIdx.m_addrCode!=iterInfo->m_addrCode)
+      {
+        ++ indexCount;
+        kindIdx.m_kind = iterInfo->m_kind;
+        kindIdx.m_addrCode = iterInfo->m_addrCode;
+        //
+        m_fileBasic.WriteFile(pKindIndexHandle,&kindIdx,sizeof(kindIdx),1);
+      }
+    }
+    //开始写每个块poi对应的dbpoi索引
+    for (std::vector<KindIndex>::iterator iterInfo(vecKindEntry.begin());
+      iterInfo!=vecKindEntry.end(); ++iterInfo)
+    {
+      m_fileBasic.WriteFile(pKindIndexHandle,&iterInfo->m_bodyIdx,sizeof(iterInfo->m_bodyIdx),1);
+    }
+    m_fileBasic.SeekFile(pKindIndexHandle,indexOffset);
+    m_fileBasic.WriteFile(pKindIndexHandle,&indexCount,4,1);
+    //
+    m_fileBasic.CloseFile(pKindIndexHandle);
+    return true;
+  }
+  bool CKindIndex::CmpKindIndexEntry(const KindIndex &first,const KindIndex &second)
+  {
+    if (first.m_kind<second.m_kind)
+    {
+      return true;
+    }
+    if (first.m_kind>second.m_kind)
+    {
+      return false;
+    }
+    return first.m_addrCode<second.m_addrCode;
+  }
 	/**
 	* Note: Here filters means specify which results should be feteched not filtered
 	**/
@@ -64,55 +160,10 @@ namespace UeQuery
 			{
 				int start(oneItem->m_bodyIdx),
 					end((m_curIdx>=m_idxCount)?m_bodyCount:(oneItem+1)->m_bodyIdx);
-#ifndef USE_NEW_DATA
-				//这个地方可以在数据上优化，为什么它不将各个poi的拼音简写连续放在一起呢？
-				for (KindInfo *indexInfo(m_bodyEntries+start); start<end; ++start,++indexInfo)
-				{
-					// Firstly check whether it satisfy the basic filter demands 
-					// TODO:
-					// Directly use full text search method
-					if (strLen<1)
-					{
-						// Secondly get the offset value pointing to main body file
-						idxes.Add(&indexInfo->m_bodyIdx);
-					}
-					else
-					{
-						CMemVector matches(sizeof(int));
-						if(m_strMatch.StrictMatch(indexInfo->m_filter,
-							m_sql.m_acronyms,MAXACROENTRY-1,MAXACROENTRY,matches))
-						{
-							// Secondly get the offset value pointing to main body file
-							idxes.Add(&indexInfo->m_bodyIdx);
-						}
-					}
-				}
-#else
-				int length((end-start)*MAXACROENTRY);
-				//获取当前区域所有道路名称拼音简写数据
-				char *content(m_pchAcroEntries+oneItem->m_bodyIdx*MAXACROENTRY);
-				//获取与查询条件匹配的道路索引
-				int num = 0;
-				CMemVector matches(sizeof(int));
-				if(!m_sql.m_misses)
-				{
-					num = m_strMatch.StrictMatch(content,m_sql.m_acronyms,
-						length,MAXACROENTRY,matches,maxNumber);
-				}
-				else
-				{
-					num = m_strMatch.LikeMatch(m_sql.m_misses,content,m_sql.m_acronyms,
-						length,MAXACROENTRY,matches,maxNumber);
-				}
-				if (num>0)
-				{
-					for (int *head(reinterpret_cast<int *>(matches.GetHead())),
-						i(0); i<matches.GetCount(); ++i,++head)
-					{
-						idxes.Add(m_bodyEntries+*head+oneItem->m_bodyIdx);
-					}
-				}
-#endif
+        for (; start<end; ++start)
+        {
+          idxes.Add(m_bodyEntries+start);
+        }
 			}
 			++m_curIdx;
 			//
@@ -134,20 +185,8 @@ namespace UeQuery
 	{
 		// Exception check
 		assert(m_idxCount && m_kindEntries);
-		//
-#ifndef USE_NEW_DATA
-		unsigned codeMask(0xff00);
-		if (m_sql.m_kind&0x00ff)
-		{
-			codeMask = 0xffff;
-		}
-#else
-		unsigned codeMask(m_sql.m_kind&0xff0000);
-		codeMask >>= 4;
-		codeMask |= m_sql.m_kind&0xfff;
-		m_sql.m_kind = codeMask;
-		//
-		codeMask = 0xf000;
+    //
+		unsigned codeMask = 0xf000;
 		if (m_sql.m_kind&0x00ff)
 		{
 			codeMask = 0xffff;
@@ -156,7 +195,6 @@ namespace UeQuery
 		{
 			codeMask = 0xff00;
 		}
-#endif
 		register int startIdx(0),endIdx(m_idxCount-1),midIdx(0),cmp(0);
 		//
 		while (startIdx<=endIdx)

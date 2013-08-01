@@ -23,17 +23,28 @@ CRoundSelectionHook::~CRoundSelectionHook()
 
 void CRoundSelectionHook::Load()
 {
+  if (CAggHook::GetPrevHookType() == DHT_MapHook)
+  {
+    m_isFromMap = true;
+  }
+  else
+  {
+    m_isFromMap = false;
+  }
+
   m_pCurItemCtrl = &CCodeIndexCtrl::GetKindCodeCtrl();
   m_pCurItemCtrl->GetComItem(m_vecListItem);
+  m_comSize = m_vecListItem.size();
   PutItemToList();
 }
 
 void CRoundSelectionHook::MakeNames()
 {
   CMenuBackgroundHook::MakeNames();
-  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_SwitchBtn,	"SwitchBtn"));
-  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_SwitchBtnLabel,	"SwitchBtnLabel"));
-  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_SwitchBtnIcon,	"SwitchBtnIcon"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_TypeSelectLeftBtn,	"TypeSelectLeftBtn"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_TypeSelectRightBtn,	"TypeSelectRightBtn"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_TypeSelectBtnLabel,	"TypeSelectBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_TypeSelectBtnIcon,	"TypeSelectBtnIcon"));
   m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List1CenterBtn,	"List1CenterBtn"));
   m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List2CenterBtn,	"List2CenterBtn"));
   m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List3CenterBtn,	"List3CenterBtn"));
@@ -51,16 +62,15 @@ void CRoundSelectionHook::MakeNames()
 void CRoundSelectionHook::MakeControls()
 {
   CMenuBackgroundHook::MakeControls();
-  m_switchBtn.SetCenterElement(GetGuiElement(RoundSelectionHook_SwitchBtn));
-  m_switchBtn.SetIconElement(GetGuiElement(RoundSelectionHook_SwitchBtnIcon));
-  m_switchBtn.SetLabelElement(GetGuiElement(RoundSelectionHook_SwitchBtnLabel));
+  m_switchBtn.SetCenterElement(GetGuiElement(RoundSelectionHook_TypeSelectLeftBtn));
+  m_switchBtn.SetRightElement(GetGuiElement(RoundSelectionHook_TypeSelectRightBtn));
+  m_switchBtn.SetIconElement(GetGuiElement(RoundSelectionHook_TypeSelectBtnIcon));
+  m_switchBtn.SetLabelElement(GetGuiElement(RoundSelectionHook_TypeSelectBtnLabel));
 
-  for (int i=0, j=RoundSelectionHook_List1CenterBtn; i<11; i++)
+  for (int i=0, j=RoundSelectionHook_List1CenterBtn; i<12; i++)
   {
     m_listBtn[i].SetCenterElement(GetGuiElement(j++));
   }
-
-  m_comBtn.SetCenterElement(GetGuiElement(RoundSelectionHook_List12CenterBtn));
 }
 
 short CRoundSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -68,27 +78,22 @@ short CRoundSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
-  case RoundSelectionHook_SwitchBtn:
-  case RoundSelectionHook_SwitchBtnIcon:
-  case RoundSelectionHook_SwitchBtnLabel:
+  case RoundSelectionHook_TypeSelectLeftBtn:
+  case RoundSelectionHook_TypeSelectRightBtn:
+  case RoundSelectionHook_TypeSelectBtnIcon:
+  case RoundSelectionHook_TypeSelectBtnLabel:
     {
       m_switchBtn.MouseDown();
       AddRenderUiControls(&m_switchBtn);
     }
     break;
-  case RoundSelectionHook_List12CenterBtn:
-    {
-      m_comBtn.MouseDown();
-      AddRenderUiControls(&m_comBtn);
-    }
-    break;
   default:
-    if (ctrlType >= RoundSelectionHook_List1CenterBtn && ctrlType <= RoundSelectionHook_List11CenterBtn)
+    if (ctrlType >= RoundSelectionHook_List1CenterBtn && ctrlType <= RoundSelectionHook_List12CenterBtn)
     {
       int index = ctrlType-RoundSelectionHook_List1CenterBtn;
       m_listBtn[index].MouseDown();
       AddRenderUiControls(&m_listBtn[index]);
-    } 
+    }
     else
     {
       return CMenuBackgroundHook::MouseDown(scrPoint);
@@ -114,21 +119,16 @@ short CRoundSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
-  case RoundSelectionHook_SwitchBtn:
-  case RoundSelectionHook_SwitchBtnIcon:
-  case RoundSelectionHook_SwitchBtnLabel:
+  case RoundSelectionHook_TypeSelectLeftBtn:
+  case RoundSelectionHook_TypeSelectRightBtn:
+  case RoundSelectionHook_TypeSelectBtnIcon:
+  case RoundSelectionHook_TypeSelectBtnLabel:
     {
       m_switchBtn.MouseUp();
     }
     break;
-  case RoundSelectionHook_List12CenterBtn:
-    {
-      m_comBtn.MouseUp();
-      CAggHook::TurnTo(DHT_TypeNoDistSelectionHook);
-    }
-    break;
   default:
-    if (ctrlType >= RoundSelectionHook_List1CenterBtn && ctrlType <= RoundSelectionHook_List11CenterBtn)
+    if (ctrlType >= RoundSelectionHook_List1CenterBtn && ctrlType <= RoundSelectionHook_List12CenterBtn)
     {
       int index = ctrlType-RoundSelectionHook_List1CenterBtn;
       m_listBtn[index].MouseUp();
@@ -137,9 +137,15 @@ short CRoundSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
         //m_pCurItemCtrl->GetLeve3Item(m_vecListItem[index].m_uCode,m_vecQueryListItem);
         ////暂时处理
         //TCodeEntry item = *(m_pCurItemCtrl->GetItemByCode(m_vecQueryListItem[1].m_uCode));
-        CQueryWrapper::Get().SetQueryKindInfo(m_vecListItem[index]);
-
-        CAggHook::TurnTo(DHT_TypeNoDistQueryListHook);
+        if (index < m_comSize && index != 11)
+        {
+          CQueryWrapper::Get().SetQueryKindInfo(m_vecListItem[index]);
+          CAggHook::TurnTo(DHT_TypeNoDistQueryListHook);
+        }
+        else
+        {
+          CAggHook::TurnTo(DHT_TypeNoDistSelectionHook);
+        }
       }
     } 
     else
@@ -159,22 +165,28 @@ short CRoundSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
 
 void CRoundSelectionHook::PutItemToList()
 {
-  m_comBtn.SetCaption("更多分类");
-
   int i;
-  for (i = 0; i < m_vecListItem.size(); ++i)
+  for (i = 0; i < m_comSize; ++i)
   {
     m_listBtn[i].SetCaption(m_vecListItem[i].m_chName);
-    m_listBtn[i].SetEnable(true);
+    m_listBtn[i].SetVisible(true);
 
     if (i >= 10)
     {
-      break;
+      m_listBtn[11].SetCaption("更多分类");
+      return;
     }
   }
-  for (i; i < 11; ++i)
+
+  m_listBtn[i++].SetCaption("更多分类");
+  for (i; i < 12; ++i)
   {
-    m_listBtn[i].SetEnable(false);
+    m_listBtn[i].SetVisible(false);
     m_listBtn[i].ClearCaption();
   }
+}
+
+bool CRoundSelectionHook::IsFromMap()
+{
+  return m_isFromMap;
 }

@@ -135,7 +135,7 @@ namespace UeGui
     CViewWrapper& m_viewWrapper;
     //路径规划访问接口
     CRouteWrapper& m_routeWrapper;
-    //模拟导航状态
+    //模拟导航状态:正在模式时为True,否则为False
     bool m_simulationStatus;
     //模拟导航速度索引值
     char m_speedIndex;

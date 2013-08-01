@@ -68,7 +68,7 @@ namespace UeQuery
 			return SQL_Success;
 		//
 		tstring tstrIndexFile;
-		CGridIndexCtrl::GetDataPath(tstrIndexFile);
+		CDataEntryCtrl::GetDataPath(tstrIndexFile);
 		tstrIndexFile += GetIndexFileName();
 		const CFileBasic &fileBasic(CFileBasic::Get());
 		if (m_bReadMode)
@@ -331,7 +331,7 @@ namespace UeQuery
 		fileBasic.CloseFile(m_pIndexTmpHandle);
 		//重新打开临时文件
 		tstring tstrIndexFile;
-		CGridIndexCtrl::GetDataPath(tstrIndexFile);
+		CDataEntryCtrl::GetDataPath(tstrIndexFile);
 		tstrIndexFile += GetIndexFileName();
 		tstrIndexFile += _T("tmp");
 		//判断临时文件句柄是否有效

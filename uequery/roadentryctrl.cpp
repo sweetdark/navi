@@ -548,7 +548,7 @@ namespace UeQuery
 			return SQL_Success;
 		//
 		tstring tstrFileName;
-		CGridIndexCtrl::GetDataPath(tstrFileName);
+		CDataEntryCtrl::GetDataPath(tstrFileName);
 		//打开原来的grid.mj文件获取类型
 		tstrFileName += _T("road.db");
 		const CFileBasic &fileBasic(CFileBasic::Get());
@@ -790,7 +790,7 @@ namespace UeQuery
 		//
 		long nameOffset1(0),nameOffset2(0),distCode(0);
 		CDistIndex::TDistEntry indexEntry,*pIndexEntry(0);
-		char filterData[CCrossIndexExtend::MAXACROENTRY],*pTempBuf(filterData);
+		char filterData[CCrossIndexExtend::MAXACROENTRY+2],*pTempBuf(filterData);
 		CCrossIndexExtend::CrossBodyEntry crossData,*pCrossData(&crossData);
 		char chTempStr1[256];
     char chTempStr2[256];
@@ -819,13 +819,15 @@ namespace UeQuery
 			{
 				bodyCount = crossCount- indexEntry.m_startAcro;
 			}
-			for (int i(0); i<bodyCount; ++i,filterOffset+=sizeof(filterData),
+			for (int i(0); i<bodyCount; ++i,filterOffset+=CCrossIndexExtend::MAXACROENTRY,
 				crossOffset+=sizeof(CCrossIndexExtend::CrossBodyEntry))
 			{
-				fileBasic.SeekFile(pCrossFile,filterOffset,CFileBasic::UE_SEEK_BEGIN);
-				fileBasic.ReadFile(pCrossFile,(void **)&pTempBuf,sizeof(filterData),count);
+        ::memset(filterData,0,sizeof(filterData));
         //
-        ::strupr(filterData);
+				fileBasic.SeekFile(pCrossFile,filterOffset,CFileBasic::UE_SEEK_BEGIN);
+				fileBasic.ReadFile(pCrossFile,(void **)&pTempBuf,CCrossIndexExtend::MAXACROENTRY,count);
+        //
+        ::_strupr(filterData);
         std::string strTemp(filterData);
         int offset(strTemp.find('-')+1);
 				if (filterData[0]<'0' || filterData[0]>'9')

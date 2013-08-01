@@ -204,6 +204,8 @@ void UeGui::CMapQueryMenuHook::ExpandMenu( bool bExpand /*= true*/ )
         mapHook->ShowDetailBtn1(true);
         mapHook->ShowDetailBtn2(false);
         mapHook->ShowGuideInfoBtn(false);
+        mapHook->ShowCompass(false);
+        mapHook->ShowElecEye(false);
         //开启界面切换定时器
         mapHook->RestarGuiTimer();
       }
@@ -230,6 +232,8 @@ void UeGui::CMapQueryMenuHook::ExpandMenu( bool bExpand /*= true*/ )
         mapHook->ShowDetailBtn1(false);
         mapHook->ShowDetailBtn2(true);
         mapHook->ShowGuideInfoBtn(false);
+        mapHook->ShowCompass(false);
+        mapHook->ShowElecEye(false);
         //开启界面切换定时器
         mapHook->CloseGuiTimer();
       }

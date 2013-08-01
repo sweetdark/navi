@@ -88,6 +88,8 @@ namespace UeQuery
 	class CIndexCtrl:public CMemoryConsumer
 	{
 	public:
+    CIndexCtrl(void):m_bReadMode(true),
+      m_pDataFileHandle(0) {};
 		CIndexCtrl(bool bReadMode):m_bReadMode(bReadMode),
 			m_pDataFileHandle(0) {};
 		virtual ~CIndexCtrl(void) {};

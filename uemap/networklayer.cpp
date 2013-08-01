@@ -251,7 +251,7 @@ void CNetworkLayer::Draw(short type, const CViewDC *viewDC, CGeoRect<short> &scr
               {
                 // TODO: ...
                 // Need overloading function
-                if(is3d && type != VT_Guidance)
+                if(is3d && type != VT_Guidance && type == VT_Eagle)
                 {
                   CGeoPoint<short> onePoint;
                   onePoint.m_x = static_cast<short>(oneCoord.m_x);

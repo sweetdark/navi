@@ -19,7 +19,7 @@ namespace UeQuery
 		if (m_pIndexHandle!=0)
 			return SQL_Success;
 		tstring tstrIndexFile;
-		CGridIndexCtrl::GetDataPath(tstrIndexFile);
+		CDataEntryCtrl::GetDataPath(tstrIndexFile);
 		tstrIndexFile += GetIndexFileName(dataMode);
 		const CFileBasic &fileBasic(CFileBasic::Get());
 		if (!bReadMode)

@@ -350,12 +350,12 @@ namespace UeQuery
 		tstring path,tstrFileName;
 		if (m_bReadMode)
 		{
-			CGridIndexCtrl::GetDataPath(path);
+			CDataEntryCtrl::GetDataPath(path);
 			tstrFileName = path+_T("poisnew.db");
 		}
 		else
 		{
-			CGridIndexCtrl::GetDataScrPath(path);
+			CDataEntryCtrl::GetDataScrPath(path);
 			tstrFileName = path+_T("pois.db");
 		}
 		//判断文件是否存在
@@ -411,7 +411,7 @@ namespace UeQuery
 		if (m_pWPoiFileHandle)
 			return SQL_Success;
 		tstring path;
-		CGridIndexCtrl::GetDataPath(path);
+		CDataEntryCtrl::GetDataPath(path);
 		//
 		tstring tstrFileName(path);
 		tstrFileName += _T("poisnew.db");

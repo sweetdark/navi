@@ -49,6 +49,7 @@ using namespace UeModel;
 
 // Refer to UeRoute package
 #include "ueroute\route.h"
+#include "eagleview.h"
 using namespace UeRoute;
 
 // Matix definition for affine transformation
@@ -72,11 +73,11 @@ double CAGGView::m_maxPspVarious = 0.88;
 // AGG view singleton
 CAGGView *CAGGView::m_mainView = 0;
 CGuidanceView *CAGGView::m_guidanceView = 0;
+CEagleView *CAGGView::m_eagleView = 0;
 CGeoPoint<short> CAGGView::m_movePoint(0,0);
 bool CAGGView::m_isScrolling = false;
 
 static HandleType sThreadHandle = 0;
-
 
 unsigned int __stdcall ScrollMapThread(void *param)
 {
@@ -155,6 +156,18 @@ CViewState *CAGGView::GetState(unsigned short type, bool isLand, CViewImpl *oneV
       return m_guidanceView;
     }
     break;
+  case VT_Eagle:
+    {
+      if (!m_eagleView)
+      {
+        if (!m_eagleView)
+        {
+          m_eagleView = new CEagleView(isLand, oneView);
+        }
+      }
+
+      return m_eagleView;
+    }
   default:
     {
       assert(false);
@@ -182,6 +195,12 @@ void CAGGView::Release()
   {
     delete m_guidanceView;
     m_guidanceView = 0;
+  }
+
+  if (m_eagleView)
+  {
+    delete m_eagleView;
+    m_eagleView = NULL;
   }
 }
 
@@ -1566,4 +1585,9 @@ void CAGGView::RefreshLayerData()
   {
     m_viewImpl->m_layers[scale][i]->Draw(m_type, &stackDC, scrExtent, curDC->m_clipBox, isRotated);
   }
+}
+
+const double CAGGView::GetScaleY()
+{
+  return m_scaleY;
 }

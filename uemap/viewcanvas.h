@@ -354,6 +354,7 @@ namespace UeMap
     virtual void RenderBasic(short scaleLevel, bool isRaster = false, bool is3d = false, bool isGradual = false) = 0;
 
 
+    virtual void RenderEagle(short scaleLevel, bool isRaster, bool is3d) = 0;
     //
     // Methods for rendering VTM and network data
     //

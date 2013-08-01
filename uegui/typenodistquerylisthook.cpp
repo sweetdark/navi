@@ -4,6 +4,8 @@
 #include "querywrapper.h"
 #endif
 
+#include "roundselectionhook.h"
+
 #include "maphook.h"
 
 using namespace UeGui;
@@ -25,15 +27,25 @@ void CTypeNoDistQueryListHook::Load()
 {
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
   queryWrapper.GetQueryKindName(m_typeSelectBtn.GetCaption());
-  //默认查找当前位置周边
-  m_queryType = RoundQueryType::MapCenter;
-  SetFocusBtn();
-  SearchForResult();
 
   //暂时设置为不可用
   m_curPosBtn.SetEnable(false);
   m_endPointBtn.SetEnable(false);
   m_routeBtn.SetEnable(false);
+
+  //默认查找地图中心周边
+  m_queryType = MapCenter;
+  //如果有GPS信号且是从搜索->其它搜索->附近检索进来则显示当前位置周边
+  if (m_gps!=0 && m_gps->IsLive())
+  {
+    m_curPosBtn.SetEnable(true);
+    if (((CRoundSelectionHook *)m_view->GetHook(DHT_RoundSelectionHook))->IsFromMap())
+    {
+      m_queryType = CurPos;
+    }
+  }
+  SetFocusBtn();
+  SearchForResult();
 }
 
 void CTypeNoDistQueryListHook::UnLoad()
@@ -253,7 +265,7 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_mapCenterBtn.MouseUp();
       if (m_mapCenterBtn.IsEnable())
       {
-        m_queryType = RoundQueryType::MapCenter;
+        m_queryType = MapCenter;
         SetFocusBtn();
         SearchForResult();
       }
@@ -264,7 +276,7 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_curPosBtn.MouseUp();
       if (m_curPosBtn.IsEnable())
       {
-        m_queryType = RoundQueryType::CurPos;
+        m_queryType = CurPos;
         SetFocusBtn();
         SearchForResult();
       }
@@ -275,7 +287,7 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_endPointBtn.MouseUp();
       if (m_endPointBtn.IsEnable())
       {
-        m_queryType = RoundQueryType::EndPoint;
+        m_queryType = EndPoint;
         SetFocusBtn();
         SearchForResult();
       }
@@ -286,7 +298,7 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_routeBtn.MouseUp();
       if (m_routeBtn.IsEnable())
       {
-        m_queryType = RoundQueryType::Route;
+        m_queryType = Route;
         SetFocusBtn();
         SearchForResult();
       }

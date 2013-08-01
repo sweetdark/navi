@@ -33,7 +33,7 @@ void CTypeInDistQueryListHook::Load()
 
 void CTypeInDistQueryListHook::UnLoad()
 {
-  CQueryWrapper::Get().SetDefaultQueryKind();
+  //CQueryWrapper::Get().SetDefaultQueryKind();
 }
 
 void CTypeInDistQueryListHook::MakeNames()

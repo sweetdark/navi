@@ -1695,6 +1695,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\qcodeinputhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\qcodeinputhook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\roadquerylisthook.cpp"
 				>
 			</File>

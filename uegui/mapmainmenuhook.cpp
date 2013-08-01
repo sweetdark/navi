@@ -292,7 +292,7 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
   //读取当前规划状态
   short planState = m_routeWrapper.GetPlanState();
   //执行展开或者收缩
-  if (m_expandStatus)
+  if (bExpand)
   {
     //展开菜单
     m_expandBtn.SetVisible(false);
@@ -308,14 +308,13 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     if (m_parentHook)
     {
       CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
-      mapHook->ShowMinimizeBtn(true);      
-      mapHook->ShowMapAzimuthBtn(true);
-      mapHook->ShowMapScalingBtn(true); 
-      mapHook->ShowDetailBtn1(true);
+      mapHook->ShowMinimizeBtn();      
+      mapHook->ShowMapAzimuthBtn();
+      mapHook->ShowMapScalingBtn(); 
       mapHook->ShowDetailBtn2(false);
       mapHook->ShowGuideInfoBtn(false);
-      mapHook->ShowTimeBtn(true);
       mapHook->ShowCompass(false);
+      mapHook->ShowElecEye(false);
 
       if ((UeRoute::PS_RealGuidance == planState) && (UeMap::VM_Guidance == viewMode))
       {
@@ -327,15 +326,27 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
       else
       {
         m_stopGuide.SetVisible(false);
-        mapHook->ShowAddElecEyeBtn(true);        
-        mapHook->ShowSetDestPointBtn(true);
-        mapHook->ShowFixedPostionBtn(true);
+        mapHook->ShowAddElecEyeBtn();        
+        mapHook->ShowSetDestPointBtn();
+        mapHook->ShowFixedPostionBtn();
       }
       //如果路口放大图显示，则隐藏时间按钮
       if ((UeRoute::PS_RealGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
       {
         mapHook->ShowDetailBtn1(false);
         mapHook->ShowTimeBtn(false);
+      }
+      else
+      {
+        mapHook->ShowDetailBtn1();
+        if (m_viewWrapper.IsNeedRenderGuidanceView())
+        {
+          mapHook->ShowTimeBtn(false);
+        }
+        else
+        {
+          mapHook->ShowTimeBtn();
+        } 
       }
       //开启界面切换定时器
       mapHook->RestarGuiTimer();
@@ -382,32 +393,60 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     {
       CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
       mapHook->ShowMinimizeBtn(false);
-      mapHook->ShowAddElecEyeBtn(true);
+      mapHook->ShowAddElecEyeBtn();
       mapHook->ShowDetailBtn1(false);
       if (VM_Browse == viewMode)
       {
-        mapHook->ShowMapAzimuthBtn(true);
-        mapHook->ShowMapScalingBtn(true);
-        mapHook->ShowSetDestPointBtn(true);
-        mapHook->ShowFixedPostionBtn(true);
-        mapHook->ShowDetailBtn2(true);
-        mapHook->ShowGuideInfoBtn(false);
+        mapHook->ShowMapAzimuthBtn();
+        mapHook->ShowMapScalingBtn();
+        mapHook->ShowSetDestPointBtn();
+        mapHook->ShowFixedPostionBtn();
+        mapHook->ShowDetailBtn2();
       }
       else
       {
-        mapHook->ShowCompass(true);
+        if (mapHook->HaveElecEyePrompt())
+        {
+          mapHook->ShowCompass(false);
+          mapHook->ShowElecEye();
+        }
+        else
+        {
+          mapHook->ShowCompass();
+          mapHook->ShowElecEye(false);
+        }
         mapHook->ShowMapAzimuthBtn(false);
         mapHook->ShowMapScalingBtn(false);
         mapHook->ShowSetDestPointBtn(false);
         mapHook->ShowFixedPostionBtn(false);
         mapHook->ShowDetailBtn2(false);
-        mapHook->ShowGuideInfoBtn(true);
       }
+
       //如果路口放大图显示，则隐藏时间按钮
       if ((UeRoute::PS_RealGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
       {
         mapHook->ShowGuideInfoBtn(false);
         mapHook->ShowTimeBtn(false);
+      }
+      else
+      {
+        if (VM_Browse == viewMode)
+        {
+          mapHook->ShowGuideInfoBtn(false);
+        }
+        else
+        {
+          mapHook->ShowGuideInfoBtn();
+        }
+        
+        if (m_viewWrapper.IsNeedRenderGuidanceView())
+        {
+          mapHook->ShowTimeBtn(false);
+        }
+        else
+        {
+          mapHook->ShowTimeBtn();
+        } 
       }
       //开启界面切换定时器
       mapHook->CloseGuiTimer();
@@ -422,5 +461,115 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
 
 void UeGui::CMapMainMenuHook::Update( short type )
 {
-  ExpandMenu(m_expandStatus);
+  //读取当前地图操作模式
+  UeMap::ViewOpeMode viewMode = UeMap::VM_Unknown;
+  CViewState* curViewState = m_viewWrapper.GetMainViewState();
+  if (curViewState)
+  {
+    viewMode = m_viewWrapper.GetViewOpeMode((UeMap::ViewType)curViewState->GetType());
+  }
+  //读取当前规划状态
+  short planState = m_routeWrapper.GetPlanState();
+  //执行展开或者收缩
+  if (m_expandStatus)
+  {
+    //设置主界面控件状态
+    if (m_parentHook)
+    {
+      CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
+      //如果路口放大图显示，则隐藏时间按钮
+      if ((UeRoute::PS_RealGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+      {
+        mapHook->ShowDetailBtn1(false);
+        mapHook->ShowTimeBtn(false);
+      }
+      else
+      {
+        mapHook->ShowDetailBtn1();
+        if (m_viewWrapper.IsNeedRenderGuidanceView())
+        {
+          mapHook->ShowTimeBtn(false);
+        }
+        else
+        {
+          mapHook->ShowTimeBtn();
+        } 
+      }
+    }
+    //如果路口放大图显示，则隐藏菜单
+    if ((UeRoute::PS_RealGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+    {
+      m_closeBtn.SetVisible(false);
+      m_functionBtn.SetVisible(false);
+      m_shortcutBtn.SetVisible(false);
+      m_aroundBtn.SetVisible(false);
+      m_searchBtn.SetVisible(false);
+      m_delimiter1.SetVisible(false);
+      m_delimiter2.SetVisible(false);
+      m_delimiter3.SetVisible(false);
+    }
+    else
+    {
+      m_closeBtn.SetVisible(true);
+      m_functionBtn.SetVisible(true);
+      m_shortcutBtn.SetVisible(true);
+      m_aroundBtn.SetVisible(true);
+      m_searchBtn.SetVisible(true);
+      m_delimiter1.SetVisible(true);
+      m_delimiter2.SetVisible(true);
+      m_delimiter3.SetVisible(true);
+    }
+  }
+  else
+  {
+    //设置主界面控件状态
+    if (m_parentHook)
+    {
+      CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
+      if (VM_Guidance == viewMode)
+      {
+        if (mapHook->HaveElecEyePrompt())
+        {
+          mapHook->ShowCompass(false);
+          mapHook->ShowElecEye();
+        }
+        else
+        {
+          mapHook->ShowCompass();
+          mapHook->ShowElecEye(false);
+        }
+      }
+
+      //如果路口放大图显示，则隐藏时间按钮
+      if ((UeRoute::PS_RealGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+      {
+        mapHook->ShowGuideInfoBtn(false);
+        mapHook->ShowTimeBtn(false);
+      }
+      else
+      {
+        if (VM_Browse == viewMode)
+        {
+          mapHook->ShowGuideInfoBtn(false);
+        }
+        else
+        {
+          mapHook->ShowGuideInfoBtn();
+        }
+        if (m_viewWrapper.IsNeedRenderGuidanceView())
+        {
+          mapHook->ShowTimeBtn(false);
+        }
+        else
+        {
+          mapHook->ShowTimeBtn();
+        } 
+      }
+    }
+    //如果路口放大图显示，则隐藏菜单
+    if ((UeRoute::PS_RealGuidance == planState) && (m_viewWrapper.IsGuidanceViewShown()))
+    {
+      m_expandBtn.SetVisible(false);
+    }
+  }
 }

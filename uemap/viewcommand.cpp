@@ -79,7 +79,7 @@ bool CViewCommand::MoveTo(const GpsCar &curPos,bool isRefresh)
     //
     CViewState *curView = m_view->m_views[i];
     assert(curView);
-    if(curView->m_type == VT_Guidance)
+    if(curView->m_type == VT_Guidance || curView->m_type == VT_Eagle)
     {
       continue;
     }

@@ -523,11 +523,25 @@ unsigned int UeGui::CRouteWrapper::StopGuidance()
   return UeRoute::PEC_OtherError;
 }
 
-bool UeGui::CRouteWrapper::GetCurElecEye( EEyeProp &elecEye )
+bool UeGui::CRouteWrapper::GetCurElecEye( EEyeProp &elecEye, double& distance )
 {
+  bool rt = false;
   if (m_route)
   {
-    return m_route->GetCurElecEye(elecEye);
+
+    rt = m_route->GetCurElecEye(elecEye);
+    if (rt)
+    {
+      distance = m_route->GetCurElecEyeDist();
+    }
+    else
+    {
+      distance = 0.0;
+    }
   }
-  return false;
+  else
+  {
+    distance = 0.0;
+  }
+  return rt;
 }

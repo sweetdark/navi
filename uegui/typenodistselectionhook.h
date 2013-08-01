@@ -94,9 +94,11 @@ namespace UeGui
 
     void ShowSubItemList();
 
+    void ShowFocusBtn();
+
   private:
-    CUiButton m_comInfoBtn;
-    CUiButton m_mainInfoBtn[6];
+    CUiBitButton m_comInfoBtn;
+    CUiBitButton m_mainInfoBtn[6];
     CUiButton m_subInfoBtn[7];
 
     CUiBitButton m_mainPageUpBtn;
@@ -117,6 +119,8 @@ namespace UeGui
 
     CPageController m_mainPageController;
     CPageController m_subPageController;
+    //用于显示当前选中的选项
+    int m_index;
   };
 }
 #endif

@@ -967,3 +967,8 @@ void UeMap::IView::UnLockScalling()
 {
   m_viewImpl->UnLockScalling();
 }
+
+void UeMap::IView::SetEagleState(bool isEagleOn)
+{
+  m_viewImpl->SetEagleState(isEagleOn);
+}

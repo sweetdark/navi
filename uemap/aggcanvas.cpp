@@ -1625,24 +1625,9 @@ void CAGGCanvas::RenderGuidance(const CViewDC *viewDC, const CGeoRect<short> &sc
       // Secondly render different lines
       //矢量路口放大图需要
       RenderAfnLinks(0, false, true);
-      //RenderAfnGuidanceArrow(0);
       RenderAfnLines(0, false, true);
       RenderBubbleForGuidance();
-      //RenderGuidanceLines(0, false);
-
-      //RenderBubble(0);
-
-      // Thirdly render POIs
-      //RenderAfnPoints(0, false);
-
-      // Thirdly render POIs
-      //RenderAfnTexts(0, false);
-
-      // Lastly render road names
-      //RenderRoadName(0, false, NT_Normal/*NT_Aligned*/);
-
-      // Render cross picture
-      //RenderGpsCar(0);
+      RenderRightScreenCarIcon();
     }
     if (rt == PEC_Success)
     {
@@ -1815,15 +1800,16 @@ bool CAGGCanvas::SetupCanvas(bool is3d)
     m_renderPrim = CAggStackDC::m_renderPrim;
     m_lineRas = CAggStackDC::m_lineRas;
 
-    //
-    if(is3d)
+    m_scanRas.clip_box(0, 0, CAggStackDC::m_curBuf.width(), CAggStackDC::m_curBuf.height());
+    //不是3d时，也要透视效果。
+    /*if(is3d)
     {
       m_scanRas.clip_box(0, 0, CAggStackDC::m_curBuf.width(), CAggStackDC::m_curBuf.height());
     }
     else
     {
       m_scanRas.clip_box(0, 0, CAggStackDC::m_curBuf.width(), CAggStackDC::m_curBuf.height()/CAGGView::m_scaleY);
-    }
+    }*/
 
     return (m_renderSolid && m_renderBin && m_renderPrim && m_lineRas);
   }
@@ -4458,6 +4444,8 @@ inline void CAGGCanvas::RenderAfnRouteLine(AGGPath &onePath, short scaleLevel, b
   int vertexes = onePath.m_path.total_vertices();
   if(vertexes > 1)
   {
+    //记录路线的起始点的位置，就是车标的位置.
+    onePath.m_path.vertex(0, &m_rightScreenCarPos.m_x, &m_rightScreenCarPos.m_y);
     //
     double lineWidth = (15 - scaleLevel) > 2 ? (15 - scaleLevel) : 3;
     agg::rgba8 clrFill/*(0, 200, 0);*/ = onePath.m_clrFill;
@@ -4570,8 +4558,8 @@ inline void CAGGCanvas::RenderAfnRouteLineForGuidance(AGGPath onePath, short sca
   int vertexes = onePath.m_path.total_vertices();
   if(vertexes > 1)
   {
-    //
-    //onePath.m_path.modify_command(vertexes - 1, path_cmd_stop);
+    //记录右半屏的车标位置
+    onePath.m_path.vertex(0, &m_rightScreenCarPos.m_x, &m_rightScreenCarPos.m_y);
     double lineWidth = (15 - scaleLevel) > 1 ? (15 - scaleLevel) : 2;
     agg::rgba8 clrFill/*(0, 200, 0);*/ = onePath.m_clrFill;
     agg::rgba8 clrStroke/*(0, 105, 0)*/ = onePath.m_clrStroke;
@@ -4580,27 +4568,14 @@ inline void CAGGCanvas::RenderAfnRouteLineForGuidance(AGGPath onePath, short sca
     agg::conv_stroke<agg::path_storage, agg::vcgen_markers_term> strokeLine(onePath.m_path);
     strokeLine.miter_limit(0.5);
     strokeLine.line_cap(agg::round_cap);
-    //if (onePath.m_path.total_vertices() > 2)
-    //{
-    //  double lastX, lastY;
-    //  double lastButOneX, lastButOneY;
-    //  onePath.m_path.last_vertex(&lastX, &lastY);
-    //  unsigned int lastButOne =  onePath.m_path.total_vertices() - 2;
-    //  onePath.m_path.vertex(lastButOne, &lastButOneX, &lastButOneY);
-    //  double middleX = (lastX + lastButOneX) / 2;
-    //  double middleY = (lastY + lastButOneY) / 2;
-    //  onePath.m_path.modify_vertex(onePath.m_path.total_vertices() - 1, middleX, middleY);
-    //}
-    //
-    m_scanRas.reset();
-    //画箭头
-    agg::arrowhead ah;
-    ah.head(20, 5, 16, 0);   
-    m_scanRas.reset();
+     
     agg::rgba8 &lineClr = (lineWidth > 3) ? clrStroke : clrFill;
     strokeLine.width(lineWidth);
     m_scanRas.add_path(strokeLine);
 
+    //画箭头
+    agg::arrowhead ah;
+    ah.head(20, 5, 16, 0);  
     agg::conv_marker<agg::vcgen_markers_term, agg::arrowhead> strokeLineMarker(strokeLine.markers(), ah);
     m_scanRas.add_path(strokeLineMarker);
 
@@ -4609,44 +4584,6 @@ inline void CAGGCanvas::RenderAfnRouteLineForGuidance(AGGPath onePath, short sca
 
     m_scanRas.reset();
 
-    //画自车图标
-    short carIcon = m_view->GetCarIcon(); 
-    //车标角度
-    double angle = 0.0;
-    //计算角度
-    if (m_gpsCar.m_curPos.IsValid())
-    {
-      CGeoPoint<double> start, end;
-      start.m_x = m_gpsCar.m_curPos.m_x;
-      start.m_y = m_gpsCar.m_curPos.m_y;
-      end.m_x = m_gpsCar.m_nextPos.m_x;
-      end.m_y = m_gpsCar.m_nextPos.m_y;
-      angle = PI + CVectOP<double>::Angle(start, end);
-      // 因为默认默认是向上及90度方向，所以这里要对指南针逆时针旋转90度变成0度角
-      angle -= HALFPI;    
-    }
-    
-    CUePicture *poiPicture = const_cast<CUePicture *>(m_view->GetUePicture(CViewHook::IT_GuiBegin + carIcon));
-    if (poiPicture)
-    {      
-      double x, y;
-      onePath.m_path.vertex(0, &x, &y);
-
-      CGeoPoint<short> HeadPos;
-      HeadPos.m_x = static_cast<short>(x);
-      HeadPos.m_y = static_cast<short>(y);
-
-      CGeoRect<int> rect;
-      rect.m_minX = HeadPos.m_x - poiPicture->GetRenderingSpec().m_cx/2;
-      rect.m_minY = HeadPos.m_y - poiPicture->GetRenderingSpec().m_cy/2;
-      rect.m_maxX = HeadPos.m_x + poiPicture->GetRenderingSpec().m_cx/2;
-      rect.m_maxY = HeadPos.m_y + poiPicture->GetRenderingSpec().m_cy/2;
-      m_poiRects.Add(&rect);
-
-      CPictureBasic::PictureBasic picSrc = poiPicture->GetPicture(carIcon - 1);  
-      //可实现图片任意角度旋转
-      RenderPicture(picSrc, HeadPos.m_x, HeadPos.m_y, poiPicture->GetRenderingSpec().m_cx, poiPicture->GetRenderingSpec().m_cy, angle);
-    }
   }
 }
 
@@ -6365,13 +6302,9 @@ void UeMap::CAGGCanvas::RenderCarIcon( int cX, int cY, short carIcon, double ang
   CUePicture *poiPicture = const_cast<CUePicture *>(m_view->GetUePicture(CViewHook::IT_GuiBegin + carIcon));
   if (poiPicture)
   {      
-    double x = cX;
-    double y = cY;
-    CAGGView::m_mtxPsp.transform(&x, &y);
-
     CGeoPoint<short> HeadPos;
-    HeadPos.m_x = static_cast<short>(x);
-    HeadPos.m_y = static_cast<short>(y);
+    HeadPos.m_x = static_cast<short>(cX);
+    HeadPos.m_y = static_cast<short>(cY);
 
     CGeoRect<int> rect;
     rect.m_minX = HeadPos.m_x - poiPicture->GetRenderingSpec().m_cx/2;
@@ -6726,18 +6659,7 @@ inline void CAGGCanvas::RenderGpsCar(short scaleLevel)
   if (IRoute::GetRoute()->GetPlanState()== PS_DemoGuidance || 
       IRoute::GetRoute()->GetPlanState()== PS_RealGuidance)
   {
-    if (m_gpsCar.m_curPos.IsValid())
-    {
-      CGeoPoint<double> start, end;
-      start.m_x = m_gpsCar.m_curPos.m_x;
-      start.m_y = m_gpsCar.m_curPos.m_y;
-      end.m_x = m_gpsCar.m_nextPos.m_x;
-      end.m_y = m_gpsCar.m_nextPos.m_y;
-      angle = PI + CVectOP<double>::Angle(start, end);
-      // 因为默认是向上及90度方向，所以这里要对车标逆时针旋转90度变成0度角
-      angle -= HALFPI;    
-    }
-    
+    angle = CaculateCarAngle();
     
     //start.m_x = scrPos.m_x;
     //start.m_y = scrPos.m_y;
@@ -6790,7 +6712,10 @@ inline void CAGGCanvas::RenderGpsCar(short scaleLevel)
   carPos.m_y = scrPos.m_y;
   if (curView->GetScrLayout().m_extent.IsContain(carPos))
   {
-    RenderCarIcon(carPos.m_x, carPos.m_y, carIcon, angle);
+    double x = carPos.m_x;
+    double y = carPos.m_y;
+    CAGGView::m_mtxPsp.transform(&x, &y);
+    RenderCarIcon(x, y, carIcon, angle);
   }
 
   //判断当前视图是否是浏览状态及可在地图上选点
@@ -8140,7 +8065,6 @@ void CAGGCanvas::RenderElecEye(bool is3D)
       poiPicture->DirectDraw(m_bits, m_rows, m_bufWidth, m_bufHeight, scrPoint.m_x, scrPoint.m_y, 0, 0, spec);
     }
   }
-  
 }
 void CAGGCanvas::RenderSpecialText(short scaleLevel)
 {
@@ -8302,4 +8226,77 @@ int CAGGCanvas::GetElementTextWidth(int elementWidth, TCHAR *uniText)
     }
   }
   return iTextWidth;
+}
+
+void CAGGCanvas::RenderEagle(short scaleLevel, bool isRaster, bool is3d)
+{
+  if(!SetupCanvas(is3d))
+  {
+    return;
+  }
+
+  m_poiRects.RemoveAll(false);
+  m_nameRects.RemoveAll(false);
+  m_drawnNames.RemoveAll(false);
+
+  // TODO:
+  // Should also consider the landscape or portrait screen mode
+  if(scaleLevel > 10)
+  {
+    m_drawnTolerance.m_x = 0;
+    m_drawnTolerance.m_y = 0;
+  }
+  else
+  {
+    m_drawnTolerance.m_x = 3;
+    m_drawnTolerance.m_y = 5;
+  }
+  // Firstly render different polygons
+  RenderAfnPolygons(scaleLevel, isRaster);
+
+  //
+  RenderAfnLinks(scaleLevel, isRaster);
+
+  // secondly render different lines
+  RenderAfnLines(scaleLevel, isRaster);
+
+  // Lastly render different points
+
+  RenderAfnLandmark(scaleLevel, is3d);
+
+  RenderAfnPoints(scaleLevel, is3d);
+
+  //RenderAfnTexts(scaleLevel, is3d);
+
+  // Thirdly render road names
+  RenderRoadName(scaleLevel, is3d, NT_Normal);
+
+  RenderRightScreenCarIcon();
+}
+
+double CAGGCanvas::CaculateCarAngle()
+{
+  double angle = 0.0;
+  if (m_gpsCar.m_curPos.IsValid())
+  {
+    CGeoPoint<double> start, end;
+    start.m_x = m_gpsCar.m_curPos.m_x;
+    start.m_y = m_gpsCar.m_curPos.m_y;
+    end.m_x = m_gpsCar.m_nextPos.m_x;
+    end.m_y = m_gpsCar.m_nextPos.m_y;
+    angle = PI + CVectOP<double>::Angle(start, end);
+    // 因为默认是向上及90度方向，所以这里要对车标逆时针旋转90度变成0度角
+    angle -= HALFPI;    
+  }
+  return angle;
+}
+
+void CAGGCanvas::RenderRightScreenCarIcon()
+{
+  //画自车图标
+  short carIcon = m_view->GetCarIcon(); 
+  //车标角度
+  double angle = CaculateCarAngle();
+
+  RenderCarIcon(m_rightScreenCarPos.m_x, m_rightScreenCarPos.m_y, carIcon, angle);
 }

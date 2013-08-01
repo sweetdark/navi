@@ -63,6 +63,9 @@
 #ifndef _UEBASE_STRINGMATCH_H
 #include "uebase\stringmatch.h"
 #endif
+#ifndef _UEQUERY_INDEXCTRL_H
+#include "indexctrl.h"
+#endif
 using namespace UeBase;
 
 // Declare namespace 
@@ -71,7 +74,7 @@ namespace UeQuery
 	/**
 	*
 	**/
-	class UEQUERY_CLASS CUeIndex : public CMemoryConsumer
+	class UEQUERY_CLASS CUeIndex : public CIndexCtrl
 	{
 		friend class CUeQueryImpl;
 		friend class CQueryDataVerify;
@@ -143,8 +146,8 @@ namespace UeQuery
 		* \brief ¹¹Ôìº¯Êý
 		**/
 		CUeIndex(void):m_idxCount(0),m_bodyCount(0),m_startIdx(0),
-			m_endIdx(-1),m_curIdx(0),m_indexHandle(0),m_mapHandle(0),
-			m_begin(0),m_indices(0),m_bodies(0),m_filters(0) { };
+      m_endIdx(-1),m_curIdx(0),m_indexHandle(0),m_mapHandle(0),
+      m_begin(0),m_indices(0),m_bodies(0),m_filters(0) { };
 		//
 		virtual unsigned GetIdxes(void) {return 0;};
 		virtual tstring getIndexFileName(void) const = 0;

@@ -31,13 +31,18 @@ void CTypeNoDistSelectionHook::Load()
   m_subPageController.SetTotal(m_vecSubListItem.size());
   m_subPageController.SetQuantityOfOnePage(7);
 
+  //默认选中常用分类
+  m_comInfoBtn.SetEnable(false);
+  m_index = -1;
+  ShowFocusBtn();
+
   ShowMainItemList();
   ShowSubItemList();
 }
 
 void CTypeNoDistSelectionHook::UnLoad()
 {
-  CQueryWrapper::Get().SetDefaultQueryKind();
+  //CQueryWrapper::Get().SetDefaultQueryKind();
 }
 
 void CTypeNoDistSelectionHook::MakeNames()
@@ -86,7 +91,7 @@ void CTypeNoDistSelectionHook::MakeControls()
 {
   CMenuBackgroundHook::MakeControls();
   m_comInfoBtn.SetCenterElement(GetGuiElement(TypeNoDistSelectionHook_MainListComBtn));
-  // m_comInfoBtn.SetIconElement(GetGuiElement(TypeNoDistSelectionHook_MainListBtnMarkCom));
+  m_comInfoBtn.SetIconElement(GetGuiElement(TypeNoDistSelectionHook_MainListBtnMarkCom));
 
   m_mainPageUpBtn.SetCenterElement(GetGuiElement(TypeNoDistSelectionHook_MainPageUpBtn));
   m_mainPageUpBtn.SetIconElement(GetGuiElement(TypeNoDistSelectionHook_MainPageUpIcon));
@@ -106,7 +111,7 @@ void CTypeNoDistSelectionHook::MakeControls()
   for (int i=0, j=TypeNoDistSelectionHook_MainList1Btn; i<6; i++)
   {
     m_mainInfoBtn[i].SetCenterElement(GetGuiElement(j++));
-    j++;
+    m_mainInfoBtn[i].SetIconElement(GetGuiElement(j++));
   }
 
   for (int i=0, j=TypeNoDistSelectionHook_SubList1Btn; i<7; i++)
@@ -200,6 +205,7 @@ short CTypeNoDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_mainPageUpBtn.IsEnable())
       {
         m_mainPageController.PreviousPage();
+        ShowFocusBtn();
         ShowMainItemList();
       }
     }
@@ -211,6 +217,7 @@ short CTypeNoDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_mainPageDownBtn.IsEnable())
       {
         m_mainPageController.NextPage();
+        ShowFocusBtn();
         ShowMainItemList();
       }
     }
@@ -243,6 +250,8 @@ short CTypeNoDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_comInfoBtn.MouseUp();
       m_pCurItemCtrl->GetComItem(m_vecSubListItem);
       m_subPageController.SetTotal(m_vecSubListItem.size());
+      m_index = -1;
+      ShowFocusBtn();
       ShowSubItemList();
     }
     break;
@@ -251,16 +260,17 @@ short CTypeNoDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       int listIndex = (ctrlType-TypeNoDistSelectionHook_MainList1Btn)/2;
       m_mainInfoBtn[listIndex].MouseUp();
-      if (m_mainInfoBtn[listIndex].IsEnable())
+      if (::strcmp(m_mainInfoBtn[listIndex].GetCaption(), ""))
       {
-        int index = listIndex + m_mainPageController.GetPageStartPosition();
-        m_pCurItemCtrl->GetLeve2Item(m_vecMainListItem[index].m_uCode,m_vecSubListItem);
+        m_index = listIndex + m_mainPageController.GetPageStartPosition();
+        m_pCurItemCtrl->GetLeve2Item(m_vecMainListItem[m_index].m_uCode,m_vecSubListItem);
         //暂时处理
         std::vector<TCodeEntry>::iterator iter = m_vecSubListItem.begin();
         m_vecSubListItem.erase(iter); //返回上一级
         m_vecSubListItem.erase(iter); //全部
         //
         m_subPageController.SetTotal(m_vecSubListItem.size());
+        ShowFocusBtn();
         ShowSubItemList();
       }
     } 
@@ -311,7 +321,7 @@ void CTypeNoDistSelectionHook::ShowMainItemList()
   for (int i = firstItemIndx; i < m_vecMainListItem.size(); ++i)
   {
     m_mainInfoBtn[itemIndex].SetCaption(m_vecMainListItem[i].m_chName);
-    m_mainInfoBtn[itemIndex].SetEnable(true);
+    //m_mainInfoBtn[itemIndex].SetEnable(true);
     itemIndex++;
 
     if (itemIndex >= 6)
@@ -321,7 +331,7 @@ void CTypeNoDistSelectionHook::ShowMainItemList()
   }
   for (int i = itemIndex; i < 6; ++i)
   {
-    m_mainInfoBtn[i].SetEnable(false);
+    //m_mainInfoBtn[i].SetEnable(false);
     m_mainInfoBtn[i].ClearCaption();
   }
 
@@ -389,5 +399,28 @@ void CTypeNoDistSelectionHook::ShowSubItemList()
   {
     m_subPageUpBtn.SetEnable(true);
     m_subPageDownBtn.SetEnable(true);
+  }
+}
+
+void CTypeNoDistSelectionHook::ShowFocusBtn()
+{
+  m_comInfoBtn.SetEnable(true);
+  for (int i=0; i<6; i++)
+  {
+    m_mainInfoBtn[i].SetEnable(true);
+  }
+
+  if (m_index == -1)
+  {
+    m_comInfoBtn.SetEnable(false);
+    return;
+  }
+  else
+  {
+    int index = m_index - m_mainPageController.GetPageStartPosition();
+    if (index > -1 && index < 6)
+    {
+      m_mainInfoBtn[index].SetEnable(false);
+    }
   }
 }

@@ -24,7 +24,8 @@ using namespace UeGui;
 UeGui::CMapHook::CMapHook() : CAggHook(), m_viewWrapper(CViewWrapper::Get()), m_routeWrapper(CRouteWrapper::Get()),
 m_settingWrapper(CSettingWrapper::Get()), m_userDataWrapper(CUserDataWrapper::Get()), m_selectPointObj(NULL), 
 m_selectPointEvent(NULL), m_curGuiType(GUI_None), m_preGuiType(GUI_None), m_queryPointIndex(-1), m_planType(Plan_Single),
-m_guiTimerInterval(0), m_curPlanmethodType(UeRoute::MT_Max), m_bIsCompassShown(false)
+m_guiTimerInterval(0), m_curPlanmethodType(UeRoute::MT_Max), m_elecEyeStatus(false), m_bIsCompassShown(false),
+m_elecProgressBarWidth(0), m_elecMaxPromptDist(0)
 {
   m_queryPointList.clear();
   //地图界面渲染完成后不需要释放图片资源，提高效率
@@ -62,6 +63,7 @@ void UeGui::CMapHook::Update( short type )
   case CViewHook::UHT_FillGuidanceInfo:
     {
       FillGuidanceInfo();
+      UpdateElecEyeInfo();
       break;
     }
   case CViewHook::UHT_UpdateLocationMapHook:
@@ -195,6 +197,22 @@ void UeGui::CMapHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(MapHook_GuideInfoRightIcon,	"GuideInfoRightIcon"));
   m_ctrlNames.insert(GuiName::value_type(MapHook_GuideInfoRightLabe,	"GuideInfoRightLabe"));
   m_ctrlNames.insert(GuiName::value_type(MapHook_OtherIcon,	"OtherIcon"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeBack,	"ElecEyeBack"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIcon,	"ElecEyeIcon"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeProgressBar,	"ElecEyeProgressBar"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_1,	"ElecEyeIconType_1"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_2,	"ElecEyeIconType_2"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_3,	"ElecEyeIconType_3"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_4,	"ElecEyeIconType_4"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_5,	"ElecEyeIconType_5"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_6,	"ElecEyeIconType_6"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_7,	"ElecEyeIconType_7"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_8,	"ElecEyeIconType_8"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_9,	"ElecEyeIconType_9"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_10,	"ElecEyeIconType_10"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_11,	"ElecEyeIconType_11"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_12,	"ElecEyeIconType_12"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ElecEyeIconType_13,	"ElecEyeIconType_13"));
 }
 
 void UeGui::CMapHook::MakeControls()
@@ -254,9 +272,21 @@ void UeGui::CMapHook::MakeControls()
   //分割符
   m_delimiter1.SetCenterElement(GetGuiElement(MapHook_Delimiter1));
   m_delimiter2.SetCenterElement(GetGuiElement(MapHook_Delimiter2));
+  //电子眼提示图标
+  m_elecEye.SetCenterElement(GetGuiElement(MapHook_ElecEyeBack));
+  m_elecEye.SetIconElement(GetGuiElement(MapHook_ElecEyeIcon));
+  m_elecEye.SetLabelElement(GetGuiElement(MapHook_ElecEyeProgressBar));
+
+  CViewHook::GuiElement* guiElement = NULL;
+  //读取电子眼进度条的宽度
+  guiElement = m_elecEye.GetLabelElement();
+  if (guiElement)
+  {
+    m_elecProgressBarWidth = guiElement->m_width;
+  }
 
   //设置指南针图标
-  CViewHook::GuiElement* guiElement = m_compassIcon.GetCenterElement();
+  guiElement = m_compassIcon.GetCenterElement();
   if (guiElement)
   {
     CGeoPoint<short> scrPoint;
@@ -285,6 +315,23 @@ void UeGui::CMapHook::MakeControls()
     m_viewWrapper.AddViewIcon(VI_SKY_DAY_ICON, guiElement->m_bkFocus);
     //3D夜晚天空图片
     m_viewWrapper.AddViewIcon(VI_SKY_NIGHT_ICON, guiElement->m_bkDisabled);
+  }
+
+  //设置车道显示位置
+  guiElement = m_soundBtn.GetCenterElement();
+  if (guiElement)
+  {
+    CGeoPoint<short> scrPoint;
+    scrPoint.m_x = guiElement->m_startX + guiElement->m_width + guiElement->m_width * 2 / 10;
+    scrPoint.m_y = guiElement->m_startY;
+    short width = 50, height = 50;
+    if (guiElement)
+    {
+      width = guiElement->m_height;
+      height = guiElement->m_height;
+    }
+    scrPoint.m_y += height;
+    m_viewWrapper.SetLanePos(scrPoint, width, height);
   }
 }
 
@@ -683,6 +730,11 @@ short UeGui::CMapHook::MouseDown(CGeoPoint<short> &scrPoint)
     break;
   }
 
+  //如果鼠标点击的不是地图则停止计时
+  if (CT_Unknown != m_downElementType)
+  {
+    CloseGuiTimer();  
+  }
   if (needRefresh)
   {
     m_viewWrapper.Refresh();
@@ -866,9 +918,13 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   }
- 
-  if (needRefresh)
+  //如果鼠标点击的不是地图则重新开始计时
+  if (CT_Unknown != m_downElementType)
   {
+    RestarGuiTimer();  
+  }
+  if (needRefresh)
+  {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
     m_viewWrapper.Refresh();
   }
   return ctrlType;
@@ -885,6 +941,7 @@ void UeGui::CMapHook::HideAllCtrl()
   ShowDetailBtn1(false);
   ShowDetailBtn2(false);
   ShowGuideInfoBtn(false);
+  ShowElecEye(false);
 }
 
 void UeGui::CMapHook::ShowMinimizeBtn( bool show /*= true*/ )
@@ -950,6 +1007,11 @@ void UeGui::CMapHook::ShowGuideInfoBtn( bool show /*= true*/ )
 void UeGui::CMapHook::ShowCompass( bool show /*= true*/ )
 {
   m_bIsCompassShown = show;
+}
+
+void UeGui::CMapHook::ShowElecEye( bool show /*= true*/ )
+{
+  m_elecEye.SetVisible(show);
 }
 
 void UeGui::CMapHook::ShowTimeBtn( bool show /*= true*/ )
@@ -1116,11 +1178,13 @@ unsigned int UeGui::CMapHook::RoutePlane( PlanType planType /*= Plan_Single*/ )
   {
     rt = m_routeWrapper.RoutePlan();
     rt = m_routeWrapper.MultiRoutePlan();
+    m_viewWrapper.AutoScallingMap();
     m_planType = Plan_Multiple;
   }
   else
   {
     rt = m_routeWrapper.RoutePlan();
+    m_viewWrapper.AutoScallingMap();
     m_planType = Plan_Single;
   }
   
@@ -1206,6 +1270,7 @@ unsigned int UeGui::CMapHook::StopDemo()
   //切换到浏览菜单
   SwitchingGUI(GUI_MapBrowse);
   UpdateMenu();
+  m_elecEyeStatus = false;
   return rt;
 }
 
@@ -1226,6 +1291,7 @@ unsigned int UeGui::CMapHook::StopGuidance()
   //切换到浏览状态状态菜单
   SwitchingGUI(GUI_MapBrowse);
   UpdateMenu();
+  m_elecEyeStatus = false;
   return rt;
 }
 
@@ -1271,7 +1337,7 @@ void UeGui::CMapHook::SetPickPos( const CGeoPoint<long> &point, const char* name
   CGeoPoint<short> scrPoint;
   m_viewWrapper.SwitchTo(SCALE_200M, 0);  
   RefreshZoomingInfo();
-  m_viewWrapper.SetPickPos(point, scrPoint);
+  m_viewWrapper.SetPickPos(point, scrPoint, true);
 }
 
 void UeGui::CMapHook::SetPickPos( PointList pointList, unsigned short posIndex )
@@ -1795,6 +1861,11 @@ void UeGui::CMapHook::CloseGuiTimer()
   m_guiTimerInterval = 0;
 }
 
+bool UeGui::CMapHook::IsGuiTimerDown()
+{
+  return 0 == m_guiTimerInterval;
+}
+
 void UeGui::CMapHook::ShowGuideView()
 {
   UpdateMenu();
@@ -1804,5 +1875,138 @@ void UeGui::CMapHook::ShowGuideView()
 bool UeGui::CMapHook::IsShowCompass()
 {
   bool isShowCompass = m_settingWrapper.GetCompassPrompt();
-  return isShowCompass && m_bIsCompassShown;
+  //return isShowCompass && m_bIsCompassShown;
+  return m_bIsCompassShown;
+}
+
+bool UeGui::CMapHook::HaveElecEyePrompt()
+{
+  return m_elecEyeStatus;
+}
+
+void UeGui::CMapHook::UpdateElecEyeInfo()
+{
+  //显示电子眼
+  EEyeProp eyeProp;
+  double distance = 0.0;
+  bool rt = m_routeWrapper.GetCurElecEye(eyeProp, distance);
+  if (rt && (distance > 0))
+  {
+    //更新电子眼状态
+    m_elecEyeStatus = true;
+    //读取最大提示距离
+    if (distance > m_elecMaxPromptDist)
+    {
+      m_elecMaxPromptDist = distance;
+    }    
+    UpdateElecIcon(eyeProp);
+    UpdateElecProgress(distance);
+  }
+  else
+  {
+    m_elecMaxPromptDist = 0;
+    m_elecEyeStatus = false;
+    ShowElecEye(false);
+  }
+}
+
+void UeGui::CMapHook::UpdateElecProgress( double distance /*= 0*/ )
+{
+  int promptDist = distance;
+  if (promptDist < 0)
+  {
+    promptDist = 0;
+  }
+  GuiElement* guiElement = m_elecEye.GetLabelElement();
+  if (guiElement)
+  {
+    int progress = 0;
+    if (m_elecMaxPromptDist > 0)
+    {
+      progress = (m_elecProgressBarWidth * promptDist) / m_elecMaxPromptDist;
+      if (progress <= 0)
+      {
+        progress = 1;
+      }      
+    }
+    guiElement->m_width = progress;
+  }
+}
+
+bool UeGui::CMapHook::UpdateElecIcon( UeRoute::EEyeProp& eyeProp )
+{
+  short promptElementType = MapHook_Begin;
+  switch (eyeProp.m_type)
+  {
+  case UeRoute::TVT_TrafficLights:
+    {
+      //红绿灯
+      promptElementType = MapHook_ElecEyeIconType_13;
+      break;
+    }
+  case UeRoute::TVT_SpeedLimit:
+    {
+      //限速
+      if (eyeProp.m_speed <= 25)
+      {
+        promptElementType = MapHook_ElecEyeIconType_1;
+      }
+      else if ((eyeProp.m_speed > 25) && (eyeProp.m_speed <= 35))
+      {
+        promptElementType = MapHook_ElecEyeIconType_2;
+      }
+      else if ((eyeProp.m_speed > 35) && (eyeProp.m_speed <= 45))
+      {
+        promptElementType = MapHook_ElecEyeIconType_3;
+      }
+      else if ((eyeProp.m_speed > 45) && (eyeProp.m_speed <= 55))
+      {
+        promptElementType = MapHook_ElecEyeIconType_4;
+      }
+      else if ((eyeProp.m_speed > 55) && (eyeProp.m_speed <= 65))
+      {
+        promptElementType = MapHook_ElecEyeIconType_5;
+      }
+      else if ((eyeProp.m_speed > 65) && (eyeProp.m_speed <= 75))
+      {
+        promptElementType = MapHook_ElecEyeIconType_6;
+      }
+      else if ((eyeProp.m_speed > 75) && (eyeProp.m_speed <= 85))
+      {
+        promptElementType = MapHook_ElecEyeIconType_7;
+      }
+      else if ((eyeProp.m_speed > 85) && (eyeProp.m_speed <= 95))
+      {
+        promptElementType = MapHook_ElecEyeIconType_8;
+      }
+      else if ((eyeProp.m_speed > 95) && (eyeProp.m_speed <= 105))
+      {
+        promptElementType = MapHook_ElecEyeIconType_9;
+      }
+      else if ((eyeProp.m_speed > 105) && (eyeProp.m_speed <= 115))
+      {
+        promptElementType = MapHook_ElecEyeIconType_10;
+      }
+      else
+      {
+        promptElementType = MapHook_ElecEyeIconType_11;
+      }
+      break;
+    }
+  case UeRoute::TVT_NormalCamera:
+  case UeRoute::TVT_InTunnel:
+  case UeRoute::TVT_TunnelPort:
+    {
+      //电子眼
+      promptElementType = MapHook_ElecEyeIconType_12;
+      break;
+    }
+  }
+  if (MapHook_Begin != promptElementType)
+  {
+    //先只显示电子眼
+    ChangeElementIcon(m_elecEye.GetIconElement(), GetGuiElement(promptElementType));
+    return true;
+  }
+  return false;
 }

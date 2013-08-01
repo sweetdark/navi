@@ -49,8 +49,6 @@ void CMapGuideInfoViewHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_DistInfoLabel,	"DistInfoLabel"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_NextDirectionBoard,	"NextDirectionBoard"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_NextDirectionBoardIcon,	"NextDirectionBoardIcon"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_PromptBack,	"PromptBack"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_PromptIcon,	"PromptIcon"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_HighSpeedBoardBack1,	"HighSpeedBoardBack1"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_HighSpeedBoardNameLabel1,	"HighSpeedBoardNameLabel1"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_HighSpeedBoardTypeLabel1,	"HighSpeedBoardTypeLabel1"));
@@ -63,7 +61,6 @@ void CMapGuideInfoViewHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_HighSpeedBoardNameLabel3,	"HighSpeedBoardNameLabel3"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_HighSpeedBoardTypeLabel3,	"HighSpeedBoardTypeLabel3"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_HighSpeedBoardDistLabel3,	"HighSpeedBoardDistLabel3"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_PromptDistBar,	"PromptDistBar"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_ShowGuideViewBack,	"ShowGuideViewBack"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_ShowGuideViewLabel,	"ShowGuideViewLabel"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType1_1,	"IconType1_1"));
@@ -99,19 +96,6 @@ void CMapGuideInfoViewHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType2_26,	"IconType2_26"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType2_27,	"IconType2_27"));
   m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType2_28,	"IconType2_28"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_1,	"IconType3_1"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_2,	"IconType3_2"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_3,	"IconType3_3"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_4,	"IconType3_4"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_5,	"IconType3_5"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_6,	"IconType3_6"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_7,	"IconType3_7"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_8,	"IconType3_8"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_9,	"IconType3_9"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_10,	"IconType3_10"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_11,	"IconType3_11"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_12,	"IconType3_12"));
-  m_ctrlNames.insert(GuiName::value_type(MapGuideInfoViewHook_IconType3_13,	"IconType3_13"));
 }
 
 void CMapGuideInfoViewHook::MakeControls()
@@ -124,9 +108,6 @@ void CMapGuideInfoViewHook::MakeControls()
   m_curDirectionBoard.SetLabelElement(GetGuiElement(MapGuideInfoViewHook_DistInfoLabel));
   m_nextDirectionBoard.SetCenterElement(GetGuiElement(MapGuideInfoViewHook_NextDirectionBoard));
   m_nextDirectionBoard.SetIconElement(GetGuiElement(MapGuideInfoViewHook_NextDirectionBoardIcon));
-  m_promptBtn.SetCenterElement(GetGuiElement(MapGuideInfoViewHook_PromptBack));
-  m_promptBtn.SetIconElement(GetGuiElement(MapGuideInfoViewHook_PromptIcon));
-  m_promptDistBar.SetLabelElement(GetGuiElement(MapGuideInfoViewHook_PromptDistBar));
   m_highSpeedBoard1.SetCenterElement(GetGuiElement(MapGuideInfoViewHook_HighSpeedBoardBack1));
   m_highSpeedBoard1.SetLabelElement(GetGuiElement(MapGuideInfoViewHook_HighSpeedBoardNameLabel1));
   m_highSpeedBoard2.SetCenterElement(GetGuiElement(MapGuideInfoViewHook_HighSpeedBoardBack2));
@@ -243,17 +224,6 @@ void UeGui::CMapGuideInfoViewHook::Update( short type )
   {
     HideAllCtrl();
     return;
-  }
-
-  //显示电子眼
-  EEyeProp eyeProp; 
-  if (m_routeWrapper.GetCurElecEye(eyeProp))
-  {
-    ShowPromptIcon(true);
-  }
-  else
-  {
-    ShowPromptIcon(false);
   }
 
   //显示引导图标
@@ -454,8 +424,6 @@ void UeGui::CMapGuideInfoViewHook::HideAllCtrl()
   m_routeInfoBtn.SetVisible(false);
   m_curDirectionBoard.SetVisible(false);
   m_nextDirectionBoard.SetVisible(false);
-  m_promptBtn.SetVisible(false);
-  m_promptDistBar.SetVisible(false);
   m_highSpeedBoard1.SetVisible(false);
   m_highSpeedBoard1.SetVisible(false);
   m_highSpeedBoardTypeLabel1.SetVisible(false);
@@ -745,22 +713,6 @@ void UeGui::CMapGuideInfoViewHook::ShowNextGuidanceIcon( bool isShow, int sndCod
   else
   {
     ShowGuidanceIconCtrl(m_nextDirectionBoard, false);
-  }
-}
-
-void UeGui::CMapGuideInfoViewHook::ShowPromptIcon( bool isShow, unsigned char infoCode /*= 0*/, double distance /*= 0*/ )
-{
-  if (isShow)
-  {
-    //先只显示电子眼
-    ChangeElementIcon(m_promptBtn.GetIconElement(), GetGuiElement(MapGuideInfoViewHook_IconType3_12));
-    //m_promptBtn.SetVisible(true);
-    //m_promptDistBar.SetVisible(true);
-  }
-  else
-  {
-    m_promptBtn.SetVisible(false);
-    m_promptDistBar.SetVisible(false);
   }
 }
 

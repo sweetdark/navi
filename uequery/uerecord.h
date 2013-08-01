@@ -110,7 +110,8 @@ namespace UeQuery
 		void operator = (CUeRecord &other);
 	protected:
 		void PushBack(SQLRecord *oneRecord);
-		static bool CompareDist(const SQLRecord *first, const SQLRecord *second);
+    static bool CmpRecordPtrByIdx(const SQLRecord *,const SQLRecord *);
+    static bool CmpRecordPtrByDistance(const SQLRecord *,const SQLRecord *);
 		//
 		short m_curPage;
 		short m_totalPage;
