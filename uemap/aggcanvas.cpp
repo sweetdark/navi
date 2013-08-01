@@ -6365,52 +6365,7 @@ void UeMap::CAGGCanvas::RenderRouteThroughtPoint( double skyLimit, short scaleLe
   unsigned int rt = IRoute::GetRoute()->GetPosition(onePos);
   if (rt == PEC_Success && onePos.m_pos.IsValid() && !onePos.m_isGPS)
   {
-    //
-    CGeoPoint<short> scrPoint;
-    m_view->Map2Scr(onePos.m_pos, scrPoint);
-    double x = scrPoint.m_x;
-    double y = scrPoint.m_y;
-    CAGGView::m_mtxPsp.transform(&x, &y);
-    scrPoint.m_x = static_cast<int>(x);
-    scrPoint.m_y = static_cast<int>(y);
-
-    //
-    CUePicture *onePicture = const_cast<CUePicture *>(m_view->GetUePicture(CViewHook::IT_GuiBegin + ITStartFLagOffset));
-    assert(onePicture);
-    onePicture->GetPicture(ITStartFLagOffset - 1);
-
-    CGeoRect<int> rect;
-    rect.m_minX = scrPoint.m_x - onePicture->GetRenderingSpec().m_cx/2;
-    rect.m_minY = scrPoint.m_y - onePicture->GetRenderingSpec().m_cy/2;
-    rect.m_maxX = scrPoint.m_x + onePicture->GetRenderingSpec().m_cx/2;
-    rect.m_maxY = scrPoint.m_y + onePicture->GetRenderingSpec().m_cy/2;
-    if(IsContained(rect) && scrPoint.m_y > skyLimit)
-    {
-      // Follow default rendering spec set by this CUePicture object
-      CPictureBasic::RenderingSpec spec;
-      spec.m_cx = 0;
-      spec.m_cy = 0;
-      spec.m_style = CPictureBasic::RS_Transparent;
-
-      onePicture->DirectDraw(m_bits, m_rows, m_bufWidth, m_bufHeight, scrPoint.m_x, scrPoint.m_y - onePicture->GetRenderingSpec().m_cy , 0, 0, spec);
-      if (scaleLevel < SCALE_500M)
-      {
-        // 绘制字体框
-        char info[1024] = {0,};
-        if(::strlen(onePos.m_name))
-        {
-          ::strcpy(info, onePos.m_name);
-        }
-        else
-        {
-          ::sprintf(info,"%s\n", "未命名");
-        }
-        CGeoPoint<long> pos;
-        pos.m_x = scrPoint.m_x;
-        pos.m_y = scrPoint.m_y;
-        RenderRoutePosition(0, onePos.m_pos, info);
-      }
-    }
+    RenderMainViewFlag(onePos, ITStartFLagOffset, skyLimit, scaleLevel);
   }
 
   // 渲染终点图标
@@ -6418,110 +6373,18 @@ void UeMap::CAGGCanvas::RenderRouteThroughtPoint( double skyLimit, short scaleLe
   rt = IRoute::GetRoute()->GetPosition(onePos);
   if(rt == PEC_Success && onePos.m_pos.IsValid() && !onePos.m_isGPS)
   {
-    //
-    CGeoPoint<short> scrPoint;
-    m_view->Map2Scr(onePos.m_pos, scrPoint);
-    double x = scrPoint.m_x;
-    double y = scrPoint.m_y;
-    CAGGView::m_mtxPsp.transform(&x, &y);
-    scrPoint.m_x = static_cast<int>(x);
-    scrPoint.m_y = static_cast<int>(y);
-
-    //
-    CUePicture *onePicture = const_cast<CUePicture *>(m_view->GetUePicture(CViewHook::IT_GuiBegin + ITEndFLagOffset));
-    assert(onePicture);
-    onePicture->GetPicture(ITEndFLagOffset - 1);
-
-    CGeoRect<int> rect;
-    rect.m_minX = scrPoint.m_x - onePicture->GetRenderingSpec().m_cx/2;
-    rect.m_minY = scrPoint.m_y - onePicture->GetRenderingSpec().m_cy/2;
-    rect.m_maxX = scrPoint.m_x + onePicture->GetRenderingSpec().m_cx/2;
-    rect.m_maxY = scrPoint.m_y + onePicture->GetRenderingSpec().m_cy/2;
-    if(IsContained(rect) && scrPoint.m_y > skyLimit)
-    {
-      // Follow default rendering spec set by this CUePicture object
-      CPictureBasic::RenderingSpec spec;
-      spec.m_cx = 0;
-      spec.m_cy = 0;
-      spec.m_style = CPictureBasic::RS_Transparent;
-
-      onePicture->DirectDraw(m_bits, m_rows, m_bufWidth, m_bufHeight, scrPoint.m_x, scrPoint.m_y - onePicture->GetRenderingSpec().m_cy, 0, 0, spec);
-      if(scaleLevel < SCALE_500M)
-      {
-        // 绘制字体框
-        char info[1024] = {0,};
-        if(::strlen(onePos.m_name))
-        {
-          ::strcpy(info, onePos.m_name);
-        }
-        else
-        {
-          ::sprintf(info,"%s\n", "未命名");
-        }
-        CGeoPoint<long> pos;
-        pos.m_x = scrPoint.m_x;
-        pos.m_y = scrPoint.m_y;
-        RenderRoutePosition(0, onePos.m_pos, info);
-      }
-    }
+    RenderMainViewFlag(onePos, ITEndFLagOffset, skyLimit, scaleLevel);
   }
 
-  //渲染经由点图标
-  int i = 1;
-  int count = IRoute::GetRoute()->GetPosCount() - 1;
+  //渲染经由点图标,去掉起点和终点，在position的中间。
   int wayPointCount = 0;
-  for(; i < count; i++)
+  for(int wayPointCount = 0; wayPointCount < IRoute::GetRoute()->GetPosCount() - 2; wayPointCount++)
   {
     onePos.m_type = PT_Middle;
-    rt = IRoute::GetRoute()->GetPosition(onePos, i);
+    rt = IRoute::GetRoute()->GetPosition(onePos, wayPointCount + 2);
     if(rt == PEC_Success && onePos.m_pos.IsValid())
     {
-      CGeoPoint<short> scrPoint;
-      m_view->Map2Scr(onePos.m_pos, scrPoint);
-      double x = scrPoint.m_x;
-      double y = scrPoint.m_y;
-      CAGGView::m_mtxPsp.transform(&x, &y);
-      scrPoint.m_x = static_cast<int>(x);
-      scrPoint.m_y = static_cast<int>(y);
-
-      //
-      CUePicture *onePicture = const_cast<CUePicture *>(m_view->GetUePicture(CViewHook::IT_GuiBegin + ITWayFLagBeginOffset + wayPointCount));
-      assert(onePicture);
-      onePicture->GetPicture(ITWayFLagBeginOffset + wayPointCount - 1);
-
-      CGeoRect<int> rect;
-      rect.m_minX = scrPoint.m_x - onePicture->GetRenderingSpec().m_cx/2;
-      rect.m_minY = scrPoint.m_y - onePicture->GetRenderingSpec().m_cy/2;
-      rect.m_maxX = scrPoint.m_x + onePicture->GetRenderingSpec().m_cx/2;
-      rect.m_maxY = scrPoint.m_y + onePicture->GetRenderingSpec().m_cy/2;
-      if(IsContained(rect) && scrPoint.m_y > skyLimit)
-      {
-        // Follow default rendering spec set by this CUePicture object
-        CPictureBasic::RenderingSpec spec;
-        spec.m_cx = 0;
-        spec.m_cy = 0;
-        spec.m_style = CPictureBasic::RS_Transparent;
-
-        onePicture->DirectDraw(m_bits, m_rows, m_bufWidth, m_bufHeight, scrPoint.m_x, scrPoint.m_y - onePicture->GetRenderingSpec().m_cy , 0, 0, spec);
-        if(scaleLevel < 3)
-        {
-          // 绘制字体框
-          char info[1024] = {0,};
-          if(::strlen(onePos.m_name))
-          {
-            ::strcpy(info, onePos.m_name);
-          }
-          else
-          {
-            ::strcpy(info, "未命名");
-          }
-          CGeoPoint<long> pos;
-          pos.m_x = scrPoint.m_x;
-          pos.m_y = scrPoint.m_y;
-          RenderRoutePosition(0, onePos.m_pos, info);
-        }
-      }
-      wayPointCount++;// 途经点数量标识自增
+      RenderMainViewFlag(onePos, ITWayFLagBeginOffset + wayPointCount, skyLimit, scaleLevel);
     }
   }
 }
@@ -8234,23 +8097,10 @@ void CAGGCanvas::RenderEagle(short scaleLevel, bool isRaster, bool is3d)
   {
     return;
   }
-
   m_poiRects.RemoveAll(false);
   m_nameRects.RemoveAll(false);
   m_drawnNames.RemoveAll(false);
 
-  // TODO:
-  // Should also consider the landscape or portrait screen mode
-  if(scaleLevel > 10)
-  {
-    m_drawnTolerance.m_x = 0;
-    m_drawnTolerance.m_y = 0;
-  }
-  else
-  {
-    m_drawnTolerance.m_x = 3;
-    m_drawnTolerance.m_y = 5;
-  }
   // Firstly render different polygons
   RenderAfnPolygons(scaleLevel, isRaster);
 
@@ -8271,7 +8121,11 @@ void CAGGCanvas::RenderEagle(short scaleLevel, bool isRaster, bool is3d)
   // Thirdly render road names
   RenderRoadName(scaleLevel, is3d, NT_Normal);
 
+  RenderEagleFlag();
+
   RenderRightScreenCarIcon();
+
+  RenderEagleSplit();
 }
 
 double CAGGCanvas::CaculateCarAngle()
@@ -8299,4 +8153,116 @@ void CAGGCanvas::RenderRightScreenCarIcon()
   double angle = CaculateCarAngle();
 
   RenderCarIcon(m_rightScreenCarPos.m_x, m_rightScreenCarPos.m_y, carIcon, angle);
+}
+
+void CAGGCanvas::RenderEagleSplit()
+{
+  const ScreenLayout& scrLayout = m_view->GetScrLayout(VT_Eagle);
+  agg::path_storage path;
+  path.move_to(0, scrLayout.m_extent.m_minY);
+  path.line_to(0, scrLayout.m_extent.m_maxY);
+  agg::conv_stroke<agg::path_storage> strokeLine(path);
+  strokeLine.width(3.0);
+  m_renderBin->color(agg::rgba(0, 0, 0));
+  m_scanRas.reset();
+  m_scanRas.add_path(strokeLine);
+  agg::render_scanlines(m_scanRas, m_binSL, *m_renderBin); 
+}
+
+void CAGGCanvas::RenderEagleFlag()
+{
+  CViewState *eagleView = m_view->GetState(VT_Eagle);
+  if (!eagleView)
+  {
+    return;
+  }
+  PlanPosition onePos;
+  onePos.m_type = PT_Start;
+  unsigned int rt = IRoute::GetRoute()->GetPosition(onePos);
+  if (rt == PEC_Success && onePos.m_pos.IsValid() && !onePos.m_isGPS)
+  {
+    RenderFlagPic(eagleView, onePos.m_pos, ITStartFLagOffset);
+  }
+
+  // 渲染终点图标
+  onePos.m_type = PT_End;
+  rt = IRoute::GetRoute()->GetPosition(onePos);
+  if(rt == PEC_Success && onePos.m_pos.IsValid() && !onePos.m_isGPS)
+  {
+    RenderFlagPic(eagleView, onePos.m_pos, ITEndFLagOffset);
+  }
+}
+
+void CAGGCanvas::RenderFlagPic(CViewState *curView, CGeoPoint<long> &pos, const int picNum)
+{
+  if (!curView || !pos.IsValid())
+  {
+    return;
+  }
+  CGeoPoint<short> scrPoint;
+  curView->Map2Scr(pos, scrPoint);
+  double x = scrPoint.m_x;
+  double y = scrPoint.m_y;
+  scrPoint.m_x = static_cast<int>(x);
+  scrPoint.m_y = static_cast<int>(y);
+  //
+  CUePicture *onePicture = const_cast<CUePicture *>(m_view->GetUePicture(CViewHook::IT_GuiBegin + picNum));
+  if (onePicture)
+  {
+    onePicture->GetPicture(picNum - 1);
+    CPictureBasic::RenderingSpec spec;
+    spec.m_style = CPictureBasic::RS_Transparent;
+    onePicture->DirectDraw(m_bits, m_rows, m_bufWidth, m_bufHeight, scrPoint.m_x, scrPoint.m_y - onePicture->GetRenderingSpec().m_cy , 0, 0, spec);
+  }
+}
+
+void CAGGCanvas::RenderMainViewFlag(PlanPosition& onePos, const int picNum, const double skyLimit, const short scaleLevel)
+{
+  if(onePos.m_pos.IsValid())
+  {
+    CUePicture *onePicture = const_cast<CUePicture *>(m_view->GetUePicture(CViewHook::IT_GuiBegin + picNum));
+    if (onePicture)
+    {
+      CGeoPoint<short> scrPoint;
+      m_view->Map2Scr(onePos.m_pos, scrPoint);
+      double x = scrPoint.m_x;
+      double y = scrPoint.m_y;
+      CAGGView::m_mtxPsp.transform(&x, &y);
+      scrPoint.m_x = static_cast<int>(x);
+      scrPoint.m_y = static_cast<int>(y);
+
+      onePicture->GetPicture(picNum - 1);
+
+      CGeoRect<int> rect;
+      rect.m_minX = scrPoint.m_x - onePicture->GetRenderingSpec().m_cx/2;
+      rect.m_minY = scrPoint.m_y - onePicture->GetRenderingSpec().m_cy/2;
+      rect.m_maxX = scrPoint.m_x + onePicture->GetRenderingSpec().m_cx/2;
+      rect.m_maxY = scrPoint.m_y + onePicture->GetRenderingSpec().m_cy/2;
+      if(IsContained(rect) && scrPoint.m_y > skyLimit)
+      {
+        // Follow default rendering spec set by this CUePicture object
+        CPictureBasic::RenderingSpec spec;
+        spec.m_style = CPictureBasic::RS_Transparent;
+
+        onePicture->DirectDraw(m_bits, m_rows, m_bufWidth, m_bufHeight, scrPoint.m_x, scrPoint.m_y - onePicture->GetRenderingSpec().m_cy , 0, 0, spec);
+        if (scaleLevel < SCALE_500M)
+        {
+          // 绘制字体框
+          char info[1024] = {0,};
+          if(::strlen(onePos.m_name))
+          {
+            ::strcpy(info, onePos.m_name);
+          }
+          else
+          {
+            ::sprintf(info,"%s\n", "未命名");
+          }
+          CGeoPoint<long> pos;
+          pos.m_x = scrPoint.m_x;
+          pos.m_y = scrPoint.m_y;
+          RenderRoutePosition(0, onePos.m_pos, info);
+        }
+      }
+    }
+  }
 }

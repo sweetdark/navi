@@ -154,7 +154,7 @@ bool CViewImpl::Attach(void *oneWnd, ScreenLayout &scrLayout)
   m_wnd = oneWnd;
 
   InitSrcLayout(scrLayout);
-  
+
   InitResolutionRatio();
 
   // Create memory DCs for different states
@@ -167,7 +167,7 @@ bool CViewImpl::Attach(void *oneWnd, ScreenLayout &scrLayout)
   InitState();
 
   AddDC(VT_Gui | DC_Whole);
-  
+
   //根据屏幕分辨率获取配置文件存放路径
   TCHAR path[CPathBasic::MAXPATHLENGTH] = {0, }; 
   //加载图片
@@ -182,7 +182,7 @@ bool CViewImpl::Attach(void *oneWnd, ScreenLayout &scrLayout)
   tstring hookPath = CPathConfig::GetResolutionPath(CPathConfig::RPK_HooksPath);
   ::lstrcpy(path, hookPath.c_str());
   ueMediator->SetHooksPath(path);
-    
+
 #if (__UE_WINCE__)
   m_isProductActivation = false;
   //判断产品是否激活，如果没有激活则弹出激活窗口
@@ -542,7 +542,7 @@ void CViewImpl::NextState()
         //
         CAGGView::m_scaleY = 1.5;
         CAGGView::m_maxPspVarious = 0.88;
-        
+
         //设置地图中心偏移量
         imageView->SetViewMoveOffset(0, PERSPECTIVEVIEW_OFFSET_PERCENT);
         SetViewPort(imageView, mapLayout, curScaleLevel, m_layoutSchema);
@@ -1193,7 +1193,7 @@ inline void CViewImpl::SetPickPos(const CGeoPoint<long> &pickPos, CGeoPoint<shor
 **/
 inline void CViewImpl::SetPickPos_NoRefresh(const CGeoPoint<long> &pickPos, CGeoPoint<short> &scrPoint)
 {
-	CViewCanvas::GetCanvas(CT_AGG)->SetPickPosition_NoRefresh(pickPos, scrPoint);
+  CViewCanvas::GetCanvas(CT_AGG)->SetPickPosition_NoRefresh(pickPos, scrPoint);
 }
 /**
 *
@@ -1337,7 +1337,7 @@ inline void CViewImpl::Refresh()
   int count = static_cast<int>(m_views.size());
   for(; i < count; i++)
   {
-  	m_views[i]->GetDC()->m_isRefresh = true;
+    m_views[i]->GetDC()->m_isRefresh = true;
   }
 
   //CTimerCommand::m_synObject.Lock();
@@ -1363,7 +1363,7 @@ inline void CViewImpl::RefreshUI(short type)
   {
     return;
   }
-  
+
   if (type == VT_Guidance)
   {
     i = 0;
@@ -1401,7 +1401,7 @@ inline void CViewImpl::RefreshUI(short type)
     }
   }
 
-  
+
 }
 
 /**
@@ -2120,32 +2120,40 @@ void CViewImpl::Update(short type)
   {
     // It let main view in maximum status but if current map hook is using QueryList or RouteList splitted window, it need
     // fixed view port
-    //m_needShowGuidanceView = true;
-    if(m_layoutSchema != LS_Full && m_layoutSchema != LS_Fix_Split)
+    //快接近目的地时,通知的类型就是ST_RenderLatest 导致鹰眼图关闭。
+    //但是停止导航时，调用的也是ST_RednderLatest。是需要关闭鹰眼图的。
+    if ((type & ST_RenderPathes) && IsNeedShowEagle())
     {
-      const MapLayout &mapLayout = curView->GetMapLayout();
-      int curScaleLevel = curView->m_curScaleLevel;
-      m_layoutSchema = LS_Full;
-      SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
+      ShowEagle(curView, type);
     }
-
-    // If it also contain ST_RenderGuidance
+    else 
     {
-      IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_FillGuidanceInfo);
-    }
-    if (type & ST_RenderLatest)
-    {
-      IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
-    }
-    
-    // If it re-route
-    if ((type & ST_RenderPathes))
-    {
-      //IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_ForRealGuidance);
-      //路线规划完成后会发出ST_RenderPathes类型通知，如果当前界面不是停留在Maphook则不刷新界面
-      if (CViewHook::m_curHookType != CViewHook::DHT_MapHook)
+      if(m_layoutSchema != LS_Full && m_layoutSchema != LS_Fix_Split)
       {
-        return;
+        const MapLayout &mapLayout = curView->GetMapLayout();
+        int curScaleLevel = curView->m_curScaleLevel;
+        m_layoutSchema = LS_Full;
+        SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
+      }
+
+      // If it also contain ST_RenderGuidance
+      {
+        IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_FillGuidanceInfo);
+      }
+      if (type & ST_RenderLatest)
+      {
+        IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
+      }
+
+      // If it re-route
+      if ((type & ST_RenderPathes))
+      {
+        //IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_ForRealGuidance);
+        //路线规划完成后会发出ST_RenderPathes类型通知，如果当前界面不是停留在Maphook则不刷新界面
+        if (CViewHook::m_curHookType != CViewHook::DHT_MapHook)
+        {
+          return;
+        }
       }
     }
   }
@@ -2172,7 +2180,7 @@ void CViewImpl::Update(short type)
       m_needShowGuidanceView = true;
       lastSndOrder = dirInfo.m_curOrderForSnd;
     }
-    
+
     m_needRenderGuidanceView = false;
     if(rt == PEC_Success)
     {
@@ -2205,8 +2213,8 @@ void CViewImpl::Update(short type)
     PosBasic gpsPos;
     MatchResult matchedPos;
     if (IMapMatch::GetMapMatch()->IsLive() && 
-        IMapMatch::GetMapMatch()->GetPos(gpsPos, matchedPos, false) == GEC_Success &&
-        IRoute::GetRoute()->GetPlanState() == UeRoute::PS_RealGuidance)
+      IMapMatch::GetMapMatch()->GetPos(gpsPos, matchedPos, false) == GEC_Success &&
+      IRoute::GetRoute()->GetPlanState() == UeRoute::PS_RealGuidance)
     {
       //IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_ForRealGuidance);
     }
@@ -2243,7 +2251,6 @@ void CViewImpl::Update(short type)
         else if (IsNeedShowEagle())
         {
           ShowEagle(curView, type);
-          IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_SplitMapHook);
         }
         else
         {
@@ -2260,7 +2267,6 @@ void CViewImpl::Update(short type)
       {
         m_needShowGuidanceView = true;
         ShowEagle(curView, type);
-        IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_SplitMapHook);
       }
       else
       {
@@ -2274,7 +2280,6 @@ void CViewImpl::Update(short type)
         }
       }
     }
-    
     return;
   }
   else if (type & ST_RenderCountDown)
@@ -2354,7 +2359,7 @@ CViewState *CViewImpl::ZoomInFull(CViewState *curView, GuidanceStatus &dirInfo)
     m_layoutSchema = LS_Full;
     SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
   }
-  
+
   if (!m_isScallingMapLock)
   {
     if (m_viewSettings.m_crossingAmplify)
@@ -2362,7 +2367,7 @@ CViewState *CViewImpl::ZoomInFull(CViewState *curView, GuidanceStatus &dirInfo)
       CCrossAssist::AdjustScaleWhenCross(curView, dirInfo, m_carInfo.m_headingDegree);
     }
   }
-  
+
   return curView;
 }
 
@@ -2375,21 +2380,21 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
 
   /*if(m_layoutSchema != LS_Split || m_layoutSchema != LS_Fix_Split)
   {
-    const MapLayout &mapLayout = curView->GetMapLayout();
-    int curScaleLevel = curView->m_curScaleLevel;
-    m_layoutSchema = ((type & ST_RenderPathes) && m_layoutSchema == LS_Full) ? LS_Full : LS_Split;
-    SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
+  const MapLayout &mapLayout = curView->GetMapLayout();
+  int curScaleLevel = curView->m_curScaleLevel;
+  m_layoutSchema = ((type & ST_RenderPathes) && m_layoutSchema == LS_Full) ? LS_Full : LS_Split;
+  SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
   }*/
-  
+
   ChangeViewPort(curView, type);
   // TODO:
   // The size should be configed by one CFG file
   EraseState(VT_Eagle);
   InitGuidanceView(curView);
   CGuidanceView *guidanceView = dynamic_cast<CGuidanceView *>(GetState(VT_Guidance));
-  
+
   if ((rt != PEC_Success && (m_layoutSchema == LS_Split || m_layoutSchema == LS_Fix_Split)) || 
-      (rt == UeRoute::PEC_Success && dirInfo.m_curDistForSnd  > 500 && m_layoutSchema == LS_Split || m_layoutSchema == LS_Fix_Split))
+    (rt == UeRoute::PEC_Success && dirInfo.m_curDistForSnd  > 500 && m_layoutSchema == LS_Split || m_layoutSchema == LS_Fix_Split))
   {
     // Back to full screen status
     const MapLayout &mapLayout = curView->GetMapLayout();
@@ -2413,7 +2418,7 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
         guidanceView->m_distForSnd = dirInfo.m_curDistForSnd;
         //if(guidanceView->m_orderForSnd != dirInfo.m_curOrderForSnd)
         {
-          
+
           GuidanceIndicator *oneIndicator = IRoute::GetRoute()->GetIndicator(dirInfo.m_curPair, dirInfo.m_curOrderForSnd);
           CGeoPoint<long> basePos = oneIndicator->m_vtxs[0];
           if (dirInfo.m_curOrderForSnd == 0)
@@ -2421,7 +2426,7 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
             oneIndicator = IRoute::GetRoute()->GetIndicator(dirInfo.m_curPair, dirInfo.m_curOrderForSnd + 1);
             CGeoPoint<long> basePos = oneIndicator->m_vtxs[0];
           }
-          
+
           GetCurRoundAboutCenter(dirInfo, basePos);
           //判断车是否在转弯点的附近
           MapLayout mapLayout;
@@ -2450,7 +2455,7 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
           CGuidanceView::m_curPair = dirInfo.m_curPair;
           CGuidanceView::m_curIndicator = dirInfo.m_curIndicator;
           guidanceView->m_curScaleLevel = 1; //路口放大图的比例尺
-          
+
         }
         //else
         //{
@@ -3044,7 +3049,6 @@ bool UeMap::CViewImpl::AutoScallingMap(bool isLock)
     CGeoPoint<short> endScrPos;
     mainView->Map2Scr(startPos.m_pos, startScrPos);
     mainView->Map2Scr(endPos.m_pos, endScrPos);
-    MapLayout layout = mainView->GetMapLayout();
     //TODO: 修改条件，判断起点、终点屏幕距离是否太近
     afterLevel = curLevel;
     while (startScrPos.m_x > 0 && startScrPos.m_y > 0 
@@ -3058,7 +3062,6 @@ bool UeMap::CViewImpl::AutoScallingMap(bool isLock)
       mainView->SwitchTo(afterLevel, 0);
       mainView->Map2Scr(startPos.m_pos, startScrPos);
       mainView->Map2Scr(endPos.m_pos, endScrPos);
-      layout = mainView->GetMapLayout();
     }
 
     while ( !IsAllPlanLineInScreen(route, mainView) )
@@ -3069,15 +3072,11 @@ bool UeMap::CViewImpl::AutoScallingMap(bool isLock)
         break;
       }
       mainView->SwitchTo(afterLevel, 0);
-      layout = mainView->GetMapLayout();
     }
 
     m_overViewScale = afterLevel;
     m_eagleLayout = mainView->GetMapLayout();
-    //if (mainView)
-    //{
-    //  mainView->GetScale(afterLevel, curScale);
-    //}
+
     if (curLevel != afterLevel)
     {
       mainView->ForColleguesByScaleLevel(curLevel);     
@@ -3099,7 +3098,7 @@ bool CViewImpl::IsAllPlanLineInScreen(IRoute *route, CViewState *view)
     return true;
   }
   int pairs = route->GetPairs();
-  
+
 
   std::vector<unsigned char> planTypeList;
   //多路径的话每一条路径都要判断
@@ -3113,7 +3112,7 @@ bool CViewImpl::IsAllPlanLineInScreen(IRoute *route, CViewState *view)
   {
     planTypeList.push_back(GetPlanMethodType());
   }
-  
+
   CGeoRect<short> scrExtent(0, 0, 0, 0);
   CGeoRect<long> mapExtent;
   view->GetMapExtent(scrExtent, mapExtent);
@@ -3148,10 +3147,10 @@ bool CViewImpl::IsAllPlanLineInScreen(IRoute *route, CViewState *view)
               CGeoPoint<short> oneCoord;
               if (view->Map2Scr(oneIndicator->m_vtxs[j], oneCoord))
               {
-                 if (!sreenLayout.m_extent.IsContain(oneCoord))
-                 {
-                   return false;
-                 }
+                if (!sreenLayout.m_extent.IsContain(oneCoord))
+                {
+                  return false;
+                }
               }
             }
           }
@@ -3223,7 +3222,7 @@ bool CViewImpl::IsRoundAbout(GuidanceStatus &dirInfo)
 {
   GuidanceIndicator *indicator = IRoute::GetRoute()->GetIndicator(dirInfo.m_curPair, dirInfo.m_curIndicator);
   if ((indicator->m_snd.m_infoCode == IVT_EnterRoundAbout) || indicator->m_roadForm == RF_Roundabout
-     || indicator->m_snd.m_infoCode == IVT_ExitRoundAbout)
+    || indicator->m_snd.m_infoCode == IVT_ExitRoundAbout)
   {
     return true;
   }
@@ -3434,22 +3433,26 @@ ScreenLayout CViewImpl::GetHalfScreenLayout(bool isPerspective)
 
 void CViewImpl::ShowEagle(CViewState *curView, const short renderType)
 {
-  ChangeViewPort(curView, renderType);
-
-  ScreenLayout scrLayout = GetHalfScreenLayout(false);
-  CViewState *eagleView = GetState(VT_Eagle);
-  if (!eagleView)
+  if ((renderType & ST_RenderPathes) || (renderType & ST_RenderGuidance))
   {
-    bool isLand = (GetScrMode() == SM_Land) ? true : false;
-    eagleView = CAGGView::GetState(VT_Eagle, isLand, this);
-    eagleView->SetScrLayout(scrLayout);
-    //因为变成了半屏所以比例尺再加
-    eagleView->m_curScaleLevel = m_overViewScale + 1;
-    MapLayout mapLayout = m_eagleLayout;
-    mapLayout.m_angle = 0.0;
-    mapLayout.m_scale = curView->m_scales[eagleView->m_curScaleLevel];
-    eagleView->SetMapLayout(mapLayout);
-    m_views.push_back(eagleView);
+    ChangeViewPort(curView, renderType);
+
+    ScreenLayout scrLayout = GetHalfScreenLayout(false);
+    CViewState *eagleView = GetState(VT_Eagle);
+    if (!eagleView)
+    {
+      bool isLand = (GetScrMode() == SM_Land) ? true : false;
+      eagleView = CAGGView::GetState(VT_Eagle, isLand, this);
+      eagleView->SetScrLayout(scrLayout);
+      //因为变成了半屏所以比例尺再加
+      eagleView->m_curScaleLevel = m_overViewScale + 1;
+      MapLayout mapLayout = m_eagleLayout;
+      mapLayout.m_angle = 0.0;
+      mapLayout.m_scale = curView->m_scales[eagleView->m_curScaleLevel];
+      eagleView->SetMapLayout(mapLayout);
+      m_views.push_back(eagleView);
+      IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_SplitMapHook);
+    }
   }
 }
 

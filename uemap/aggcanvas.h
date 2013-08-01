@@ -1255,6 +1255,14 @@ namespace UeMap
     void RenderSpecialText(short scaleLevel);
 
     int GetElementTextWidth(int elementWidth, TCHAR *uniText);
+
+    void RenderEagleSplit();
+
+    void RenderEagleFlag();
+
+    void RenderFlagPic(CViewState *curView, CGeoPoint<long> &pos, const int picNum);
+
+    void RenderMainViewFlag(PlanPosition& onePos, const int picNum, const double skyLimit, const short scaleLevel);
  
   protected:
     //
