@@ -170,7 +170,8 @@ void UeMap::CGuidanceView::DoDrawCross()
     short maxY = m_mapping.m_scrLayout.m_extent.m_maxY;
     // TODO: ...
     // Should know the order of hooks  
-    //裁剪非当前类型的并且是VS_FLOAT的view.如果鹰眼图则会有问题，鹰眼图也是VS_FLOAT而且区域与guidanceview相同。
+    //裁剪掉非当前类型的并且是VS_FLOAT的view的矩形边界.如果有鹰眼图则可能会有问题，鹰眼图也是VS_FLOAT而且区域与guidanceview相同。
+    //庆幸的是目前在容器中鹰眼图和放大图没有同时存在。
     /*CGeoRect<short> excludeRect;
     m_viewImpl->ExcludeRegions(dc, m_type, excludeRect);*/
 

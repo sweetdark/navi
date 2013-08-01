@@ -596,6 +596,10 @@ namespace UeMap
 
     ////显示电子眼-由UI去做，该函数暂时无用
     void RenderElecEye(bool is3D);
+    /**
+    * \brief 渲染鹰眼图
+    */
+    virtual void RenderEagle(short scaleLevel, bool isRaster, bool is3d);
   protected:
     //
     //
@@ -1033,6 +1037,15 @@ namespace UeMap
     */
     void RenderCrossProgress(GuidanceStatus &dirInfo, const CGeoRect<short> &scrExtent);
 
+    /**
+    * \brief 计算车标角度
+    */
+    double CaculateCarAngle();
+    /**
+    * \brief 画右半屏的车标
+    */
+    void RenderRightScreenCarIcon();
+
 #if __FOR_PC__
     /**
     * 
@@ -1314,7 +1327,7 @@ namespace UeMap
     tstring m_advVideoPath;
     tstring m_preFontFile;
     int m_preFont;
-
+    CGeoPoint<double> m_rightScreenCarPos;
 
 #if __FOR_PC__
     // DirectShow interfaces

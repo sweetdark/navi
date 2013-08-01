@@ -91,6 +91,7 @@ namespace UeMap
     friend class CViewImpl;
     friend class CGuidanceView;
     friend class CPanCommand;
+    friend class CEagleView;
 
   public:
     //

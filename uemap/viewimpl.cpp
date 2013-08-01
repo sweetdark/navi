@@ -2242,7 +2242,7 @@ void CViewImpl::Update(short type)
         }
         else if (IsNeedShowEagle())
         {
-          ShowEagle(curView);
+          ShowEagle(curView, type);
           IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_SplitMapHook);
         }
         else
@@ -2259,7 +2259,7 @@ void CViewImpl::Update(short type)
       else if (IsNeedShowEagle())
       {
         m_needShowGuidanceView = true;
-        ShowEagle(curView);
+        ShowEagle(curView, type);
         IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_SplitMapHook);
       }
       else
@@ -2373,14 +2373,15 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
 {
   // Prepare splitted view port and if it already in splitted mode, it no needs to ...
 
-  if(m_layoutSchema != LS_Split || m_layoutSchema != LS_Fix_Split)
+  /*if(m_layoutSchema != LS_Split || m_layoutSchema != LS_Fix_Split)
   {
     const MapLayout &mapLayout = curView->GetMapLayout();
     int curScaleLevel = curView->m_curScaleLevel;
     m_layoutSchema = ((type & ST_RenderPathes) && m_layoutSchema == LS_Full) ? LS_Full : LS_Split;
     SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
-  }
+  }*/
   
+  ChangeViewPort(curView, type);
   // TODO:
   // The size should be configed by one CFG file
   EraseState(VT_Eagle);
@@ -3431,15 +3432,10 @@ ScreenLayout CViewImpl::GetHalfScreenLayout(bool isPerspective)
   return scrLayout;
 }
 
-void CViewImpl::ShowEagle(CViewState *curView)
+void CViewImpl::ShowEagle(CViewState *curView, const short renderType)
 {
-  if(m_layoutSchema != LS_Split || m_layoutSchema != LS_Fix_Split)
-  {
-    const MapLayout &mapLayout = curView->GetMapLayout();
-    int curScaleLevel = curView->m_curScaleLevel;
-    m_layoutSchema =  LS_Split;
-    SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
-  }
+  ChangeViewPort(curView, renderType);
+
   ScreenLayout scrLayout = GetHalfScreenLayout(false);
   CViewState *eagleView = GetState(VT_Eagle);
   if (!eagleView)
@@ -3447,14 +3443,23 @@ void CViewImpl::ShowEagle(CViewState *curView)
     bool isLand = (GetScrMode() == SM_Land) ? true : false;
     eagleView = CAGGView::GetState(VT_Eagle, isLand, this);
     eagleView->SetScrLayout(scrLayout);
-    //必须是2的n次方
+    //因为变成了半屏所以比例尺再加
     eagleView->m_curScaleLevel = m_overViewScale + 1;
     MapLayout mapLayout = m_eagleLayout;
-    //mapLayout.m_angle = 0.0;
-    mapLayout.m_scale = curView->m_scales[eagleView->m_curScaleLevel]; 
-    //设置偏移量
-    //eagleView->SetViewMoveOffset(0, 0);
+    mapLayout.m_angle = 0.0;
+    mapLayout.m_scale = curView->m_scales[eagleView->m_curScaleLevel];
     eagleView->SetMapLayout(mapLayout);
     m_views.push_back(eagleView);
+  }
+}
+
+void CViewImpl::ChangeViewPort(CViewState *curView, const short renderType)
+{
+  if(m_layoutSchema != LS_Split || m_layoutSchema != LS_Fix_Split)
+  {
+    const MapLayout &mapLayout = curView->GetMapLayout();
+    int curScaleLevel = curView->m_curScaleLevel;
+    m_layoutSchema = ((renderType & ST_RenderPathes) && m_layoutSchema == LS_Full) ? LS_Full : LS_Split;
+    SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
   }
 }

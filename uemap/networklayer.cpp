@@ -110,7 +110,7 @@ void CNetworkLayer::Draw(short type, const CViewDC *viewDC, CGeoRect<short> &scr
 
   //
   CGeoRect<int> clipExtent;
-  if(type == VT_Guidance || type == VT_Eagle)
+  if(type == VT_Guidance)
   {
     clipExtent.m_minX = 5;
     clipExtent.m_maxX = curView->m_mapping.m_scrLayout.m_extent.Width() - 5;

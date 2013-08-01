@@ -100,7 +100,6 @@ namespace UeMap
     friend class CAGGView;
     friend class CImageView;
     friend class CGuidanceView;
-    friend class CEagleView;
 
     friend class CViewLayer;
     friend class CGroundLayer;
@@ -847,7 +846,9 @@ namespace UeMap
 
     ScreenLayout GetHalfScreenLayout(bool isPerspective);
 
-    void ShowEagle(CViewState *curView);
+    void ShowEagle(CViewState *curView, const short renderType);
+
+    void ChangeViewPort(CViewState *curView, const short renderType);
   protected:
     // Belonged window
     void *m_wnd;
