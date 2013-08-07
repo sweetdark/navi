@@ -35,6 +35,7 @@ namespace UeGui
   */
   class UEGUI_CLASS CRouteSettingHook : public CAggHook
   {
+    friend class CNavigationLeftHook;
   public:
     /**
     *
@@ -42,57 +43,32 @@ namespace UeGui
     enum RouteSettingCtrlType
     {
       RouteSettingHook_Begin = 0,
-
-      RouteSettingHook_Map,
-      RouteSettingHook_Previous,
-
       RouteSettingHook_Optimum,
-      RouteSettingHook_OptimumLeft,
       RouteSettingHook_OptimumIcon,
-      RouteSettingHook_OptimumRight,
-      
-      RouteSettingHook_Normal,
-      RouteSettingHook_NormalLeft,
-      RouteSettingHook_NormalIcon,
-      RouteSettingHook_NormalRight,
 
       RouteSettingHook_Highway,
-      RouteSettingHook_HighwayLeft,
-      RouteSettingHook_HighwayIcon,
-      RouteSettingHook_HighwayRight,
+      RouteSettingHook_HighwayIcon,      
 
+      RouteSettingHook_Economy,
+      RouteSettingHook_EconomyIcon,
+
+      RouteSettingHook_Shortest,
+      RouteSettingHook_ShortestIcon,
+      
       RouteSettingHook_AvoidHighway,
-      RouteSettingHook_AvoidHighwayLeft,
       RouteSettingHook_AvoidHighwayIcon,
-      RouteSettingHook_AvoidHighwayRight,
 
-      RouteSettingHook_AvoidRisk,
-      RouteSettingHook_AvoidRiskLeft,
-      RouteSettingHook_AvoidRiskIcon,
-      RouteSettingHook_AvoidRiskRight,
+      RouteSettingHook_AvoidBoat,
+      RouteSettingHook_AvoidBoatIcon,
 
-      RouteSettingHook_AvoidFerry,
-      RouteSettingHook_AvoidFerryLeft,
-      RouteSettingHook_AvoidFerryIcon,
-      RouteSettingHook_AvoidFerryRight,
-
-      RouteSettingHook_AvoidOverPass,
-      RouteSettingHook_AvoidOverPassLeft,
-      RouteSettingHook_AvoidOverPassIcon,
-      RouteSettingHook_AvoidOverPassRight,
-
+      RouteSettingHook_RouteType,
+      RouteSettingHook_AvoidLabel,
       RouteSettingHook_End,
     };
 
   public:
-    /**
-    * \brief 默认构造函数
-    */
     CRouteSettingHook();
 
-    /**
-    * \brief 析构函数
-    */
     virtual ~CRouteSettingHook();
   public:
     /**
@@ -120,7 +96,7 @@ namespace UeGui
     */
     virtual bool operator ()();
 
-    virtual void Load();
+    //virtual void Load();
   protected:
     /**
     *
@@ -137,7 +113,7 @@ namespace UeGui
     void MakeControls();
 
     //
-    void Init();
+    void ReadSetting();
 
     void Restore();
 
@@ -159,18 +135,13 @@ namespace UeGui
     //
     UeBase::RouteSettings m_settings;
 
-    // Top Button
-    CUiButton m_mapCtrl;
-    CUiButton m_previousCtrl;
-
     CUiRadioButton m_optimumCtrl;
-    CUiRadioButton m_normalCtrl;
     CUiRadioButton m_highwayCtrl;
+    CUiRadioButton m_economyCtrl;
+    CUiRadioButton m_shortestCtrl;
 
     CUiCheckButton m_avoidHighwayCtrl;
-    CUiCheckButton m_avoidRiskCtrl;
-    CUiCheckButton m_avoidFerryCtrl;
-    CUiCheckButton m_avoidOverPassCtrl;
+    CUiCheckButton m_avoidBoatCtrl;
   };
 }
 

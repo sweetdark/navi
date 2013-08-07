@@ -326,6 +326,12 @@ namespace UeMap
       DHT_RoundSelectionHook          = 0x130A,
       //Q码输入界面
       DHT_QCodeInputHook              = 0x130B,
+      //地址簿查询界面
+      DHT_QueryAddressBookHook        = 0x130C,
+      //历史记录查询界面
+      DHT_QueryHistoryHook            = 0x130D,
+      //历史输入选择界面
+      DHT_InputSelectHook             = 0x130E,
       DHT_Outside					            = 0x2010,
     };
 

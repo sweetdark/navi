@@ -5,6 +5,10 @@
 #include "uegui.h"
 #endif
 
+#ifndef _UEQUERY_CODEINDEXCTRL_H
+#include "uequery/codeindexctrl.h"
+#endif
+
 #include "uequery/uerecord.h"
 
 #include "menubackgroundhook.h"
@@ -79,6 +83,8 @@ namespace UeGui
 
     virtual void UnLoad();
 
+    void SetQueryTypeInfo(TCodeEntry *tcodeEntry);
+
   protected:
 
     virtual void MakeNames();
@@ -111,6 +117,8 @@ namespace UeGui
     CUeRecord* m_pRecord;
 
     PointList m_pointList;
+
+    TCodeEntry m_tCodeEntry;
   };
 }
 #endif

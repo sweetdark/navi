@@ -27,6 +27,7 @@ void CTypeInDistQueryListHook::Load()
 {
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
   m_distSwitchBtn.SetCaption(queryWrapper.GetQueryAdmName());
+  queryWrapper.SetQueryKindInfo(m_tCodeEntry);
   queryWrapper.GetQueryKindName(m_typeSelectBtn.GetCaption());
   SearchForResult();
 }
@@ -351,4 +352,9 @@ void CTypeInDistQueryListHook::DoDistSwitchCallBack(const SQLRecord *pResult)
   ::strcpy(codeEntry.m_chName, pResult->m_asciiName);
   CQueryWrapper::Get().SetQueryAdmInfo(codeEntry);
   Load();
+}
+
+void CTypeInDistQueryListHook::SetQueryTypeInfo(TCodeEntry *tcodeEntry)
+{
+  ::memcpy(&m_tCodeEntry, tcodeEntry, sizeof(TCodeEntry));
 }

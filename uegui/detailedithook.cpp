@@ -1,10 +1,9 @@
 #include "detailedithook.h"
 //#include "InputHook.h"
 #include "myaddressbookhook.h"
-#include "guisetting.h"
 //#include "InputSwitchHook.h"
 #include "myinformationhook.h"
-#include "guisetting.h"
+#include "settingwrapper.h"
 #include "messagedialoghook.h"
 
 using namespace UeGui;
@@ -472,11 +471,8 @@ void UeGui::CDetailEditHook::DoRecordPosition(int n)
 bool UeGui::CDetailEditHook::SaveFavoriteEntryData( const FavoriteEntry& data )
 {
   int maxDataCount = 0;
-  CGuiSettings* guiSetting = CGuiSettings::GetGuiSettings();
-  if (guiSetting)
-  {
-    maxDataCount = guiSetting->GetAddressBookCapacity();
-  }
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+  maxDataCount = settingWrapper.GetAddressBookCapacity();
   maxDataCount = 10;
   UeQuery::SQLSetting setting;
   m_query->ConnectTo(UeQuery::DT_Favorite, setting);

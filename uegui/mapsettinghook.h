@@ -50,6 +50,8 @@ namespace UeGui
     virtual void MakeGUI();
 
     virtual bool operator ()();
+  
+    virtual void UnLoad();
 
     void ReadSetting();
 

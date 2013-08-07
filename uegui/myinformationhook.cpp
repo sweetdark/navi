@@ -1,7 +1,7 @@
 #include "myinformationhook.h"
 #include "myaddressbookhook.h"
 #include "myjourneyhook.h"
-#include "guisetting.h"
+#include "settingwrapper.h"
 #include "guioperationright.h"
 #include "userdatawrapper.h"
 
@@ -292,8 +292,8 @@ short CMyInformationHook::MouseUp(CGeoPoint<short> &scrPoint)
       if ((ctrlType == m_downElementType) && (m_threeBtnCtrl.IsEnable()))
       {
         //从配置中读取我的行程容量上限
-        CGuiSettings* ueSettings = CGuiSettings::GetGuiSettings();
-        size_t maxCapacity = ueSettings->GetMyJourneyCapacity();
+        CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+        size_t maxCapacity = settingWrapper.GetMyJourneyCapacity();
 
         /*CViewHook::m_prevHookType = CViewHook::m_curHookType;
         CViewHook::m_curHookType = CViewHook::DHT_MyJourneyHook;*/

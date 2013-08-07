@@ -92,14 +92,19 @@ void UeBase::CUeSettingsIO::ReWriteFile()
   SettingsHeader header = {};
   // 地图设置
   ViewSettings viewSettings;
+  viewSettings.Restore();
   // 声音设置
   VoiceSettings voiceSettings;
+  voiceSettings.Restore();
   // 路线设置
   RouteSettings routeSettings;
+  routeSettings.Restore();
   // 系统设置
   SystemSettings systemSettings;
+  systemSettings.Restore();
   // 查询设置
   QuerySettings querySettings;
+  querySettings.Restore();
   // 容量数据
   CapacityInfo capacityInfo;
 

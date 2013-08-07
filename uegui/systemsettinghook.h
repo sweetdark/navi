@@ -52,6 +52,10 @@ namespace UeGui
 
     virtual void Init();
 
+    void Load();
+
+    void DoReturn();
+
   protected:
 
     virtual void MakeNames();
@@ -59,6 +63,10 @@ namespace UeGui
     void MakeControls();
 
   private:
+    TabPageType m_active;
+
+    void SetTabStatus(TabPageType, bool);
+
     void SwitchTabPage(unsigned short type);
 
   private:

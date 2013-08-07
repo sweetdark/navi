@@ -11,8 +11,8 @@
 
 //#include "uilabel.h"
 #include "uibutton.h"
-//#include "uiradiobutton.h"
-//#include "uicheckbutton.h"
+#include "uiradiobutton.h"
+#include "uicheckbutton.h"
 
 namespace UeGui
 {
@@ -28,12 +28,15 @@ namespace UeGui
     {
       navimapsettinghook_Begin = 0,
       navimapsettinghook_NaviMapLabel,
+
       navimapsettinghook_AutoZoomBtn,
       navimapsettinghook_AutoZoomIcon,
       navimapsettinghook_AutoZoomLabel,
+
       navimapsettinghook_DirectCompassBtn,
       navimapsettinghook_DirectCompassIcon,
       navimapsettinghook_DirectCompassLabel,
+
       navimapsettinghook_IntersectionPicBtn,
       navimapsettinghook_IntersectionPicIcon,
       navimapsettinghook_IntersectionPicLabel,
@@ -51,6 +54,10 @@ namespace UeGui
     virtual bool operator ()();
 
   protected:
+    void SaveSetting();
+
+    void ReadSetting();
+
     virtual tstring GetBinaryFileName();
 
     virtual void MakeNames();
@@ -58,14 +65,17 @@ namespace UeGui
     void MakeControls();
 
   private:
-    CUiBitButton m_autoZoomCtrl;
+    CUiCheckButton m_autoZoomCtrl;
     CUiLabel m_autoZoomLabelCtrl;
+    bool m_changeAuto;
 
-    CUiBitButton m_directCompassCtrl;
+    CUiRadioButton m_directCompassCtrl;
     CUiLabel m_directCompassLabelCtrl;
+    bool m_changeCompass;
 
-    CUiBitButton m_intersectionPicCtrl;
+    CUiRadioButton m_intersectionPicCtrl;
     CUiLabel m_intersectionPicLabelCtrl;
+    bool m_changeIntersection;
   };
 }
 #endif

@@ -31,6 +31,8 @@ namespace UeGui
     virtual ~CSystemLeftHook();
 
     void SwitchTabPage(unsigned short type);
+    //»Ö¸´Ä¬ÈÏ
+    void Reset();
 
   public:
     enum systemlefthookCtrlType
@@ -55,13 +57,23 @@ namespace UeGui
 
     virtual void MakeGUI();
 
+    virtual void Init();
+
+    void DoReturn();
+
+    virtual void UnLoad();
+
   protected:
+    void SetTabStatus(systemlefthookCtrlType, bool);
+
     virtual tstring GetBinaryFileName();
 
     virtual void MakeNames();
 
     void MakeControls();
   private:
+    systemlefthookCtrlType m_active;
+
     CMapSettingHook *m_mapSetting;
     CCarSettingHook *m_carSetting;
     CVoiceSettingHook *m_soundSetting;
@@ -75,3 +87,4 @@ namespace UeGui
   };
 }
 #endif
+

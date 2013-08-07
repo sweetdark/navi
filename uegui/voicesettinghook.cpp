@@ -26,77 +26,31 @@ void CVoiceSettingHook::MakeGUI()
   MakeControls();
 
   Set_VDialect();
-
-  //初始化系统音量
-  CGuiSettings* setting= CGuiSettings::GetGuiSettings();
-  if (setting->IsLoudSpeakerMute())
-  {
-    setting->SetVoice(0);
-  }
-  else
-  {
-    unsigned int voice = setting->GetVoice();
-    setting->SetVoice(voice);
-  }
 }
 
-//void CVoiceSettingHook::Load()
-//{
-//  //获取系统设置  
-//  CGuiSettings* setting= CGuiSettings::GetGuiSettings();
-//  if (setting->IsLoudSpeakerMute())
-//  {
-//    m_silenceBtn.SetCheck(true);
-//    SetVolumeBar(0);
-//  }
-//  else
-//  {
-//    m_silenceBtn.SetCheck(false);        
-//    SetVolumeBar(setting->GetVoice());
-//  }
-//
-//  //设置语言
-//  m_initDialectType = (DialectType)setting->GetLanguage();
-//  m_route->GetGuider()->SetRole((UETTS_Role)m_initDialectType);
-//  m_dialectCtrl.SetCaption(m_dialectMap[m_initDialectType].c_str());
-//
-//  //设置按键音
-//  unsigned char value = setting->GetVoicePrompt();
-//  if((value & SystemSettings::VT_KeyVoice) > 0)
-//  {
-//    m_keytoneCheckBtn.SetCheck(true);
-//    m_isKeytoneCheck = true;
-//  } 
-//  else
-//  {
-//    m_keytoneCheckBtn.SetCheck(false);
-//    m_isKeytoneCheck = false;
-//  }
-//
-//  //设置动态音
-//  if ((value & SystemSettings::VT_DynamicVoice) > 0)
-//  {
-//    m_dynamicVolumeCheckBtn.SetCheck(true);
-//    m_isDynamicVolumeCheck = true;
-//  } 
-//  else
-//  {
-//    m_dynamicVolumeCheckBtn.SetCheck(false);
-//    m_isDynamicVolumeCheck = false;
-//  }
-//
-//  //判断是否静音
-//  if (setting->IsLoudSpeakerMute())
-//  {
-//    m_silenceBtn.SetCheck(true);
-//    SetControls(false);//控件不能用
-//  }
-//  else
-//  {
-//    m_silenceBtn.SetCheck(false);
-//    SetControls(true);
-//  }
-//}
+void CVoiceSettingHook::ReadSetting()
+{
+  //获取系统设置  
+  CSettingWrapper& settingWrapper = CSettingWrapper::Get();
+  //设置语言
+  m_initDialectType = (DialectType)settingWrapper.GetLanguage();
+  m_route->GetGuider()->SetRole((UETTS_Role)m_initDialectType);
+  m_voiceCenterCtrl.SetCaption(m_dialectMap[m_initDialectType].c_str());
+  SwitchVoicePageInfo();
+
+  //设置动态音
+  unsigned char value = settingWrapper.GetVoicePrompt();
+  if ((value & SystemSettings::VT_DynamicVoice) > 0)
+  {
+    m_dynamicVoiceCtrl.SetCheck(true);
+    m_isDynamicVolumeCheck = true;
+  } 
+  else
+  {
+    m_dynamicVoiceCtrl.SetCheck(false);
+    m_isDynamicVolumeCheck = false;
+  }
+}
 tstring CVoiceSettingHook::GetBinaryFileName()
 {
   return _T("voicesettinghook.bin");
@@ -166,24 +120,29 @@ short CVoiceSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
   case VoiceSettingHook_DynamicVoiceLabel:
     {
       m_dynamicVoiceCtrl.MouseDown();
-      m_dynamicVoiceLabelCtrl.MouseDown();
+      m_dynamicVoiceLabelCtrl.MouseDown();      
+      AddRenderUiControls(&m_dynamicVoiceCtrl);
+      AddRenderUiControls(&m_dynamicVoiceLabelCtrl);
     }
     break;
   case VoiceSettingHook_VoiceLeftBtn:
   case VoiceSettingHook_VoiceLeftIcon:
     {
       m_voiceLeftCtrl.MouseDown();
+      AddRenderUiControls(&m_voiceLeftCtrl);
     }
     break;
   case VoiceSettingHook_VoiceRightBtn:
   case VoiceSettingHook_VoiceRightIcon:
     {
       m_voiceRightCtrl.MouseDown();
+      AddRenderUiControls(&m_voiceRightCtrl);
     }
     break;
   case VoiceSettingHook_TestListenBtn:
     {
       m_testListenCtrl.MouseDown();
+      AddRenderUiControls(&m_testListenCtrl);
     }
     break;
   default:
@@ -209,34 +168,50 @@ short CVoiceSettingHook::MouseMove(CGeoPoint<short> &scrPoint)
 short CVoiceSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
 {
   short upElementType = CAggHook::MouseUp(scrPoint);
-  CGuiSettings* setting = CGuiSettings::GetGuiSettings();
-  //bool canSet = (upElementType == m_downElementType) && (!m_silenceBtn.Checked());
-
+  CSettingWrapper& settingWrapper = CSettingWrapper::Get();
   switch(upElementType)
   {
   case VoiceSettingHook_DynamicVoiceBtn:
   case VoiceSettingHook_DynamicVoiceIcon:
   case VoiceSettingHook_DynamicVoiceLabel:
     {
-      m_dynamicVoiceCtrl.MouseDown();
-      m_dynamicVoiceLabelCtrl.MouseDown();
+      m_dynamicVoiceCtrl.MouseUp();
+      m_dynamicVoiceLabelCtrl.MouseUp();
+      if (upElementType == m_downElementType)
+      {        
+        m_isDynamicVolumeCheck = m_isDynamicVolumeCheck?false:true;
+        m_dynamicVoiceCtrl.SetCheck(m_isDynamicVolumeCheck);
+      }
     }
     break;
   case VoiceSettingHook_VoiceLeftBtn:
   case VoiceSettingHook_VoiceLeftIcon:
     {
-      m_voiceLeftCtrl.MouseDown();
+      m_voiceLeftCtrl.MouseUp();
+      if (upElementType == m_downElementType && m_voiceLeftCtrl.IsEnable())
+      {
+        --m_initDialectType;
+        m_voiceCenterCtrl.SetCaption(m_dialectMap[m_initDialectType].c_str());
+        SwitchVoicePageInfo();
+      } 
     }
     break;
   case VoiceSettingHook_VoiceRightBtn:
   case VoiceSettingHook_VoiceRightIcon:
     {
-      m_voiceRightCtrl.MouseDown();
+      m_voiceRightCtrl.MouseUp();
+      if (upElementType == m_downElementType && m_voiceRightCtrl.IsEnable())
+      {
+        ++m_initDialectType;
+        m_voiceCenterCtrl.SetCaption(m_dialectMap[m_initDialectType].c_str());
+        SwitchVoicePageInfo();
+      }      
     }
     break;
   case VoiceSettingHook_TestListenBtn:
     {
-      m_testListenCtrl.MouseDown();
+      m_testListenCtrl.MouseUp();
+      PlaySounds();
     }
     break;
   default:
@@ -249,6 +224,7 @@ short CVoiceSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
   if (m_isNeedRefesh)
   {
     Refresh();
+    SaveSetting();
   }
   m_isNeedRefesh = true;
   return upElementType;
@@ -272,46 +248,25 @@ void CVoiceSettingHook::Set_VDialect()
 
 void CVoiceSettingHook::SaveSetting()
 {
-  //CGuiSettings* settingIO= CGuiSettings::GetGuiSettings();
-  //if(settingIO) {
-  //  CMapHook* mapHook = dynamic_cast<CMapHook*>(m_view->GetHook(DHT_MapHook));
-  //  //设置静音
-  //  if(m_silenceBtn.Checked()) 
-  //  {
-  //    settingIO->SetIsLoudSpeakerMute(true);  //静音
-  //    mapHook->SetSlience(true);
-  //  }
-  //  else
-  //  {
-  //    settingIO->SetIsLoudSpeakerMute(false);  //非静音
-  //    mapHook->SetSlience(false);
-  //  }
+  CSettingWrapper& settingWrapper = CSettingWrapper::Get();
+  //设置按键音和动态音
+  unsigned char value = 0;
+  if (m_dynamicVoiceCtrl.Checked())
+  {
+    value |= SystemSettings::VT_DynamicVoice;
+  }
+  settingWrapper.SetVoicePrompt(value);
 
-  //  //设置按键音和动态音
-  //  unsigned char value = 0;
-  //  if (m_keytoneCheckBtn.Checked())
-  //  {
-  //    value |= SystemSettings::VT_KeyVoice;
-  //  }
-  //  if (m_dynamicVolumeCheckBtn.Checked())
-  //  {
-  //    value |= SystemSettings::VT_DynamicVoice;
-  //  }
-  //  settingIO->SetVoicePrompt(value);
-
-  //  //设置语言
-  //  settingIO->SetLanguage(m_initDialectType);
-  //  m_route->GetGuider()->SetRole((UETTS_Role)m_initDialectType);
-
-  //  settingIO->SaveAllSettings();
-  //}
+  //设置语言
+  settingWrapper.SetLanguage(m_initDialectType);
+  m_route->GetGuider()->SetRole((UETTS_Role)m_initDialectType);
+  settingWrapper.SaveAllSettings();
 }
 
 void CVoiceSettingHook::PlaySounds() 
 {
   UeRoute::UeSound snd;
   snd.m_priority = 0;
-  //snd.Add(UeRoute::IVT_ReRoute);
   snd.Add("欢迎使用道道通导航系统", ::strlen("欢迎使用道道通导航系统"),  IVT_TTS);
   m_route->GetGuider()->PlayVoice(snd);
 }
@@ -379,19 +334,19 @@ void UeGui::CVoiceSettingHook::ChangeVolumeBarStatus( unsigned short id, bool st
 
 void UeGui::CVoiceSettingHook::SaveSoundSetting( int soundSize, bool isLoudSpeakerMute )
 {
-  CGuiSettings* setting = CGuiSettings::GetGuiSettings();
-  if (setting->IsLoudSpeakerMute() | isLoudSpeakerMute)
+  CSettingWrapper& settingWrapper = CSettingWrapper::Get();
+  if (settingWrapper.IsLoudSpeakerMute() | isLoudSpeakerMute)
   {
     m_changeSetting = true;
-    setting->SetIsLoudSpeakerMute(isLoudSpeakerMute);    
+    settingWrapper.SetIsLoudSpeakerMute(isLoudSpeakerMute);    
   }
 
   if (!isLoudSpeakerMute)
   {
-    if (setting->GetVoice() != soundSize)
+    if (settingWrapper.GetVoice() != soundSize)
     {
       m_changeSetting = true;
-      setting->SetVoice(soundSize);
+      settingWrapper.SetVoice(soundSize);
     }    
   }
 }
@@ -416,4 +371,25 @@ void UeGui::CVoiceSettingHook::SetControls( bool isEnable )
   {
     m_dialectCtrlRight.SetEnable(false);
   }*/
+}
+void UeGui::CVoiceSettingHook::SwitchVoicePageInfo()
+{
+  m_voiceLeftCtrl.SetEnable(false);
+  m_voiceRightCtrl.SetEnable(false);
+  if (m_initDialectType >= m_dialectMap.size()-1)
+  {
+    m_voiceRightCtrl.SetEnable(false);
+  }
+  else
+  {
+    m_voiceRightCtrl.SetEnable(true);
+  }
+  if (m_initDialectType <= 0)
+  {
+    m_voiceLeftCtrl.SetEnable(false);
+  }
+  else
+  {
+    m_voiceLeftCtrl.SetEnable(true);
+  }
 }

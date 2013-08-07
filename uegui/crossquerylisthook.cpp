@@ -248,10 +248,18 @@ void CCrossQueryListHook::ResetResultList()
   m_pageUpBtn.SetEnable(m_records.CanUp());
   m_pageDownBtn.SetEnable(m_records.CanDown());
 
-  char* curPage = m_curPageInfo.GetCaption();
-  char* totalPage = m_totalPageInfo.GetCaption();
-  ::sprintf(curPage,"%d",m_records.GetCurPage());
-  ::sprintf(totalPage,"%d",m_records.GetTotalPage());
-  m_curPageInfo.SetCaption(curPage);
-  m_totalPageInfo.SetCaption(totalPage);
+  if (m_records.GetTotalPage() == 0)
+  {
+    m_curPageInfo.SetCaption("0");
+    m_totalPageInfo.SetCaption("0");
+  }
+  else
+  {
+    char* curPage = m_curPageInfo.GetCaption();
+    char* totalPage = m_totalPageInfo.GetCaption();
+    ::sprintf(curPage,"%d",m_records.GetCurPage());
+    ::sprintf(totalPage,"%d",m_records.GetTotalPage());
+    m_curPageInfo.SetCaption(curPage);
+    m_totalPageInfo.SetCaption(totalPage);
+  }
 }

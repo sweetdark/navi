@@ -112,7 +112,6 @@ namespace UeGui
       MapHook_GuideInfoRightBack,
       MapHook_GuideInfoRightIcon,
       MapHook_GuideInfoRightLabe,
-      MapHook_OtherIcon,
       MapHook_ElecEyeBack,
       MapHook_ElecEyeIcon,
       MapHook_ElecEyeProgressBar,
@@ -129,6 +128,8 @@ namespace UeGui
       MapHook_ElecEyeIconType_11,
       MapHook_ElecEyeIconType_12,
       MapHook_ElecEyeIconType_13,
+      MapHook_OtherIcon1,
+      MapHook_OtherIcon2,
       MapHook_End
     };
     //地图界面操作类型
@@ -163,6 +164,16 @@ namespace UeGui
     {
       Plan_Single,   //单路径规划
       Plan_Multiple  //多路径规划
+    };
+    //屏幕模式
+    enum ScreenMode
+    {
+      SM_None,          //无选择
+      SM_DoubleScreen,  //双屏模式
+      SM_EagelView,     //鹰眼图
+      SM_RouteGuidance, //后续路口
+      SM_HighWayBoard,  //高速看板
+      SM_End
     };
   public:
     CMapHook();
@@ -218,9 +229,17 @@ namespace UeGui
     */
     unsigned int SetRouteEnd();
     /**
-    * \brief 路径规划
+    * \brief 路径规划,规划成功后保存到历史路线，不直接开始导航或模拟导航
     */
-    unsigned int RoutePlane(PlanType planType = Plan_Single);
+    unsigned int RoutePlan(PlanType planType = Plan_Single);
+    /**
+    * \brief 路径规划,并且规划完成后直接开始导航
+    */
+    unsigned int RoutePlan_StartGuidance(PlanType planType = Plan_Single);
+    /**
+    * \brief 路径规划,并且规划完成后直接开始模拟导航
+    */
+    unsigned int RoutePlan_StartDemo(PlanType planType = Plan_Single);
     /**
     * \brief 获取多路径规划方式
     */
@@ -407,6 +426,18 @@ namespace UeGui
     * \brief 是否有电子眼提示
     */
     bool HaveElecEyePrompt();
+    /**
+    * \brief 是否是分屏模式
+    */
+    bool IsSplitScreen();
+    /**
+    * \brief 回复路线
+    */
+    void RestoreRote();
+    /**
+    * \brief 回复路线
+    */
+    void CancelRestoreRote();
   protected:
     /**
     * \brief 返回皮肤配置文件名称
@@ -491,6 +522,30 @@ namespace UeGui
     * \param distance 当前提示距离
     */
     void UpdateElecProgress(double distance = 0);
+    /**
+    * \brief 设置屏幕模式
+    */
+    void SetScreenMode(ScreenMode screenMode);
+    /**
+    * \brief 刷新屏幕模式按钮图标
+    */
+    void RefreshScreenModeIcon();
+    /**
+    * \brief 改变两个元素的图片
+    */
+    bool ChangeElementIcon(GuiElement* destElement, GuiElement* srcElement);
+    /**
+    * \brief 回复路线
+    */
+    static void OnRestoreRote(CAggHook* sender, ModalResultType modalResult);
+    /**
+    * \brief 设置车道位置
+    */
+    void ResetLanPos();
+    /**
+    * \brief 路线规划
+    */
+    unsigned int DoRoutePlan(PlanType planType);
   private:
     //主页：最小化
     CUiBitButton m_miniMizeBtn;    
@@ -583,76 +638,31 @@ namespace UeGui
     short m_elecProgressBarWidth;
     //电子眼提示的最大距离
     short m_elecMaxPromptDist;
+    //当前屏幕模式
+    ScreenMode m_screenMode;
+    //是否是第一次渲染地图，因为之后渲染过一次地图之后，才能读取到地图上的点和线数据
+    bool m_firstDrawMap;
+    //是否需要回复上次未导航完成路线
+    bool m_needRestoreRoute;
+    //回复路线类型
+    unsigned int m_restoreRouteType;
+    //回复路线经由点
+    POIDataList m_restorePoiList;
+    //车道图标的宽高
+    short m_lanHight;
+    short m_lanWidth;
 
   //////////////////////////////////////////////////////////////////////////
   //旧代码
   public:
     /**
-    * \brief 打开主菜单
-    */
-    void OpenMainMenu(){}
-    /**
-    * \brief 刷新试图按钮状态
-    */
-    void SwitchViewStateBtn(){};
-     /**
-    * \brief 地图放大
-    * \param count 放大多少级
-    */
-    void MapZoomIn(unsigned short count = 1){};
-    /**
-    * \brief 地图缩小
-    * @param count 缩小多少层次
-    */
-    void MapZoomOut(unsigned short count = 1){};
-    /**
-    * /brief 周边搜索
-    */
-    void OpenGridQuery(){};
-    /**
-    * /brief 线路操作
-    */
-    void RouteOperation(){};
-    /**
-    * /brief 打开多路径界面
-    */
-    void OpenMultiRoutePath(){};
-    /**
-    * \brief 查地名
-    */
-    void FindPlaceName(){};
-    /**
-    * \brief 设置模拟导航的速度
-    */
-    void SetDemoGuidanceSpeed(short speedTag){};
-    /**
-    * \brief 鹰眼图
-    */
-    void HawkEyeMap(){};
-    /**
-    *  \brief 周边信息切换到maphook界面
-    **/
-    void PeripheralInformationSwitch(SQLRecord *pPoiRecord){};
-    /**
     * \brief 添加经由点
     **/
     bool AddThroughPoint(){return false;};
     /**
-    * \brief 设置目的地，并弹出规划进度窗口和导航选择窗口
-    */
-    bool SetRouteEndA(){return false;};
-    /**
-    * \brief 设置目的地，并判断是重设目的地还是添加经由点，会弹出重设目的地窗口
-    */
-    bool SetRouteEndB(){return false;};
-    /**
     * \brief 启动导航引导
     **/
     bool DoRouteGuidance(){return false;};
-    /**
-    * \brief 停止导航
-    **/
-    bool DoRouteStopGuidance(){return false;};
     /**
     * \brief 启动模拟导航
     **/
@@ -666,10 +676,6 @@ namespace UeGui
     **/
     bool DoDemoStop(){return false;};
     /**
-    * \brief 删除路线
-    */
-    bool DoEraseRoute(){return false;};
-    /**
     * \brief 取消路径规划
     */
     bool DoRouteCancel(){return false;};
@@ -682,244 +688,13 @@ namespace UeGui
     */
     void DoCancelExitGuidance(){};
     /**
-    * \brief 是否处于倒计时状态
-    */
-    bool IsCountDown(){return false;};
-    /**
-    * \brief 设置多路径规划方式
-    */
-    void SetMultiMethodType(MethodType methodType){};
-    /**
-    * \brief 更新倒计时状态
-    */
-    void UpdateCountDown(){};
-    /**
-    *
-    **/
-    void SwitchState(bool isPerspective){};
-
-    /**
-    * \brief 查周边，图上选点 按钮进入时提供回调函数接口
-    **/
-    void SetPoint(void *pDoCallBackObj, Query_CallBack *pCallBackEvent){};
-    /**
     * 是否已经准备好开始导航
     **/
     bool IsReadyForPlanning(){return false;};
     /**
-    * 是否允许操作界面,如弹出导航对话框选择时点击其它地方只是关闭窗口并不做其它事情
-    **/
-    bool InterfaceNotOperable(){return false;};
-    /**
-    * 设置选点按钮隐藏还是显示，这个函数需要重新处理
-    **/
-    void SetFavoritePickVisble(bool value){};
-    /**
-    * \brief 由全屏切换到半屏界面
-    */
-    void MoveToSplitGui(){};
-    /**
-    * \brief 由半屏切换到全屏界面
-    */
-    void MoveToFullGui(){};
-    /**
-    * \brief 切换到到真实导航界面
-    **/
-    void MoveToRealGuidanceGUI(){};
-    /**
-    * \brief 切换到到模拟导航界面
-    **/
-    void MoveToDemoGuidanceGUI(){};
-    /**
-    * \brief 路线概览
-    **/
-    void SwitchToRouteOverview(){};
-
-    void GoToPosFromList(const CGeoPoint<long> &point, const char *name){};
-    /**
-    * \brief 路线概览
-    **/
-    void SwitchToRoutePlanReadyGUI(){};
-    /**
-    * \brief 是否打开多路径规划
-    */
-    bool ShowMultiMethod(){return false;};
-    /**
-    * \brief 重新设置SetMethod
-    */
-    void ReSetMethod(){};
-    /**
-    * \brief 判断是否重新设置SetMethod
-    */
-    void IsReSetMethod(bool TrueOrFalse){};
-    /**
-    * \brief 以屏幕中心点刷新详情和速度信息
-    **/
-    void RefershLocationInfo(){};
-    /**
     * \brief 设置静音
     **/
     void SetSlience(bool isSlience){};
-  public:
-    /**
-    * \brief 地图状态信息
-    */
-    struct MapStateInfo
-    {      
-      int  m_curScaleLevel;               // 当前比例尺
-      bool isOpenStopGuidanceMessageBox;  // 是否已经打开停止导航对话框
-      bool hasMoveCenter;                 // 是否移动过地图中心点      
-      bool needCountDown;                 // 是否需要进行倒计时
-      bool hasOpenRouteOption;            // 是否已经打开规划选项
-      bool hasOpenRoutePathOption;        // 是否已经打开多路径选项
-      bool needShowGudianceIcon;          // 是否需要显示导航图标
-      bool needShowHighSpeedBoard;        // 是否需要显示高速看板
-    };
-  private: 
-    /**
-    * \brief 隐藏当前界面所有元素
-    **/
-    void HideAllGUIElements(){};
-    /**
-    * \brief 返回到上一个操作界面
-    **/
-    void ReturnToPreviousGUI(){};
-    /**
-    * \brief 隐藏引导图标
-    */
-    void HideCurGuidanceIcon(){};
-    /**
-    * \brief 显示目的地及起点到目的地距离
-    */
-    void ShowDestinationInfo(){};
-    /**
-    * \brief 显示隐藏起点距离目的地距离的状态栏
-    */
-    void ShowDestinationInfoBar(bool value = true){};
-    /**
-    * \brief 显示下一道路名称及距离目的地距离
-    */
-    void ShowRouteInfo(const char* roadName, int distance){};
-    /**
-    * \brief 显示隐藏下一道路名称及距离目的地距离的状态栏
-    */
-    void ShowRouteInfoBar(bool value = true){};
-    /**
-    * \brief 根据当前引导信息显示特定的图标提示(拐弯处图片)
-    * \param isShow 显示还是隐藏
-    */
-    void ShowCurGuidanceIcon(bool isShow, int sndCode = 0, unsigned char infoCode = 0){};
-    /**
-    * \brief 根据下一引导信息显示特定的图标提示(拐弯处图片)
-    * \param isShow 显示还是隐藏
-    */
-    void ShowNextGuidanceIcon(bool isShow, int sndCode = 0, unsigned char infoCode = 0){};
-    /**
-    * \brief 在右上角显示路口放大图标
-    * \param isShow 显示还是隐藏
-    * \param iconType 显示的图标类型
-    */
-    void ShowCrossingIcon(bool isShow, short iconType = 0, const char* content = NULL){};
-    /**
-    * \param iconType 显示目的地图标类型
-    */
-    void ShowDestationPointIcon(short iconElementType){};
-    /**
-    * \brief 显示三限图标
-    * \param isShow 显示还是隐藏
-    */
-    void ShowLimitIcon(bool isShow, short iconType = 0){};
-    /**
-    * \brief 获得距终点剩余时间
-    */
-    double GetLeftTime(const UeRoute::GuidanceStatus &dirInfo){return 0;};
-    /**
-    * \brief 重置比例尺显示标识
-    */
-    void ResetScaleLabel(int scaleLevel){};
-    /**
-    * \brief 打开导航选项对话框并开始计时
-    */
-    void OpenNavigationSelectionHook(){};
-    /**
-    * \brief 设置音量
-    */
-    void SetVolume(int volumeSize){};
-    /**
-    * \brief 选点 从我的信息->常用点 进入
-    */
-    void DoSelectPoint(){};
-    /**
-    * \brief 设定 从找地方->查周边->图上选点附近 进入
-    */
-    void DoSetPoint(){};
-
-    /**
-    * \brief 根据界面类型调整控件位置
-    */
-    void ResetGuiElementPosition(){};
-
-    /**
-    * \brief 设置电子眼图标位置坐标
-    */
-    void ResetEyePosition(){};
-
-    /**
-    * \brief 设置车道信息位置坐标
-    */
-    void ResetLaneInfoPosition(){};
-
-    /**
-    * \brief 限高、限重、限宽图标测试用
-    */
-    void TestLimitShow(int sumTimeLimit){};
-
-    /**
-    * \brief 获取主地图视图
-    */
-    CViewState* GetMainViewState(){return NULL;};
-
-    /**
-    * \brief 改变两个元素的图片
-    */
-    bool ChangeElementIcon(GuiElement* destElement, GuiElement* srcElement){return false;};
-
-    /**
-    * \brief 显示路口转向图控件
-    */
-    void ShowCornerIconCtrl(CUiBitButton &cornerIconCtrl, bool isShown = true){};
-    
-    /**
-    * \brief 自动调整地图界面到可看见全路线的合适比例尺
-    */ 
-    void AutoScallingMap(){};
-
-   /**
-    * \从半屏或导航引导等切换到之前界面
-    */ 
-   void FindFuturGUI2Switch( GUIType guiType ){};
-
-   /**
-    * \判断是否是导航状态，包括模拟导航和真实导航
-    */ 
-   bool IsGuidanceStatus(){return false;};
-
-   void SwitchTopStateBar(bool isDetail){};
-
-    /**
-    * \高速看板
-    */ 
-   void HighSpeedBoard(){};
-   /**
-   * \brief 显示GPS信息
-   **/
-   void ShowGPS(){};
- public:
-     //判断是否打开菜单
-     bool m_isOpenMenu;
-     //是否处于双屏显示状态
-     bool m_isSplit;
-  private:
   //////////////////////////////////////////////////////////////////////////
   };
 }

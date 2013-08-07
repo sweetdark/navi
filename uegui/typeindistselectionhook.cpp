@@ -6,6 +6,9 @@
 
 #include "districtselectionhook.h"
 
+#include "typeindistquerylisthook.h"
+#include "typenodistquerylisthook.h"
+
 using namespace UeGui;
 
 CTypeInDistSelectionHook::CTypeInDistSelectionHook()
@@ -316,6 +319,7 @@ short CTypeInDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
         ////ÔÝÊ±´¦Àí
         //TCodeEntry item = *(m_pCurItemCtrl->GetItemByCode(m_vecQueryListItem[1].m_uCode));
         CQueryWrapper::Get().SetQueryKindInfo(m_vecSubListItem[index]);
+        ((CTypeInDistQueryListHook *)m_view->GetHook(DHT_TypeInDistQueryListHook))->SetQueryTypeInfo(&m_vecSubListItem[index]);
 
         CAggHook::TurnTo(DHT_TypeInDistQueryListHook);
       }

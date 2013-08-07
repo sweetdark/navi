@@ -1,13 +1,12 @@
 #include "navigationlefthook.h"
 #include "navimapsettinghook.h"
+#include "promptsettinghook.h"
+#include "routesettinghook.h"
 using namespace UeGui;
 
 CNavigationLeftHook::CNavigationLeftHook()
 {
   MakeGUI();
-  m_naviMapSetting = new CNaviMapSettingHook();
-  m_naviMapSetting->Show(true);
-  AddChildHook(DHT_NaviMapSettingHook, m_naviMapSetting);
 }
 
 CNavigationLeftHook::~CNavigationLeftHook()
@@ -19,6 +18,33 @@ CNavigationLeftHook::~CNavigationLeftHook()
   {
     delete m_naviMapSetting;
   }
+  if (m_promptSetting)
+  {
+    delete m_promptSetting;
+  }
+  if (m_routeSetting)
+  {
+    delete m_routeSetting;
+  }
+}
+
+void CNavigationLeftHook::Init()
+{
+  m_naviMapSetting = new CNaviMapSettingHook();
+  m_naviMapSetting->SetHelpers(m_net, m_view, m_route, m_gps, m_query);
+  m_naviMapSetting->Show(true);
+
+  m_promptSetting = new CPromptSettingHook();
+  m_promptSetting->SetHelpers(m_net, m_view, m_route, m_gps, m_query);
+  m_promptSetting->Show(false);
+  
+  m_routeSetting = new CRouteSettingHook();
+  m_routeSetting->SetHelpers(m_net, m_view, m_route, m_gps, m_query);
+  m_routeSetting->Show(false);
+
+  AddChildHook(DHT_NaviMapSettingHook, m_naviMapSetting);
+  AddChildHook(DHT_PromptSettingHook, m_promptSetting);
+  AddChildHook(DHT_RouteSettingHook, m_routeSetting);
 }
 
 void CNavigationLeftHook::MakeGUI()
@@ -99,16 +125,30 @@ short CNavigationLeftHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_mapNavigationBtnCtrl.MouseUp();
       SwitchTabPage(navigationlefthook_MapNavigationBtn);
+      SetTabStatus(navigationlefthook_MapNavigationBtn,true);
+      m_active = navigationlefthook_MapNavigationBtn;
+      SetTabStatus(navigationlefthook_PromptSettingBtn,false);
+      SetTabStatus(navigationlefthook_RouteSettingBtn,false);
     }
     break;
   case navigationlefthook_PromptSettingBtn:
     {
       m_promptSettingBtnCtrl.MouseUp();
+      SwitchTabPage(navigationlefthook_PromptSettingBtn);
+      SetTabStatus(navigationlefthook_MapNavigationBtn,false);
+      SetTabStatus(navigationlefthook_PromptSettingBtn,true);
+      m_active = navigationlefthook_PromptSettingBtn;
+      SetTabStatus(navigationlefthook_RouteSettingBtn,false);
     }
     break;
   case navigationlefthook_RouteSettingBtn:
     {
       m_routeSettingBtnCtrl.MouseUp();
+      SwitchTabPage(navigationlefthook_RouteSettingBtn);
+      SetTabStatus(navigationlefthook_MapNavigationBtn,false);
+      SetTabStatus(navigationlefthook_PromptSettingBtn,false);
+      SetTabStatus(navigationlefthook_RouteSettingBtn,true);
+      m_active = navigationlefthook_RouteSettingBtn;
     }
     break;
   default:
@@ -136,6 +176,92 @@ void CNavigationLeftHook::SwitchTabPage(unsigned short type)
   case navigationlefthook_MapNavigationBtn:
     {
       m_naviMapSetting->Show(true);
+      m_naviMapSetting->ReadSetting();
+      m_promptSetting->Show(false);
+      m_routeSetting->Show(false);
+    }
+    break;
+  case navigationlefthook_PromptSettingBtn:
+    {
+      m_promptSetting->Show(true);
+      m_promptSetting->ReadSetting();
+      m_naviMapSetting->Show(false);
+      m_routeSetting->Show(false);
+    }
+    break;
+  case navigationlefthook_RouteSettingBtn:
+    {
+      m_promptSetting->Show(false);
+      m_naviMapSetting->Show(false);
+      m_routeSetting->Show(true);
+      m_routeSetting->ReadSetting();
+    }
+    break;
+  default:
+    assert(false);
+    break;
+  }
+}
+void CNavigationLeftHook::SetTabStatus(navigationlefthookCtrlType page, bool status)
+{
+  CViewHook::GuiElement* element = NULL;
+  switch(page)
+  {
+  case navigationlefthook_MapNavigationBtn:
+    {
+      element = GetGuiElement(navigationlefthook_MapNavigationBtn);
+    }
+    break;
+  case navigationlefthook_PromptSettingBtn:
+    {
+      element = GetGuiElement(navigationlefthook_PromptSettingBtn);
+    }
+    break;
+  case navigationlefthook_RouteSettingBtn:
+    {
+      element = GetGuiElement(navigationlefthook_RouteSettingBtn);
+    }
+    break;
+  default:
+    assert(false);
+    break;
+  }
+  if (status)
+  {
+    element->m_backStyle = element->m_bkDisabled;
+    element->m_textStyle = element->m_disabledTextStype;
+  }
+  else
+  {
+    element->m_backStyle = element->m_bkNormal;
+    element->m_textStyle = element->m_normalTextStylpe;
+  }
+}
+void CNavigationLeftHook::Reset()
+{
+  SwitchTabPage(navigationlefthook_MapNavigationBtn);
+  SetTabStatus(navigationlefthook_MapNavigationBtn,true);
+  m_active = navigationlefthook_MapNavigationBtn;
+  SetTabStatus(navigationlefthook_PromptSettingBtn,false);
+  SetTabStatus(navigationlefthook_RouteSettingBtn,false);
+}
+void CNavigationLeftHook::DoReturn()
+{
+  switch(m_active)
+  {
+  case navigationlefthook_MapNavigationBtn:
+    {
+      m_naviMapSetting->ReadSetting();
+    }
+    break;
+  case navigationlefthook_PromptSettingBtn:
+    {
+      m_promptSetting->ReadSetting();
+    }
+    break;
+  case navigationlefthook_RouteSettingBtn:
+    {
+      m_routeSetting->ReadSetting();
     }
     break;
   default:

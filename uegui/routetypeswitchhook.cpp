@@ -1,7 +1,11 @@
 #include "routetypeswitchhook.h"
 #include "settingwrapper.h"
 #include "maphook.h"
+#include "messagedialoghook.h"
 using namespace UeGui;
+
+RouteTypeCallBack CRouteTypeSwitchHook::m_callBackFun = NULL;
+UeGui::CAggHook* CRouteTypeSwitchHook::m_sender = NULL;
 
 CRouteTypeSwitchHook::CRouteTypeSwitchHook()
 {
@@ -108,6 +112,7 @@ short CRouteTypeSwitchHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_economicWayBtnCtrl.MouseUp();
       ChangeRouteType(UeRoute::RW_Economic);
+      DoCallBack();
     }
     break;
   case routetypeswitchhook_HighWayBtn:
@@ -115,6 +120,7 @@ short CRouteTypeSwitchHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_highWayBtnCtrl.MouseUp();
       ChangeRouteType(UeRoute::RW_Fast);
+      DoCallBack();
     }
     break;
   case routetypeswitchhook_ShortestBtn:
@@ -122,6 +128,7 @@ short CRouteTypeSwitchHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_shortestBtnCtrl.MouseUp();
       ChangeRouteType(UeRoute::RW_Short);
+      DoCallBack();
     }
     break;
   case routetypeswitchhook_RecommondBtn:
@@ -129,6 +136,7 @@ short CRouteTypeSwitchHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_recommondBtnCtrl.MouseUp();
       ChangeRouteType(UeRoute::RW_Optimal);
+      DoCallBack();
     }
     break;
   default:
@@ -202,13 +210,24 @@ void CRouteTypeSwitchHook::ChangeRouteType(unsigned int planMethod)
   {
     planMethod |= UeRoute::RA_Ferry;
   }
+  m_planMethod = planMethod;
+}
 
-  m_route->SetMethod(planMethod);
-  GoToMapHook();
-  m_route->RoutePlan();
-  CMapHook* maphook = (CMapHook*)m_view->GetHook(DHT_MapHook);
-  if (maphook)
+
+
+void CRouteTypeSwitchHook::SetRouteTypeCallBackFun(CAggHook *sender, RouteTypeCallBack callBack)
+{
+  m_callBackFun = callBack;
+  m_sender = sender;
+}
+
+void CRouteTypeSwitchHook::DoCallBack()
+{
+  if (m_callBackFun)
   {
-    maphook->OverviewRoute();
+    m_callBackFun(m_sender, m_planMethod);
+    m_callBackFun = NULL;
+    m_sender = NULL;
   }
+  Return();
 }

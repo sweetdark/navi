@@ -70,7 +70,6 @@ namespace UeGui
       districtselectionhook_vsplit2,
       districtselectionhook_PrePageArrowBtn,
       districtselectionhook_NextPageArrowBtn,
-      districtselectionhook_VSplit3,
       districtselectionhook_CurrentPageLable,
       districtselectionhook_TotalPageLable,
       districtselectionhook_PageSplit,
@@ -96,6 +95,8 @@ namespace UeGui
 		 * pCallBackEvent: »Øµ÷º¯Êý
 		*/
 		void SetCallBackFun(void *pDoCallBackObj, DistrictCallBack pCallBackEvent);
+
+    void DistQueryListCallBack(SQLRecord *sqlRecord);
 
   protected:
 
@@ -131,6 +132,8 @@ namespace UeGui
     void OnClickGpsCityBtn();
 
     void OnClickGpsAreaBtn();
+
+    void OnClickSearchAreaBtn();
   private:
     int m_firstItemIndx;
     unsigned char m_itemLevel;
@@ -187,7 +190,6 @@ namespace UeGui
     CUiButton m_splitCtrl;
     CUiButton m_totalPageLableCtrl;
     CUiButton m_vSplitCtrl;
-    CUiButton m_vSplit3Ctrl;
     CUiButton m_vsplit2Ctrl;
   };
 }

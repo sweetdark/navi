@@ -18,33 +18,36 @@
 namespace UeGui
 {
   class UEGUI_CLASS CRestoreDefaultshook : public CAggHook
-  {
+  {    
   public:
     enum RestoreDefaultshookCtrlType
     {
       RestoreDefaultshook_Begin = 0,
-      RestoreDefaultshook_BackGround,
-      RestoreDefaultshook_MesageText1,
-      RestoreDefaultshook_MessageText2,
       RestoreDefaultshook_HistoricalInfoLabel,
-      RestoreDefaultshook_PersonalInfoLabel,
       RestoreDefaultshook_HistoricalInfoCenter,
       RestoreDefaultshook_HistoricalInfoIcon,
-      RestoreDefaultshook_HistoricalInfoLeft,
-      RestoreDefaultshook_HistoricalInfoRight,
-      RestoreDefaultshook_PersonalInfoCenter,
-      RestoreDefaultshook_PersonalInfoIcon,
-      RestoreDefaultshook_PersonalInfoLeft,
-      RestoreDefaultshook_PersonalInfoRight,
+
+      RestoreDefaultshook_MyJourneyCenter,
+      RestoreDefaultshook_MyJourneyIcon,
+      RestoreDefaultshook_MyJourneyLabel,
+
+      RestoreDefaultshook_ElecEyeCenter,
+      RestoreDefaultshook_ElecEyeIcon,
+      RestoreDefaultshook_ElecEyeLabel,
+
+      RestoreDefaultshook_AddressBookCenter,
+      RestoreDefaultshook_AddressBookIcon,
+      RestoreDefaultshook_AddressBookLabel,
+
+      RestoreDefaultshook_TextOne,
+      RestoreDefaultshook_TextTwo,
+      RestoreDefaultshook_TopPic,
+
       RestoreDefaultshook_OnOk,
-      RestoreDefaultshook_OnOKLeft,
-      RestoreDefaultshook_OnOKRight,
       RestoreDefaultshook_OnCance,
-      RestoreDefaultshook_OnCanceLeft,
-      RestoreDefaultshook_OnCanceRight,
       RestoreDefaultshook_End
     };
-
+    
     CRestoreDefaultshook();
 
     virtual ~CRestoreDefaultshook();
@@ -59,9 +62,7 @@ namespace UeGui
 
     virtual bool operator ()();
 
-    void Init();
-
-    void prepare();
+    void Load();
   protected:
     virtual tstring GetBinaryFileName();
 
@@ -73,18 +74,25 @@ namespace UeGui
     void UpdateSettings();
     //清除历史信息
     void ClearHistoryData();
-    //清除个人数据
-    void ClearPersonalData();
+    //清除地址薄
+    void ClearAddressBookData();
+    //清除我的行程
+    void ClearMyJourneyData();
+    //清除电子眼
+    void ClearElecEyeData();
     //初始化设置
     void Restore();
   private:
-    CUiButton m_backGroundCtrl;
-    CUiCheckButton m_historicalInfo;
-    CUiButton m_mesageText1Ctrl;
-    CUiButton m_messageText2Ctrl;
+    CUiCheckButton m_historyCtrl;
+    CUiCheckButton m_myJourneyCtrl;
+    CUiCheckButton m_addressBookCtrl;
+    CUiCheckButton m_elecEyeCtrl;
+
+    CUiLabel m_textOne;
+    CUiLabel m_textTwo;
+    
     CUiButton m_onCanceCtrl;
     CUiButton m_onOkCtrl;
-    CUiCheckButton m_personalInfo;
   };
 }
 #endif

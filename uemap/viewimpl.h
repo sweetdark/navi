@@ -849,6 +849,10 @@ namespace UeMap
     void ShowEagle(CViewState *curView, const short renderType);
 
     void ChangeViewPort(CViewState *curView, const short renderType);
+
+    void SetFullViewPort(CViewState *curView);
+
+    CViewState *GetMapView();
   protected:
     // Belonged window
     void *m_wnd;

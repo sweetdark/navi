@@ -23,9 +23,15 @@ CTypeNoDistQueryListHook::~CTypeNoDistQueryListHook()
   m_imageNames.clear();
 }
 
+void CTypeNoDistQueryListHook::Init()
+{
+  m_view->GetScreenCenter(m_mapCenterPos);
+}
+
 void CTypeNoDistQueryListHook::Load()
 {
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
+  queryWrapper.SetQueryKindInfo(m_tCodeEntry);
   queryWrapper.GetQueryKindName(m_typeSelectBtn.GetCaption());
 
   //暂时设置为不可用
@@ -416,11 +422,11 @@ void CTypeNoDistQueryListHook::SetFocusBtn()
 void CTypeNoDistQueryListHook::SearchForResult()
 {
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
-   CGeoPoint<long> geoCurPos;
+  CGeoPoint<long> geoCurPos;
   switch (m_queryType)
   {
   case MapCenter:
-    m_view->GetScreenCenter(geoCurPos);
+    geoCurPos = m_mapCenterPos;
     break;
   case CurPos:
   case Route:
@@ -514,4 +520,9 @@ void CTypeNoDistQueryListHook::ResetResultList()
   ::sprintf(totalPage,"%d",m_pRecord->GetTotalPage());
   m_curPageInfo.SetCaption(curPage);
   m_totalPageInfo.SetCaption(totalPage);
+}
+
+void CTypeNoDistQueryListHook::SetQueryTypeInfo(TCodeEntry *tcodeEntry)
+{
+  ::memcpy(&m_tCodeEntry, tcodeEntry, sizeof(TCodeEntry));
 }

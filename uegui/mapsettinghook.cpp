@@ -1,5 +1,6 @@
 #include "mapsettinghook.h"
-#include "guisetting.h"
+#include "settingwrapper.h"
+#include "viewwrapper.h"
 using namespace UeGui;
 
 CMapSettingHook::CMapSettingHook()
@@ -66,6 +67,7 @@ short CMapSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_autoModeBtnCtrl.MouseDown();
       AddRenderUiControls(&m_autoModeBtnCtrl);
+      AddRenderUiControls(&m_autoModeLableCtrl);
     }
     break;
   case mapsettinghook_DayModeBtn:
@@ -74,6 +76,7 @@ short CMapSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_dayModeBtnCtrl.MouseDown();
       AddRenderUiControls(&m_dayModeBtnCtrl);
+      AddRenderUiControls(&m_dayModeLableCtrl);
     }
     break;
   case mapsettinghook_NightModeBtn:
@@ -82,6 +85,7 @@ short CMapSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_nightModeBtnCtrl.MouseDown();
       AddRenderUiControls(&m_nightModeBtnCtrl);
+      AddRenderUiControls(&m_nigthModeLableCtrl);
     }
     break;
   default:
@@ -116,7 +120,6 @@ short CMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_dayModeBtnCtrl.SetCheck(false);
         m_nightModeBtnCtrl.SetCheck(false);
-        UpdateSettings();
       }
     }
     break;
@@ -129,7 +132,6 @@ short CMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_autoModeBtnCtrl.SetCheck(false);
         m_nightModeBtnCtrl.SetCheck(false);
-        UpdateSettings();
       }
     }
     break;
@@ -142,7 +144,6 @@ short CMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_autoModeBtnCtrl.SetCheck(false);
         m_dayModeBtnCtrl.SetCheck(false);
-        UpdateSettings();
       }
     }
     break;
@@ -151,7 +152,6 @@ short CMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
     assert(false);
     break;
   }
-
   if (m_isNeedRefesh)
   {
     Refresh();
@@ -164,49 +164,54 @@ bool CMapSettingHook::operator ()()
 {
   return false;
 }
+
+void CMapSettingHook::UnLoad()
+{
+  UpdateSettings();
+}
+
 void CMapSettingHook::ReadSetting()
 {
-  CGuiSettings* ueSettings = CGuiSettings::GetGuiSettings();
-  if (ueSettings)
-  {  
-    /// 设置地图模式
-    if (ueSettings->GetMapModel() == ViewSettings::MM_Atuo)
-    {
-      m_dayModeBtnCtrl.SetCheck(false);
-      m_nightModeBtnCtrl.SetCheck(false);
-      m_autoModeBtnCtrl.SetCheck(true);
-    }
-    else if(ueSettings->GetMapModel() == ViewSettings::MM_DayTime)
-    {
-      m_dayModeBtnCtrl.SetCheck(true);
-      m_nightModeBtnCtrl.SetCheck(false);
-      m_autoModeBtnCtrl.SetCheck(false);
-    }
-    else if(ueSettings->GetMapModel() == ViewSettings::MM_Night)
-   {
-      m_dayModeBtnCtrl.SetCheck(false);
-      m_nightModeBtnCtrl.SetCheck(true);
-      m_autoModeBtnCtrl.SetCheck(false);
-    }
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+  /// 设置地图模式
+  if (settingWrapper.GetMapModel() == ViewSettings::MM_Atuo)
+  {
+    m_dayModeBtnCtrl.SetCheck(false);
+    m_nightModeBtnCtrl.SetCheck(false);
+    m_autoModeBtnCtrl.SetCheck(true);
+  }
+  else if(settingWrapper.GetMapModel() == ViewSettings::MM_DayTime)
+  {
+    m_dayModeBtnCtrl.SetCheck(true);
+    m_nightModeBtnCtrl.SetCheck(false);
+    m_autoModeBtnCtrl.SetCheck(false);
+  }
+  else if(settingWrapper.GetMapModel() == ViewSettings::MM_Night)
+  {
+    m_dayModeBtnCtrl.SetCheck(false);
+    m_nightModeBtnCtrl.SetCheck(true);
+    m_autoModeBtnCtrl.SetCheck(false);
   }
 }
 void CMapSettingHook::UpdateSettings()
 {
-  CGuiSettings* ueSettings = CGuiSettings::GetGuiSettings();
-  if (ueSettings)
-  {  
-    /// 设置地图模式
-    if (m_dayModeBtnCtrl.Checked())
-    {
-      ueSettings->SetMapModel(ViewSettings::MM_DayTime);
-    }
-    if (m_nightModeBtnCtrl.Checked())
-    {
-      ueSettings->SetMapModel(ViewSettings::MM_Night);
-    }
-    if (m_autoModeBtnCtrl.Checked())
-    {
-      ueSettings->SetMapModel(ViewSettings::MM_Atuo);
-    }
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+  /// 设置地图模式
+  if (m_dayModeBtnCtrl.Checked())
+  {
+    settingWrapper.SetMapModel(ViewSettings::MM_DayTime);
+  }
+  if (m_nightModeBtnCtrl.Checked())
+  {
+    settingWrapper.SetMapModel(ViewSettings::MM_Night);
+  }
+  if (m_autoModeBtnCtrl.Checked())
+  {
+    settingWrapper.SetMapModel(ViewSettings::MM_Atuo);
+  }
+  settingWrapper.SaveAllSettings();
+  if (CViewWrapper::Get().GetMainViewState())
+  {
+    CViewWrapper::Get().GetMainViewState()->RefreshLayerData();  
   }
 }

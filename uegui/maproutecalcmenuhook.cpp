@@ -242,7 +242,7 @@ short CMapRouteCalcMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
       needRefresh = true;
       m_button2.MouseUp();
       //切换到调整路线页面
-      TurnTo(DHT_AdjustRouteHook);
+      //TurnTo(DHT_AdjustRouteHook);
     }
     break;
   case MapRouteCalcMenuHook_Button3:
@@ -533,7 +533,7 @@ void UeGui::CMapRouteCalcMenuHook::ShowDestInfo(UeRoute::MethodType methType)
   }
 
   int costTime = 0.0;
-  costTime = m_planResult[methType].costTime * 60;
+  costTime = m_planResult[methType].costTime;
   int hours = costTime / 60;   
   int minutes = costTime % 60;
 
@@ -541,11 +541,11 @@ void UeGui::CMapRouteCalcMenuHook::ShowDestInfo(UeRoute::MethodType methType)
   double totalDist = m_planResult[methType].totalLength;  
   if (totalDist > 1000)
   {
-    ::sprintf(buf, "%.1f km | %d:%2d", totalDist / 1000, hours, minutes);
+    ::sprintf(buf, "%.1fkm | %d:%2d", totalDist / 1000, hours, minutes);
   }
   else
   {
-    ::sprintf(buf, "%d m | %d:%d", static_cast<int>(totalDist), hours, minutes);
+    ::sprintf(buf, "%dm | %d:%d", static_cast<int>(totalDist), hours, minutes);
   }
   m_distInfoLabel.SetCaption(buf);
 }
@@ -555,7 +555,8 @@ void UeGui::CMapRouteCalcMenuHook::ShowDistLabel( double dist, CUiLabel& label )
   char buf[12] = {};  
   if (dist > 1000)
   {
-    ::sprintf(buf, "%.1f km", dist / 1000);
+    //::sprintf(buf, "%.1f km", dist / 1000);
+    ::sprintf(buf, "%dkm", static_cast<int>(dist / 1000));
   }
   else
   {
@@ -563,7 +564,7 @@ void UeGui::CMapRouteCalcMenuHook::ShowDistLabel( double dist, CUiLabel& label )
     {
       dist = 0;
     }
-    ::sprintf(buf, "%d m", static_cast<int>(dist));
+    ::sprintf(buf, "%dm", static_cast<int>(dist));
   }
   label.SetCaption(buf);
 }

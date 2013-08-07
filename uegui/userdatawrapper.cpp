@@ -12,10 +12,13 @@ using namespace UeModel;
 
 //#include "myjourneyhook.h"
 #include "myjourneywrapper.h"
-#include "guisetting.h"
+#include "settingwrapper.h"
 #include "messagedialoghook.h"
 #include "maphook.h"
+#include "uebase\pathconfig.h"
+
 using namespace UeGui;
+using namespace UeBase;
 
 const CUserDataWrapper& CUserDataWrapper::Get()
 {
@@ -24,7 +27,8 @@ const CUserDataWrapper& CUserDataWrapper::Get()
 }
 
 CUserDataWrapper::CUserDataWrapper() : m_view(IView::GetView()), m_route(IRoute::GetRoute()),
-m_query(IQuery::GetQuery()),m_net(IRoadNetwork::GetNetwork())
+m_query(IQuery::GetQuery()),m_net(IRoadNetwork::GetNetwork()),m_pathBasic(CPathBasic::Get()),
+m_fileBasic(CFileBasic::Get())
 {
   m_usuallyFile = new CUsuallyFile();
 }
@@ -91,8 +95,8 @@ void CUserDataWrapper::AddHistoryPoint(UeRoute::PlanPosition& pos) const
   }
   ConnectToHistoryRecord();
   int count = m_query->GetHistoryRecordCount();
-  CGuiSettings* guiSettings = CGuiSettings::GetGuiSettings();
-  int maxCount = guiSettings->GetHistoryRecordCapacity();
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+  int maxCount = settingWrapper.GetHistoryRecordCapacity();
   if (count >= maxCount)
   {
     m_query->RemoveHistoryRocord(--count);
@@ -165,9 +169,9 @@ void CUserDataWrapper::AddRecent() const
   SetAddrName(startPos, (char *)entry.m_routePos[0].m_addrName);
 
   int count = GetRecentCount();
-
-  CGuiSettings* guiSettings = CGuiSettings::GetGuiSettings();
-  int maxCount = guiSettings->GetHistoryRouteCapacity();
+  
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+  int maxCount = settingWrapper.GetHistoryRouteCapacity();
   if (count >= maxCount)   
   {
     m_query->RemoveRecent(--count);
@@ -380,7 +384,7 @@ void CUserDataWrapper::HistoryRoutePlan(int dataIndex) const
       CMapHook* mapHook = (CMapHook*)m_view->GetHook(CViewHook::DHT_MapHook);
       if (mapHook)
       {
-//        CAggHook::TurnToHook(CViewHook::DHT_MapHook);
+        //        CAggHook::TurnToHook(CViewHook::DHT_MapHook);
         mapHook->OverviewRoute();
         m_view->Refresh();
       }
@@ -646,3 +650,158 @@ unsigned int CUserDataWrapper::DisconnectHistoryRecord(void) const
   return m_query->Disconnect(UeQuery::DT_HistoryRecords);
 }
 
+tstring UeGui::CUserDataWrapper::GetLastRouteBackFilename() const
+{
+  tstring fileName;
+  fileName = CPathConfig::GetCommonPath(CPathConfig::CPK_UserPath);
+  fileName += _T("lastroute.db");
+  return fileName;
+}
+
+bool UeGui::CUserDataWrapper::SaveLastRoute() const
+{
+  if (NULL == m_route)
+  {
+    return false;
+  }
+  short planStatue = m_route->GetPlanState();
+  if ((UeRoute::PS_Ready == planStatue) || (UeRoute::PS_RealGuidance == planStatue))
+  {
+    //路线类型:推荐路线,高速优先,最短路径,经济路线
+    unsigned int routeType = m_route->GetMethod();
+    //路线的经由点下标0为起点，目前加上起点和终点总共不超过6个经由点。
+    POIDataList poiList;
+    poiList.clear();
+    //获取起点
+    POIItem poiItem;
+    poiItem.m_type = UeRoute::PT_Start;
+    m_route->GetPosition(poiItem);
+    if(poiItem.m_type != UeRoute::PT_Invalid)
+    {
+      poiList.push_back(poiItem);
+    }
+    //获取中间经由点
+    unsigned int posCount = m_route->GetPosCount();
+    if(posCount > 2)
+    {
+      ::memset(&poiItem, 0, sizeof(POIItem));
+      poiItem.m_type = UeRoute::PT_Middle;
+      for(int i = 1; i < posCount - 1; i++)
+      {
+        m_route->GetPosition(poiItem, i);
+        if(poiItem.m_type != UeRoute::PT_Invalid)
+        {
+          poiList.push_back(poiItem);
+        }
+      }
+    }
+    //获取终点
+    ::memset(&poiItem, 0, sizeof(POIItem));
+    poiItem.m_type = UeRoute::PT_End;
+    m_route->GetPosition(poiItem);
+    if(poiItem.m_type != UeRoute::PT_Invalid)
+    {
+      poiList.push_back(poiItem);
+    }
+
+    tstring fileName = GetLastRouteBackFilename();
+    void *fileHandle = m_fileBasic.OpenFile(fileName, CFileBasic::UE_FILE_WRITE);
+    if(!m_fileBasic.IsValidHandle(fileHandle))
+    {
+      m_fileBasic.CloseFile(fileHandle);
+      return false;
+    }
+
+    m_fileBasic.SeekFile(fileHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+    //先写一个是否有未导航完成路线的标识
+    int count = 1;
+    short tag = 1;
+    m_fileBasic.WriteFile(fileHandle, &tag, sizeof(tag), count);
+    //写路线规划类型
+    m_fileBasic.WriteFile(fileHandle, &routeType, sizeof(routeType), count);
+    //再写当前有多少个经过点
+    unsigned int dataCount = poiList.size();
+    m_fileBasic.WriteFile(fileHandle, &dataCount, sizeof(dataCount), count);
+    //写入路线各经由点
+    for (int i = 0; i < poiList.size(); ++i)
+    {
+      m_fileBasic.WriteFile(fileHandle, &poiList[i], sizeof(POIItem), count);
+    }
+    m_fileBasic.CloseFile(fileHandle);
+  }
+  return false;
+}
+
+bool UeGui::CUserDataWrapper::GetLastRoute( unsigned int& routeType, POIDataList &poiList ) const
+{
+  poiList.clear();
+  tstring fileName = GetLastRouteBackFilename();
+  void *fileHandle = NULL;
+  if(m_pathBasic.IsFileExist(fileName))
+  {
+    fileHandle = m_fileBasic.OpenFile(fileName, CFileBasic::UE_FILE_READ);
+  }
+  else
+  {
+    return false;
+  }
+
+  if(!m_fileBasic.IsValidHandle(fileHandle))
+  {
+    m_fileBasic.CloseFile(fileHandle);
+    return false;
+  }
+  m_fileBasic.SeekFile(fileHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+  //先读取是否有未导航完成路线的标识
+  int count = 1;
+  short tag = 0;
+  void *buffer = &tag;
+  m_fileBasic.ReadFile(fileHandle, &buffer, sizeof(short), count);
+  bool bHaveLastRoute = 1 == tag;
+  if (bHaveLastRoute)
+  {
+    unsigned int routeType = 0;
+    unsigned int dataCount = 0;
+    buffer = &routeType;
+    m_fileBasic.ReadFile(fileHandle, &buffer, sizeof(unsigned int), count);
+    buffer = &dataCount;
+    m_fileBasic.ReadFile(fileHandle, &buffer, sizeof(unsigned int), count);
+    POIItem poiItem;
+    for (int i = 0; i < dataCount; ++i)
+    {
+      ::memset(&poiItem, 0, sizeof(POIItem));
+      buffer = &poiItem;
+      m_fileBasic.ReadFile(fileHandle, &buffer, sizeof(POIItem), count);
+      poiList.push_back(poiItem);
+    }
+  }
+  m_fileBasic.CloseFile(fileHandle);
+  return bHaveLastRoute;
+}
+
+bool UeGui::CUserDataWrapper::ClearLastRoute() const
+{
+  tstring fileName = GetLastRouteBackFilename();
+  void *fileHandle = NULL;
+  if(m_pathBasic.IsFileExist(fileName))
+  {
+    fileHandle = m_fileBasic.OpenFile(fileName, CFileBasic::UE_FILE_WRITE);
+  }
+  else
+  {
+    return true;
+  }
+
+  if(!m_fileBasic.IsValidHandle(fileHandle))
+  {
+    m_fileBasic.CloseFile(fileHandle);
+    return false;
+  }
+  m_fileBasic.SeekFile(fileHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+  //先写一个是否有未导航完成路线的标识
+  int count = 1;
+  short tag = 0;
+  m_fileBasic.WriteFile(fileHandle, &tag, sizeof(tag), count);
+  m_fileBasic.CloseFile(fileHandle);
+  return true;
+}

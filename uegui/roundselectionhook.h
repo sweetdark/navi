@@ -29,17 +29,29 @@ namespace UeGui
       RoundSelectionHook_TypeSelectBtnLabel,
       RoundSelectionHook_TypeSelectBtnIcon,
       RoundSelectionHook_List1CenterBtn,
+      RoundSelectionHook_List1CenterBtnLabel,
       RoundSelectionHook_List2CenterBtn,
+      RoundSelectionHook_List2CenterBtnLabel,
       RoundSelectionHook_List3CenterBtn,
+      RoundSelectionHook_List3CenterBtnLabel,
       RoundSelectionHook_List4CenterBtn,
+      RoundSelectionHook_List4CenterBtnLabel,
       RoundSelectionHook_List5CenterBtn,
+      RoundSelectionHook_List5CenterBtnLabel,
       RoundSelectionHook_List6CenterBtn,
+      RoundSelectionHook_List6CenterBtnLabel,
       RoundSelectionHook_List7CenterBtn,
+      RoundSelectionHook_List7CenterBtnLabel,
       RoundSelectionHook_List8CenterBtn,
+      RoundSelectionHook_List8CenterBtnLabel,
       RoundSelectionHook_List9CenterBtn,
+      RoundSelectionHook_List9CenterBtnLabel,
       RoundSelectionHook_List10CenterBtn,
+      RoundSelectionHook_List10CenterBtnLabel,
       RoundSelectionHook_List11CenterBtn,
+      RoundSelectionHook_List11CenterBtnLabel,
       RoundSelectionHook_List12CenterBtn,
+      RoundSelectionHook_List12CenterBtnLabel,
       RoundSelectionHook_End
     };
 
@@ -66,7 +78,7 @@ namespace UeGui
     void PutItemToList();
 
   private:
-    CUiButton m_listBtn[12];
+    CUiBitButton m_listBtn[12];
     CUiBitButton m_switchBtn;
 
     CCodeIndexCtrl *m_pCurItemCtrl;

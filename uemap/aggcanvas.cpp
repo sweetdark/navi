@@ -7460,8 +7460,8 @@ void CAGGCanvas::RenderFlags(double skyLimit, short scaleLevel, bool isRaster /*
   // Special scenes
   if (!isRaster)
   {
-    //// 画电子眼图标
-    //RenderElecEye(is3d);
+    // 画电子眼图标
+    RenderElecEye(is3d);
     // 车标
     RenderGpsCar(scaleLevel);
     // 指南针

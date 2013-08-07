@@ -16,9 +16,11 @@
 #include "maphook.h"
 #endif
 
+#include "districtselectionhook.h"
+
 using namespace UeGui;
 
-CDistQueryListHook::CDistQueryListHook()
+CDistQueryListHook::CDistQueryListHook() : m_returnType(DHT_Unknown)
 {
   m_strTitle = "请选择一条记录";
   m_vecHookFile.push_back(_T("distquerylisthook.bin"));
@@ -33,6 +35,15 @@ CDistQueryListHook::~CDistQueryListHook()
 
 void CDistQueryListHook::Load()
 {
+  int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
+  if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
+  {
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityAcro);
+  }
+  else
+  {
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
+  }
   char* keyword = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetKeyWord();
   if (keyword != NULL)
   {
@@ -201,9 +212,22 @@ short CDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_distLabel[listIndex].MouseUp();
       if (m_infoBtn[listIndex].IsEnable())
       {
-        CAggHook::TurnTo(DHT_MapHook);
-        CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
-        pMapHook->SetPickPos(m_pointList, listIndex);
+        if (m_returnType == DHT_Unknown)
+        {
+          CAggHook::TurnTo(DHT_MapHook);
+          CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
+          pMapHook->SetPickPos(m_pointList, listIndex);
+        }
+        else
+        {
+          CAggHook::Return();
+          CAggHook::Return();
+          SQLRecord *pRecord(m_records.GetRecord(listIndex));
+          if (pRecord!=0)
+          {
+            ((CDistrictSelectionHook *)m_view->GetHook(DHT_DistrictSelectionHook))->DistQueryListCallBack(pRecord);
+          }
+        }
       }
     } 
     else if (ctrlType >= DistQueryListHook_List1DistBtn && ctrlType <= DistQueryListHook_List7DistBtn)
@@ -222,8 +246,16 @@ short CDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
           CQueryWrapper::Get().SetDefaultQueryKind();
           CQueryWrapper::Get().SetQueryAdmInfo(*(CCodeIndexCtrl::GetDistCodeCtrl().GetItemByCode(item.m_uCode)));
 
-          //按照现在版本的逻辑, 重新跳到输入法入口界面, 返回的是一开始进入的界面
-          CAggHook::GoToMapHook();
+          //按照新逻辑, 直接进入输入法界面, 返回的时候是返回上一个界面
+          int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
+          if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
+          {
+            CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiAcro);
+          }
+          else
+          {
+            CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiName);
+          }
           CInputSwitchHook *inputHook = (CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook);
           if (inputHook)
           {
@@ -292,6 +324,11 @@ void CDistQueryListHook::ResetResultList()
     UeQuery::CTermIndexCtrl::GetKeyWordPosInRecord(oneRecord->m_uniName, sql, posBuffer);
     m_distLabel[i].SetFocusKey(posBuffer);
     m_distBtn[i].SetVisible(true);
+    //如果是从区域选择界面进来则隐藏按钮
+    for (int i=0; i<7; i++)
+    {
+      m_distBtn[i].SetVisible(m_returnType==DHT_Unknown);
+    }
 
     if (!(oneRecord->m_addrCode&0x00ffff))
     {
@@ -318,10 +355,23 @@ void CDistQueryListHook::ResetResultList()
   m_pageUpBtn.SetEnable(m_records.CanUp());
   m_pageDownBtn.SetEnable(m_records.CanDown());
 
-  char* curPage = m_curPageInfo.GetCaption();
-  char* totalPage = m_totalPageInfo.GetCaption();
-  ::sprintf(curPage,"%d",m_records.GetCurPage());
-  ::sprintf(totalPage,"%d",m_records.GetTotalPage());
-  m_curPageInfo.SetCaption(curPage);
-  m_totalPageInfo.SetCaption(totalPage);
+  if (m_records.GetTotalPage() == 0)
+  {
+    m_curPageInfo.SetCaption("0");
+    m_totalPageInfo.SetCaption("0");
+  }
+  else
+  {
+    char* curPage = m_curPageInfo.GetCaption();
+    char* totalPage = m_totalPageInfo.GetCaption();
+    ::sprintf(curPage,"%d",m_records.GetCurPage());
+    ::sprintf(totalPage,"%d",m_records.GetTotalPage());
+    m_curPageInfo.SetCaption(curPage);
+    m_totalPageInfo.SetCaption(totalPage);
+  }
+}
+
+void CDistQueryListHook::SetReturnHookType(int type)
+{
+  m_returnType = type;
 }

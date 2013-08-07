@@ -328,20 +328,20 @@ void UeGui::CRouteWrapper::GetPlanPositionList( PlanPositionList& positionList )
   UeRoute::PlanPosition startPos;
   startPos.m_type = UeRoute::PT_Start;
   m_route->GetPosition(startPos);
-  if(startPos.m_type != UeRoute::PT_Invalid)
+  if (startPos.m_type != UeRoute::PT_Invalid)
   {
     positionList.push_back(startPos);
   }
   //获取中间经由点
   int posCount = m_route->GetPosCount();
-  if(posCount > 2)
+  if (posCount > 2)
   {
     UeRoute::PlanPosition midPos;
     midPos.m_type = UeRoute::PT_Middle;
-    for(int i = 1; i < posCount - 1; i++)
+    for (int i = 1; i < posCount - 1; i++)
     {
       m_route->GetPosition(midPos, i);
-      if(midPos.m_type != UeRoute::PT_Invalid)
+      if (midPos.m_type != UeRoute::PT_Invalid)
       {
         positionList.push_back(midPos);
       }
@@ -351,7 +351,7 @@ void UeGui::CRouteWrapper::GetPlanPositionList( PlanPositionList& positionList )
   UeRoute::PlanPosition endPos;
   endPos.m_type = UeRoute::PT_End;
   m_route->GetPosition(endPos);
-  if(endPos.m_type != UeRoute::PT_Invalid)
+  if (endPos.m_type != UeRoute::PT_Invalid)
   {
     positionList.push_back(endPos);
   }

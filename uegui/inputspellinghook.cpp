@@ -14,13 +14,15 @@
 
 #include "inputswitchhook.h"
 
+#include "inputselecthook.h"
+
 #include "districtselectionhook.h"
 
 using namespace UeGui;
 
 const char cAcrSpelling[][2] = {"a","b","c","d","e","f","g","h",
 "i","j","k","l","m","n","o","p",
-"q","r","s","t","u","v","w","s",
+"q","r","s","t","u","v","w","x",
 "y","z"};
 
 CInputSpellingHook::CInputSpellingHook()
@@ -38,6 +40,8 @@ CInputSpellingHook::~CInputSpellingHook()
 
 void CInputSpellingHook::Init()
 {
+  ::memset(m_poiKeyWord, 0x00, sizeof(m_poiKeyWord));
+  ::memset(m_distKeyWord, 0x00, sizeof(m_distKeyWord));
   CQueryWrapper::Get().SetQueryMode(UeQuery::IndexType::IT_PoiName);
   InitKeyBoard();
   m_iCurCursorIndex = 0;
@@ -49,15 +53,35 @@ void CInputSpellingHook::Init()
 
 void CInputSpellingHook::Load()
 {
+  CInputSwitchHook *inputHook = (CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook);
+  if (inputHook->GetCurInputMethod() != CInputSwitchHook::IM_SpellingMethod)
+  {
+    Return();
+    TurnTo(inputHook->GetCurInputHookType());
+    return;
+  }
+
   m_curSpellingCursor = 0;
   m_posBuffer[0] = 0xff;
   m_isWordsReady = false;
+  m_isAssociateExist = true;
   InitKeyBoard();
-  SetCursorPosX(m_iCurCursorIndex);
 
   CQueryWrapper::Get().SetDefaultQueryKind();
   SetQueryMode();
   GetAssociateThing();
+}
+
+void CInputSpellingHook::UnLoad()
+{
+  if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
+  {
+    ::memcpy(m_distKeyWord, m_keyWordBox.GetCaption(), sizeof(m_distKeyWord));
+  }
+  else
+  {
+    ::memcpy(m_poiKeyWord, m_keyWordBox.GetCaption(), sizeof(m_poiKeyWord));
+  }
 }
 
 void CInputSpellingHook::MakeNames()
@@ -294,6 +318,15 @@ short CInputSpellingHook::MouseUp(CGeoPoint<short> &scrPoint)
   case InputSpellingHook_EditSelectBtnIcon:
     {
       m_editSelectBtn.MouseUp();
+      if (m_editSelectBtn.IsEnable())
+      {
+        CInputSelectHook* hook = (CInputSelectHook*)m_view->GetHook(DHT_InputSelectHook);
+        if (hook)
+        {
+          hook->SetCallBackFun(this, InputSelectCallBack);
+        }
+        TurnTo(DHT_InputSelectHook);
+      }
     }
     break;
   case InputSpellingHook_OtherSearchBtn:
@@ -308,13 +341,17 @@ short CInputSpellingHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_searchBtn.MouseUp();
       if (m_searchBtn.IsEnable())
       {
-        if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_PoiName)
+        if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
         {
-          CAggHook::TurnTo(DHT_PoiQueryListHook);
+          ::memcpy(m_distKeyWord, m_keyWordBox.GetCaption(), sizeof(m_distKeyWord));
+          CQueryWrapper::Get().SaveCurKeyWord(m_distKeyWord, false);
+          CAggHook::TurnTo(DHT_DistQueryListHook);
         }
         else
         {
-          CAggHook::TurnTo(DHT_DistQueryListHook);
+          ::memcpy(m_poiKeyWord, m_keyWordBox.GetCaption(), sizeof(m_poiKeyWord));
+          CQueryWrapper::Get().SaveCurKeyWord(m_poiKeyWord, false);
+          CAggHook::TurnTo(DHT_PoiQueryListHook);
         }
       }
     }
@@ -572,6 +609,10 @@ void CInputSpellingHook::SetCursorPosX(int curIndex)
 bool CInputSpellingHook::GetAssociateThing()
 {
   //
+  if (m_curSpellingCursor == 0)
+  {
+    m_isWordsReady = true;
+  }
   m_iCurWordIndex = 0;
   m_vecWordsBuf.clear();
   //
@@ -610,12 +651,24 @@ void CInputSpellingHook::SetAssociateBtnLabels()
     m_associateBtn[i].SetCaption(m_vecWordsBuf[j].c_str());
     if (!m_isWordsReady)
     {
+      //正在输入拼音
       m_associateBtn[i].SetFocusKey(m_posBuffer);
     }
     else
     {
+      //正在输入联想字
       unsigned char posBuffer[10];
       posBuffer[0] = 0xff;
+      m_associateBtn[i].SetFocusKey(posBuffer);
+    }
+    if (!m_isAssociateExist)
+    {
+      //无可选联想字
+      m_associateBtn[i].SetEnable(false);
+      m_associateBtn[i].SetCaption(m_vecWordsBuf[j].c_str());
+      unsigned char posBuffer[10];
+      posBuffer[0] = 0x00;
+      posBuffer[1] = 0xff;
       m_associateBtn[i].SetFocusKey(posBuffer);
     }
   }
@@ -628,10 +681,13 @@ void CInputSpellingHook::SetAssociateBtnLabels()
     m_associateBtn[i].SetEnable(false);
     m_associateBtn[i].SetCaption("");
   }
+  //设置完变色字体后重新设置
+  m_isAssociateExist = true;
 }
 
 void CInputSpellingHook::ResetSpellingToBtns(int chIndex)
 {
+  m_isWordsReady = false;
   if (m_curSpellingCursor == 0)
   {
     m_iCurWordIndex = 0;
@@ -708,12 +764,21 @@ void CInputSpellingHook::ResetSpellingWordToBtns(const char *pchSpelling)
       ++ iterInfo;
     }
   }
-  SetAssociateBtnLabels();
   if (m_vecWordsBuf.size() == 0)
   {
     InitKeyBoard();
     m_deleteBtn.SetEnable(m_iCurCursorIndex);
+
+    m_vecWordsBuf.push_back("无");
+    m_vecWordsBuf.push_back("可");
+    m_vecWordsBuf.push_back("选");
+    m_vecWordsBuf.push_back("联");
+    m_vecWordsBuf.push_back("想");
+    m_vecWordsBuf.push_back("字");
+
+    m_isAssociateExist = false;
   }
+  SetAssociateBtnLabels();
 
   m_isWordsReady = true;
 }
@@ -764,7 +829,26 @@ void CInputSpellingHook::SetKeyBoardBtnsEnable()
 
 char* CInputSpellingHook::GetKeyWord()
 {
-  return m_keyWordBox.GetCaption();
+  if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
+  {
+    return m_distKeyWord;
+  }
+  else
+  {
+    return m_poiKeyWord;
+  }
+}
+
+void CInputSpellingHook::SetKeyWord(char* keyword)
+{
+  if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
+  {
+    ::memcpy(m_distKeyWord, keyword, sizeof(m_distKeyWord));
+  }
+  else
+  {
+    ::memcpy(m_poiKeyWord, keyword, sizeof(m_poiKeyWord));
+  }
 }
 
 void CInputSpellingHook::DistSwitchCallBack(void *pDoCallBackObj,const SQLRecord *pResult)
@@ -785,33 +869,42 @@ void CInputSpellingHook::DoDistSwitchCallBack(const SQLRecord *pResult)
   GetAssociateThing();
 }
 
+void CInputSpellingHook::InputSelectCallBack(void *pDoCallBackObj, char *keyword)
+{
+  if (pDoCallBackObj)
+  {
+    ((CInputSpellingHook *)pDoCallBackObj)->DoInputSelectCallBack(keyword);
+  }
+}
+
+void CInputSpellingHook::DoInputSelectCallBack(char *keyword)
+{
+  SetKeyWord(keyword);
+}
+
 void CInputSpellingHook::SetQueryMode()
 {
-  //如果搜索类型与上次不一样则清空关键字
-  int indexType = CQueryWrapper::Get().GetSQLSentence().m_indexType;
-  //判断搜索类型的条件是用打开输入法界面的上一个界面
-  if (CAggHook::GetPrevHookType() == DHT_QueryMenuHook || CAggHook::GetPrevHookType() == DHT_DistrictSelectionHook)
+  if (CAggHook::GetPrevHookType() == DHT_MapHook)
   {
-    if (indexType != UeQuery::IT_CityName && indexType != UeQuery::IT_CityAcro)
-    {
-      ResetKeyWord("");
-    }
-    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
-    m_distSwitchBtn.SetCaption("全国");
-    m_distSwitchBtn.SetEnable(false);
-    m_distSelectBtn.SetEnable(false);
-    m_otherSearchBtn.SetVisible(false);
-  }
-  else
-  {
-    if (indexType == UeQuery::IT_CityAcro || indexType == UeQuery::IT_CityName)
-    {
-      ResetKeyWord("");
-    }
     CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiName);
+  }
+
+  //根据搜索类型切换界面
+  int indexType = CQueryWrapper::Get().GetSQLSentence().m_indexType;
+  if (indexType == UeQuery::IT_PoiName || indexType == UeQuery::IT_RoadName)
+  {
+    ResetKeyWord(m_poiKeyWord);
     m_distSwitchBtn.SetCaption(CQueryWrapper::Get().GetQueryAdmName());
     m_distSwitchBtn.SetEnable(true);
     m_distSelectBtn.SetEnable(true);
     m_otherSearchBtn.SetVisible(true);
+  }
+  else
+  {
+    ResetKeyWord(m_distKeyWord);
+    m_distSwitchBtn.SetCaption("全国");
+    m_distSwitchBtn.SetEnable(false);
+    m_distSelectBtn.SetEnable(false);
+    m_otherSearchBtn.SetVisible(false);
   }
 }

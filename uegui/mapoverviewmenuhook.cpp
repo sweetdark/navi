@@ -219,6 +219,14 @@ void UeGui::CMapOverViewMenuHook::Update()
   {
     CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
     mapHook->HideAllCtrl();
-    mapHook->ShowMapScalingBtn(true);
-  }  
-}
+    mapHook->ShowMapScalingBtn(true); 
+    mapHook->ShowTimeBtn();
+  }
+  m_button1.SetVisible(false);
+  m_button2.SetVisible(false);
+  m_button3.SetVisible(false);
+  m_button4.SetVisible(false);
+  m_delimiter1.SetVisible(false);
+  m_delimiter2.SetVisible(false);
+  m_delimiter3.SetVisible(false);
+};

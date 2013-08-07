@@ -95,6 +95,12 @@ namespace UeGui
     void MakeControls();
   private:
     /**
+    * \brief 显示和隐藏菜单栏
+    * param bShow 显示还是隐藏
+    * param bExpand 展开还是收缩
+    */
+    void ShowMenuBar(bool bShow, bool bExpand);
+    /**
     * \brief 减速
     */
     void SlowlyDown();
@@ -110,6 +116,10 @@ namespace UeGui
     * \brief 设置按钮文字状态
     */
     void ResetSpeedBtnCaption();
+    /**
+    * \brief 刷新速度值
+    */
+    void RefreshSpeedLabel();
   private:
     CAggHook* m_parentHook;
     //展开菜单按钮

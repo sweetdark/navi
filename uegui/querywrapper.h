@@ -105,6 +105,10 @@ namespace UeGui
     const UeQuery::SQLRecord *GetNearestPoi(CGeoPoint<long> &curPos,long radius=10);
     //获取某点所属当前区域的中心位置,eg:pOneRecord->m_addrCode=440101时获取广州市越秀区的中心点
     const UeQuery::SQLRecord *GetAdmCenterPoi(const UeQuery::SQLRecord *pOneRecord);
+    //保存当前检索输入的关键字
+    void SaveCurKeyWord(const char *pchKeyWord,bool bIsAcro);
+    //获取之前检索输入的历史关键字
+    void GetHistoryKeyword(std::vector<string> &vecHistoryKey,bool bIsAcro);
   private:
     CQueryWrapper(void);
     //是否无任何条件处理事件

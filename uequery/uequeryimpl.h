@@ -61,7 +61,7 @@ namespace UeQuery
 	public:
 		CUeQueryImpl(void):m_records(0),m_pRoadEntryCtrl(0),
 			m_pRoadDistCodeCtrl(0),m_pRecentCtrl(0),m_pFavoriteCtrl(0),
-			m_pHistoryrecordCtrl(0) {};
+			m_pHistoryrecordCtrl(0),m_pHistKeywordHandle(0) {};
 		~CUeQueryImpl(void)
 		{
 			Release();
@@ -113,6 +113,10 @@ namespace UeQuery
 		unsigned int RemoveAllHistoryRecord();
 		//更新索引为order的历史记录
 		unsigned UpdateHistoryRecord(const HistoryRecordEntry &curHisRecord,int order);
+    //保存当前检索输入的关键字
+    unsigned SaveCurKeyWord(const char *pchKeyWord,bool bIsAcro);
+    //获取之前检索输入的历史关键字
+    unsigned GetHistoryKeyword(std::vector<string> &vecHistoryKey,bool bIsAcro);
 		//
 		virtual bool ForCollegues(void)
 		{
@@ -159,6 +163,7 @@ namespace UeQuery
 		bool InitRecentCtrl(void);
 		bool InitFavoriteCtrl(void);
 		bool InitHistoryrecordCtrl(void);
+    bool InitHistoryKeywordCtrl(void);
 		//
 		unsigned ConnectToRecent(void);
 		unsigned DisconnectRecent(void);
@@ -200,6 +205,23 @@ namespace UeQuery
 		CCustomerFileReader *m_pRecentCtrl;
 		CCustomerFileReader *m_pFavoriteCtrl;
 		CCustomerFileReader *m_pHistoryrecordCtrl;
-	};
+    //
+    void *m_pHistKeywordHandle;
+    //
+    struct THistoryKeywordEntry
+    {
+      const static long MaxKeywordNum = 5;
+      const static long MaxKeywordLen = 128;
+      //
+      THistoryKeywordEntry(void):m_recordNum(0)
+      {
+        ::memset(m_keywordList,0,MaxKeywordLen*MaxKeywordNum);
+      }
+      //
+      long m_recordNum;
+      char m_keywordList[MaxKeywordLen*MaxKeywordNum];
+    };
+    THistoryKeywordEntry m_keywordList[2];
+  };
 }
 #endif

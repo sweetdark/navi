@@ -83,6 +83,8 @@ namespace UeGui
 
     virtual void Load();
 
+    virtual void UnLoad();
+
     SQLRecord* GetCurRoadInfo();
 
   protected:

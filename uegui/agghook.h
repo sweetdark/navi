@@ -251,16 +251,28 @@ namespace UeGui
     */    
     void ClearFocusTextElements();
   public:
-    //跳转到某一个hook的界面
-    void TurnTo(int hookType);
-    //返回到前一个hook
-    void Return();
     /**
-    * 获得前一个hook的类型,没有则返回DHT_Unknown
+    * \跳转到某一个hook的界面
+    * param: bUnLoadCurHook 是否调用当前Hook的UnLoad()函数(当前Hook不是要TurnTo的Hook)
+    */   
+    void TurnTo(int hookType, bool bUnLoadCurHook = true);
+    /**
+    * \返回到前一个hook
+    * param: bUnLoadCurHook 是否调用要返回的前一个Hook的Load()函数
+    */   
+    void Return(bool bLoadPreHook = true);
+    /**
+    * \获得前一个hook的类型,没有则返回DHT_Unknown
     */
     int GetPrevHookType();
-    //返回地图的按钮调用，并清空栈。
+    /**
+    * \返回地图的按钮调用，并清空栈
+    */
     void GoToMapHook();
+    /**
+    * \brief 回退到指定类型的hook，里面没有调用Load和UnLoad方法。
+    */
+    void Fall(int hookType);
   protected:
     //
     // GUI response functions
@@ -434,7 +446,10 @@ namespace UeGui
     CAggHook* GetChildHook(HookType hookType);
     //判断是否是局部渲染
     bool IsPartRefresh(const CGeoRect<short> &scrExtent);
-
+    //递归判断子hook中是否有局部渲染的元素，子hook层次不应该过大，控制在5层以内
+    void RenderChildHooksRenderElements(const CGeoRect<short> &scrExtent, AggHookMap &childHookList, bool &isHasRenderElement);
+    //递归清除子hook的局部渲染元素
+    void ClearChildHooksRenderElements(AggHookMap &childHookList);
     /**
     * 获取当前元素需要进行焦点变色的文字信息
     * 如果读取不到则返回NULL，证明该元素不需要进行焦点文字变色

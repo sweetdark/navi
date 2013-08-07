@@ -15,6 +15,8 @@
 
 #include "inputswitchhook.h"
 
+#include "inputselecthook.h"
+
 using namespace UeGui;
 
 short CInputHandHook::m_writingNum(0);
@@ -39,6 +41,8 @@ CInputHandHook::~CInputHandHook()
 
 void CInputHandHook::Init()
 {
+  ::memset(m_poiKeyWord, 0x00, sizeof(m_poiKeyWord));
+  ::memset(m_distKeyWord, 0x00, sizeof(m_distKeyWord));
   CQueryWrapper::Get().SetQueryMode(UeQuery::IndexType::IT_PoiName);
   m_iCurCursorIndex = 0;
   m_vecWordPosX.clear();
@@ -47,6 +51,15 @@ void CInputHandHook::Init()
 
 void CInputHandHook::Load()
 {
+  CInputSwitchHook *inputHook = (CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook);
+  if (inputHook->GetCurInputMethod() != CInputSwitchHook::IM_HandMethod)
+  {
+    Return();
+    TurnTo(inputHook->GetCurInputHookType());
+    return;
+  }
+
+  m_isIdentify = false;
   CQueryWrapper::Get().SetDefaultQueryKind();
   SetQueryMode();
   GetAssociateThing();
@@ -54,6 +67,15 @@ void CInputHandHook::Load()
 
 void CInputHandHook::UnLoad()
 {
+  if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
+  {
+    ::memcpy(m_distKeyWord, m_keyWordBox.GetCaption(), sizeof(m_distKeyWord));
+  }
+  else
+  {
+    ::memcpy(m_poiKeyWord, m_keyWordBox.GetCaption(), sizeof(m_poiKeyWord));
+  }
+
   m_isNewChar = true;
   if (m_renderingDC!=0)
   {
@@ -318,6 +340,15 @@ short CInputHandHook::MouseUp(CGeoPoint<short> &scrPoint)
   case InputHandHook_EditSelectBtnIcon:
     {
       m_editSelectBtn.MouseUp();
+      if (m_editSelectBtn.IsEnable())
+      {
+        CInputSelectHook* hook = (CInputSelectHook*)m_view->GetHook(DHT_InputSelectHook);
+        if (hook)
+        {
+          hook->SetCallBackFun(this, InputSelectCallBack);
+        }
+        TurnTo(DHT_InputSelectHook);
+      }
     }
     break;
   case InputHandHook_OtherSearchBtn:
@@ -332,13 +363,17 @@ short CInputHandHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_searchBtn.MouseUp();
       if (m_searchBtn.IsEnable())
       {
-        if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_PoiName)
+        if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
         {
-          CAggHook::TurnTo(DHT_PoiQueryListHook);
+          ::memcpy(m_distKeyWord, m_keyWordBox.GetCaption(), sizeof(m_distKeyWord));
+          CQueryWrapper::Get().SaveCurKeyWord(m_distKeyWord, false);
+          CAggHook::TurnTo(DHT_DistQueryListHook);
         }
         else
         {
-          CAggHook::TurnTo(DHT_DistQueryListHook);
+          ::memcpy(m_poiKeyWord, m_keyWordBox.GetCaption(), sizeof(m_poiKeyWord));
+          CQueryWrapper::Get().SaveCurKeyWord(m_poiKeyWord, false);
+          CAggHook::TurnTo(DHT_PoiQueryListHook);
         }
       }
     }
@@ -400,6 +435,7 @@ short CInputHandHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (curIndex!=m_iCurCursorIndex)
       {
         SetCursorPosX(curIndex);
+        m_isIdentify = false;
       }
     }
     break;
@@ -408,8 +444,18 @@ short CInputHandHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       short tempcode = ctrlType-InputHandHook_InputCode1;
       m_inputCode[tempcode].MouseUp();
-      AddOneKeyWord(m_inputCode[tempcode].GetCaption());
-      GetAssociateThing();
+      if (m_isIdentify)
+      {
+        EraseOneKeyWord();
+        AddOneKeyWord(m_inputCode[tempcode].GetCaption());
+        GetAssociateThing();
+        m_isIdentify = false;
+      }
+      else
+      {
+        AddOneKeyWord(m_inputCode[tempcode].GetCaption());
+        GetAssociateThing();
+      }
       break;
     }
     else if (m_isWriting && m_pWrittingArea->m_extent.IsContain(scrPoint))
@@ -577,10 +623,7 @@ bool CInputHandHook::GetAssociateThing()
       m_inputCode[i].SetCaption("");
     }
   }
-  else
-  {
-    SetAssociateBtnLabels();
-  }
+  SetAssociateBtnLabels();
 
   return true;
 }
@@ -606,7 +649,26 @@ void CInputHandHook::SetAssociateBtnLabels()
 
 char* CInputHandHook::GetKeyWord()
 {
-  return m_keyWordBox.GetCaption();
+  if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
+  {
+    return m_distKeyWord;
+  }
+  else
+  {
+    return m_poiKeyWord;
+  }
+}
+
+void CInputHandHook::SetKeyWord(char* keyword)
+{
+  if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
+  {
+    ::memcpy(m_distKeyWord, keyword, sizeof(m_distKeyWord));
+  }
+  else
+  {
+    ::memcpy(m_poiKeyWord, keyword, sizeof(m_poiKeyWord));
+  }
 }
 
 void CInputHandHook::DoHandWriting(int curTime)
@@ -646,6 +708,7 @@ void CInputHandHook::DoHandWriting(int curTime)
         if (iWordNum!=0)
         {
           AddOneKeyWord(m_inputCode[0].GetCaption());
+          m_isIdentify = true;
         }
         delete[] pusWordBuf;
       }
@@ -746,33 +809,42 @@ void CInputHandHook::DoDistSwitchCallBack(const SQLRecord *pResult)
   GetAssociateThing();
 }
 
+void CInputHandHook::InputSelectCallBack(void *pDoCallBackObj, char *keyword)
+{
+  if (pDoCallBackObj)
+  {
+    ((CInputHandHook *)pDoCallBackObj)->DoInputSelectCallBack(keyword);
+  }
+}
+
+void CInputHandHook::DoInputSelectCallBack(char *keyword)
+{
+  SetKeyWord(keyword);
+}
+
 void CInputHandHook::SetQueryMode()
 {
-  //如果搜索类型与上次不一样则清空关键字
-  int indexType = CQueryWrapper::Get().GetSQLSentence().m_indexType;
-  //判断搜索类型的条件是用打开输入法界面的上一个界面
-  if (CAggHook::GetPrevHookType() == DHT_QueryMenuHook || CAggHook::GetPrevHookType() == DHT_DistrictSelectionHook)
+  if (CAggHook::GetPrevHookType() == DHT_MapHook)
   {
-    if (indexType != UeQuery::IT_CityName && indexType != UeQuery::IT_CityAcro)
-    {
-      ResetKeyWord("");
-    }
-    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
-    m_distSwitchBtn.SetCaption("全国");
-    m_distSwitchBtn.SetEnable(false);
-    m_distSelectBtn.SetEnable(false);
-    m_otherSearchBtn.SetVisible(false);
-  }
-  else
-  {
-    if (indexType == UeQuery::IT_CityAcro || indexType == UeQuery::IT_CityName)
-    {
-      ResetKeyWord("");
-    }
     CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiName);
+  }
+
+  //根据搜索类型切换界面
+  int indexType = CQueryWrapper::Get().GetSQLSentence().m_indexType;
+  if (indexType == UeQuery::IT_PoiName || indexType == UeQuery::IT_RoadName)
+  {
+    ResetKeyWord(m_poiKeyWord);
     m_distSwitchBtn.SetCaption(CQueryWrapper::Get().GetQueryAdmName());
     m_distSwitchBtn.SetEnable(true);
     m_distSelectBtn.SetEnable(true);
     m_otherSearchBtn.SetVisible(true);
+  }
+  else
+  {
+    ResetKeyWord(m_distKeyWord);
+    m_distSwitchBtn.SetCaption("全国");
+    m_distSwitchBtn.SetEnable(false);
+    m_distSelectBtn.SetEnable(false);
+    m_otherSearchBtn.SetVisible(false);
   }
 }

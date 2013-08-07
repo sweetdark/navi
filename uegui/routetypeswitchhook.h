@@ -14,6 +14,7 @@
 
 namespace UeGui
 {
+  typedef void (*RouteTypeCallBack) (CAggHook *sender, unsigned int planMethod);
   class UEGUI_CLASS CRouteTypeSwitchHook : public CAggHook
   {
   public:
@@ -49,6 +50,8 @@ namespace UeGui
 
     virtual bool operator ()() { return true; }
 
+    static void SetRouteTypeCallBackFun(CAggHook *sender, RouteTypeCallBack callBack);
+
   protected:
     virtual tstring GetBinaryFileName();
 
@@ -59,6 +62,16 @@ namespace UeGui
   private:
     void ChangeRouteType(unsigned int planMethod);
 
+    
+    void RouteReplan();
+
+    void DoCallBack();
+
+  private:
+    unsigned int m_planMethod;
+
+    static RouteTypeCallBack m_callBackFun;
+    static CAggHook *m_sender;
   private:
     CUiButton m_grayBackCtrl;
     CUiBitButton m_highWayBtnCtrl;

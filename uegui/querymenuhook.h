@@ -59,6 +59,8 @@ namespace UeGui
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
+    virtual void Load();
+
   protected:
 
     virtual void MakeNames();

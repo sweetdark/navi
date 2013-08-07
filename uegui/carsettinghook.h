@@ -61,8 +61,6 @@ namespace UeGui
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
     virtual bool operator ()();
-    
-    //virtual void Load();
 
   protected:
     virtual tstring GetBinaryFileName();
@@ -92,19 +90,6 @@ namespace UeGui
     CUiRadioButton m_rCarIcon8;
     CUiRadioButton m_rCarIcon9;
     CUiRadioButton m_rCarIcon10;
-
-    CUiButton m_iconOnePickCtrl;
-    CUiButton m_iconTwoPickCtrl;
-    CUiButton m_iconThreePickCtrl;
-    CUiButton m_iconFourPickCtrl;
-    CUiButton m_iconFivePickCtrl;
-    CUiButton m_iconSixPickCtrl;
-    CUiButton m_iconSevenPickCtrl;
-    CUiButton m_iconEightPickCtrl;
-    CUiButton m_iconNinePickCtrl;  
-    CUiButton m_iconTenPickCtrl;
-    
-    
   };
 }
 #endif

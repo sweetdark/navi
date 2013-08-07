@@ -239,14 +239,14 @@ short CSoundMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   if (needRefresh)
   {
     CMapHook* mapHook = dynamic_cast<CMapHook*>(m_view->GetHook(DHT_MapHook));
-    if (mapHook->m_isSplit)
-    {
-      m_view->Refresh();
-    }
-    else
-    {
-      Refresh();
-    }
+    //if (mapHook->m_isSplit)
+    //{
+    //  m_view->Refresh();
+    //}
+    //else
+    //{
+    //  Refresh();
+    //}
     
   }  
   return upElementType;

@@ -846,14 +846,6 @@
 				RelativePath=".\guioperationright.h"
 				>
 			</File>
-			<File
-				RelativePath=".\guisetting.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\guisetting.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="hooks"
@@ -883,14 +875,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\capacityinformationhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\capacityinformationhook.h"
-				>
-			</File>
-			<File
 				RelativePath=".\carsettinghook.cpp"
 				>
 			</File>
@@ -904,22 +888,6 @@
 			</File>
 			<File
 				RelativePath=".\city3Dhook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\comportsettinghook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\comportsettinghook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\crosspicsettinghook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\crosspicsettinghook.h"
 				>
 			</File>
 			<File
@@ -944,14 +912,6 @@
 			</File>
 			<File
 				RelativePath=".\ddtupdateservicehook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\declaresettinghook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\declaresettinghook.h"
 				>
 			</File>
 			<File
@@ -987,27 +947,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\eeyesettinghook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\eeyesettinghook.h"
-				>
-			</File>
-			<File
 				RelativePath=".\fasthandlehelphook.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\fasthandlehelphook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\gpshook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\gpshook.h"
 				>
 			</File>
 			<File
@@ -1091,14 +1035,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\mapmenuhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\mapmenuhook.h"
-				>
-			</File>
-			<File
 				RelativePath=".\mapnavigationhook.cpp"
 				>
 			</File>
@@ -1179,14 +1115,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\multiroutepathoptionhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\multiroutepathoptionhook.h"
-				>
-			</File>
-			<File
 				RelativePath=".\myaddressbookhook.cpp"
 				>
 			</File>
@@ -1251,22 +1179,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\promptsettinghook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\promptsettinghook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\resetdestinationhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\resetdestinationhook.h"
-				>
-			</File>
-			<File
 				RelativePath=".\RestoreDefaultshook.cpp"
 				>
 			</File>
@@ -1283,35 +1195,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\routesettinghook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\routesettinghook.h"
-				>
-			</File>
-			<File
 				RelativePath=".\routetypeselecthook.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\routetypeselecthook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\safetysettinghook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\safetysettinghook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\soundmenuhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\soundmenuhook.h"
 				>
 			</File>
 			<File
@@ -1328,22 +1216,6 @@
 			</File>
 			<File
 				RelativePath=".\terminationnavigationhook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\timesettinghook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\timesettinghook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\tracksettinghook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\tracksettinghook.h"
 				>
 			</File>
 			<File
@@ -1368,14 +1240,6 @@
 			</File>
 			<File
 				RelativePath=".\versioninfohook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\voicesettinghook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\voicesettinghook.h"
 				>
 			</File>
 		</Filter>
@@ -1563,6 +1427,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\promptsettinghook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\promptsettinghook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\querymenuhook.cpp"
 				>
 			</File>
@@ -1584,6 +1456,14 @@
 			</File>
 			<File
 				RelativePath=".\routeoperationhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\routesettinghook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\routesettinghook.h"
 				>
 			</File>
 			<File
@@ -1624,6 +1504,14 @@
 			</File>
 			<File
 				RelativePath=".\usuallyhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\voicesettinghook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\voicesettinghook.h"
 				>
 			</File>
 		</Filter>
@@ -1671,6 +1559,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\inputselecthook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\inputselecthook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\inputspellinghook.cpp"
 				>
 			</File>
@@ -1700,6 +1596,22 @@
 			</File>
 			<File
 				RelativePath=".\qcodeinputhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\queryaddressbookhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\queryaddressbookhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\queryhistoryhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\queryhistoryhook.h"
 				>
 			</File>
 			<File

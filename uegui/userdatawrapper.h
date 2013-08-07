@@ -18,6 +18,10 @@ using namespace UeMap;
 
 using namespace UeModel;
 
+#include "uebase/pathbasic.h"
+#include "uebase/filebasic.h"
+using namespace UeBase;
+
 #include "usuallyfile.h"
 
 
@@ -171,7 +175,7 @@ namespace UeGui
 
     //获取历史路线的名称
     bool GetRecentName(unsigned int index, char *recentName) const;
-  
+
     /*
     * \brief 修改历史路线的名称。
     */
@@ -195,11 +199,23 @@ namespace UeGui
     unsigned int ConnectToHistoryRecord(void) const;
     unsigned int DisconnectHistoryRecord(void) const;
 
-    
-
+    /*
+    * \brief 保存最后最后一次未导航完成的路线
+    */
+    bool SaveLastRoute() const;
+    /*
+    * \brief 读取最后一次未导航完成的路线
+    */
+    bool GetLastRoute(unsigned int& routeType, POIDataList &poiList) const;
+    /*
+    * \brief 清除上次保存的未导航完成路线
+    */
+    bool ClearLastRoute() const;
   private:
     //设置地址名称
     void SetAddrName(const PlanPosition& planPos, char *addrName) const;
+    //读取最后一次未导航完成的路线保存文件名称
+    tstring GetLastRouteBackFilename() const;
   private:
     UeMap::IView *m_view;
     UeRoute::IRoute *m_route;
@@ -209,6 +225,8 @@ namespace UeGui
     static CUserDataWrapper m_userDataWrapper;
 
     UeQuery::SQLSetting setting;
+    const CPathBasic &m_pathBasic;
+    const CFileBasic &m_fileBasic;
   };
 }
 

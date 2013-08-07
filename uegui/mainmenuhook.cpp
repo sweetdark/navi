@@ -221,6 +221,7 @@ short CMainMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case mainmenuhook_RoutePlanLable:
     {
       m_routePlanBackgroundCtrl.MouseUp();
+      TurnTo(DHT_AdjustRouteHook);
     }
     break;
   case mainmenuhook_ServeBackground:

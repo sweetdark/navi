@@ -5,6 +5,12 @@
 #include "uegui.h"
 #endif
 
+#ifndef _UEQUERY_CODEINDEXCTRL_H
+#include "uequery/codeindexctrl.h"
+#endif
+
+#include "uequery/uerecord.h"
+
 #include "menubackgroundhook.h"
 
 //#include "uilabel.h"
@@ -89,9 +95,13 @@ namespace UeGui
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
+    virtual void Init();
+
     virtual void Load();
 
     virtual void UnLoad();
+
+    void SetQueryTypeInfo(TCodeEntry *tcodeEntry);
 
   protected:
 
@@ -133,6 +143,10 @@ namespace UeGui
     PointList m_pointList;
 
     RoundQueryType m_queryType;
+
+    TCodeEntry m_tCodeEntry;
+    //刚在地图界面进入的时候记录地图中心点
+    CGeoPoint<long> m_mapCenterPos;
   };
 }
 #endif

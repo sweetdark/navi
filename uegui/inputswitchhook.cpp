@@ -261,19 +261,19 @@ void CInputSwitchHook::SwitchInputMethod()
   {
   case IM_AcronymMethod:
     hookType = DHT_InputAcronymHook;
-    ((CInputAcronymHook *)m_view->GetHook(DHT_InputAcronymHook))->ResetKeyWord(m_arcKeyword);
+    ((CInputAcronymHook *)m_view->GetHook(DHT_InputAcronymHook))->SetKeyWord(m_arcKeyword);
     break;
   case IM_SpellingMethod:
     hookType = DHT_InputSpellingHook;
-    ((CInputSpellingHook *)m_view->GetHook(DHT_InputSpellingHook))->ResetKeyWord(m_keyword);
+    ((CInputSpellingHook *)m_view->GetHook(DHT_InputSpellingHook))->SetKeyWord(m_keyword);
     break;
   case IM_CharMethod:
     hookType = DHT_InputCharHook;
-    ((CInputCharHook *)m_view->GetHook(DHT_InputCharHook))->ResetKeyWord(m_keyword);
+    ((CInputCharHook *)m_view->GetHook(DHT_InputCharHook))->SetKeyWord(m_keyword);
     break;
   case IM_HandMethod:
     hookType = DHT_InputHandHook;
-    ((CInputHandHook *)m_view->GetHook(DHT_InputHandHook))->ResetKeyWord(m_keyword);
+    ((CInputHandHook *)m_view->GetHook(DHT_InputHandHook))->SetKeyWord(m_keyword);
     break;
   }
 

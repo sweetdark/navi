@@ -80,11 +80,15 @@ namespace UeGui
 
     char* GetKeyWord();
 
+    void SetKeyWord(char* keyword);
+
     void SetQueryMode();
 
   protected:
 
     virtual void Load();
+
+    virtual void UnLoad();
 
     virtual void Init();
 
@@ -104,6 +108,10 @@ namespace UeGui
     static void DistSwitchCallBack(void *pDoCallBackObj, const SQLRecord *pResult);
 
     void DoDistSwitchCallBack(const SQLRecord *pResult);
+
+    static void InputSelectCallBack(void *pDoCallBackObj, char *keyword);
+
+    void DoInputSelectCallBack(char *keyword);
 
   private:
     CUiButton m_distSwitchBtn;
@@ -127,6 +135,12 @@ namespace UeGui
     int m_iCurWordIndex;
     //保存当前的要显示在按钮上的文字
     std::vector<string> m_vecWordsBuf;
+    //保存搜索poi和路名用的关键字
+    char m_poiKeyWord[128];
+    //保存搜索区域用的关键字
+    char m_distKeyWord[128];
+    //关键字过长显示不全时, 标识从第几个字开始显示
+    int m_wordPosOffset;
   };
 }
 #endif

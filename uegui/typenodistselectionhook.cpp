@@ -4,6 +4,9 @@
 #include "querywrapper.h"
 #endif
 
+#include "typenodistquerylisthook.h"
+#include "typeindistquerylisthook.h"
+
 using namespace UeGui;
 
 CTypeNoDistSelectionHook::CTypeNoDistSelectionHook()
@@ -288,10 +291,13 @@ short CTypeNoDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
 
         if (CAggHook::GetPrevHookType() == DHT_RoundSelectionHook)
         {
+          ((CTypeNoDistQueryListHook *)m_view->GetHook(DHT_TypeNoDistQueryListHook))->SetQueryTypeInfo(&m_vecSubListItem[index]);
           CAggHook::TurnTo(DHT_TypeNoDistQueryListHook);
         }
         else
         {
+          ((CTypeInDistQueryListHook *)m_view->GetHook(DHT_TypeInDistQueryListHook))->SetQueryTypeInfo(&m_vecSubListItem[index]);
+          ((CTypeNoDistQueryListHook *)m_view->GetHook(DHT_TypeNoDistQueryListHook))->SetQueryTypeInfo(&m_vecSubListItem[index]);
           CAggHook::Return();
         }
         

@@ -1,6 +1,6 @@
 #include "multiroutepathoptionhook.h"
 #include "maphook.h"
-#include "guisetting.h"
+#include "settingwrapper.h"
 
 using namespace UeGui;
 
@@ -244,9 +244,9 @@ void CMultiRoutePathOptionHook::SaveMultiMethod( unsigned int planMethod )
    UeBase::RouteSettings::RouteWay methodType;
 
    //获取内存里的路线配置信息
-   CGuiSettings* setting = CGuiSettings::GetGuiSettings();
+   CSettingWrapper &settingWrapper = CSettingWrapper::Get();
    //获取道路规避类型
-   unsigned int PlanAvoidRouteType=setting->GetAvoidRoute();
+   unsigned int PlanAvoidRouteType=settingWrapper.GetAvoidRoute();
 
    //
    planMethod |=UeModel::VT_Car;

@@ -12,29 +12,32 @@
 //#include "uilabel.h"
 #include "uibutton.h"
 //#include "uiradiobutton.h"
-//#include "uicheckbutton.h"
+#include "uicheckbutton.h"
 
 namespace UeGui
 {
   class UEGUI_CLASS COtherSystemSettingHook : public CAggHook
   {
+    friend class CSystemLeftHook;
+
+    COtherSystemSettingHook();
+
+    virtual ~COtherSystemSettingHook();
   public:
     enum othersystemsettinghookCtrlType
     {
       othersystemsettinghook_Begin = 0,
       othersystemsettinghook_PromptLabel,
+
       othersystemsettinghook_SpDeclarationBtn,
       othersystemsettinghook_SpDeclarationIcon,
       othersystemsettinghook_SpDeclarationLabel,
+
       othersystemsettinghook_FastOperatPanelBtn,
       othersystemsettinghook_FastOperatPanelIcon,
       othersystemsettinghook_FastOperatPanelLabel,
       othersystemsettinghook_End
-    };
-
-    COtherSystemSettingHook();
-
-    virtual ~COtherSystemSettingHook();
+    };    
 
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
@@ -45,6 +48,12 @@ namespace UeGui
     virtual bool operator ()();
 
   protected:
+    void ReadSetting();
+
+    void SaveSetting();
+
+    void MakeGUI();
+
     virtual tstring GetBinaryFileName();
 
     virtual void MakeNames();
@@ -52,11 +61,12 @@ namespace UeGui
     void MakeControls();
 
   private:
-    CUiBitButton m_fastOperatPanelCtrl;
+    CUiCheckButton m_fastOperatPanelCtrl;
     CUiLabel m_fastOperatPanelLabelCtrl;
-    CUiLabel m_promptLabelCtrl;
-    CUiBitButton m_spDeclarationCtrl;
+    CUiCheckButton m_spDeclarationCtrl;
     CUiLabel m_spDeclarationLabelCtrl;
+    bool m_changePanel;
+    bool m_changeDeclaration;
   };
 }
 #endif

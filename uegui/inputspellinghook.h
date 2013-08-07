@@ -93,11 +93,15 @@ namespace UeGui
 
     char* GetKeyWord();
 
+    void SetKeyWord(char* keyword);
+
     void SetQueryMode();
 
   protected:
 
     virtual void Load();
+
+    virtual void UnLoad();
 
     virtual void Init();
 
@@ -128,6 +132,10 @@ namespace UeGui
     static void DistSwitchCallBack(void *pDoCallBackObj, const SQLRecord *pResult);
 
     void DoDistSwitchCallBack(const SQLRecord *pResult);
+
+    static void InputSelectCallBack(void *pDoCallBackObj, char *keyword);
+
+    void DoInputSelectCallBack(char *keyword);
 
   private:
     CUiButton m_distSwitchBtn;
@@ -161,6 +169,12 @@ namespace UeGui
     int m_curSpellingCursor;
     //用于记录输入过的字母变色
     unsigned char m_posBuffer[10];
+    //保存搜索poi和路名用的关键字
+    char m_poiKeyWord[128];
+    //保存搜索区域用的关键字
+    char m_distKeyWord[128];
+    //判断是否无联想字
+    bool m_isAssociateExist;
   };
 }
 #endif

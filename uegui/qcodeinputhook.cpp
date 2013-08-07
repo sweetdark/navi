@@ -21,7 +21,7 @@ using namespace UeGui;
 
 CQCodeInputHook::CQCodeInputHook()
 {
-  m_strTitle = "";
+  m_strTitle = "²éQÂë";
   m_vecHookFile.push_back(_T("qcodeinputhook.bin"));
 }
 

@@ -33,7 +33,7 @@ using namespace UeGui;
 
 UeGui::CSettingWrapper::CSettingWrapper() : CUeSettingsIO()
 {
-
+  ReadSettings();
 }
 
 /**

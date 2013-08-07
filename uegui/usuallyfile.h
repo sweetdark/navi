@@ -7,17 +7,18 @@
 
 #include "uebase/filebasic.h"
 
-#define FAVORITECOUNT 5
+#define FAVORITECOUNT 6
 namespace UeGui
 {
   enum UsuallyRecordType
   {
     RT_begin=0,
-    RT_HOME,
-    RT_COMPANY,
-    RT_ONE,
-    RT_TWO,
-    RT_THREE,
+    RT_HOME,     //常用点-家
+    RT_COMPANY,  //常用点-单位
+    RT_ONE,      //常用点-1
+    RT_TWO,      //常用点-2
+    RT_THREE,    //常用点-3
+    RT_STARTPOS, //开机位置
     RT_end
   };
 

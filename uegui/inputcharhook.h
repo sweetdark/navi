@@ -93,11 +93,15 @@ namespace UeGui
 
     char* GetKeyWord();
 
+    void SetKeyWord(char* keyword);
+
     void SetQueryMode();
 
   protected:
 
     virtual void Load();
+
+    virtual void UnLoad();
 
     virtual void Init();
 
@@ -121,6 +125,10 @@ namespace UeGui
     static void DistSwitchCallBack(void *pDoCallBackObj, const SQLRecord *pResult);
 
     void DoDistSwitchCallBack(const SQLRecord *pResult);
+
+    static void InputSelectCallBack(void *pDoCallBackObj, char *keyword);
+
+    void DoInputSelectCallBack(char *keyword);
 
   private:
     CUiButton m_distSwitchBtn;
@@ -153,6 +161,10 @@ namespace UeGui
     std::vector<string> m_vecWordsBuf;
     //保存当前的要显示在键盘上的文字
     std::vector<string> m_vecCodesBuf;
+    //保存搜索poi和路名用的关键字
+    char m_poiKeyWord[128];
+    //保存搜索区域用的关键字
+    char m_distKeyWord[128];
   };
 }
 #endif

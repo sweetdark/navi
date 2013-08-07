@@ -1,5 +1,13 @@
 #include "districtselectionhook.h"
 
+#ifndef _UEGUI_QUERYWRAPPER_H
+#include "querywrapper.h"
+#endif
+
+#include "inputswitchhook.h"
+
+#include "distquerylisthook.h"
+
 using namespace UeGui;
 
 
@@ -55,7 +63,8 @@ void CDistrictSelectionHook::Load()
     m_pageController.SetTotal(m_vecListItem.size());
     m_pageController.SetQuantityOfOnePage(ITEMCOUNT);
     m_pageController.ShowPageInfo(&m_currentPageLableCtrl, &m_totalPageLableCtrl);
-    m_countryBtnCtrl.MouseDown();
+    m_countryBtnCtrl.SetEnable(false);
+    m_commonUsebtnCtrl.SetEnable(true);
     ShowAreaList();
   }
 }
@@ -98,7 +107,6 @@ void CDistrictSelectionHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_vsplit2,	"vsplit2"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_PrePageArrowBtn,	"PrePageArrowBtn"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_NextPageArrowBtn,	"NextPageArrowBtn"));
-  m_ctrlNames.insert(GuiName::value_type(districtselectionhook_VSplit3,	"VSplit3"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_CurrentPageLable,	"CurrentPageLable"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_TotalPageLable,	"TotalPageLable"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_PageSplit,	"PageSplit"));
@@ -138,7 +146,6 @@ void CDistrictSelectionHook::MakeControls()
   m_splitCtrl.SetCenterElement(GetGuiElement(districtselectionhook_Split));
   m_totalPageLableCtrl.SetCenterElement(GetGuiElement(districtselectionhook_TotalPageLable));
   m_vSplitCtrl.SetCenterElement(GetGuiElement(districtselectionhook_VSplit));
-  m_vSplit3Ctrl.SetCenterElement(GetGuiElement(districtselectionhook_VSplit3));
   m_vsplit2Ctrl.SetCenterElement(GetGuiElement(districtselectionhook_vsplit2));
 }
 
@@ -150,166 +157,193 @@ short CDistrictSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
   case districtselectionhook_Area10Btn:
     {
       m_area10BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area10BtnCtrl);
     }
     break;
   case districtselectionhook_Area11Btn:
     {
       m_area11BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area11BtnCtrl);
     }
     break;
   case districtselectionhook_Area12Btn:
     {
       m_area12BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area12BtnCtrl);
     }
     break;
   case districtselectionhook_Area13Btn:
     {
       m_area13BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area13BtnCtrl);
     }
     break;
   case districtselectionhook_Area14Btn:
     {
       m_area14BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area14BtnCtrl);
     }
     break;
   case districtselectionhook_Area15Btn:
     {
       m_area15BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area15BtnCtrl);
     }
     break;
   case districtselectionhook_Area16Btn:
     {
       m_area16BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area16BtnCtrl);
     }
     break;
   case districtselectionhook_Area1Btn:
     {
       m_area1BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area1BtnCtrl);
     }
     break;
   case districtselectionhook_Area2Btn:
     {
       m_area2BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area2BtnCtrl);
     }
     break;
   case districtselectionhook_Area3Btn:
     {
       m_area3BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area3BtnCtrl);
     }
     break;
   case districtselectionhook_Area4Btn:
     {
       m_area4BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area4BtnCtrl);
     }
     break;
   case districtselectionhook_Area5Btn:
     {
       m_area5BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area5BtnCtrl);
     }
     break;
   case districtselectionhook_Area6Btn:
     {
       m_area6BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area6BtnCtrl);
     }
     break;
   case districtselectionhook_Area7Btn:
     {
       m_area7BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area7BtnCtrl);
     }
     break;
   case districtselectionhook_Area8Btn:
     {
       m_area8BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area8BtnCtrl);
     }
     break;
   case districtselectionhook_Area9Btn:
     {
       m_area9BtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_area9BtnCtrl);
     }
     break;
   case districtselectionhook_CommonUsebtn:
     {
       m_commonUsebtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_commonUsebtnCtrl);
     }
     break;
   case districtselectionhook_CountryBtn:
     {
       m_countryBtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_countryBtnCtrl);
     }
     break;
   case districtselectionhook_CurrentPageLable:
     {
       m_currentPageLableCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_currentPageLableCtrl);
     }
     break;
   case districtselectionhook_GPSAreaBtn:
     {
       m_gPSAreaBtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_gPSAreaBtnCtrl);
     }
     break;
   case districtselectionhook_GPSCityBtn:
     {
       m_gPSCityBtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_gPSCityBtnCtrl);
     }
     break;
   case districtselectionhook_Lable1:
     {
       m_lable1Ctrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_lable1Ctrl);
     }
     break;
   case districtselectionhook_NextPageArrowBtn:
     {
       m_nextPageArrowBtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_nextPageArrowBtnCtrl);
     }
     break;
   case districtselectionhook_NextPageBtn:
     {
       m_nextPageBtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_nextPageBtnCtrl);
     }
     break;
   case districtselectionhook_PageSplit:
     {
       m_pageSplitCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_pageSplitCtrl);
     }
     break;
   case districtselectionhook_PrePageArrowBtn:
     {
       m_prePageArrowBtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_prePageArrowBtnCtrl);
     }
     break;
   case districtselectionhook_PrevPageBtn:
     {
       m_prevPageBtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_prevPageBtnCtrl);
     }
     break;
   case districtselectionhook_SearchAreaBtn:
     {
       m_searchAreaBtnCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_searchAreaBtnCtrl);
     }
     break;
   case districtselectionhook_Split:
     {
       m_splitCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_splitCtrl);
     }
     break;
   case districtselectionhook_TotalPageLable:
     {
       m_totalPageLableCtrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_totalPageLableCtrl);
     }
     break;
   case districtselectionhook_VSplit:
     {
       m_vSplitCtrl.MouseDown();
-    }
-    break;
-  case districtselectionhook_VSplit3:
-    {
-      m_vSplit3Ctrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_vSplitCtrl);
     }
     break;
   case districtselectionhook_vsplit2:
     {
       m_vsplit2Ctrl.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_vsplit2Ctrl);
     }
     break;
   default:
@@ -335,24 +369,28 @@ short CDistrictSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
-  case districtselectionhook_CommonUsebtn:
+  case districtselectionhook_CountryBtn:
     {
       m_countryBtnCtrl.MouseUp();
-      if (!m_isCommonUse)
+      if (m_isCommonUse && m_countryBtnCtrl.IsEnable())
       {
-        m_isCommonUse = true;
+        m_countryBtnCtrl.SetEnable(false);
+        m_commonUsebtnCtrl.SetEnable(true);
+        m_isCommonUse = false;
         GetItemList();
         UpdatePageController();
         ShowAreaList();
       }
     }
     break;
-  case districtselectionhook_CountryBtn:
+  case districtselectionhook_CommonUsebtn:
     {
       m_commonUsebtnCtrl.MouseUp();
-      if (m_isCommonUse)
+      if (!m_isCommonUse && m_commonUsebtnCtrl.IsEnable())
       {
-        m_isCommonUse = false;
+        m_countryBtnCtrl.SetEnable(true);
+        m_commonUsebtnCtrl.SetEnable(false);
+        m_isCommonUse = true;
         GetItemList();
         UpdatePageController();
         ShowAreaList();
@@ -413,6 +451,7 @@ short CDistrictSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
   case districtselectionhook_SearchAreaBtn:
     {
       m_searchAreaBtnCtrl.MouseUp();
+      OnClickSearchAreaBtn();
     }
     break;
   case districtselectionhook_Split:
@@ -428,11 +467,6 @@ short CDistrictSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
   case districtselectionhook_VSplit:
     {
       m_vSplitCtrl.MouseUp();
-    }
-    break;
-  case districtselectionhook_VSplit3:
-    {
-      m_vSplit3Ctrl.MouseUp();
     }
     break;
   case districtselectionhook_vsplit2:
@@ -642,18 +676,24 @@ void CDistrictSelectionHook::ShowGpsLocation()
   unsigned uDistCode = CCodeIndexCtrl::GetDistCode(carInfo.m_curPos.m_x, carInfo.m_curPos.m_y);
   if (uDistCode!=-1)
   {
+    unsigned uCityCode = uDistCode & 0xff0000;
     const TCodeEntry *pItem = m_pCurItemCtrl->GetItemByCode(uDistCode);
+    const TCodeEntry *pCityItem = m_pCurItemCtrl->GetItemByCode(uCityCode);
     if (pItem!=0)
     {
+      m_gpsHighCodeEntry = *pCityItem;
       m_gpsLowCodeEntry = *pItem;
       m_pCurItemCtrl->SetLastSettingCode(pItem);
     } 
   }
   else
   {
-    m_gpsLowCodeEntry.m_uCode = 0xb0000;
+    m_gpsHighCodeEntry.m_uCode = 0x0b0000;
+    m_gpsLowCodeEntry.m_uCode = 0x0b0102;
+    ::strcpy(m_gpsHighCodeEntry.m_chName, "北京市");
     ::strcpy(m_gpsLowCodeEntry.m_chName, "西城区");
   }
+  m_gPSCityBtnCtrl.SetCaption(m_gpsHighCodeEntry.m_chName);
   m_gPSAreaBtnCtrl.SetCaption(m_gpsLowCodeEntry.m_chName);
 }
 
@@ -661,8 +701,8 @@ void CDistrictSelectionHook::ShowGpsLocation()
 void CDistrictSelectionHook::OnClickGpsCityBtn()
 {
   SQLRecord record;
-  record.m_addrCode = m_gpsLowCodeEntry.m_uCode;
-  record.m_asciiName = m_gpsLowCodeEntry.m_chName;
+  record.m_addrCode = m_gpsHighCodeEntry.m_uCode;
+  record.m_asciiName = m_gpsHighCodeEntry.m_chName;
   m_queryCallBack(m_callBackObject, &record);
   Return();
 }
@@ -674,4 +714,47 @@ void CDistrictSelectionHook::OnClickGpsAreaBtn()
   record.m_asciiName = m_gpsLowCodeEntry.m_chName;
   m_queryCallBack(m_callBackObject, &record);
   Return();
+}
+
+void CDistrictSelectionHook::OnClickSearchAreaBtn()
+{
+  int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
+  if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
+  {
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityAcro);
+  }
+  else
+  {
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
+  }
+  CInputSwitchHook *inputHook = (CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook);
+  if (inputHook)
+  {
+    TurnTo(inputHook->GetCurInputHookType());
+  }
+  //记录要返回的hook
+  ((CDistQueryListHook *)m_view->GetHook(DHT_DistQueryListHook))->SetReturnHookType(CAggHook::GetPrevHookType());
+}
+
+void CDistrictSelectionHook::DistQueryListCallBack(SQLRecord *sqlRecord)
+{
+  const TCodeEntry *item = CCodeIndexCtrl::GetDistCodeCtrl().GetItemByCode(sqlRecord->m_addrCode);
+  TCodeEntry tempItem;
+  ::memcpy(&tempItem, item, sizeof(TCodeEntry));
+  if (!(sqlRecord->m_addrCode&0x00ffff))
+  {
+    m_itemLevel = SECONDE_LEVEL;
+    m_preCode = item->m_uCode;
+    m_pCurItemCtrl->GetLeve2Item(m_preCode,m_vecListItem);
+    ShowAreaList();
+  }
+  else
+  {
+    SQLRecord record;
+    record.m_addrCode = item->m_uCode;
+    record.m_asciiName = tempItem.m_chName;
+    m_queryCallBack(m_callBackObject, &record);
+    CCodeIndexCtrl::GetDistCodeCtrl().AddComItem(item->m_uCode);
+    Return();
+  }
 }

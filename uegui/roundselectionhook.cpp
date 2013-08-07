@@ -4,6 +4,8 @@
 #include "querywrapper.h"
 #endif
 
+#include "typenodistquerylisthook.h"
+
 #include "maphook.h"
 
 using namespace UeGui;
@@ -57,6 +59,18 @@ void CRoundSelectionHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List10CenterBtn,	"List10CenterBtn"));
   m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List11CenterBtn,	"List11CenterBtn"));
   m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List12CenterBtn,	"List12CenterBtn"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List1CenterBtnLabel,	"List1CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List2CenterBtnLabel,	"List2CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List3CenterBtnLabel,	"List3CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List4CenterBtnLabel,	"List4CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List5CenterBtnLabel,	"List5CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List6CenterBtnLabel,	"List6CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List7CenterBtnLabel,	"List7CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List8CenterBtnLabel,	"List8CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List9CenterBtnLabel,	"List9CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List10CenterBtnLabel,	"List10CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List11CenterBtnLabel,	"List11CenterBtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(RoundSelectionHook_List12CenterBtnLabel,	"List12CenterBtnLabel"));
 }
 
 void CRoundSelectionHook::MakeControls()
@@ -70,6 +84,7 @@ void CRoundSelectionHook::MakeControls()
   for (int i=0, j=RoundSelectionHook_List1CenterBtn; i<12; i++)
   {
     m_listBtn[i].SetCenterElement(GetGuiElement(j++));
+    m_listBtn[i].SetLabelElement(GetGuiElement(j++));
   }
 }
 
@@ -88,9 +103,9 @@ short CRoundSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    if (ctrlType >= RoundSelectionHook_List1CenterBtn && ctrlType <= RoundSelectionHook_List12CenterBtn)
+    if (ctrlType >= RoundSelectionHook_List1CenterBtn && ctrlType <= RoundSelectionHook_List12CenterBtnLabel)
     {
-      int index = ctrlType-RoundSelectionHook_List1CenterBtn;
+      int index = (ctrlType-RoundSelectionHook_List1CenterBtn)/2;
       m_listBtn[index].MouseDown();
       AddRenderUiControls(&m_listBtn[index]);
     }
@@ -128,9 +143,9 @@ short CRoundSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    if (ctrlType >= RoundSelectionHook_List1CenterBtn && ctrlType <= RoundSelectionHook_List12CenterBtn)
+    if (ctrlType >= RoundSelectionHook_List1CenterBtn && ctrlType <= RoundSelectionHook_List12CenterBtnLabel)
     {
-      int index = ctrlType-RoundSelectionHook_List1CenterBtn;
+      int index = (ctrlType-RoundSelectionHook_List1CenterBtn)/2;
       m_listBtn[index].MouseUp();
       if (m_listBtn[index].IsEnable())
       {
@@ -140,6 +155,7 @@ short CRoundSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
         if (index < m_comSize && index != 11)
         {
           CQueryWrapper::Get().SetQueryKindInfo(m_vecListItem[index]);
+          ((CTypeNoDistQueryListHook *)m_view->GetHook(DHT_TypeNoDistQueryListHook))->SetQueryTypeInfo(&m_vecListItem[index]);
           CAggHook::TurnTo(DHT_TypeNoDistQueryListHook);
         }
         else

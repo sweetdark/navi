@@ -382,7 +382,7 @@ void UeGui::CAggHook::AddRenderUiControls(CUiControl* control)
 
 void UeGui::CAggHook::ClearRenderElements()
 {
-  AggHookMap::iterator first = m_childHookList.begin();
+  /*AggHookMap::iterator first = m_childHookList.begin();
   for (; first != m_childHookList.end(); ++first)
   {
     CAggHook* childHook = first->second;
@@ -390,9 +390,11 @@ void UeGui::CAggHook::ClearRenderElements()
     {
       childHook->m_renderElements.clear();
     }	
-  }
+  }*/
+  ClearChildHooksRenderElements(m_childHookList);
   m_renderElements.clear();
 }
+
 
 void UeGui::CAggHook::AddChildHook( HookType childHookType, CAggHook* aggHook )
 {
@@ -1087,10 +1089,10 @@ void UeGui::CAggHook::ClearFocusTextElements()
 }
 
 //跳转到某一个hook的界面
-void UeGui::CAggHook::TurnTo(int hookType) 
+void UeGui::CAggHook::TurnTo( int hookType, bool bUnLoadCurHook /*= true*/ )
 { 
   CAggHook* hook = static_cast<CAggHook*>(m_view->GetHook(m_curHookType));
-  if (hook)
+  if (bUnLoadCurHook && hook)
   {
     hook->UnLoad();
   }
@@ -1104,8 +1106,9 @@ void UeGui::CAggHook::TurnTo(int hookType)
     hook->Load();
   }
 }
+
 //返回到前一个hook
-void UeGui::CAggHook::Return()
+void UeGui::CAggHook::Return( bool bLoadPreHook /*= true*/ )
 {
   if (m_hookTypeStack.size() <= 0)
   {
@@ -1121,12 +1124,12 @@ void UeGui::CAggHook::Return()
   m_hookTypeStack.pop_back();
 
   hook = static_cast<CAggHook*>(m_view->GetHook(m_curHookType));
-  if (hook)
+  if (bLoadPreHook && hook)
   {
     hook->Load();
   }
-
 }
+
 /**
 * 获得前一个hook的类型,没有则返回DHT_Unknown
 */
@@ -1150,6 +1153,15 @@ void UeGui::CAggHook::GoToMapHook()
     hook->Load();
   }
   m_hookTypeStack.push_back(DHT_MapHook);
+}
+
+void UeGui::CAggHook::Fall(int hookType)
+{
+  vector<int>::iterator pos = std::find(m_hookTypeStack.begin(), m_hookTypeStack.end(), hookType);
+  if (pos != m_hookTypeStack.end())
+  {
+    m_hookTypeStack.erase(pos + 1, m_hookTypeStack.end());
+  }
 }
 
 const unsigned char* UeGui::CAggHook::GetFocusText( CViewHook::GuiElement* guielement )
@@ -1194,9 +1206,20 @@ bool UeGui::CAggHook::IsPartRefresh(const CGeoRect<short> &scrExtent)
     }
   }
   //查找子hook中是否有需要局部渲染的控件。
-  for (AggHookMap::iterator first = m_childHookList.begin(); first != m_childHookList.end(); ++first)
+  RenderChildHooksRenderElements(m_scrExtent, m_childHookList, isHasRenderElement);
+
+  return isHasRenderElement;
+}
+
+void CAggHook::RenderChildHooksRenderElements(const CGeoRect<short> &scrExtent, AggHookMap &childHookList, bool &isHasRenderElement)
+{
+  for (AggHookMap::iterator first = childHookList.begin(); first != childHookList.end(); ++first)
   {
     CAggHook* childHook = first->second;
+    if (childHook)
+    {
+      RenderChildHooksRenderElements(scrExtent, childHook->m_childHookList, isHasRenderElement);
+    }
     if (childHook && childHook->m_renderElements.size() != 0)
     {
       isHasRenderElement = true;
@@ -1211,15 +1234,25 @@ bool UeGui::CAggHook::IsPartRefresh(const CGeoRect<short> &scrExtent)
           (*iter)->m_extent.m_maxY = (*iter)->m_startY + (*iter)->m_height;
 
           const unsigned char* fkey = GetFocusText(*iter);
-          RenderHookCommands(scrExtent, *(*iter), fkey, m_needReleasePic);    
+          RenderHookCommands(scrExtent, *(*iter), fkey, childHook->m_needReleasePic);    
         }
       }
     }	
   }
-
-  return isHasRenderElement;
 }
 
+void CAggHook::ClearChildHooksRenderElements(AggHookMap &childHookList)
+{
+  for (AggHookMap::iterator first = childHookList.begin(); first != childHookList.end(); ++first)
+  {
+    CAggHook* childHook = first->second;
+    if (childHook)
+    {
+      ClearChildHooksRenderElements(childHook->m_childHookList);
+      childHook->m_renderElements.clear();
+    }	
+  }
+}
 //////////////////////////////////////////////////////////////////////////
 
 UeGui::CFocusTextElement::CFocusTextElement()

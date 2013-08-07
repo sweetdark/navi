@@ -114,6 +114,17 @@ void UeGui::CViewWrapper::MoveToGPS()
   m_view->SetViewOpeMode(VM_Guidance);
   m_view->SetGpsCar(gpsInfo);
   m_view->GetCommand(UeMap::CT_Select)->MoveTo(gpsInfo);
+
+  //如果没有设置开机位置则读取最后保存的GPS位置
+  CViewState* curViewState = GetMainViewState();
+  if (curViewState)
+  {
+    const ScreenLayout& srcLayout = curViewState->GetScrLayout();
+    CGeoPoint<short> scrPoint = srcLayout.m_base;
+    //屏幕选点，读取当前选点的名称
+    CMemVector objects(sizeof(CViewCanvas::RenderedPrimitive), 10);
+    Pick(scrPoint, objects, true);
+  }
 }
 
 bool UeGui::CViewWrapper::AddViewIcon( ViewIconType iconType, short icon )
@@ -162,6 +173,25 @@ void UeGui::CViewWrapper::SetGpsCar( const GpsCar &gpsCar )
   if (m_view)
   {
     m_view->SetGpsCar(gpsCar);
+  }
+}
+
+const GpsCar & UeGui::CViewWrapper::GetGpsPosInfo()
+{
+  if (m_view)
+  {
+    return m_view->GetGpsPosInfo();
+  }
+  //自车图标位置
+  GpsCar gpsCar;
+  return gpsCar;
+}
+
+void UeGui::CViewWrapper::SetGpsPosInfo( const GpsCar &gpsInfo )
+{
+  if (m_view)
+  {
+    m_view->SetGpsPosInfo(gpsInfo);
   }
 }
 
@@ -216,6 +246,16 @@ bool UeGui::CViewWrapper::Pick( const CGeoPoint<short> &scrPoint, CMemVector &ob
   return false;
 }
 
+void UeGui::CViewWrapper::SetPickPos( const CGeoPoint<long> &pickPos, CGeoPoint<short> &scrPoint, bool refresh /*= true*/ )
+{
+  if (m_view)
+  {
+    //切换地图为可操作状态
+    m_view->SetViewOpeMode(VM_Browse);
+    m_view->SetPickPos(pickPos, scrPoint);
+  }
+}
+
 void UeGui::CViewWrapper::GetPickPos( CGeoPoint<long> &pickPos )
 {
   if (m_view)
@@ -235,6 +275,16 @@ void UeGui::CViewWrapper::GetPickName( char *pickName )
 char* UeGui::CViewWrapper::GetSelectName()
 {
   return CViewCanvas::GetSelectedName();
+}
+
+
+bool UeGui::CViewWrapper::GetScreenCenter( CGeoPoint<long> &mapPt )
+{
+  if (m_view)
+  {
+    return m_view->GetScreenCenter(mapPt);
+  }
+  return false;
 }
 
 void UeGui::CViewWrapper::ZoomIn( short levelDown, short step )
@@ -308,9 +358,15 @@ void UeGui::CViewWrapper::SetLanePos( CGeoPoint<short> &scrPoint, short width, s
 
 bool UeGui::CViewWrapper::IsNeedRenderGuidanceView()
 {
+  short planState = UeRoute::PS_None;
+  if (m_route)
+  {
+    planState = m_route->GetPlanState();
+  }
+  bool isGuidance = (UeRoute::PS_DemoGuidance == planState) || (UeRoute::PS_RealGuidance == planState);
   if (m_view)
   {
-    return m_view->IsNeedRenderGuidanceView();
+    return m_view->IsNeedRenderGuidanceView() && isGuidance;
   }
   return false;
 }
@@ -332,12 +388,10 @@ void UeGui::CViewWrapper::ShowGuidanceView()
   }
 }
 
-void UeGui::CViewWrapper::SetPickPos( const CGeoPoint<long> &pickPos, CGeoPoint<short> &scrPoint, bool refresh /*= true*/ )
+void UeGui::CViewWrapper::ShowEagleView( bool show /*= true*/ )
 {
   if (m_view)
   {
-    //切换地图为可操作状态
-    m_view->SetViewOpeMode(VM_Browse);
-    m_view->SetPickPos(pickPos, scrPoint);
+    m_view->SetEagleState(show);
   }
 }

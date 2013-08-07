@@ -7,7 +7,6 @@
 #include "detailedithook.h"
 #include "guioperationright.h"
 #include "uebase\stringbasic.h"
-#include "guisetting.h"
 #include "userdatawrapper.h"
 
 
@@ -160,10 +159,10 @@ void UeGui::CHistoryInformationHook::Load()
   {
     ActivatePage(kPageHisRecord);
   }
-  else if (m_canOpeHistoryTrajectory)
+  /*else if (m_canOpeHistoryTrajectory)
   {
     ActivatePage(kPageHisTrajectory);
-  }
+  }*/
   else if (m_canOpeHistoryRoute && (m_userWrapper.GetRecentCount() > 0))
   {
     ActivatePage(kPageHisRoute);
@@ -819,15 +818,17 @@ void UeGui::CHistoryInformationHook::DoSelectRecord( RowTag row )
       CMapHook* mapHook = dynamic_cast<CMapHook*>(m_view->GetHook(CViewHook::DHT_MapHook));
       if (mapHook) 
       {
-        int dataIndex = GetDataIndex(m_selectRow);
+        int dataIndex = m_selectRow - 1;
         if (dataIndex < 0)
         {
           return;
         }
         m_userWrapper.ConnectToHistoryRecord();             
         PointList resultList;
-        PointInfo pointInfo;     
-        for (int i = 0; i < m_pageTurning.GetPageEndPosition(); ++i)
+        PointInfo pointInfo;
+        int startPos = m_pageTurning.GetPageStartPosition() - 1;
+        int endPos = m_pageTurning.GetPageEndPosition() - 1;
+        for (int i = startPos; i <= endPos; ++i)
         {     
           const HistoryRecordEntry *tempEntry = m_userWrapper.GetHistoryRecord(i); 
           HistoryRecordEntry curEntry;
@@ -854,7 +855,7 @@ void UeGui::CHistoryInformationHook::DoSelectRecord( RowTag row )
       //如果当前正在导航，停止导航重新规划路线
       if (m_route)
       {
-        short planState = m_route->GetPlanState();
+        /*short planState = m_route->GetPlanState();
         if ((UeRoute::PS_DemoGuidance == planState) || (UeRoute::PS_RealGuidance == planState))
         {          
           m_isNeedRefesh = false;
@@ -863,10 +864,10 @@ void UeGui::CHistoryInformationHook::DoSelectRecord( RowTag row )
           return;
         }
         else
-        {
+        {*/
           //重新规划路线
           DoPlanHistoryRoute();
-        }
+        //}
       }
       break;
     }
@@ -890,7 +891,85 @@ void UeGui::CHistoryInformationHook::DoPlanHistoryRoute()
   {
     return;
   }
-  m_userWrapper.HistoryRoutePlan(dataIndex);
+  m_userWrapper.ConnectToRecent();
+  const RecentEntry *tempEntry = m_userWrapper.GetRecent(dataIndex);
+  //因为Disconnect后会释放掉tempEntry，所以这里要拷贝一份数据
+  RecentEntry curEntry;
+  ::memcpy(&curEntry, tempEntry, sizeof(RecentEntry));
+  m_userWrapper.DisconnectRecent();
+
+  unsigned int rt = PEC_Success;
+  CGeoPoint<short> scrPoint;
+  CGeoPoint<long> point;
+  //设起点
+  PlanPosition startPos;
+  startPos.m_type = PT_Start;
+  startPos.m_pos.m_x = curEntry.m_routePos[0].m_X;
+  startPos.m_pos.m_y = curEntry.m_routePos[0].m_Y;
+  startPos.m_isGPS = false;
+  ::strcpy(startPos.m_name, (char*)curEntry.m_routePos[0].m_addrName);
+  if (rt = m_route->SetPosition(startPos) != PEC_Success)
+  {
+    return;
+  }
+
+  //设目的地
+  PlanPosition endPos;
+  endPos.m_type = PT_End;
+  endPos.m_pos.m_x = curEntry.m_routePos[curEntry.m_routePosCnt-1].m_X;
+  endPos.m_pos.m_y = curEntry.m_routePos[curEntry.m_routePosCnt-1].m_Y;
+  endPos.m_isGPS = false;
+  ::strcpy(endPos.m_name, (char*)curEntry.m_routePos[curEntry.m_routePosCnt-1].m_addrName);
+  if (rt = m_route->SetPosition(endPos) != PEC_Success)
+  {
+    return;
+  }
+
+  //设置经由点
+  for (int i = 1; i < curEntry.m_routePosCnt - 1; ++i)
+  {
+    PlanPosition middlePos;
+    middlePos.m_type = PT_Middle;
+    middlePos.m_pos.m_x = curEntry.m_routePos[i].m_X;
+    middlePos.m_pos.m_y = curEntry.m_routePos[i].m_Y;
+    middlePos.m_isGPS = false;
+    ::strcpy(middlePos.m_name, (char*)curEntry.m_routePos[i].m_addrName);
+    if (rt = m_route->SetPosition(middlePos) != PEC_Success)
+    {
+      return;
+    }
+  }
+
+  //设置规划方式
+  unsigned int status = 0;
+  unsigned int planMethod = curEntry.m_routeMode;
+  status = m_route->SetMethod(curEntry.m_routeMode);
+  status = m_route->IsReadyForPlanning();
+  if ((status | PEC_Success) != PEC_Success)
+  {
+    m_route->RemovePosition();
+    return;
+  }
+
+  CMessageDialogEvent dialogEvent(NULL, CViewHook::DHT_MapHook, NULL);
+  CMessageDialogHook::ShowMessageDialog(MB_NONE, "规划中，请稍候...", dialogEvent); 
+  CMessageDialogHook::CloseMessageDialog();
+
+  rt = m_route->RoutePlan(false);
+  if (rt == UeRoute::PEC_Success)
+  {
+    //切换到路线规划成功倒计时界面
+    CMapHook* mapHook = (CMapHook*)m_view->GetHook(CViewHook::DHT_MapHook);
+    if (mapHook)
+    {
+      mapHook->StartGuidance();
+    }
+  }
+  else
+  {
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "路径规划失败", dialogEvent, 2);
+    m_route->RemovePosition();
+  }  
 }
 
 void UeGui::CHistoryInformationHook::DoEditRecord( RowTag row )

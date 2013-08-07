@@ -60,7 +60,7 @@ void CVersionInfoHook::MakeControls()
 short CVersionInfoHook::MouseDown(CGeoPoint<short> &scrPoint)
 {
   short ctrlType = CAggHook::MouseDown(scrPoint);
-  switch(ctrlType)
+  /*switch(ctrlType)
   {
   case versioninfohook_ActivateVersionNumLabel:
     {
@@ -141,13 +141,13 @@ short CVersionInfoHook::MouseDown(CGeoPoint<short> &scrPoint)
     m_isNeedRefesh = false;
     assert(false);
     break;
-  }
+  }*/
 
-  if (m_isNeedRefesh)
+  /*if (m_isNeedRefesh)
   {
     Refresh();
   }
-  m_isNeedRefesh = true;
+  m_isNeedRefesh = true;*/
   return ctrlType;
 }
 
@@ -159,7 +159,7 @@ short CVersionInfoHook::MouseMove(CGeoPoint<short> &scrPoint)
 short CVersionInfoHook::MouseUp(CGeoPoint<short> &scrPoint)
 {
   short ctrlType = CAggHook::MouseUp(scrPoint);
-  switch(m_downElementType)
+  /*switch(m_downElementType)
   {
   case versioninfohook_ActivateVersionNumLabel:
     {
@@ -245,7 +245,7 @@ short CVersionInfoHook::MouseUp(CGeoPoint<short> &scrPoint)
   {
     Refresh();
   }
-  m_isNeedRefesh = true;
+  m_isNeedRefesh = true;*/
   return ctrlType;
 }
 

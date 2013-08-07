@@ -1,5 +1,7 @@
 #include "navimapsettinghook.h"
+#include "settingwrapper.h"
 using namespace UeGui;
+
 
 CNaviMapSettingHook::CNaviMapSettingHook()
 {
@@ -57,6 +59,8 @@ short CNaviMapSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_autoZoomLabelCtrl.MouseDown();
       m_autoZoomCtrl.MouseDown();
+      AddRenderUiControls(&m_autoZoomCtrl);
+      AddRenderUiControls(&m_autoZoomLabelCtrl);
     }
     break;
   case navimapsettinghook_DirectCompassBtn:
@@ -65,6 +69,8 @@ short CNaviMapSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_directCompassLabelCtrl.MouseDown();
       m_directCompassCtrl.MouseDown();
+      AddRenderUiControls(&m_directCompassCtrl);
+      AddRenderUiControls(&m_directCompassLabelCtrl);
     }
     break;
   case navimapsettinghook_IntersectionPicBtn:
@@ -73,6 +79,8 @@ short CNaviMapSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_intersectionPicLabelCtrl.MouseDown();
       m_intersectionPicCtrl.MouseDown();
+      AddRenderUiControls(&m_intersectionPicCtrl);
+      AddRenderUiControls(&m_intersectionPicLabelCtrl);
     }
     break;
   default:
@@ -105,7 +113,12 @@ short CNaviMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_autoZoomLabelCtrl.MouseUp();
       m_autoZoomCtrl.MouseUp();
-    }
+      /*if (ctrlType == m_downElementType)
+      {
+        m_changeAuto = m_changeAuto?false:true;
+        m_autoZoomCtrl.SetCheck(m_changeAuto);
+      }*/
+      }
     break;
   case navimapsettinghook_DirectCompassBtn:
   case navimapsettinghook_DirectCompassIcon:
@@ -113,6 +126,11 @@ short CNaviMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_directCompassLabelCtrl.MouseUp();
       m_directCompassCtrl.MouseUp();
+      if (ctrlType == m_downElementType)
+      {
+        m_changeCompass = m_changeCompass?false:true;
+        m_directCompassCtrl.SetCheck(m_changeCompass);
+      }
     }
     break;
   case navimapsettinghook_IntersectionPicBtn:
@@ -121,16 +139,22 @@ short CNaviMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_intersectionPicLabelCtrl.MouseUp();
       m_intersectionPicCtrl.MouseUp();
+      if (ctrlType == m_downElementType)
+      {
+        m_changeIntersection = m_changeIntersection?false:true;
+        m_intersectionPicCtrl.SetCheck(m_changeIntersection);
+      }
     }
     break;
+  default:
     m_isNeedRefesh = false;
     assert(false);
     break;
   }
-
   if (m_isNeedRefesh)
   {
     Refresh();
+    SaveSetting();
   }
   m_isNeedRefesh = true;
   return ctrlType;
@@ -139,5 +163,74 @@ short CNaviMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
 bool CNaviMapSettingHook::operator ()()
 {
   return false;
+}
+void CNaviMapSettingHook::ReadSetting()
+{
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+    /// 路口自动缩放
+    if (settingWrapper.GetCrossingAmplify() == OS_ON)
+    {
+      m_autoZoomCtrl.SetCheck(true);
+      m_changeAuto = true;
+    }
+    else
+    {
+      m_autoZoomCtrl.SetCheck(false);
+      m_changeAuto = false;
+    }
+    /// 方向罗盘提示
+    if (settingWrapper.GetCompassPrompt() == OS_ON)
+    {
+      m_directCompassCtrl.SetCheck(true);
+      m_changeCompass = true;
+    }
+    else
+    {
+      m_directCompassCtrl.SetCheck(false);
+      m_changeCompass = false;
+    }
+    ///路口放大图
+    if (settingWrapper.GetIsOpenCrossingMap() == UeBase::OS_ON)
+    {
+      m_intersectionPicCtrl.SetCheck(true);
+      m_changeIntersection = true;
+    }
+    else
+    {
+      m_intersectionPicCtrl.SetCheck(false);
+      m_changeIntersection = false;
+    }
+}
+void CNaviMapSettingHook::SaveSetting()
+{
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+  /// 路口自动缩放
+  if (m_autoZoomCtrl.Checked())
+  {
+    settingWrapper.SetCrossingAmplify(UeBase::OS_ON);
+  }
+  else
+  {
+    settingWrapper.SetCrossingAmplify(UeBase::OS_OFF);
+  }
+  /// 方向罗盘
+  if (m_directCompassCtrl.Checked())
+  {
+    settingWrapper.SetCompassPrompt(UeBase::OS_ON);
+  }
+  else
+  {
+    settingWrapper.SetCompassPrompt(UeBase::OS_OFF);
+  }
+  ///路口放大图
+  if (m_intersectionPicCtrl.Checked())
+  {
+    settingWrapper.SetIsOpenCrossingMap(OS_ON);
+  }
+  else
+  {
+    settingWrapper.SetIsOpenCrossingMap(OS_OFF);
+  }
+  settingWrapper.SaveAllSettings();
 }
 

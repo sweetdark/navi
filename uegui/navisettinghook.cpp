@@ -1,7 +1,7 @@
 #include "navisettinghook.h"
 #include "messagedialoghook.h"
-#include "guisetting.h"
 #include "guioperationright.h"
+#include "settingwrapper.h"
 #include "uequery\query.h"
 #include "myjourneyhook.h"
 #include "usuallyfile.h"
@@ -375,10 +375,10 @@ short CNaviSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
         //  CMessageDialogEvent(this, CViewHook::DHT_NaviSettingHook, OnRestore), 0);
 
         //初始化历史信息和个人数据
-        CRestoreDefaultshook *RestoreDef = (CRestoreDefaultshook*)(m_view->GetHook(CViewHook::DHT_RestoreDefaultshook));
+       /* CRestoreDefaultshook *RestoreDef = (CRestoreDefaultshook*)(m_view->GetHook(CViewHook::DHT_RestoreDefaultshook));
         RestoreDef->prepare();
         CAggHook::TurnTo(DHT_RestoreDefaultshook);
-        AddRenderUiControls(&m_restoreCtrl);
+        AddRenderUiControls(&m_restoreCtrl);*/
       }      
     }
     break;
@@ -418,10 +418,11 @@ void CNaviSettingHook::OnRestore(CAggHook* sender, ModalResultType modalResult)
 
 void UeGui::CNaviSettingHook::DoRestore()
 {
-  CGuiSettings* guisett = CGuiSettings::GetGuiSettings();
-  if (guisett)
-  {
-    guisett->Restore();
+  //CsettingWrapperings* settingWrapper = CsettingWrapperings::GetsettingWrapperings();
+  CSettingWrapper& settingWrapper = CSettingWrapper::Get();
+  /*if (settingWrapper)
+  {*/
+    settingWrapper.Restore();
 
     MapsHeader header;
     CUeMapsIO mapsIO;
@@ -431,8 +432,8 @@ void UeGui::CNaviSettingHook::DoRestore()
     gpsInfo.m_curPos.m_y = header.m_baseY;
     m_view->SetGpsCar(gpsInfo);
     m_view->SetGpsPosInfo(gpsInfo);
-    m_view->SetCarIcon(guisett->GetCarIcon());
-  }  
+    m_view->SetCarIcon(settingWrapper.GetCarIcon());
+  //}  
   ClearAllData();
 }
 

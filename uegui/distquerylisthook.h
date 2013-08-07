@@ -82,6 +82,8 @@ namespace UeGui
 
     virtual void Load();
 
+    void SetReturnHookType(int type);
+
   protected:
 
     virtual void MakeNames();
@@ -106,6 +108,8 @@ namespace UeGui
     CUeRecord m_records;
 
     PointList m_pointList;
+    //如果是回调, 记录要返回的hook, 由区域选择界面设置
+    int m_returnType;
   };
 }
 #endif

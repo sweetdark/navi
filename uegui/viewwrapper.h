@@ -89,6 +89,16 @@ namespace UeGui
     void SetGpsCar(const GpsCar &gpsCar);
 
     /**
+    * 获取当前GPS所在位置坐标
+    **/
+    const GpsCar &GetGpsPosInfo();
+
+    /**
+    * 设置当前GPS所在位置坐标
+    **/
+    void SetGpsPosInfo(const GpsCar &gpsInfo);
+
+    /**
     * 读取Hook
     **/
     CViewHook *GetHook(short type);
@@ -137,6 +147,11 @@ namespace UeGui
     * \读取选择点的名称
     **/
     char* GetSelectName();
+
+    /**
+    * 获取屏幕中心
+    **/
+    bool GetScreenCenter(CGeoPoint<long> &mapPt);
 
     /**
     * \放大地图
@@ -194,6 +209,11 @@ namespace UeGui
     * param 显示路口放大图
     */
     void ShowGuidanceView();
+
+    /**
+    * param 显示鹰眼图
+    */
+    void ShowEagleView(bool show = true);
   public:
     /**
     * 添加地图资源图片接口

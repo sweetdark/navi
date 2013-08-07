@@ -427,6 +427,11 @@ short CMapQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
     {      
       m_aroundBtn.MouseUp();
       needRefresh = true;
+      if (m_parentHook)
+      {
+        CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
+        mapHook->OpenAroundSearchMenu();
+      }
     }
     break;
   case MapQueryMenuHook_ReturnBtnBack:

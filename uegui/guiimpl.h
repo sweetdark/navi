@@ -130,11 +130,6 @@ namespace UeGui
     */
     virtual bool GetDistrictName(const CGeoPoint<long> &pos, char *distName);
 
-    /*!
-    * \brief 判断GUI是否处于倒计时状态
-    */
-    virtual bool IsCountDown();
-
     /**
     * \brief 开始导航
     */
@@ -170,6 +165,10 @@ namespace UeGui
     */
     virtual bool IsMapHook();
 
+    /**
+    * \brief 备份最后一次未导航完成路线
+    */
+    void BackupLastRoute();
 #if __FOR_FPC__
     /**
     * 
@@ -191,6 +190,7 @@ namespace UeGui
     * \brief 加载Hook,注意：该方法内部使申请了内存，需要外部控制内存释放
     */
     CViewHook *LoadHook(short hookType);
+
   private:
     //
     IView *m_view;

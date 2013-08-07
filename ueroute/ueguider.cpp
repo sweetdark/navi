@@ -1993,7 +1993,9 @@ inline void CUeGuider::GetSndCode(PlannedLink &curLink, PlannedLink &nextLink, s
   {
     infoCode =  IVT_EnterToll;
   }
-  else if((curLink.m_roadForm != RF_SA && curLink.m_roadForm != RF_EnterSA) && (nextLink.m_roadForm == RF_SA || nextLink.m_roadForm == RF_EnterSA))
+  else if((curLink.m_roadForm != RF_SA && curLink.m_roadForm != RF_EnterSA) 
+    && (nextLink.m_roadForm == RF_SA || nextLink.m_roadForm == RF_EnterSA)
+    && dirCode != DVT_DirectGo)
   {
     infoCode = IVT_EnterSA;
   }
@@ -2027,7 +2029,8 @@ inline void CUeGuider::GetSndCode(PlannedLink &curLink, PlannedLink &nextLink, s
   {
     infoCode = IVT_CrossAdmin;
   }
-  else if(curLink.m_roadType != RT_Bridge && nextLink.m_roadType == RT_Bridge)
+  // TODO: Remove Magic Number
+  else if(curLink.m_roadType != RT_Bridge && nextLink.m_roadType == RT_Bridge && nextLink.m_length > 350.0)
   {
     infoCode =  IVT_EnterBridge;
   }

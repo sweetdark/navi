@@ -373,4 +373,18 @@ namespace UeGui
     m_curKindInfo.m_uCode = uCode;
     SetQueryKindInfo(m_curKindInfo);
   }
+  void CQueryWrapper::SaveCurKeyWord(const char *pchKeyWord,bool bIsAcro)
+  {
+    IQuery *pQuery(IQuery::GetQuery());
+    if (pQuery==0)
+      return;
+    pQuery->SaveCurKeyWord(pchKeyWord,bIsAcro);
+  }
+  void CQueryWrapper::GetHistoryKeyword(std::vector<string> &vecHistoryKey,bool bIsAcro)
+  {
+    IQuery *pQuery(IQuery::GetQuery());
+    if (pQuery==0)
+      return;
+    pQuery->GetHistoryKeyword(vecHistoryKey,bIsAcro);
+  }
 }

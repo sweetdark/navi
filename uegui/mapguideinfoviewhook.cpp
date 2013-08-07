@@ -218,6 +218,15 @@ short CMapGuideInfoViewHook::MouseUp(CGeoPoint<short> &scrPoint)
 
 void UeGui::CMapGuideInfoViewHook::Update( short type )
 {
+  CMapHook* mapHook = NULL;
+  if (m_parentHook)
+  {
+    mapHook = dynamic_cast<CMapHook*>(m_parentHook);
+  }
+  if (NULL == mapHook)
+  {
+    return;
+  }
   //根据导航状态更新当前导航图标的显示
   GuidanceStatus dirInfo;
   if (UeRoute::PEC_Success != m_routeWrapper.GetCurrent(dirInfo))
@@ -237,31 +246,26 @@ void UeGui::CMapGuideInfoViewHook::Update( short type )
     }
     if (curRoad)
     {
-      if (m_parentHook)
+      //显示当前道路名
+      char *roadName = NULL;
+      short length = 0;
+      if (curRoad->m_nameOffset)
       {
-        CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
-        //显示当前道路名
-        char *roadName = NULL;
-        short length = 0;
-        if (curRoad->m_nameOffset)
+        m_net->GetNameTable(UeModel::UNT_Network)->GetContent(curRoad->m_nameOffset, &roadName, length);
+        if (roadName)
         {
-          m_net->GetNameTable(UeModel::UNT_Network)->GetContent(curRoad->m_nameOffset, &roadName, length);
-          if (roadName)
-          {
-            unsigned char chLen = roadName[0];
-            roadName++;
-            roadName[chLen] = 0;
-          }
+          unsigned char chLen = roadName[0];
+          roadName++;
+          roadName[chLen] = 0;
         }
-        else
-        {
-          roadName = "一般道路";
-        }
-        GpsCar gpsCar = m_viewWrapper.GetGpsCar();
-        mapHook->UpdateGuideInfo(roadName, gpsCar.m_speed, curRoad->m_leftDist);
-      }    
+      }
+      else
+      {
+        roadName = "一般道路";
+      }
+      GpsCar gpsCar = m_viewWrapper.GetGpsCar();
+      mapHook->UpdateGuideInfo(roadName, gpsCar.m_speed, curRoad->m_leftDist);
     }
-
     //顶部状态栏显示下一条道路信息
     char *roadName = NULL;
     //到目的地的距离，初始化为全程的长度
@@ -398,8 +402,8 @@ void UeGui::CMapGuideInfoViewHook::Update( short type )
     }
   }
 
-  //如果当前显示路口放大图
-  if (m_viewWrapper.IsGuidanceViewShown())
+  //如果是分屏模式
+  if (mapHook->IsSplitScreen())
   {
     m_shwoGuideViewBtn.SetVisible(false);
     m_routeInfoBtn.SetVisible(false);
@@ -579,12 +583,12 @@ void UeGui::CMapGuideInfoViewHook::ShowCurGuidanceIcon( bool isShow, int sndCode
     else if (UeRoute::DVT_RightDirect == sndCode)
     { 
       /// 靠右直行
-      rt = ChangeElementIcon(m_curDirectionBoard.GetIconElement(), GetGuiElement(MapGuideInfoViewHook_IconType2_12));
+      rt = ChangeElementIcon(m_curDirectionBoard.GetIconElement(), GetGuiElement(MapGuideInfoViewHook_IconType2_11));
     }
     else if (UeRoute::DVT_LeftDirect == sndCode)
     {
       /// 靠左直行
-      rt = ChangeElementIcon(m_curDirectionBoard.GetIconElement(), GetGuiElement(MapGuideInfoViewHook_IconType2_13));
+      rt = ChangeElementIcon(m_curDirectionBoard.GetIconElement(), GetGuiElement(MapGuideInfoViewHook_IconType2_10));
     }
     else if (UeRoute::DVT_Right == sndCode)
     {

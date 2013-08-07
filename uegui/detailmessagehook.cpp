@@ -1,7 +1,9 @@
 #include "detailmessagehook.h"
 #include "uequery\querybasic.h"
+#include "uemap\viewbasic.h"
 #include "usuallyfile.h"
 #include "messagedialoghook.h"
+#include "viewwrapper.h"
 
 using namespace UeGui;
 
@@ -55,6 +57,7 @@ void CDetailMessageHook::MakeControls()
   m_favoratePosition2Btn.SetCenterElement(GetGuiElement(DetailMessageHook_FavoratePosition2));
   m_favoratePosition3Btn.SetCenterElement(GetGuiElement(DetailMessageHook_FavoratePosition3));
   m_avoidAreaBtn.SetCenterElement(GetGuiElement(DetailMessageHook_AvoidArea));
+  m_avoidAreaBtn.SetVisible(false);
   m_bootPositionBtn.SetCenterElement(GetGuiElement(DetailMessageHook_BootPosition));
 }
 
@@ -198,6 +201,7 @@ short CDetailMessageHook::MouseUp(CGeoPoint<short> &scrPoint)
   case DetailMessageHook_BootPosition:
     {
       m_bootPositionBtn.MouseUp();
+      SaveToSysStartPosition();
     }
     break;
   default:
@@ -315,5 +319,17 @@ UeGui::UsuallyRecordType UeGui::CDetailMessageHook::GetUsuallyRecordType()
 
 void UeGui::CDetailMessageHook::SaveToSysStartPosition()
 {
+  //保存开机位置
+  SaveUsuallyRecord(RT_STARTPOS);
+  //修改地图定位
+  CViewWrapper& viewWrapper = CViewWrapper::Get();
+  const UeMap::GpsCar& carInfo = viewWrapper.GetGpsPosInfo();
+  UeMap::GpsCar carInfoNew = carInfo;
+  carInfoNew.m_curPos.m_x = m_detailInfo.m_position.m_x;
+  carInfoNew.m_curPos.m_y = m_detailInfo.m_position.m_y;
+  viewWrapper.SetGpsPosInfo(carInfoNew);
+  viewWrapper.SetGpsCar(carInfoNew); 
 
+  CGeoPoint<short> scrPoint;
+  viewWrapper.SetPickPos(m_detailInfo.m_position, scrPoint, true);
 }

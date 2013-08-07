@@ -52,6 +52,19 @@ void CRoadQueryListHook::Load()
   }
 }
 
+void CRoadQueryListHook::UnLoad()
+{
+  int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
+  if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
+  {
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiAcro);
+  }
+  else
+  {
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiName);
+  }
+}
+
 void CRoadQueryListHook::MakeNames()
 {
   CMenuBackgroundHook::MakeNames();
@@ -392,8 +405,8 @@ void CRoadQueryListHook::ResetResultList()
     }
     else
     {
-      pointInfo.m_point.m_x = oneRecord->m_x;
-      pointInfo.m_point.m_y = oneRecord->m_y;
+      pointInfo.m_point.m_x = oneRecord->m_startX;
+      pointInfo.m_point.m_y = oneRecord->m_startY;
     }
 
     m_pointList.push_back(pointInfo);
@@ -402,12 +415,20 @@ void CRoadQueryListHook::ResetResultList()
   m_pageUpBtn.SetEnable(m_records.CanUp());
   m_pageDownBtn.SetEnable(m_records.CanDown());
 
-  char* curPage = m_curPageInfo.GetCaption();
-  char* totalPage = m_totalPageInfo.GetCaption();
-  ::sprintf(curPage,"%d",m_records.GetCurPage());
-  ::sprintf(totalPage,"%d",m_records.GetTotalPage());
-  m_curPageInfo.SetCaption(curPage);
-  m_totalPageInfo.SetCaption(totalPage);
+  if (m_records.GetTotalPage() == 0)
+  {
+    m_curPageInfo.SetCaption("0");
+    m_totalPageInfo.SetCaption("0");
+  }
+  else
+  {
+    char* curPage = m_curPageInfo.GetCaption();
+    char* totalPage = m_totalPageInfo.GetCaption();
+    ::sprintf(curPage,"%d",m_records.GetCurPage());
+    ::sprintf(totalPage,"%d",m_records.GetTotalPage());
+    m_curPageInfo.SetCaption(curPage);
+    m_totalPageInfo.SetCaption(totalPage);
+  }
 }
 
 SQLRecord* CRoadQueryListHook::GetCurRoadInfo()

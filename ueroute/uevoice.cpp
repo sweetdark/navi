@@ -190,7 +190,6 @@ unsigned int CUeVoice::Prepare(bool isReady)
   ::memset(&m_preBuf, 0, sizeof(UeSound));
   ::memset(&m_prePrompt, 0, sizeof(m_prePrompt));
   m_distFlag = 0;
-  m_prevDistFlag = 0;
   m_preIndicator = -1;
   m_eyeDistFlag = 0;
   m_trafficDistFlag = 0;
@@ -678,6 +677,7 @@ unsigned int CUeVoice::PlayVoice(short type, double speed, double distForSnd)
   m_orderForSnd = (m_orderForSnd < curOrder) ? m_orderForSnd : curOrder;
   m_distForSnd = static_cast<int>(distForSnd);
   m_distFlag = (m_orderForSnd <= curOrder) ? m_distFlag : 0;
+  bool isHighway = (curIndicator->m_roadClass == RC_MotorWay);
 
   // Generate SNDs
   // 1) Just finish once route plan if it face the immediate guidance
@@ -732,9 +732,8 @@ unsigned int CUeVoice::PlayVoice(short type, double speed, double distForSnd)
     return PEC_HaveNextSnd;
   }
 
-  // 2) When driving within 300M, it had better render below pictures
-  // TODO: if current road is highway, distForSnd should be larger than 300.
-  if(distForSnd < 300)
+  // 2) When driving within 300M(600M), it had better render below pictures
+  if((distForSnd < CDT_Normal && !isHighway) || (distForSnd < CDT_Highway && isHighway))
   {
     // TODO: Extract method.
     char prop[eSideEntry::MAXSIDEPROPLENGTH] = {0, };
@@ -825,7 +824,7 @@ unsigned int CUeVoice::PlayVoice(short type, double speed, double distForSnd)
 
   // 3) Normal guidance including turn and obvious info voice subject to 
   // distance spec: 2km, 1km, ...
-  rt = ForwardSND(prompt, snd, speed, static_cast<int>(distForSnd));
+  rt = ForwardSND(prompt, snd, speed, static_cast<int>(distForSnd), isHighway);
   if(rt == PEC_TooShortPlay || rt == PEC_TooLongPlay)
   {
     // In order to get correct TURN icon rendering
@@ -1061,7 +1060,7 @@ double UeRoute::CUeVoice::GetCurElecEyeDist()
 /**
 *
 */
-inline unsigned int CUeVoice::ForwardSND(SndPrompt &prompt, UeSound &snd, double speed, int distForSnd)
+inline unsigned int CUeVoice::ForwardSND(SndPrompt &prompt, UeSound &snd, double speed, int distForSnd, bool isHighway/* = false*/)
 {
   // Note:
   // There are still chance different continuous indicators trapped into the same condition branch, and it seems cause snd broadcast miss
@@ -1075,10 +1074,8 @@ inline unsigned int CUeVoice::ForwardSND(SndPrompt &prompt, UeSound &snd, double
   else if((1900 < distForSnd) && (distForSnd < 2200))
   {
 #if STANDARDVOICE
-    //snd.Add(IVT_Forward);
     snd.Add(IVT_2KM);
 #else
-    //MakeTTS(IVT_Forward, snd);
     MakeTTS(IVT_2KM, snd);
 #endif
     distFlag = IVT_2KM;
@@ -1086,53 +1083,54 @@ inline unsigned int CUeVoice::ForwardSND(SndPrompt &prompt, UeSound &snd, double
   else if((900 < distForSnd) && (distForSnd < 1100))
   {
 #if STANDARDVOICE
-    //snd.Add(IVT_Forward);
     snd.Add(IVT_1KM);
 #else
-    //MakeTTS(IVT_Forward, snd);
     MakeTTS(IVT_1KM, snd);
 #endif
     distFlag = IVT_1KM;
   }
-  else if((450 < distForSnd) && (distForSnd < 550))
+  else if((550 < distForSnd) && (distForSnd < 650) && isHighway)
   {
 #if STANDARDVOICE
-    //snd.Add(IVT_Forward);
+    snd.Add(IVT_600M);
+#else
+    MakeTTS(IVT_600M, snd);
+#endif
+    distFlag = IVT_600M;
+  }
+  else if((450 < distForSnd) && (distForSnd < 550) && !isHighway)
+  {
+#if STANDARDVOICE
     snd.Add(IVT_500M);
 #else
-    //MakeTTS(IVT_Forward, snd);
     MakeTTS(IVT_500M, snd);
 #endif
     distFlag = IVT_500M;
   }
-  else if((250 < distForSnd) && (distForSnd < 350))
+  else if((250 < distForSnd) && (distForSnd < 350) && isHighway)
   {
 #if STANDARDVOICE
-    //snd.Add(IVT_Forward);
     snd.Add(IVT_300M);
 #else
-    //MakeTTS(IVT_Forward, snd);
     MakeTTS(IVT_300M, snd);
 #endif
     distFlag = IVT_300M;
   }
-  else if((100 < distForSnd) && (distForSnd < 150) && m_prevDistFlag != IVT_300M)
+  else if((150 < distForSnd) && (distForSnd < 250) && !isHighway)
   {
 #if STANDARDVOICE
-    //snd.Add(IVT_Forward);
-    snd.Add(IVT_100M);
+    snd.Add(IVT_200M);
 #else
-    //MakeTTS(IVT_Forward, snd);
-    MakeTTS(IVT_100M, snd);
+    MakeTTS(IVT_200M, snd);
 #endif
-    distFlag = IVT_100M;
+    distFlag = IVT_200M;
   }
   else if((-10 < distForSnd) && (distForSnd < soonDist))
   {
 #if STANDARDVOICE
-    //snd.Add(IVT_Forward);
+    snd.Add(IVT_Forward);
 #else
-    //MakeTTS(IVT_Forward, snd);
+    MakeTTS(IVT_Forward, snd);
 #endif
     distFlag = IVT_50M;
   }
@@ -1145,11 +1143,6 @@ inline unsigned int CUeVoice::ForwardSND(SndPrompt &prompt, UeSound &snd, double
   //
   if(distFlag != 0 && m_distFlag != distFlag)
   {
-    // 因m_distFlag在无需播报语音时会置为0，
-    // 故此处用m_prevDistFlag来保存播报距离，
-    // 若上次播报距离为IVT_300M，则在播报距离为IVT_100M时不播报语音
-    m_prevDistFlag = distFlag;
-
     m_distFlag = distFlag;
     return PEC_Success;
   }
@@ -2976,7 +2969,7 @@ void CUeVoice::PlaySideSigns(double distForSnd, double speed, const GuidanceIndi
   }
 
   m_curElecEyeDist = 0.0;
-  bool isHighway = curIndicator->m_roadClass == RC_MotorWay ? true : false;
+  bool isHighway = (curIndicator->m_roadClass == RC_MotorWay);
   if(curIndicator->m_snd.m_sideCode & SVT_EEye)
   {
     bool isEyeFound = false;
@@ -3229,23 +3222,22 @@ bool CUeVoice::PlayElecEye(double distForSnd, unsigned short type, unsigned shor
     UeSound snd;
     // Get Dist Type.
     short distFlag = 0;
-    if((350 < distForSnd) && (distForSnd < 450) && isHighway)
+    if((450 < distForSnd) && (distForSnd < 550) && isHighway)
     {
-      //MakeTTS(IVT_Forward, snd);
-      MakeTTS(IVT_400M, snd);
-      distFlag = IVT_400M;
+      MakeTTS(IVT_500M, snd);
+      distFlag = IVT_500M;
     }
-    else if((150 < distForSnd) && (distForSnd < 250) && !isHighway)
+    else if((250 < distForSnd) && (distForSnd < 350) && !isHighway)
     {
       if(type == TVT_SpeedLimit)
       {
-        MakeTTS(IVT_200M, snd);
+        MakeTTS(IVT_300M, snd);
       }
       else
       {
         MakeTTS(IVT_Forward, snd);
       }
-      distFlag = IVT_200M;
+      distFlag = IVT_300M;
     }
     else if((-10 < distForSnd) && (distForSnd < 150))
     {

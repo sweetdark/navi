@@ -5,6 +5,7 @@
 #include "routewrapper.h"
 #include "maphook.h"
 #include "messagedialoghook.h"
+#include "routetypeswitchhook.h"
 using namespace UeGui;
 
 CPassedRouteHook::CPassedRouteHook()
@@ -62,6 +63,14 @@ void CPassedRouteHook::Load()
     ShowRouteData();
     ShowPageInfo();
   }
+  if (GetPrevHookType() == DHT_MapHook)
+  {
+    m_routeTypeBtnCtrl.SetVisible(false);
+  }
+  else
+  {
+    m_routeTypeBtnCtrl.SetVisible(true);
+  }
 }
 
 
@@ -75,7 +84,7 @@ void CPassedRouteHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(passedroutehook_Lable3,	"Lable3"));
   m_ctrlNames.insert(GuiName::value_type(passedroutehook_HighWayDistLable,	"HighWayDistLable"));
   m_ctrlNames.insert(GuiName::value_type(passedroutehook_Lable4,	"Lable4"));
-  m_ctrlNames.insert(GuiName::value_type(passedroutehook_NormalRouteLable,	"NormalRouteLable:"));
+  m_ctrlNames.insert(GuiName::value_type(passedroutehook_NormalRouteLable,	"NormalRouteLable"));
   m_ctrlNames.insert(GuiName::value_type(passedroutehook_RowOneBtn,	"RowOneBtn"));
   m_ctrlNames.insert(GuiName::value_type(passedroutehook_RowTwoBtn,	"RowTwoBtn"));
   m_ctrlNames.insert(GuiName::value_type(passedroutehook_RowThreeBtn,	"RowThreeBtn"));
@@ -129,8 +138,8 @@ void CPassedRouteHook::MakeControls()
   m_flagTwoPicCtrl.SetCenterElement(GetGuiElement(passedroutehook_FlagTwoPic));
   m_highWayDistLableCtrl.SetCenterElement(GetGuiElement(passedroutehook_HighWayDistLable));
   m_normalRouteLableCtrl.SetCenterElement(GetGuiElement(passedroutehook_NormalRouteLable));
-  m_routeDownBtnCtrl.SetCenterElement(GetGuiElement(passedroutehook_RouteDownBtn));
   m_routeTypeBtnCtrl.SetCenterElement(GetGuiElement(passedroutehook_RouteTypeBtn));
+  m_routeTypeBtnCtrl.SetIconElement(GetGuiElement(passedroutehook_RouteDownBtn));
   m_rowDownArrowBtnCtrl.SetCenterElement(GetGuiElement(passedroutehook_RowDownArrowBtn));
   m_rowDownBtnCtrl.SetCenterElement(GetGuiElement(passedroutehook_RowDownBtn));
   m_rowFiveAvoidBtnCtrl.SetCenterElement(GetGuiElement(passedroutehook_RowFiveAvoidBtn));
@@ -276,6 +285,7 @@ short CPassedRouteHook::MouseUp(CGeoPoint<short> &scrPoint)
   case passedroutehook_RouteTypeBtn:
     {
       m_routeTypeBtnCtrl.MouseUp();
+      CRouteTypeSwitchHook::SetRouteTypeCallBackFun(this, &CPassedRouteHook::RouteReplan);
       TurnTo(DHT_RouteTypeSwitchHook);
     }
     break;
@@ -534,19 +544,16 @@ unsigned char CPassedRouteHook::GetPlanType() const
 
 void CPassedRouteHook::SetPlanInfo( UeRoute::PlanResultDesc& planResult)
 {
+  SetRouteLengthCaption(planResult.totalLength, &m_totalDistLableCtrl);
+
+  SetRouteLengthCaption(planResult.highwayLen, &m_highWayDistLableCtrl);
+  
+  SetRouteLengthCaption(planResult.normalLen, &m_normalRouteLableCtrl);
+
   char cValue[12] = {};
-  //路线总里程
-  ::sprintf(cValue, "%0.1fkm", planResult.totalLength / 1000);
-  m_totalDistLableCtrl.SetCaption(cValue);
-  //高速里程
-  ::sprintf(cValue, "%0.1fkm", planResult.highwayLen / 1000);
-  m_highWayDistLableCtrl.SetCaption(cValue);
-  //一般道路
-  ::sprintf(cValue, "%0.1fkm", planResult.normalLen / 1000);
-  m_normalRouteLableCtrl.SetCaption(cValue);
   //路线用时
   int time = planResult.costTime;
-  ::sprintf(cValue, "%d小时%d分", (int)planResult.costTime / 60, (int)planResult.costTime % 60);
+  ::sprintf(cValue, "%02d:%02d", (int)planResult.costTime / 60, (int)planResult.costTime % 60);
   m_totalTimeLableCtrl.SetCaption(cValue);
 
   //路线类型
@@ -571,6 +578,26 @@ void CPassedRouteHook::SetPlanInfo( UeRoute::PlanResultDesc& planResult)
     /// 推荐路线
     m_routeTypeBtnCtrl.SetCaption("推荐路线");
   }
+}
+
+void CPassedRouteHook::SetRouteLengthCaption(double length, CUiControl *lable)
+{
+  if (!lable)
+  {
+    return;
+  }
+  char cValue[12] = {};
+  //路线总里程
+  double kmLen = length / 1000;
+  if (kmLen >= 100)
+  {
+    ::sprintf(cValue, "%dkm", (int)kmLen);
+  }
+  else
+  {
+    ::sprintf(cValue, "%0.1fkm", kmLen);
+  }
+  lable->SetCaption(cValue);
 }
 
 void CPassedRouteHook::LaodRouteList()
@@ -864,3 +891,15 @@ void CPassedRouteHook::CRouteRow::Clear()
   m_rowDistBtn->ClearCaption();
 }
 
+void CPassedRouteHook::RouteReplan(CAggHook *sender, unsigned int planMethod)
+{
+  CRouteWrapper &routeWrapper = CRouteWrapper::Get();
+  routeWrapper.SetMethod(planMethod);
+  CMapHook* maphook = dynamic_cast<CMapHook*>(CViewWrapper::Get().GetHook(DHT_MapHook));
+  if (maphook)
+  {
+    maphook->GoToMapHook();
+    maphook->RoutePlan_StartGuidance();
+    
+  }
+}

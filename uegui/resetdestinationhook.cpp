@@ -138,7 +138,7 @@ short CResetDestinationHook::MouseUp(CGeoPoint<short> &scrPoint)
         Refresh();
         needRefresh = false;
         CMapHook* mapHook = (CMapHook*)m_view->GetHook(CViewHook::DHT_MapHook);
-        mapHook->AddThroughPoint();
+        //mapHook->AddThroughPoint();
       }
     }
     break;

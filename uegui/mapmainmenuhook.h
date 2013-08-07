@@ -88,6 +88,13 @@ namespace UeGui
     */
     void MakeControls();
   private:
+    /**
+    * \brief 显示和隐藏菜单栏
+    * param bShow 显示还是隐藏
+    * param bExpand 展开还是收缩
+    */
+    void ShowMenuBar(bool bShow, bool bExpand);
+  private:
     // 父hook
     CAggHook* m_parentHook;
     //展开菜单按钮

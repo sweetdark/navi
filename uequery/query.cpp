@@ -334,3 +334,15 @@ inline unsigned int IQuery::RemoveAllHistoryRecord()
 {
 	return m_queryImpl->RemoveAllHistoryRecord();
 }
+unsigned IQuery::SaveCurKeyWord(const char *pchKeyWord,bool bIsAcro)
+{
+  if (m_queryImpl!=0)
+    return m_queryImpl->SaveCurKeyWord(pchKeyWord,bIsAcro);
+  return -1;
+}
+unsigned IQuery::GetHistoryKeyword(std::vector<string> &vecHistoryKey,bool bIsAcro)
+{
+  if (m_queryImpl!=0)
+    return m_queryImpl->GetHistoryKeyword(vecHistoryKey,bIsAcro);
+  return -1;
+}

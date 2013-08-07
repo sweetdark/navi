@@ -28,117 +28,58 @@ namespace UeGui
   */
   class UEGUI_CLASS CPromptSettingHook : public CAggHook
   {
+    friend class CNavigationLeftHook;
   public:
     enum PromptSettingCtrlType
     {
-      PromptSettingHook_Begin,
-
-      PromptSettingHook_Back,
-
-      PromptSettingHook_Map,
-      PromptSettingHook_Previous,
-
-      PromptSettingHook_TopText,
-
-      PromptSettingHook_BriefLeft,
-      PromptSettingHook_Brief,
-      PromptSettingHook_BriefRight,
-      PromptSettingHook_BriefIcon,
-
-      PromptSettingHook_DetailLeft,
-      PromptSettingHook_Detail,
-      PromptSettingHook_DetailRight,
-      PromptSettingHook_DetailIcon,
+      PromptSettingHook_Begin = 0,
+      PromptSettingHook_Hypervelocity,
 
       PromptSettingHook_HighWay,
-      PromptSettingHook_HighWayLeft,
       PromptSettingHook_HighWayLeftIcon,
-      PromptSettingHook_HighWayLeftIconBack,
-      PromptSettingHook_HighWayLeftIconGray,
-      PromptSettingHook_HighWayRight,
       PromptSettingHook_HighWayRightIcon,
-      PromptSettingHook_HighWayRightIconBack,
-      PromptSettingHook_HighWayRightIconGray,
+      PromptSettingHook_HighWayCenter,
+      PromptSettingHook_HighWayLeftBtn,
+      PromptSettingHook_HighWayRightBtn,
+
+      PromptSettingHook_OtherWay,
+      PromptSettingHook_OtherLeftIcon,
+      PromptSettingHook_OtherRightIcon,
+      PromptSettingHook_OtherCenter,
+      PromptSettingHook_OtherLeftBtn,
+      PromptSettingHook_OtherRightBtn,
 
       PromptSettingHook_NationalWay,
-      PromptSettingHook_NationalWayLeft,
       PromptSettingHook_NationalWayLeftIcon,
-      PromptSettingHook_NationalWayLeftIconBack,
-      PromptSettingHook_NationalWayLeftIconGray,
-      PromptSettingHook_NationalWayRight,
       PromptSettingHook_NationalWayRightIcon,
-      PromptSettingHook_NationalWayRightIconBack,
-      PromptSettingHook_NationalWayRightIconGray,
-
-      PromptSettingHook_Other,
-      PromptSettingHook_OtherLeft,
-      PromptSettingHook_OtherLeftIcon,
-      PromptSettingHook_OtherLeftIconBack,
-      PromptSettingHook_OtherLeftIconGray,
-      PromptSettingHook_OtherRight,
-      PromptSettingHook_OtherRightIcon,
-      PromptSettingHook_OtherRightIconBack,
-      PromptSettingHook_OtherRightIconGray,
+      PromptSettingHook_NationalWayCenter,
+      PromptSettingHook_NationalWayLeftBtn,
+      PromptSettingHook_NationalWayRightBtn,
 
       PromptSettingHook_End
     };
 
-  public:
-    /**
-    * \brief 默认构造函数
-    */
+    private:
     CPromptSettingHook();
 
-    /**
-    * \brief 析构函数
-    */
     virtual ~CPromptSettingHook();
 
   public:
-    /**
-    *
-    */
     virtual void MakeGUI();
 
-    /**
-    *
-    */
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
-    /**
-    *
-    */
     virtual short MouseMove(CGeoPoint<short> &scrPoint);
 
-    /**
-    *
-    */
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    /**
-    *
-    */
     virtual bool operator ()();
 
-    /**
-    *
-    */
-    virtual void Init();
-
-    /**
-    *
-    */
-    virtual void Load();
+    virtual void ReadSetting();
 
   protected:
-    /**
-    *
-    */
     virtual tstring GetBinaryFileName();
 
-    /**
-    *
-    */
     virtual void MakeNames();
 
   private:
@@ -177,23 +118,17 @@ namespace UeGui
     short m_otherSpeedIndex;
 
     // Top Button
-    CUiButton m_mapCtrl;
-    CUiButton m_previousCtrl;
-
-    CUiRadioButton m_briefCtrl;
-    CUiRadioButton m_detailCtrl;
-
     CUiLabel m_highwaySpeenCtrl;
-    CUiButton m_highwayLeftCtrl;
-    CUiButton m_highwayRightCtrl;
+    CUiBitButton m_highwayLeftCtrl;
+    CUiBitButton m_highwayRightCtrl;
 
     CUiLabel m_nationalWaySpeenCtrl;
-    CUiButton m_nationalWayLeftCtrl;
-    CUiButton m_nationalWayRightCtrl;
+    CUiBitButton m_nationalWayLeftCtrl;
+    CUiBitButton m_nationalWayRightCtrl;
 
     CUiLabel m_otherSpeenCtrl;
-    CUiButton m_otherLeftCtrl;
-    CUiButton m_otherRightCtrl;
+    CUiBitButton m_otherLeftCtrl;
+    CUiBitButton m_otherRightCtrl;
   };
 }
 

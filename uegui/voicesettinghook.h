@@ -36,10 +36,13 @@ namespace UeGui
     {
       VoiceSettingHook_Begin = 0,
       VoiceSettingHook_Voicelabel,
+
       VoiceSettingHook_DynamicVoiceBtn,
       VoiceSettingHook_DynamicVoiceLabel,
       VoiceSettingHook_DynamicVoiceIcon,
+
       VoiceSettingHook_TestListenBtn,
+
       VoiceSettingHook_VoiceLeftBtn,
       VoiceSettingHook_VoiceLeftIcon,
       VoiceSettingHook_VoiceRightBtn,
@@ -67,9 +70,7 @@ namespace UeGui
 
     virtual short MouseMove(CGeoPoint<short> &scrPoint);
 
-    virtual short MouseUp(CGeoPoint<short> &scrPoint);
-
-    //virtual void Load();
+    virtual short MouseUp(CGeoPoint<short> &scrPoint);    
 
     virtual bool operator ()();
 
@@ -84,6 +85,10 @@ namespace UeGui
     void Set_VDialect();
 
   private:
+    void SwitchVoicePageInfo();
+
+    void ReadSetting();
+
     void SaveSetting();//±£¥Ê…Ë÷√
 
     void PlaySounds();// ‘Ã˝
@@ -96,7 +101,7 @@ namespace UeGui
 
   private:
     CUiLabel m_voiceLabelCtrl;
-    CUiBitButton m_dynamicVoiceCtrl;
+    CUiCheckButton m_dynamicVoiceCtrl;
     CUiLabel m_dynamicVoiceLabelCtrl;
     CUiBitButton m_testListenCtrl;
     CUiBitButton m_voiceLeftCtrl;

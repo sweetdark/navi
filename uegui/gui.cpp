@@ -189,6 +189,11 @@ void UeGui::IGui::RenderSubViewHooks( const CGeoRect<short> &scrExtent )
   m_guiImpl->RenderSubViewHooks(scrExtent);
 }
 
+void UeGui::IGui::BackupLastRoute()
+{
+  m_guiImpl->BackupLastRoute();
+}
+
 /**
 *
 */
@@ -208,11 +213,6 @@ inline bool IGui::IsReadyForPlanning()
 inline bool IGui::GetDistrictName(const CGeoPoint<long> &pos, char *distName)
 {
   return m_guiImpl->GetDistrictName(pos, distName);
-}
-
-inline bool IGui::IsCountDown()
-{
-  return m_guiImpl->IsCountDown();
 }
 
 inline void IGui::DoRouteGuidance()

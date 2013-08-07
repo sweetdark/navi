@@ -70,6 +70,8 @@ namespace UeGui
 
     char* GetKeyWord();
 
+    void SetKeyWord(char* keyword);
+
     void SetQueryMode();
 
     //实时判断当前的手写输入
@@ -79,9 +81,9 @@ namespace UeGui
 
     virtual void Load();
 
-    virtual void Init();
-
     virtual void UnLoad();
+
+    virtual void Init();
 
     virtual void MakeNames();
 
@@ -106,6 +108,10 @@ namespace UeGui
     static void DistSwitchCallBack(void *pDoCallBackObj, const SQLRecord *pResult);
 
     void DoDistSwitchCallBack(const SQLRecord *pResult);
+
+    static void InputSelectCallBack(void *pDoCallBackObj, char *keyword);
+
+    void DoInputSelectCallBack(char *keyword);
 
   private:
     CUiButton m_distSwitchBtn;
@@ -144,6 +150,10 @@ namespace UeGui
     static short m_writingNum;
     //当前可以保存坐标的下标
     static short m_writingCursor;
+    //保存搜索poi和路名用的关键字
+    char m_poiKeyWord[128];
+    //保存搜索区域用的关键字
+    char m_distKeyWord[128];
     //
     bool m_isNewChar;
     int m_writingTime;
@@ -154,6 +164,8 @@ namespace UeGui
     HPEN m_pen;
     HPEN m_oldPen;
     HDC m_renderingDC;
+    //判断当前是准备纠正想要输入的字还是输入下一个联想字
+    bool m_isIdentify;
   };
 }
 #endif

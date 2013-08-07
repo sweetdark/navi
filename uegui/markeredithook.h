@@ -16,7 +16,7 @@
 
 namespace UeGui
 {
-  class UEGUI_CLASS CMarkerEditHook : public CAggHook
+  class UEGUI_CLASS CMarkerEditHook : public CMenuBackgroundHook
   {
   public:
     enum MarkerEditHookCtrlType
@@ -68,15 +68,13 @@ namespace UeGui
     virtual bool operator ()();
 
   protected:
-    virtual tstring GetBinaryFileName();
+    //virtual tstring GetBinaryFileName();
 
     virtual void MakeNames();
 
     void MakeControls();
 
   private:
-    CUiButton m_backButtonCtrl;
-    CUiButton m_gotoMapBtnCtrl;
     CUiButton m_mark01Ctrl;
     CUiButton m_mark02Ctrl;
     CUiButton m_mark03Ctrl;

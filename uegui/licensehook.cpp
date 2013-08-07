@@ -1,6 +1,5 @@
 #include "licensehook.h"
-#include "guisetting.h"
-
+#include "settingwrapper.h"
 using namespace UeGui;
 
 tstring CLicenseHook::GetBinaryFileName()
@@ -21,7 +20,7 @@ void UeGui::CLicenseHook::Init()
 //   CGuiSettings* ueSettings = CGuiSettings::GetGuiSettings();
 //   if (ueSettings)
 //   {
-//     if (UeBase::OS_ON == ueSettings->GetIsOpenStartStatement())
+//     if (UeBase::OS_ON == settingWrapper.GetIsOpenStartStatement())
 //     {
 //       m_alwaysAcceptBtn.SetCheck(false);
 //     }
@@ -34,19 +33,16 @@ void UeGui::CLicenseHook::Init()
 
 void UeGui::CLicenseHook::SaveCheckSetting(bool isAlways)
 {
-  CGuiSettings* ueSettings = CGuiSettings::GetGuiSettings();
-  if (ueSettings)
-  {
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
     if (isAlways)
     {
-      ueSettings->SetIsOpenStartStatement(UeBase::OS_OFF);
+      settingWrapper.SetIsOpenStartStatement(UeBase::OS_OFF);
     }
     else
     {
-      ueSettings->SetIsOpenStartStatement(UeBase::OS_ON);
+      settingWrapper.SetIsOpenStartStatement(UeBase::OS_ON);
     }
-    ueSettings->SaveSystemSettings();
-  }
+    settingWrapper.SaveSystemSettings();
 }
 
 short CLicenseHook::MouseDown( CGeoPoint<short> &scrPoint )

@@ -2,6 +2,12 @@
 
 #include "inputswitchhook.h"
 
+#ifndef _UEGUI_QUERYWRAPPER_H
+#include "querywrapper.h"
+#endif
+
+#include "distquerylisthook.h"
+
 using namespace UeGui;
 
 CQueryMenuHook::CQueryMenuHook()
@@ -17,6 +23,18 @@ CQueryMenuHook::~CQueryMenuHook()
   m_imageNames.clear();
 }
 
+void CQueryMenuHook::Load()
+{
+  int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
+  if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
+  {
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityAcro);
+  }
+  else
+  {
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
+  }
+}
 
 void CQueryMenuHook::MakeNames()
 {
@@ -181,6 +199,7 @@ short CQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case QueryMenuHook_AddressBookLabel:
     {
       m_addressBookBtn.MouseUp();
+      CAggHook::TurnTo(DHT_QueryAddressBookHook);
     }
     break;
   case QueryMenuHook_SecondBtnBackground:
@@ -188,6 +207,7 @@ short CQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case QueryMenuHook_HistoryRecordLabel:
     {
       m_historyRecordBtn.MouseUp();
+      CAggHook::TurnTo(DHT_QueryHistoryHook);
     }
     break;
   case QueryMenuHook_ThirdBtnBackground:
@@ -233,11 +253,22 @@ short CQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case QueryMenuHook_DistSearchLabel:
     {
       m_distSearchBtn.MouseUp();
+      int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
+      if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
+      {
+        CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityAcro);
+      }
+      else
+      {
+        CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
+      }
       CInputSwitchHook *inputHook = (CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook);
       if (inputHook)
       {
         TurnTo(inputHook->GetCurInputHookType());
       }
+      //不是回调则设置为unknown
+      ((CDistQueryListHook *)m_view->GetHook(DHT_DistQueryListHook))->SetReturnHookType(DHT_Unknown);
     }
     break;
   default:

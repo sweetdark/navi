@@ -5,7 +5,7 @@ using namespace UeGui;
 using namespace UeModel;
 
 
-CGuidanceViewHook::CGuidanceViewHook() : m_maxProgressHight(290), m_maxProgressDist(300),m_lastDistForSnd(0)
+CGuidanceViewHook::CGuidanceViewHook() : m_maxProgressHight(0), m_maxProgressDist(0),m_lastDistForSnd(0)
 {
 }
 
@@ -133,6 +133,16 @@ void UeGui::CGuidanceViewHook::RefreshProgressBar()
     //    return;
     //  }
     //}
+    GuidanceIndicator *oneIndicator = IRoute::GetRoute()->GetIndicator(dirInfo.m_curPair, dirInfo.m_curOrderForSnd);
+    if (oneIndicator->m_roadClass == RC_MotorWay)
+    {
+      m_maxProgressDist = UeRoute::CDT_Highway;
+    }
+    else
+    {
+      m_maxProgressDist = UeRoute::CDT_Normal;
+    }
+
     if (dirInfo.m_curDistForSnd < 0)
     {
       dirInfo.m_curDistForSnd = 0;

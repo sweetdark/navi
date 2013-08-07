@@ -29,25 +29,20 @@
 //#include "messagehook.h"
 #include "maphook.h"
 //#include "favorhook.h"
-#include "gpshook.h"
+//#include "gpshook.h"
 //#include "settinghook.h"
 #include "mapsettinghook.h"
-#include "routesettinghook.h"
 //#include "querysettinghook.h"
-#include "voicesettinghook.h"
 //#include "querycrosshook.h"
 #include "userinfohook.h"
 #include "navisettinghook.h"
-#include "crosspicsettinghook.h"
-#include "eeyesettinghook.h"
-#include "promptsettinghook.h"
-#include "safetysettinghook.h"
-#include "tracksettinghook.h"
+//#include "crosspicsettinghook.h"
+//#include "eyesettinghook.h"
+//#include "promptsettinghook.h"
 #include "systemsettinghook.h"
 #include "mapscanhook.h"
 #include "carsettinghook.h"
-#include "timesettinghook.h"
-#include "declaresettinghook.h"
+//#include "declaresettinghook.h"
 #include "editionhook.h"
 #include "detailmessagehook.h"
 #include "detailedithook.h"
@@ -70,7 +65,7 @@
 #include "Demonstration3Dhook.h"
 #include "city3Dhook.h"
 #include "myinformationhook.h"
-#include "capacityinformationhook.h"
+//#include "capacityinformationhook.h"
 #include "messagedialoghook.h"
 #include "myjourneyhook.h"
 #include "myaddressbookhook.h"
@@ -80,7 +75,7 @@
 #include "upwardordownwardhook.h"
 #include "logonhook.h"
 #include "uebase\dbgmacro.h"
-#include "guisetting.h"
+#include "settingwrapper.h"
 #include "navigationselectionhook.h"
 #include "ddtupdateservicehook.h"
 #include "guidanceviewhook.h"
@@ -106,6 +101,9 @@
 #include "typenodistquerylisthook.h"
 #include "fastoperationhook.h"
 #include "qcodeinputhook.h"
+#include "queryaddressbookhook.h"
+#include "queryhistoryhook.h"
+#include "inputselecthook.h"
 
 #if __FOR_FPC__
 #include "caphook.h"
@@ -132,13 +130,13 @@ using namespace UeRoute;
 #include "uequery\query.h"
 using namespace UeQuery;
 
-#include "guisetting.h"
 #include "guioperationright.h"
-#include "comportsettinghook.h"
 #include "productactivationhook.h"
 //#include "ddtservice4shook.h"
 #include "RestoreDefaultshook.h"
 #include "settingwrapper.h"
+#include "userdatawrapper.h"
+#include "routewrapper.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -156,11 +154,7 @@ CGuiImpl::CGuiImpl() : m_view(0)
 CGuiImpl::~CGuiImpl()
 {
   //释放配置管理对象
-  CGuiSettings* guiSettings = CGuiSettings::GetGuiSettings();
-  if (guiSettings)
-  {
-    guiSettings->Delete();
-  }
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
   //释放操作权限管理对象
   CGuiOperationRight::Delete();
 }
@@ -204,7 +198,7 @@ void CGuiImpl::Update(short type, void *para)
     break;
   case CViewHook::UHT_UpdateGPSHook:
     {
-      ((CGpsHook*)(m_view->GetHook(CViewHook::DHT_GPSHook)))->Update();
+      //((CGpsHook*)(m_view->GetHook(CViewHook::DHT_GPSHook)))->Update();
     }
     break;
   case CViewHook::UHT_UpdateKeyboardHook:
@@ -272,12 +266,6 @@ inline bool CGuiImpl::GetDistrictName(const CGeoPoint<long> &pos, char *distName
 	return CCodeIndexCtrl::GetDistCodeCtrl().GetItemNameByCode(distIdx,distName);
 }
 
-inline bool CGuiImpl::IsCountDown()
-{
-  CMapHook *mapHook = ((CMapHook*)m_view->GetHook(CViewHook::DHT_MapHook));
-  return mapHook->IsCountDown();
-}
-
 inline void CGuiImpl::DoRouteGuidance()
 {
   CMapHook *mapHook = ((CMapHook*)m_view->GetHook(CViewHook::DHT_MapHook));
@@ -339,7 +327,6 @@ void CGuiImpl::SetCapScale(int scale)
 const ViewSettings &CGuiImpl::GetMapSettings()
 {
   CSettingWrapper &settingWraper = CSettingWrapper::Get();
-  assert(ueSettings);
   return settingWraper.GetViewSettings();
 }
 
@@ -399,13 +386,10 @@ void CGuiImpl::MakeHooks()
 #else
   //默认开启启动声明
   bool isShowLicenseHook = true;
-  CGuiSettings* ueSettings = CGuiSettings::GetGuiSettings();
-  if (ueSettings)
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+  if (UeBase::OS_OFF == settingWrapper.GetIsOpenStartStatement())
   {
-    if (UeBase::OS_OFF == ueSettings->GetIsOpenStartStatement())
-    {
-      isShowLicenseHook= false;
-    }
+    isShowLicenseHook= false;
   }
   if (isShowLicenseHook)
   {
@@ -481,10 +465,10 @@ void CGuiImpl::MakeHooks()
   view->UpdateProgress();
 
   //卫星界面
-  viewHook = new CGpsHook();
-  viewHook->SetHelpers(net, view, route, gps, query);
-  viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_GPSHook, viewHook);
+  //viewHook = new CGpsHook();
+  //viewHook->SetHelpers(net, view, route, gps, query);
+  //viewHook->LoadGUI();  
+  //view->AddHook(CViewHook::DHT_GPSHook, viewHook);
 
   ////旧Hook需要移除掉
   //viewHook = new CSettingHook();
@@ -511,42 +495,31 @@ void CGuiImpl::MakeHooks()
   view->AddHook(CViewHook::DHT_NaviSettingHook, viewHook);
   
   //导航设置界面里的路口放大图界面
-  viewHook = new CCrossPicSettingHook();
-  viewHook->SetHelpers(net, view, route, gps, query);
-  //切换界面时再动态加载
-  viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_CrossPicSettingHook, viewHook);
+  //viewHook = new CCrossPicSettingHook();
+  //viewHook->SetHelpers(net, view, route, gps, query);
+  ////切换界面时再动态加载
+  //viewHook->LoadGUI();  
+  //view->AddHook(CViewHook::DHT_CrossPicSettingHook, viewHook);
 
   //导航设置界面里的电子眼界面
-  viewHook = new CEEyeSettingHook();
-  viewHook->SetHelpers(net, view, route, gps, query);
-  viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_EEyeSettingHook, viewHook);
-
+//  viewHook = new CEEyeSettingHook();
+//  viewHook->SetHelpers(net, view, route, gps, query);
+//  viewHook->LoadGUI();  
+//  view->AddHook(CViewHook::DHT_EEyeSettingHook, viewHook);
+//
   //导航设置界面里的提示设置界面
-  viewHook = new CPromptSettingHook();
+  /*viewHook = new CPromptSettingHook();
   viewHook->SetHelpers(net, view, route, gps, query);
   viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_PromptSettingHook, viewHook);
+  view->AddHook(CViewHook::DHT_PromptSettingHook, viewHook);*/
 
-  //导航设置界面里的安全设置界面
-  viewHook = new CSafetySettingHook();
-  viewHook->SetHelpers(net, view, route, gps, query);
-  //切换界面时再动态加载
-  //viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_SafetySettingHook, viewHook);
   
   //导航设置界面里的路线设置界面
-  viewHook = new CRouteSettingHook();
-  viewHook->SetHelpers(net, view, route, gps, query);  
-  viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_RouteSettingHook, viewHook);
+  //viewHook = new CRouteSettingHook();
+  //viewHook->SetHelpers(net, view, route, gps, query);  
+  //viewHook->LoadGUI();  
+  //view->AddHook(CViewHook::DHT_RouteSettingHook, viewHook);
 
-  //导航设置界面里的轨迹设置界面
-  viewHook = new CTrackSettingHook();
-  viewHook->SetHelpers(net, view, route, gps, query);
-  viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_TrackSettingHook, viewHook);
 
   ////旧Hook需要移除掉
   //viewHook = new CQuerySettingHook();
@@ -582,20 +555,14 @@ void CGuiImpl::MakeHooks()
   ////viewHook->LoadGUI();  
   //view->AddHook(CViewHook::DHT_CarSettingHook,viewHook);
 
-  //系统设置界面里的时间校准界面
-  viewHook = new CTimeSettingHook();
-  viewHook->SetHelpers(net,view,route,gps,query);
-  //切换界面时再动态加载
-  //viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_TimeSettingHook,viewHook);
 
   //系统设置界面里的启动声明界面
-  viewHook = new CDeclareSettingHook();
-  viewHook->SetHelpers(net,view,route,gps,query);
-  //切换界面时再动态加载
-  //viewHook->LoadGUI();  
-  view->AddHook(CViewHook::DHT_DeclareSettingHook,viewHook);
-
+//  viewHook = new CDeclareSettingHook();
+//  viewHook->SetHelpers(net,view,route,gps,query);
+//  //切换界面时再动态加载
+//  //viewHook->LoadGUI();  
+//  view->AddHook(CViewHook::DHT_DeclareSettingHook,viewHook);
+//
   //系统设置界面里的版本信息界面
   viewHook = new CEditionHook();
   viewHook->SetHelpers(net,view,route,gps,query);
@@ -795,6 +762,22 @@ void CGuiImpl::MakeHooks()
   viewHook->SetHelpers(net,view,route,gps,query);
   viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_MyAddressBookHook,viewHook);
+  //地址簿查询
+  viewHook = new CQueryAddressBookHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_QueryAddressBookHook,viewHook);
+  //历史记录查询
+  viewHook = new CQueryHistoryHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_QueryHistoryHook,viewHook);
+
+  //历史输入选择界面
+  viewHook = new CInputSelectHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_InputSelectHook,viewHook);
 
   //我的信息
   viewHook = new CMyInformationHook();
@@ -803,11 +786,11 @@ void CGuiImpl::MakeHooks()
   view->AddHook(CViewHook::DHT_MyInformationHook,viewHook);
 
   //容量信息
-  viewHook = new CCapacityInformationHook();
-  viewHook->SetHelpers(net,view,route,gps,query);
-  //切换界面时再动态加载
-  //viewHook->LoadGUI();
-  view->AddHook(CViewHook::DHT_CapacityInformationHook,viewHook);
+  //viewHook = new CCapacityInformationHook();
+  //viewHook->SetHelpers(net,view,route,gps,query);
+  ////切换界面时再动态加载
+  ////viewHook->LoadGUI();
+  //view->AddHook(CViewHook::DHT_CapacityInformationHook,viewHook);
 
 
   //我的行程
@@ -835,13 +818,6 @@ void CGuiImpl::MakeHooks()
   //切换界面时再动态加载
   //viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_DdtUpdateServiceHook,viewHook);
-
-  //端口配置
-  viewHook = new CCOMPortSettingHook();  
-  viewHook->SetHelpers(net, view, route, gps, query);
-  //切换界面时再动态加载
-  //viewHook->LoadGUI();
-  view->AddHook(CViewHook::DHT_COMPortSettingHook,viewHook);
 
   //导航选择对话框
   viewHook = new CNavigationSelectionHook();
@@ -1007,4 +983,19 @@ bool UeGui::CGuiImpl::IsShowCompass()
     return mapHook->IsShowCompass();
   }
   return false;
+}
+
+void UeGui::CGuiImpl::BackupLastRoute()
+{
+  const CUserDataWrapper& userDataWrapper = CUserDataWrapper::Get();
+  CRouteWrapper& routeWrapper = CRouteWrapper::Get();
+  short planStatue = routeWrapper.GetPlanState();
+  if ((UeRoute::PS_Ready == planStatue) || (UeRoute::PS_RealGuidance == planStatue))
+  {
+    userDataWrapper.SaveLastRoute();
+  }
+  else
+  {
+    userDataWrapper.ClearLastRoute();
+  }
 }

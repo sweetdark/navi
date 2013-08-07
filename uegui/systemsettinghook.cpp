@@ -33,14 +33,23 @@ CSystemSettingHook::~CSystemSettingHook()
 void CSystemSettingHook::Init()
 {
   m_systemLeftSide = new CSystemLeftHook();
-  AddChildHook(CViewHook::DHT_SystemLeftHook, m_systemLeftSide);
+  m_systemLeftSide->SetHelpers(m_net, m_view, m_route, m_gps, m_query);
+  m_systemLeftSide->Init();  
   m_systemLeftSide->Show(true);
+  m_systemLeftSide->Reset();
 
   m_navigationLeftSide = new CNavigationLeftHook();
-  AddChildHook(CViewHook::DHT_NavigationLeftHook, m_navigationLeftSide);
+  m_navigationLeftSide->SetHelpers(m_net, m_view, m_route, m_gps, m_query);
+  m_navigationLeftSide->Init();
+  m_navigationLeftSide->Show(false);
 
   m_versionInfo = new CVersionInfoHook();
+  m_versionInfo->SetHelpers(m_net, m_view, m_route, m_gps, m_query);
+  m_versionInfo->Show(false);
+
   AddChildHook(CViewHook::DHT_VersionInfoHook, m_versionInfo);
+  AddChildHook(CViewHook::DHT_NavigationLeftHook, m_navigationLeftSide);
+  AddChildHook(CViewHook::DHT_SystemLeftHook, m_systemLeftSide);
 }
 
 
@@ -103,7 +112,6 @@ short CSystemSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
     }
     break;
   }
-
   if (m_isNeedRefesh)
   {
     Refresh();
@@ -125,23 +133,36 @@ short CSystemSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
   case systemsettinghook_InitBtn:
     {
       m_initBtnCtrl.MouseUp();
+      TurnTo(DHT_RestoreDefaultshook);
     }
     break;
   case systemsettinghook_NavigationBtn:
     {
       m_navigationBtnCtrl.MouseUp();
+      SetTabStatus(kNavigationSetting,true);
+      m_active = kNavigationSetting;
+      SetTabStatus(kSystemSetting,false);
+      SetTabStatus(kVersionInfo,false);
       SwitchTabPage(kNavigationSetting);
     }
     break;
   case systemsettinghook_SystemBtn:
     {
       m_systemBtnCtrl.MouseUp();
+      SetTabStatus(kNavigationSetting,false);
+      SetTabStatus(kSystemSetting,true);
+      m_active = kSystemSetting;
+      SetTabStatus(kVersionInfo,false);
       SwitchTabPage(kSystemSetting);
     }
     break;
   case systemsettinghook_VersionInfoBtn:
     {
       m_versionInfoBtnCtrl.MouseUp();
+      SetTabStatus(kNavigationSetting,false);
+      SetTabStatus(kSystemSetting,false);
+      SetTabStatus(kVersionInfo,true);
+      m_active = kVersionInfo;
       SwitchTabPage(kVersionInfo);
     }
     break;
@@ -168,6 +189,7 @@ void CSystemSettingHook::SwitchTabPage(unsigned short type)
   case kSystemSetting:
     {
       m_systemLeftSide->Show(true);
+      m_systemLeftSide->Reset();
       m_navigationLeftSide->Show(false);
       m_versionInfo->Show(false);
     }
@@ -176,6 +198,7 @@ void CSystemSettingHook::SwitchTabPage(unsigned short type)
     {
       m_systemLeftSide->Show(false);
       m_navigationLeftSide->Show(true);
+      m_navigationLeftSide->Reset();
       m_versionInfo->Show(false);
     }
     break;
@@ -189,5 +212,69 @@ void CSystemSettingHook::SwitchTabPage(unsigned short type)
   default:
     assert(false);
     break;
+  }
+}
+void CSystemSettingHook::SetTabStatus(TabPageType page, bool status)
+{
+  CViewHook::GuiElement* tabElement = NULL;
+  switch (page)
+  {
+  case kSystemSetting :
+    {
+      tabElement = GetGuiElement(systemsettinghook_SystemBtn);      
+      break;
+    }
+  case kNavigationSetting : 
+    {
+      tabElement = GetGuiElement(systemsettinghook_NavigationBtn);
+      break;
+    }
+  case kVersionInfo :
+    {
+      tabElement = GetGuiElement(systemsettinghook_VersionInfoBtn);
+      break;
+    }
+  }
+  if (NULL != tabElement)
+  {
+    if (status == true)
+    {
+      tabElement->m_backStyle = tabElement->m_bkDisabled;
+      tabElement->m_textStyle = tabElement->m_disabledTextStype;
+    }
+    else
+    {
+      tabElement->m_backStyle = tabElement->m_bkNormal;
+      tabElement->m_textStyle = tabElement->m_normalTextStylpe;
+    }
+  }
+}
+void CSystemSettingHook::Load()
+{
+  SetTabStatus(kSystemSetting, true);
+  m_active = kSystemSetting;
+  SetTabStatus(kNavigationSetting, false);
+  SetTabStatus(kVersionInfo, false);
+  SwitchTabPage(kSystemSetting);
+}
+void CSystemSettingHook::DoReturn()
+{
+  switch(m_active)
+  {
+  case kSystemSetting :
+    {
+      m_systemLeftSide->DoReturn();
+      break;
+    }
+  case kNavigationSetting : 
+    {
+      m_navigationLeftSide->DoReturn();
+      break;
+    }
+  case kVersionInfo :
+    {
+      
+      break;
+    }
   }
 }

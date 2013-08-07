@@ -607,6 +607,36 @@ namespace UeQuery
 		}
 		return (m_pHistoryrecordCtrl!=0);
 	}
+  bool CUeQueryImpl::InitHistoryKeywordCtrl(void)
+  {
+    const CFileBasic &fileBasic(CFileBasic::Get());
+    if (!fileBasic.IsValidHandle(m_pHistKeywordHandle))
+    {
+      const CPathBasic &pathBasic(CPathBasic::Get());
+      tstring histroyKeyFile(CPathConfig::GetCommonPath(CPathConfig::CPK_UserPath));
+      histroyKeyFile += _T("historykeyword.db");
+      //
+      if (!pathBasic.IsFileExist(histroyKeyFile))
+      {
+        m_pHistKeywordHandle = fileBasic.OpenFile(histroyKeyFile,CFileBasic::UE_FILE_WRITE);
+        if (!fileBasic.IsValidHandle(m_pHistKeywordHandle))
+          return false;
+        //
+        fileBasic.WriteFile(m_pHistKeywordHandle,m_keywordList,sizeof(THistoryKeywordEntry)*2,1);
+        fileBasic.CloseFile(m_pHistKeywordHandle);
+      }
+      m_pHistKeywordHandle = fileBasic.OpenFile(histroyKeyFile,CFileBasic::UE_FILE_ALL);
+      if (!fileBasic.IsValidHandle(m_pHistKeywordHandle))
+        return false;
+      //
+      int count = 1;
+      void *pPtr = m_keywordList;
+      fileBasic.SeekFile(m_pHistKeywordHandle,0);
+      fileBasic.ReadFile(m_pHistKeywordHandle,&pPtr,sizeof(THistoryKeywordEntry)*2,count);
+      return true;
+    }
+    return true;
+  }
 	bool CUeQueryImpl::InitFavoriteCtrl(void)
 	{
 		if (m_pFavoriteCtrl==0)
@@ -788,6 +818,96 @@ namespace UeQuery
 		m_pHistoryrecordCtrl->EditBlockData(order,reinterpret_cast<const char *>(&curHisRecord));
 		return SQL_Success;
 	}
+  unsigned CUeQueryImpl::SaveCurKeyWord(const char *pchKeyWord,bool bIsAcro)
+  {
+    if (!InitHistoryKeywordCtrl())
+    {
+      return SQL_ConnectFailure;
+    }
+    char tempStr[THistoryKeywordEntry::MaxKeywordLen] = {};
+    long keywordLen = ::strlen(pchKeyWord);
+    //去除多余的字符
+    if (keywordLen>=THistoryKeywordEntry::MaxKeywordLen)
+    {
+      if (bIsAcro)
+      {
+        ::memcpy(tempStr,pchKeyWord,THistoryKeywordEntry::MaxKeywordLen-1);
+        tempStr[THistoryKeywordEntry::MaxKeywordLen-1] = 0;
+      }
+      else
+      {
+        long i = 0;
+        for (; i<(THistoryKeywordEntry::MaxKeywordLen-1); ++i,++pchKeyWord)
+        {
+          unsigned char first = *pchKeyWord;
+          if (first<0x80)
+          {
+            tempStr[i] = first;
+          }
+          else
+          {
+            unsigned char last = *(++pchKeyWord);
+            if (last==0)
+              break;
+            //判断能否添加两个字符
+            if ((i+1)>=(THistoryKeywordEntry::MaxKeywordLen-1))
+              break;
+            tempStr[i] = first;
+            tempStr[i+1] = last;
+            ++ i;
+          }
+        }
+        tempStr[i] = 0;
+      }
+    }
+    else
+    {
+      ::strcpy(tempStr,pchKeyWord);
+    }
+    //检查之前是否添加过
+    THistoryKeywordEntry *pKeywordList = bIsAcro?(m_keywordList+1):m_keywordList;
+    for (long i(0); i<pKeywordList->m_recordNum; ++i)
+    {
+      if (::strcmp(tempStr,pKeywordList->m_keywordList+i*THistoryKeywordEntry::MaxKeywordLen)==0)
+      {
+        return SQL_Success;
+      }
+    }
+    //判断是否要后移数据
+    if (pKeywordList->m_recordNum>=THistoryKeywordEntry::MaxKeywordNum)
+    {
+      -- pKeywordList->m_recordNum;
+      for (long i(0); i<(THistoryKeywordEntry::MaxKeywordNum-1); ++i)
+      {
+        ::memcpy(pKeywordList->m_keywordList+i*THistoryKeywordEntry::MaxKeywordLen,
+          pKeywordList->m_keywordList+THistoryKeywordEntry::MaxKeywordLen*(i+1),
+          THistoryKeywordEntry::MaxKeywordLen);
+      }
+    }
+    //
+    ::memcpy(pKeywordList->m_keywordList+pKeywordList->m_recordNum*THistoryKeywordEntry::MaxKeywordLen,
+      tempStr,THistoryKeywordEntry::MaxKeywordLen);
+    ++ pKeywordList->m_recordNum;
+    //写入到文件中去
+    const CFileBasic &fileBasic(CFileBasic::Get());
+    fileBasic.SeekFile(m_pHistKeywordHandle,(bIsAcro?sizeof(THistoryKeywordEntry):0));
+    fileBasic.WriteFile(m_pHistKeywordHandle,pKeywordList,sizeof(THistoryKeywordEntry),1);
+    return SQL_Success;
+  }
+  unsigned CUeQueryImpl::GetHistoryKeyword(std::vector<string> &vecHistoryKey,bool bIsAcro)
+  {
+    if (!InitHistoryKeywordCtrl())
+    {
+      return SQL_ConnectFailure;
+    }
+    vecHistoryKey.clear();
+    THistoryKeywordEntry *pKeywordList = bIsAcro?(m_keywordList+1):m_keywordList;
+    for (long i(THistoryKeywordEntry::MaxKeywordNum-1); i>=0; --i)
+    {
+      vecHistoryKey.push_back(pKeywordList->m_keywordList+i*THistoryKeywordEntry::MaxKeywordLen);
+    }
+    return SQL_Success;
+  }
 
 	unsigned int CUeQueryImpl::RemoveAllHistoryRecord()
 	{

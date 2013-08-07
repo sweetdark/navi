@@ -279,7 +279,7 @@ namespace UeRoute
     * \param speed 当前行车速度
     * \param distForSnd 距播报点的距离
     */
-    unsigned int ForwardSND(SndPrompt &prompt, UeSound &snd, double speed, int distForSnd);
+    unsigned int ForwardSND(SndPrompt &prompt, UeSound &snd, double speed, int distForSnd, bool isHighway = false);
 
     /**
     *
@@ -520,7 +520,6 @@ namespace UeRoute
     SndPrompt m_prePrompt;
 
     //
-    short m_prevDistFlag;
     short m_distFlag;
     int m_distForSnd;
     int m_orderForSnd;

@@ -109,7 +109,7 @@ namespace UeRoute
     typedef std::vector<IndicatorIndex> IndicatorVector;
 
     // Different turn angles
-    static const int DIRECTANGLE = 10;
+    static const int DIRECTANGLE = 20;
     static const int TURNANGLE = 45;
     static const int UTURNANGLE = 160;
 

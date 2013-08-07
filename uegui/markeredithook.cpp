@@ -4,6 +4,8 @@ using namespace UeGui;
 
 CMarkerEditHook::CMarkerEditHook()
 {
+  m_strTitle = "Ñ¡ÔñÍ¼±ê";
+  m_vecHookFile.push_back(_T("markeredithook.bin"));
 }
 
 CMarkerEditHook::~CMarkerEditHook()
@@ -20,14 +22,14 @@ void CMarkerEditHook::MakeGUI()
   MakeControls();
 }
 
-tstring CMarkerEditHook::GetBinaryFileName()
-{
-  return _T("markeredithook.bin");
-}
+//tstring CMarkerEditHook::GetBinaryFileName()
+//{
+//  return _T("markeredithook.bin");
+//}
 
 void CMarkerEditHook::MakeNames()
 {
-  m_ctrlNames.erase(m_ctrlNames.begin(), m_ctrlNames.end());
+  CMenuBackgroundHook::MakeNames();
   m_ctrlNames.insert(GuiName::value_type(MarkerEditHook_BackGround,	"BackGround"));
   m_ctrlNames.insert(GuiName::value_type(MarkerEditHook_BackGroundText,	"BackGroundText"));
   m_ctrlNames.insert(GuiName::value_type(MarkerEditHook_GotoMapBtn,	"GotoMapBtn"));
@@ -60,8 +62,7 @@ void CMarkerEditHook::MakeNames()
 
 void CMarkerEditHook::MakeControls()
 {
-  m_backButtonCtrl.SetCenterElement(GetGuiElement(MarkerEditHook_BackButton));
-  m_gotoMapBtnCtrl.SetCenterElement(GetGuiElement(MarkerEditHook_GotoMapBtn));
+  CMenuBackgroundHook::MakeControls();
   m_mark01Ctrl.SetCenterElement(GetGuiElement(MarkerEditHook_mark01));
   m_mark02Ctrl.SetCenterElement(GetGuiElement(MarkerEditHook_mark02));
   m_mark03Ctrl.SetCenterElement(GetGuiElement(MarkerEditHook_mark03));
@@ -93,19 +94,6 @@ short CMarkerEditHook::MouseDown(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
-  case MarkerEditHook_BackButton:
-    {
-      m_backButtonCtrl.MouseDown();
-    }
-    break;
-  case MarkerEditHook_BackGround:
-  case MarkerEditHook_BackGroundText:
-    break;
-  case MarkerEditHook_GotoMapBtn:
-    {
-      m_gotoMapBtnCtrl.MouseDown();
-    }
-    break;
   case MarkerEditHook_mark01:
     {
       m_mark01Ctrl.MouseDown();
@@ -227,10 +215,7 @@ short CMarkerEditHook::MouseDown(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    {
-      m_isNeedRefesh = false;
-      assert(false);
-    }
+    return CMenuBackgroundHook::MouseDown(scrPoint);
     break;
   }
   if (m_isNeedRefesh)
@@ -251,27 +236,6 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
-  case MarkerEditHook_BackButton:
-    {
-      m_backButtonCtrl.MouseUp();
-      if (ctrlType == m_downElementType)
-      {
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
-      }
-    }
-    break;
-  case MarkerEditHook_BackGround:
-  case MarkerEditHook_BackGroundText:
-    break;
-  case MarkerEditHook_GotoMapBtn:
-    {
-      m_gotoMapBtnCtrl.MouseUp();
-      if (ctrlType == m_downElementType)
-      {
-        CAggHook::GoToMapHook();
-      }
-    }
-    break;
   case MarkerEditHook_mark01:
     {
       m_mark01Ctrl.MouseUp();
@@ -513,10 +477,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    {
-      m_isNeedRefesh = false;
-      assert(false);
-    }
+    return CMenuBackgroundHook::MouseUp(scrPoint);
     break;
   }
   if (m_isNeedRefesh)

@@ -930,6 +930,21 @@ namespace UeRoute
   };
 
   /**
+  * \brief 定义路口放大图显示距离       
+  */
+  enum CrossDistType
+  {
+    /// 当前道路为高速时，离路口距离<800M时调出路口放大图
+    CDT_Highway = 800,
+
+    /// 快速路暂未使用
+    CDT_FastLane = 500,
+
+    /// 当前道路为普通道路，离路口距离<300M时调出路口放大图
+    CDT_Normal = 300
+  };
+
+  /**
   * \brief 播报方向的语音类型
   * Note:
   * The maximum of InfoVoiceType & eSideVoiceType should be little than 256

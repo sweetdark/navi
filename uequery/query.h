@@ -126,7 +126,10 @@ namespace UeQuery
 		unsigned int RemoveAllHistoryRecord();
 		//更新索引为order的历史记录
 		unsigned UpdateHistoryRecord(const HistoryRecordEntry &curHisRecord,int order);
-		
+    //保存当前检索输入的关键字
+    unsigned SaveCurKeyWord(const char *pchKeyWord,bool bIsAcro);
+    //获取之前检索输入的历史关键字
+    unsigned GetHistoryKeyword(std::vector<string> &vecHistoryKey,bool bIsAcro);
 		//
 		//
 		//

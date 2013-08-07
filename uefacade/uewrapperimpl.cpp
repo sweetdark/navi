@@ -218,6 +218,10 @@ unsigned int CUeWrapperImpl::UnLoad()
     header.m_baseY = gpsInfo.m_curPos.m_y;
     mapsIO.UpdateHeader(header);
   }
+  if (m_gui)
+  {
+    m_gui->BackupLastRoute();
+  }
 #endif
 
   // TODO:
@@ -929,8 +933,9 @@ inline bool CUeWrapperImpl::DetectSDCard()
     m_status = USS_NO_SD;
 
 #if __UE_WINCE__
-    ::MessageBox((HWND)m_wndHandle, _T("检测到SD卡拔出，软件退出！"), _T("RtNavi"), MB_OK);
-    ::ShowWindow((HWND)m_wndHandle, SW_HIDE);
+    //::MessageBox((HWND)m_wndHandle, _T("检测到SD卡拔出，软件退出！"), _T("RtNavi"), MB_OK);
+    //::ShowWindow((HWND)m_wndHandle, SW_HIDE);
+    ::DestroyWindow((HWND)m_wndHandle);
 
     tstring::size_type startPos = m_modulePath.find_first_of(_T('\\')) == 0 ? 1 : 0;
     tstring::size_type length = m_modulePath.find_last_of(_T('\\')) - startPos;

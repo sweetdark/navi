@@ -227,6 +227,10 @@ namespace UeGui
     void DoButtonMouseDown(CUiButton &button);
 
     void AvoidRoute(unsigned int row);
+
+    void SetRouteLengthCaption(double length, CUiControl *lable);
+    
+    static void RouteReplan(CAggHook *sender, unsigned int planMethod);
   private:
     //·­Ò³¿ØÖÆÆ÷
     CPageController m_pageController;
@@ -242,8 +246,7 @@ namespace UeGui
     CUiButton m_flagTwoPicCtrl;
     CUiButton m_highWayDistLableCtrl;
     CUiButton m_normalRouteLableCtrl;
-    CUiButton m_routeDownBtnCtrl;
-    CUiButton m_routeTypeBtnCtrl;
+    CUiBitButton m_routeTypeBtnCtrl;
     CUiButton m_rowDownArrowBtnCtrl;
     CUiButton m_rowDownBtnCtrl;
     CUiButton m_rowFiveAvoidBtnCtrl;

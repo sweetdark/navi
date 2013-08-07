@@ -113,7 +113,7 @@ short CTerminationNavigationHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_stopGuidanceMessageBoxRejectCtrl.MouseUp();
       CMapHook* mapHook = (CMapHook*)m_view->GetHook(CViewHook::DHT_MapHook);
-      mapHook->DoCancelExitGuidance();
+      //mapHook->DoCancelExitGuidance();
       Show(false);
     }
     break;
