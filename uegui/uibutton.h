@@ -44,6 +44,9 @@ namespace UeGui
     GuiElement* GetCenterElement();
     //设置控件的长度
     void SetWidth(int width);
+  protected:
+    //渲染控件元素
+    virtual void RenderElements();
   private:
     GuiElement* m_leftElement;  //按钮左边控件配置信息 可为NULL
     GuiElement* m_rightElement; //按钮右边控件配置信息 可为NULL
@@ -75,6 +78,9 @@ namespace UeGui
     void SetIconElement(GuiElement* iconElement);
     GuiElement* GetLabelElement();
     GuiElement* GetIconElement();
+  protected:
+    //渲染控件元素
+    virtual void RenderElements();
   protected:    
     GuiElement* m_labelElement; //按钮中间控件配置信息 可为NULL
     GuiElement* m_iconElement;  //按钮顶部图标控件配置信息 可为NULL

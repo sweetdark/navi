@@ -444,7 +444,7 @@ short CMapQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
         CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
         mapHook->ReturnToPrevGUI();
       }
-      Return();
+      Return(false);
     }
     break;
   case MapQueryMenuHook_SelectPointBack:

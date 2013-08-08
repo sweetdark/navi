@@ -104,6 +104,16 @@ void CMappingGateWay::GetParcelID(CGeoRect<long> &mbr, CMemVector &ids)
   {
     return;
   }
+  else
+  {
+    // Exception: NO_SD
+    tstring mbrFile = CPathConfig::GetCommonPath(CPathConfig::CPK_MapsPath);
+    mbrFile += _T("mbrs.idx");    
+    if(!m_pathBasic.IsFileExist(mbrFile))
+    {
+      return;
+    }
+  }
 
   // For mainland case
   int meshes = 0;
@@ -142,6 +152,12 @@ long CMappingGateWay::GetParcelID(CGeoPoint<long> &pos)
     }
   }
   assert(m_header && m_mbrs);
+
+  CUeGridIndex gridIndex;
+  if(m_isUseGridIdx)
+  {
+    return gridIndex.GetParcelID(pos);
+  }
 
   // For mainland case
   int i = 0;

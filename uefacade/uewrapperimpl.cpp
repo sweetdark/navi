@@ -84,8 +84,8 @@ inline unsigned int CUeWrapperImpl::Load(short oneSchema)
   MEMORYSTATUS m;
   m.dwLength = sizeof(m);
   ::GlobalMemoryStatus(&m);
-  memLogger.Log(_T("dwTotalPhys:%d, dwAvailPhys:%d, dwTotalVirtual:%d, dwAvailVirtual:%d \n"), 
-    m.dwTotalPhys, m.dwAvailPhys, m.dwTotalVirtual, m.dwAvailVirtual);
+  //memLogger.Log(_T("dwTotalPhys:%d, dwAvailPhys:%d, dwTotalVirtual:%d, dwAvailVirtual:%d \n"), 
+  //  m.dwTotalPhys, m.dwAvailPhys, m.dwTotalVirtual, m.dwAvailVirtual);
 
   //
   if(!m_garbage)
@@ -206,6 +206,11 @@ inline unsigned int CUeWrapperImpl::Load(short oneSchema)
 **/
 unsigned int CUeWrapperImpl::UnLoad()
 {
+  if(m_status == USS_NO_SD)
+  {
+    return -1;
+  }
+
   // Record current map position
 #if __FOR_DEVICE__
   if (m_view)

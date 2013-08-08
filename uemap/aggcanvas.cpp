@@ -2746,6 +2746,10 @@ void CAGGCanvas::TextOut(const AGGPoint &oneText)
         offsetH += height/2;
         pos.m_y += height/2;
       }
+      else if (::lstrcmp(uniText, _T("珠海市")) == 0)
+      {//此比例尺下，珠海市文字遮住了澳门，所以去掉
+        return;
+      }
     }
 
     if(scaleLevel == 13 && oneText.m_clrIdx == TC_Place_Begin + 70)
@@ -4578,7 +4582,6 @@ inline void CAGGCanvas::RenderAfnRouteLineForGuidance(AGGPath onePath, short sca
     ah.head(20, 5, 16, 0);  
     agg::conv_marker<agg::vcgen_markers_term, agg::arrowhead> strokeLineMarker(strokeLine.markers(), ah);
     m_scanRas.add_path(strokeLineMarker);
-
     m_renderSolid->color(lineClr);
     agg::render_scanlines(m_scanRas, m_packedSL, *m_renderSolid);
 
@@ -7955,13 +7958,15 @@ void CAGGCanvas::RenderSpecialText(short scaleLevel)
     }
 
     //黄海
-    mapPos.m_x = 12165129;
-    mapPos.m_y = 3795344;
+    mapPos.m_x = 12193436;
+    mapPos.m_y = 3574647;
     m_view->Map2Scr(mapPos, srcPoint);
     if (sreenLayout.m_extent.IsContain(srcPoint))
     {
       CGeoPoint<int> temp(srcPoint.m_x, srcPoint.m_y);
-      TextOut(_T("黄海"), temp, 0, 0, textProp.m_clr, 0, true);
+      TextOut(_T("黄"), temp, 0, 0, textProp.m_clr, 0, true);
+      temp.m_y += 22;
+      TextOut(_T("海"), temp, 0, 0, textProp.m_clr, 0, true);
     }
 
     //渤海
@@ -8091,7 +8096,24 @@ int CAGGCanvas::GetElementTextWidth(int elementWidth, TCHAR *uniText)
   return iTextWidth;
 }
 
-void CAGGCanvas::RenderEagle(short scaleLevel, bool isRaster, bool is3d)
+void CAGGCanvas::RenderEaglePolynAndLink(short scaleLevel, bool isRaster, bool is3d)
+{
+  if(!SetupCanvas(is3d))
+  {
+    return;
+  }
+  
+
+  // Firstly render different polygons
+  RenderAfnPolygons(scaleLevel, isRaster);
+
+  //
+  RenderAfnLinks(scaleLevel, isRaster);
+
+  
+}
+
+void CAGGCanvas::RenderEagleOther(short scaleLevel, bool isRaster, bool is3d)
 {
   if(!SetupCanvas(is3d))
   {
@@ -8100,13 +8122,6 @@ void CAGGCanvas::RenderEagle(short scaleLevel, bool isRaster, bool is3d)
   m_poiRects.RemoveAll(false);
   m_nameRects.RemoveAll(false);
   m_drawnNames.RemoveAll(false);
-
-  // Firstly render different polygons
-  RenderAfnPolygons(scaleLevel, isRaster);
-
-  //
-  RenderAfnLinks(scaleLevel, isRaster);
-
   // secondly render different lines
   RenderAfnLines(scaleLevel, isRaster);
 

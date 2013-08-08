@@ -21,6 +21,9 @@ namespace UeGui
   class UEGUI_CLASS CSettingWrapper : public UeBase::CUeSettingsIO
   {
   public:
+    //最大声音值
+    const static short MAX_VOLUME = 100;
+    const static unsigned long MAX_SYS_VOLUME = 0xFFFFFFFF;
     /**
     * \brief 析构函数
     */
@@ -115,7 +118,7 @@ namespace UeGui
     */
     void SetEEyeType(const unsigned char value);
     //////////////////////////////////////////////////////////////////////////
-    //读取导航提示类型：返回结果类型 NavigationPromptType 简明提示 详细提示 
+    //读取导航提示类型：返回结果类型 VoicePromptType 简明提示 详细提示 
     unsigned char GetNavigationPromptType();
     //设置导航提示 参数value类型为 NavigationPromptType
     void SetNavigationPromptType(const unsigned char value);
@@ -171,9 +174,9 @@ namespace UeGui
     bool IsLoudSpeakerMute();
     //设置是否开启静音  True:静音 False:非静音
     void SetIsLoudSpeakerMute(bool value);
-    //读取音量大小:0-7
+    //读取音量大小:0-100
     unsigned short GetVoice();
-    //设置音量大小:0-7
+    //设置音量大小:0-100
     void SetVoice(unsigned short value);
     //获取提示音信息 返回结果跟VoiceType进行与运算
     unsigned char GetVoicePrompt();

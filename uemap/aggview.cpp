@@ -1067,7 +1067,7 @@ void CAGGView::OnDraw(short style)
         (IRoute::GetRoute()->GetPlanState() == UeRoute::PS_None && CViewHook::m_curHookType == CViewHook::DHT_CapHook && !m_viewImpl->m_isReadyForOperation))
 #else
       if((CViewHook::m_curHookType != CViewHook::DHT_MapHook && CViewHook::m_curHookType != CViewHook::DHT_GPSHook && 
-        CViewHook::m_curHookType != CViewHook::DHT_InputHandHook) 
+        CViewHook::m_curHookType != CViewHook::DHT_InputHandHook && CViewHook::m_curHookType != CViewHook::DHT_EditHandHook) 
         || (IRoute::GetRoute()->GetPlanState() == UeRoute::PS_None && CViewHook::m_curHookType == CViewHook::DHT_MapHook && !m_viewImpl->m_isReadyForOperation))
 #endif
       {

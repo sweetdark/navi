@@ -387,4 +387,23 @@ namespace UeGui
       return;
     pQuery->GetHistoryKeyword(vecHistoryKey,bIsAcro);
   }
+  void CQueryWrapper::PushVecSQLSentence()
+  {
+    m_vecQuerySql.push_back(m_querySql);
+  }
+  void CQueryWrapper::PopVecSQLSentence()
+  {
+    m_vecQuerySql.pop_back();
+  }
+  void CQueryWrapper::SetSQLSentenceWithVec()
+  {
+    if (m_vecQuerySql.size() != 0)
+    {
+      ::memcpy(&m_querySql, &m_vecQuerySql.back(), sizeof(m_querySql));
+    }
+  }
+  void CQueryWrapper::ClearVecSQLSentence()
+  {
+    m_vecQuerySql.clear();
+  }
 }

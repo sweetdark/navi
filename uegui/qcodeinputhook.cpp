@@ -17,6 +17,8 @@
 
 #include "messagedialoghook.h"
 
+#include "selectpointcallbackctrl.h"
+
 using namespace UeGui;
 
 CQCodeInputHook::CQCodeInputHook()
@@ -356,7 +358,17 @@ void CQCodeInputHook::ConvertQCodeToMap()
   PointList pointList;
   pointList.push_back(pointInfo);
   //½øÈëµØÍ¼
-  CAggHook::TurnTo(DHT_MapHook);
   CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
-  pMapHook->SetPickPos(pointList, 0);
+  CSelectPointCallBackCtrl &selectpointcbctrl(CSelectPointCallBackCtrl::Get());
+  if (selectpointcbctrl.IsCallBackFunExist())
+  {
+    CAggHook::TurnTo(DHT_MapHook);
+    pMapHook->SelectPoint(pointList[0].m_point, pointList[0].m_name, 
+      selectpointcbctrl.GetCallBackObj(), selectpointcbctrl.GetEvent());
+  }
+  else
+  {
+    CAggHook::TurnTo(DHT_MapHook);
+    pMapHook->SetPickPos(pointList, 0);
+  }
 }

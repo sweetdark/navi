@@ -151,6 +151,7 @@ namespace UeGui
 
     void DeleteJourneyRecord();
 
+    void EditJourneyData(RowTag row);
   private:
     CPageController m_pageController;
 

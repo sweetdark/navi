@@ -90,7 +90,7 @@ namespace UeGui
 
     void MakeControls();
 
-    void SearchForResult(const char* keyword);
+    void SearchForResult();
 
     void ResetResultList();
 
@@ -104,6 +104,8 @@ namespace UeGui
 
     CUiLabel m_curPageInfo;
     CUiLabel m_totalPageInfo;
+    //·µ»Ø°´Å¥
+    CUiBitButton m_returnBtn;
 
     CUeRecord m_records;
 

@@ -18,6 +18,8 @@
 
 #include "districtselectionhook.h"
 
+#include "selectpointcallbackctrl.h"
+
 using namespace UeGui;
 
 CDistQueryListHook::CDistQueryListHook() : m_returnType(DHT_Unknown)
@@ -35,6 +37,7 @@ CDistQueryListHook::~CDistQueryListHook()
 
 void CDistQueryListHook::Load()
 {
+  CQueryWrapper &queryWrapper(CQueryWrapper::Get());
   int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
   if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
   {
@@ -44,11 +47,10 @@ void CDistQueryListHook::Load()
   {
     CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
   }
-  char* keyword = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetKeyWord();
-  if (keyword != NULL)
-  {
-    SearchForResult(keyword);
-  }
+  queryWrapper.SetAssociateNextWord(0);
+  queryWrapper.SetMaxQueryRecordNum(500);
+  queryWrapper.PushVecSQLSentence();
+  SearchForResult();
 }
 
 void CDistQueryListHook::MakeNames()
@@ -122,6 +124,9 @@ void CDistQueryListHook::MakeControls()
   {
     m_distBtn[i].SetCenterElement(GetGuiElement(j++));
   }
+
+  m_returnBtn.SetCenterElement(GetGuiElement(MenuBackgroundHook_ReturnBtn));
+  m_returnBtn.SetIconElement(GetGuiElement(MenuBackgroundHook_ReturnBtnIcon));
 }
 
 short CDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -129,6 +134,13 @@ short CDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
+  case MenuBackgroundHook_ReturnBtn:
+  case MenuBackgroundHook_ReturnBtnIcon:
+    {
+      m_returnBtn.MouseDown();
+      AddRenderUiControls(&m_returnBtn);
+    }
+    break;
   case DistQueryListHook_PageDownBtn:
   case DistQueryListHook_PageDownBtnIcon:
     {
@@ -182,6 +194,23 @@ short CDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
+  case MenuBackgroundHook_ReturnBtn:
+  case MenuBackgroundHook_ReturnBtnIcon:
+    {
+      m_returnBtn.MouseUp();
+      CQueryWrapper::Get().PopVecSQLSentence();
+      int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
+      if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
+      {
+        CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityAcro);
+      }
+      else
+      {
+        CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
+      }
+      Return();
+    }
+    break;
   case DistQueryListHook_PageDownBtn:
   case DistQueryListHook_PageDownBtnIcon:
     {
@@ -214,14 +243,24 @@ short CDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         if (m_returnType == DHT_Unknown)
         {
-          CAggHook::TurnTo(DHT_MapHook);
           CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
-          pMapHook->SetPickPos(m_pointList, listIndex);
+          CSelectPointCallBackCtrl &selectpointcbctrl(CSelectPointCallBackCtrl::Get());
+          if (selectpointcbctrl.IsCallBackFunExist())
+          {
+            CAggHook::TurnTo(DHT_MapHook);
+            pMapHook->SelectPoint(m_pointList[listIndex].m_point, m_pointList[listIndex].m_name, 
+              selectpointcbctrl.GetCallBackObj(), selectpointcbctrl.GetEvent());
+          }
+          else
+          {
+            CAggHook::TurnTo(DHT_MapHook);
+            pMapHook->SetPickPos(m_pointList, listIndex);
+          }
         }
         else
         {
-          CAggHook::Return();
-          CAggHook::Return();
+          CAggHook::Return(false);
+          CAggHook::Return(false);
           SQLRecord *pRecord(m_records.GetRecord(listIndex));
           if (pRecord!=0)
           {
@@ -279,13 +318,10 @@ short CDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
   return ctrlType;
 }
 
-void CDistQueryListHook::SearchForResult(const char* keyword)
+void CDistQueryListHook::SearchForResult()
 {
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
-  queryWrapper.SetAssociateNextWord(0);
-  //暂时设为20条
-  queryWrapper.SetMaxQueryRecordNum(500);
-  queryWrapper.SetQueryKeyword(keyword);
+  queryWrapper.SetSQLSentenceWithVec();
   CUeRecord *pRecordVec(queryWrapper.DoQueryGetRecord());
 
   m_records.Clear(true);
@@ -325,9 +361,9 @@ void CDistQueryListHook::ResetResultList()
     m_distLabel[i].SetFocusKey(posBuffer);
     m_distBtn[i].SetVisible(true);
     //如果是从区域选择界面进来则隐藏按钮
-    for (int i=0; i<7; i++)
+    for (int index=0; index<7; index++)
     {
-      m_distBtn[i].SetVisible(m_returnType==DHT_Unknown);
+      m_distBtn[index].SetVisible(m_returnType==DHT_Unknown);
     }
 
     if (!(oneRecord->m_addrCode&0x00ffff))

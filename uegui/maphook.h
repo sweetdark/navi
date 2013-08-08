@@ -37,8 +37,6 @@ namespace UeGui
 {
   //初始模拟导航速度
   const static short INITIAL_DEMOSPEED = 30;
-  //界面切换定时间隔
-  const static short TIMER_INTERVAL = 6;
 
   class UEGUI_CLASS CMapHook : public CAggHook
   {

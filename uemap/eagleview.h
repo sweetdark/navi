@@ -23,6 +23,8 @@ namespace UeMap
 
     virtual void SetScrLayout(const ScreenLayout &layout);
 
+  private:
+    bool m_isSaved; 
   };
 }
 #endif //_UEMAP_EAGLEVIEW_H_

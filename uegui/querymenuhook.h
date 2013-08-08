@@ -59,8 +59,6 @@ namespace UeGui
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual void Load();
-
   protected:
 
     virtual void MakeNames();
@@ -76,6 +74,8 @@ namespace UeGui
     CUiBitButton m_qCodeSearchBtn;
     CUiBitButton m_searchOnMapBtn;
     CUiBitButton m_distSearchBtn;
+
+    CUiBitButton m_returnBtn;
   };
 }
 #endif

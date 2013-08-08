@@ -1423,7 +1423,7 @@ inline void CViewImpl::OnIdle()
     CViewHook::m_curHookType != CViewHook::DHT_CapHook && 
 #endif
     //CViewHook::m_curHookType != CViewHook::DHT_KeyboardHook)
-    CViewHook::m_curHookType != CViewHook::DHT_InputHandHook)
+    CViewHook::m_curHookType != CViewHook::DHT_InputHandHook && CViewHook::m_curHookType != CViewHook::DHT_EditHandHook)
   {
     return;
   }
@@ -1431,7 +1431,7 @@ inline void CViewImpl::OnIdle()
   // Using time slot to get handwriting input
   //hnc?????????
   //if(CViewHook::m_curHookType == CViewHook::DHT_KeyboardHook)
-  if(CViewHook::m_curHookType == CViewHook::DHT_InputHandHook)
+  if(CViewHook::m_curHookType == CViewHook::DHT_InputHandHook || CViewHook::m_curHookType == CViewHook::DHT_EditHandHook)
   {
     return IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateKeyboardHook);
   }

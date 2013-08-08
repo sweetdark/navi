@@ -84,8 +84,6 @@ void CDistrictSelectionHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_GPSAreaBtn,	"GPSAreaBtn"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_CountryBtn,	"CountryBtn"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_CommonUsebtn,	"CommonUsebtn"));
-  m_ctrlNames.insert(GuiName::value_type(districtselectionhook_Split,	"Split"));
-  m_ctrlNames.insert(GuiName::value_type(districtselectionhook_VSplit,	"VSplit"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_Area1Btn,	"Area1Btn"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_Area2Btn,	"Area2Btn"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_Area4Btn,	"Area4Btn"));
@@ -104,7 +102,6 @@ void CDistrictSelectionHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_Area16Btn,	"Area16Btn"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_PrevPageBtn,	"PrevPageBtn"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_NextPageBtn,	"NextPageBtn"));
-  m_ctrlNames.insert(GuiName::value_type(districtselectionhook_vsplit2,	"vsplit2"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_PrePageArrowBtn,	"PrePageArrowBtn"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_NextPageArrowBtn,	"NextPageArrowBtn"));
   m_ctrlNames.insert(GuiName::value_type(districtselectionhook_CurrentPageLable,	"CurrentPageLable"));
@@ -143,10 +140,7 @@ void CDistrictSelectionHook::MakeControls()
   m_prePageArrowBtnCtrl.SetCenterElement(GetGuiElement(districtselectionhook_PrePageArrowBtn));
   m_prevPageBtnCtrl.SetCenterElement(GetGuiElement(districtselectionhook_PrevPageBtn));
   m_searchAreaBtnCtrl.SetCenterElement(GetGuiElement(districtselectionhook_SearchAreaBtn));
-  m_splitCtrl.SetCenterElement(GetGuiElement(districtselectionhook_Split));
   m_totalPageLableCtrl.SetCenterElement(GetGuiElement(districtselectionhook_TotalPageLable));
-  m_vSplitCtrl.SetCenterElement(GetGuiElement(districtselectionhook_VSplit));
-  m_vsplit2Ctrl.SetCenterElement(GetGuiElement(districtselectionhook_vsplit2));
 }
 
 short CDistrictSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -262,12 +256,6 @@ short CDistrictSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
       MOUSEDOWN_1RENDERCTRL(m_countryBtnCtrl);
     }
     break;
-  case districtselectionhook_CurrentPageLable:
-    {
-      m_currentPageLableCtrl.MouseDown();
-      MOUSEDOWN_1RENDERCTRL(m_currentPageLableCtrl);
-    }
-    break;
   case districtselectionhook_GPSAreaBtn:
     {
       m_gPSAreaBtnCtrl.MouseDown();
@@ -280,12 +268,6 @@ short CDistrictSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
       MOUSEDOWN_1RENDERCTRL(m_gPSCityBtnCtrl);
     }
     break;
-  case districtselectionhook_Lable1:
-    {
-      m_lable1Ctrl.MouseDown();
-      MOUSEDOWN_1RENDERCTRL(m_lable1Ctrl);
-    }
-    break;
   case districtselectionhook_NextPageArrowBtn:
     {
       m_nextPageArrowBtnCtrl.MouseDown();
@@ -296,12 +278,6 @@ short CDistrictSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_nextPageBtnCtrl.MouseDown();
       MOUSEDOWN_1RENDERCTRL(m_nextPageBtnCtrl);
-    }
-    break;
-  case districtselectionhook_PageSplit:
-    {
-      m_pageSplitCtrl.MouseDown();
-      MOUSEDOWN_1RENDERCTRL(m_pageSplitCtrl);
     }
     break;
   case districtselectionhook_PrePageArrowBtn:
@@ -320,30 +296,6 @@ short CDistrictSelectionHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_searchAreaBtnCtrl.MouseDown();
       MOUSEDOWN_1RENDERCTRL(m_searchAreaBtnCtrl);
-    }
-    break;
-  case districtselectionhook_Split:
-    {
-      m_splitCtrl.MouseDown();
-      MOUSEDOWN_1RENDERCTRL(m_splitCtrl);
-    }
-    break;
-  case districtselectionhook_TotalPageLable:
-    {
-      m_totalPageLableCtrl.MouseDown();
-      MOUSEDOWN_1RENDERCTRL(m_totalPageLableCtrl);
-    }
-    break;
-  case districtselectionhook_VSplit:
-    {
-      m_vSplitCtrl.MouseDown();
-      MOUSEDOWN_1RENDERCTRL(m_vSplitCtrl);
-    }
-    break;
-  case districtselectionhook_vsplit2:
-    {
-      m_vsplit2Ctrl.MouseDown();
-      MOUSEDOWN_1RENDERCTRL(m_vsplit2Ctrl);
     }
     break;
   default:
@@ -397,11 +349,6 @@ short CDistrictSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       }
     }
     break;
-  case districtselectionhook_CurrentPageLable:
-    {
-      m_currentPageLableCtrl.MouseUp();
-    }
-    break;
   case districtselectionhook_GPSAreaBtn:
     {
       m_gPSAreaBtnCtrl.MouseUp();
@@ -414,11 +361,6 @@ short CDistrictSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       OnClickGpsCityBtn();
     }
     break;
-  case districtselectionhook_Lable1:
-    {
-      m_lable1Ctrl.MouseUp();
-    }
-    break;
   case districtselectionhook_NextPageArrowBtn:
   case districtselectionhook_NextPageBtn:
     {
@@ -429,11 +371,6 @@ short CDistrictSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
         m_pageController.ShowPageInfo(&m_currentPageLableCtrl, &m_totalPageLableCtrl);
         ShowAreaList();
       }
-    }
-    break;
-  case districtselectionhook_PageSplit:
-    {
-      m_pageSplitCtrl.MouseUp();
     }
     break;
   case districtselectionhook_PrePageArrowBtn:
@@ -452,26 +389,6 @@ short CDistrictSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_searchAreaBtnCtrl.MouseUp();
       OnClickSearchAreaBtn();
-    }
-    break;
-  case districtselectionhook_Split:
-    {
-      m_splitCtrl.MouseUp();
-    }
-    break;
-  case districtselectionhook_TotalPageLable:
-    {
-      m_totalPageLableCtrl.MouseUp();
-    }
-    break;
-  case districtselectionhook_VSplit:
-    {
-      m_vSplitCtrl.MouseUp();
-    }
-    break;
-  case districtselectionhook_vsplit2:
-    {
-      m_vsplit2Ctrl.MouseUp();
     }
     break;
   default:

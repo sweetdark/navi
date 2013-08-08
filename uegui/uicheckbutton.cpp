@@ -4,27 +4,30 @@ using namespace UeGui;
 
 void CUiCheckButton::MouseDown()
 {
+  if (!IsVisible() || !IsEnable())
+  {
+    return;
+  }
   CUiButton::MouseDown();
 }
 
 void CUiCheckButton::MouseUp()
 {
-  CUiButton::MouseUp();
-
   if (!IsVisible() || !IsEnable())
   {
     return;
   }
+  CUiButton::MouseUp();
+
   if (m_checked)
   {
-    SetCheck(false);
+    DoCheck(false);
   }
   else
   {
-    SetCheck(true);
+    DoCheck(true);
   }
 }
-
 
 void CUiCheckButton::MouseMove()
 {
@@ -37,9 +40,17 @@ void CUiCheckButton::SetCheck( bool value )
   if (!IsVisible() || !IsEnable())
   {
     return;
-  }  
+  }
+  DoCheck(value);
+  if (m_atoRefresh)
+  {
+    RenderElements();
+  }
+}
+
+void UeGui::CUiCheckButton::DoCheck( bool value )
+{
   m_checked = value;
-  
   if (m_iconElement)
   {
     if (m_checked)
@@ -83,4 +94,9 @@ void UeGui::CUiCheckButton::SetEnable( bool value )
       }      
     }
   }
+}
+
+void UeGui::CUiCheckButton::RenderElements()
+{
+  CUiBitButton::RenderElements();
 }

@@ -83,6 +83,7 @@ void UeGui::CUiLabel::SetEnable( bool value )
 
 void UeGui::CUiLabel::SetCaption( const char* caption )
 {
+  CUiControl::SetCaption(caption);
   if (m_labelElement)
   {
     if (caption)
@@ -93,7 +94,7 @@ void UeGui::CUiLabel::SetCaption( const char* caption )
     {
       ClearCaption();
     }
-  }  
+  }
 }
 
 char* UeGui::CUiLabel::GetCaption()
@@ -110,10 +111,11 @@ char* UeGui::CUiLabel::GetCaption()
 
 void UeGui::CUiLabel::ClearCaption()
 {
+  CUiControl::ClearCaption();
   if (m_labelElement)
   {
     memset(m_labelElement->m_label, 0, sizeof(m_labelElement->m_label));
-  }  
+  }
 }
 
 void UeGui::CUiLabel::SetWidth( int width )
@@ -123,10 +125,15 @@ void UeGui::CUiLabel::SetWidth( int width )
   {
     m_labelElement->m_width = 0;
   }
+  if (m_atoRefresh)
+  {
+    RenderElements();
+  }
 }
 
 void UeGui::CUiLabel::SetFocusKey( const unsigned char* fkey )
 {
+  CUiControl::SetFocusKey(fkey);
   if (m_parent)
   {
     m_haveFocusKey = true;
@@ -136,9 +143,15 @@ void UeGui::CUiLabel::SetFocusKey( const unsigned char* fkey )
 
 void UeGui::CUiLabel::ClearFocusKey()
 {
+  CUiControl::ClearFocusKey();
   m_haveFocusKey = false;
   if (m_parent)
   {
     m_parent->EraseFocusTextElements(m_labelElement);
   }
+}
+
+void UeGui::CUiLabel::RenderElements()
+{
+  AddRenderElement(m_labelElement);
 }

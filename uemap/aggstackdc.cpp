@@ -98,7 +98,7 @@ CAggStackDC::CAggStackDC(CViewDC *saveDC, bool isReserved) : CViewDC(), m_rowBit
 CAggStackDC::~CAggStackDC()
 {
   //
-  ReservedAsFull();
+  //ReservedAsFull();
 
   //
   Release();
@@ -156,7 +156,7 @@ void CAggStackDC::ReservedAsFull()
 {
   if(m_isReserved)
   {
-    //::BitBlt(reinterpret_cast<HDC>(m_saveDC->GetDC()), 0, 0, m_saveDC->m_bufWidth, m_saveDC->m_bufHeight, reinterpret_cast<HDC>(m_memDC), 0, 0, SRCCOPY);
+    ::BitBlt(reinterpret_cast<HDC>(m_saveDC->GetDC()), 0, 0, m_saveDC->m_bufWidth, m_saveDC->m_bufHeight, reinterpret_cast<HDC>(m_memDC), 0, 0, SRCCOPY);
   }
 }
 

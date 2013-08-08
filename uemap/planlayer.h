@@ -108,6 +108,25 @@ namespace UeMap
     * para isFocusRoute 是否是选中的路线
     **/
     unsigned char GetRouteColorIndex(unsigned char planMethodType, bool isFocusRoute);
+    /**
+    * \brief 判断点是否在当前视图的地图中
+    */
+    bool IsMapLayoutContainPos(CViewState *curView, const CGeoPoint<long> &pos);
+    /**
+    * \brief 把点转换成3d
+    * \param curView 当前视图
+    * \param point 要转换的点
+    * \param is3d是否是3d模式
+    */
+    void Make3DPoint(CViewState *curView, CGeoPoint<long> &point, const bool is3d);
+    /**
+    * \brief 判断取出的矢量路口放大图的规划路径数据到此为止
+    */
+    bool IsGuidanceViewPlanBreak(const int type, const int curIndex, const GuidanceIndicator *oneIndicator, const GuidanceStatus &dirInfo);
+    /**
+    * \brief 在路段中找下一个与当前点不同的点
+    */
+    bool FindNextCoord(const GuidanceStatus &dirInfo, CViewState *curView, GuidanceIndicator *oneIndicator, const CGeoPoint<long> &oneCoord, const int index, const int curPair, CGeoPoint<long> &nextCoord);
   private:
     /// Route singleton
     IRoute *m_route;

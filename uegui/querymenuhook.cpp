@@ -23,19 +23,6 @@ CQueryMenuHook::~CQueryMenuHook()
   m_imageNames.clear();
 }
 
-void CQueryMenuHook::Load()
-{
-  int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
-  if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
-  {
-    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityAcro);
-  }
-  else
-  {
-    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
-  }
-}
-
 void CQueryMenuHook::MakeNames()
 {
   CMenuBackgroundHook::MakeNames();
@@ -100,6 +87,9 @@ void CQueryMenuHook::MakeControls()
   m_distSearchBtn.SetCenterElement(GetGuiElement(QueryMenuHook_EighthBtnBackground));
   m_distSearchBtn.SetIconElement(GetGuiElement(QueryMenuHook_DistSearchBtn));
   m_distSearchBtn.SetLabelElement(GetGuiElement(QueryMenuHook_DistSearchLabel));
+
+  m_returnBtn.SetCenterElement(GetGuiElement(MenuBackgroundHook_ReturnBtn));
+  m_returnBtn.SetIconElement(GetGuiElement(MenuBackgroundHook_ReturnBtnIcon));
 }
 
 short CQueryMenuHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -107,6 +97,13 @@ short CQueryMenuHook::MouseDown(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
+  case MenuBackgroundHook_ReturnBtn:
+  case MenuBackgroundHook_ReturnBtnIcon:
+    {
+      m_returnBtn.MouseDown();
+      AddRenderUiControls(&m_returnBtn);
+    }
+    break;
   case QueryMenuHook_FirstBtnBackground:
   case QueryMenuHook_AddressBookBtn:
   case QueryMenuHook_AddressBookLabel:
@@ -194,6 +191,22 @@ short CQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
+  case MenuBackgroundHook_ReturnBtn:
+  case MenuBackgroundHook_ReturnBtnIcon:
+    {
+      m_returnBtn.MouseUp();
+      int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
+      if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
+      {
+        CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiAcro);
+      }
+      else
+      {
+        CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiName);
+      }
+      Return();
+    }
+    break;
   case QueryMenuHook_FirstBtnBackground:
   case QueryMenuHook_AddressBookBtn:
   case QueryMenuHook_AddressBookLabel:

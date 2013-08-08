@@ -41,6 +41,10 @@ namespace UeGui
 {
   //名称长度定义
   const static int MAX_NAME_LENGTH = 128;
+  //界面切换定时间隔
+  const static short TIMER_INTERVAL_3S = 6;
+  const static short TIMER_INTERVAL_6S = 16;
+  const static short TIMER_INTERVAL_10S = 20;
   //选点事件函数指针定义
   typedef void (*SelectPointEvent)(void *callBackObj, const UeQuery::SQLRecord* data);
 

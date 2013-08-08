@@ -18,6 +18,8 @@
 
 #include "districtselectionhook.h"
 
+#include "selectpointcallbackctrl.h"
+
 using namespace UeGui;
 
 CPoiQueryListHook::CPoiQueryListHook()
@@ -35,21 +37,21 @@ CPoiQueryListHook::~CPoiQueryListHook()
 
 void CPoiQueryListHook::Load()
 {
+  CQueryWrapper &queryWrapper(CQueryWrapper::Get());
   m_distSwitchBtn.SetCaption(CQueryWrapper::Get().GetQueryAdmName());
   int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
   if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
   {
-    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiAcro);
+    queryWrapper.SetQueryMode(UeQuery::IT_PoiAcro);
   }
   else
   {
-    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiName);
+    queryWrapper.SetQueryMode(UeQuery::IT_PoiName);
   }
-  char* keyword = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetKeyWord();
-  if (keyword != NULL)
-  {
-    SearchForResult(keyword);
-  }
+  queryWrapper.SetAssociateNextWord(0);
+  queryWrapper.SetMaxQueryRecordNum(500);
+  queryWrapper.PushVecSQLSentence();
+  SearchForResult();
 }
 
 void CPoiQueryListHook::MakeNames()
@@ -122,6 +124,9 @@ void CPoiQueryListHook::MakeControls()
 
     m_addrLabel[i].SetLabelElement(GetGuiElement(j++));
   }
+
+  m_returnBtn.SetCenterElement(GetGuiElement(MenuBackgroundHook_ReturnBtn));
+  m_returnBtn.SetIconElement(GetGuiElement(MenuBackgroundHook_ReturnBtnIcon));
 }
 
 short CPoiQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -129,6 +134,13 @@ short CPoiQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
+  case MenuBackgroundHook_ReturnBtn:
+  case MenuBackgroundHook_ReturnBtnIcon:
+    {
+      m_returnBtn.MouseDown();
+      AddRenderUiControls(&m_returnBtn);
+    }
+    break;
   case PoiQueryListHook_DistSwitchBtn:
     {
       m_distSwitchBtn.MouseDown();
@@ -202,6 +214,14 @@ short CPoiQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
+  case MenuBackgroundHook_ReturnBtn:
+  case MenuBackgroundHook_ReturnBtnIcon:
+    {
+      m_returnBtn.MouseUp();
+      CQueryWrapper::Get().PopVecSQLSentence();
+      Return();
+    }
+    break;
   case PoiQueryListHook_DistSwitchBtn:
     {
       m_distSwitchBtn.MouseUp();
@@ -228,7 +248,8 @@ short CPoiQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_routeBtn.MouseUp();
       //tab页间相互跳转, 防止循环
-      CAggHook::Return();
+      CQueryWrapper::Get().PopVecSQLSentence();
+      CAggHook::Return(false);
       CAggHook::TurnTo(DHT_RoadQueryListHook);
     }
     break;
@@ -263,9 +284,19 @@ short CPoiQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_poiLabel[index].MouseUp();
       if(m_infoBtn[index].IsEnable())
       {
-        CAggHook::TurnTo(DHT_MapHook);
         CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
-        pMapHook->SetPickPos(m_pointList, index);
+        CSelectPointCallBackCtrl &selectpointcbctrl(CSelectPointCallBackCtrl::Get());
+        if (selectpointcbctrl.IsCallBackFunExist())
+        {
+          CAggHook::TurnTo(DHT_MapHook);
+          pMapHook->SelectPoint(m_pointList[index].m_point, m_pointList[index].m_name, 
+            selectpointcbctrl.GetCallBackObj(), selectpointcbctrl.GetEvent());
+        }
+        else
+        {
+          CAggHook::TurnTo(DHT_MapHook);
+          pMapHook->SetPickPos(m_pointList, index);
+        }
       }
     } 
     else
@@ -283,13 +314,10 @@ short CPoiQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
   return ctrlType;
 }
 
-void CPoiQueryListHook::SearchForResult(const char* keyword)
+void CPoiQueryListHook::SearchForResult()
 {
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
-  queryWrapper.SetAssociateNextWord(0);
-  //暂时设为20条
-  queryWrapper.SetMaxQueryRecordNum(500);
-  queryWrapper.SetQueryKeyword(keyword);
+  queryWrapper.SetSQLSentenceWithVec();
   CUeRecord *pRecordVec(queryWrapper.DoQueryGetRecord());
  
   m_records.Clear(true);
@@ -369,6 +397,7 @@ void CPoiQueryListHook::DoDistSwitchCallBack(const SQLRecord *pResult)
   TCodeEntry codeEntry;
   codeEntry.m_uCode = pResult->m_addrCode;
   ::strcpy(codeEntry.m_chName, pResult->m_asciiName);
+  CQueryWrapper::Get().PopVecSQLSentence();
   CQueryWrapper::Get().SetQueryAdmInfo(codeEntry);
   Load();
 }

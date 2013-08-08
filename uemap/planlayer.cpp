@@ -202,73 +202,23 @@ void UeMap::CPlanLayer::DrawGuidanceRoute( const CViewDC *viewDC, short type, CV
         if (dirInfo.m_curPos.IsValid() && i == dirInfo.m_curIndicator && curPair == dirInfo.m_curPair)
         {
           CGeoPoint<long> oneCoord, carCoord;
-          if (curView->m_mapping.m_mapLayout.m_extent.IsContain(dirInfo.m_curPos) && 
+          if (IsMapLayoutContainPos(curView, dirInfo.m_curPos) && 
             curView->Map2Scr(dirInfo.m_curPos, oneCoord))
           {
             CGeoPoint<long> carPos;
             carPos.m_x = gpsCar.m_curPos.m_x;
             carPos.m_y = gpsCar.m_curPos.m_y;
             curView->Map2Scr(carPos, carCoord);
-            if (is3d)
-            {
-              CGeoPoint<short> onePoint;
-              onePoint.m_x = static_cast<short>(carCoord.m_x);
-              onePoint.m_y = static_cast<short>(carCoord.m_y);
-              curView->Make3D(onePoint);
-              carCoord.m_x = onePoint.m_x;
-              carCoord.m_y = onePoint.m_y;
-            }
+            Make3DPoint(curView, carCoord, is3d); 
             coords.Add(&carCoord);
 
-            if (is3d)
-            {
-              CGeoPoint<short> onePoint;
-              onePoint.m_x = static_cast<short>(oneCoord.m_x);
-              onePoint.m_y = static_cast<short>(oneCoord.m_y);
-              curView->Make3D(onePoint);
-              oneCoord.m_x = onePoint.m_x;
-              oneCoord.m_y = onePoint.m_y;
-            }
+            Make3DPoint(curView, oneCoord, is3d); 
             coords.Add(&oneCoord);
 
             //找出下一个不同与dirInfo.m_curPos的路线点
             bool bFindNextCoord = false;
             CGeoPoint<long> nextCoord;            
-            if (dirInfo.m_curVtx >= 0)
-            {
-              //在当前的路段找，车标的角度更准确
-              for (int i = dirInfo.m_curVtx; i >= 0; --i)
-              {
-                curView->Map2Scr(oneIndicator->m_vtxs[i], nextCoord);
-                if (nextCoord != oneCoord)
-                {
-                  bFindNextCoord = true;
-                  break;
-                }
-              }
-            }
-
-            if (!bFindNextCoord)
-            {      
-              //从下一条道路乃至下下条道路找不同点
-              for (int j = i - 1; j >= 0; j--)
-              {
-                GuidanceIndicator *oneIndicator = m_route->GetIndicator(curPair, j);
-                for (int k = oneIndicator->m_vtxNum - 1; k >= 0; k--)
-                {
-                  curView->Map2Scr(oneIndicator->m_vtxs[k], nextCoord);
-                  if (nextCoord != oneCoord)
-                  {
-                    bFindNextCoord = true;                    
-                    break;
-                  }                
-                }
-                if (bFindNextCoord)
-                {
-                  break;
-                }
-              }   
-            }
+            bFindNextCoord = FindNextCoord(dirInfo, curView, oneIndicator, oneCoord, i, curPair, nextCoord); 
 
             GuidanceCar carInfo;
             carInfo.m_curIndicator = dirInfo.m_curIndicator;            
@@ -297,15 +247,7 @@ void UeMap::CPlanLayer::DrawGuidanceRoute( const CViewDC *viewDC, short type, CV
           CGeoPoint<long> oneCoord;
           if (curView->Map2Scr(oneIndicator->m_vtxs[j], oneCoord))
           {
-            if (is3d)
-            {
-              CGeoPoint<short> onePoint;
-              onePoint.m_x = static_cast<short>(oneCoord.m_x);
-              onePoint.m_y = static_cast<short>(oneCoord.m_y);
-              curView->Make3D(onePoint);
-              oneCoord.m_x = onePoint.m_x;
-              oneCoord.m_y = onePoint.m_y;
-            }
+            Make3DPoint(curView, oneCoord, is3d); 
             coords.Add(&oneCoord);
           }
         }
@@ -324,7 +266,11 @@ void UeMap::CPlanLayer::DrawGuidanceRoute( const CViewDC *viewDC, short type, CV
         }
         coords.RemoveAll();
       }
-      if (type == VT_Guidance && (dirInfo.m_curOrderForSnd - 2 == i))
+      //if (type == VT_Guidance && (dirInfo.m_curOrderForSnd - 2 == i))
+      //{
+      //  break;
+      //}
+      if (IsGuidanceViewPlanBreak(type, i, oneIndicator, dirInfo))
       {
         break;
       }
@@ -377,15 +323,7 @@ void UeMap::CPlanLayer::DrawRouteByPlanType( const CViewDC *viewDC, CViewState *
           if (curView->Map2Scr(oneIndicator->m_vtxs[j], oneCoord))
           {
             //
-            if (is3d)
-            {
-              CGeoPoint<short> onePoint;
-              onePoint.m_x = static_cast<short>(oneCoord.m_x);
-              onePoint.m_y = static_cast<short>(oneCoord.m_y);
-              curView->Make3D(onePoint);
-              oneCoord.m_x = onePoint.m_x;
-              oneCoord.m_y = onePoint.m_y;
-            }
+            Make3DPoint(curView, oneCoord, is3d);
             coords.Add(&oneCoord);
           }
         }
@@ -496,5 +434,87 @@ unsigned char UeMap::CPlanLayer::GetRouteColorIndex( unsigned char planMethodTyp
     {
       return LC_Planned_Begin + 2;
     }
+  }
+}
+
+bool CPlanLayer::IsGuidanceViewPlanBreak(const int type, const int curIndex, const GuidanceIndicator *oneIndicator, const GuidanceStatus &dirInfo)
+{
+  bool flag = false;
+  if ( type == VT_Guidance)
+  {
+    if (curIndex <= dirInfo.m_curOrderForSnd - 2 && 
+      (oneIndicator->m_snd.m_infoCode != IVT_EnterRoundAbout && oneIndicator->m_roadForm != RF_Roundabout
+      && oneIndicator->m_snd.m_infoCode != IVT_ExitRoundAbout))
+    {
+      flag = true;
+    }
+  }
+  return flag;
+}
+
+bool CPlanLayer::IsMapLayoutContainPos(CViewState *curView, const CGeoPoint<long> &pos)
+{
+  if (curView)
+  {
+    return curView->m_mapping.m_mapLayout.m_extent.IsContain(pos);
+  }
+  return false;
+}
+
+void CPlanLayer::Make3DPoint(CViewState *curView, CGeoPoint<long> &point, const bool is3d)
+{
+  if (curView && is3d)
+  {
+    CGeoPoint<short> onePoint;
+    onePoint.m_x = static_cast<short>(point.m_x);
+    onePoint.m_y = static_cast<short>(point.m_y);
+    curView->Make3D(onePoint);
+    point.m_x = onePoint.m_x;
+    point.m_y = onePoint.m_y;
+  }
+  
+}
+
+bool CPlanLayer::FindNextCoord(const GuidanceStatus &dirInfo, CViewState *curView, GuidanceIndicator *oneIndicator, const CGeoPoint<long> &oneCoord, const int index, const int curPair, CGeoPoint<long> &nextCoord)
+{
+  if (!curView && !oneIndicator)
+  {
+    return false;
+  }
+  bool bFindNextCoord = false;
+  if (dirInfo.m_curVtx >= 0)
+  {
+    //在当前的路段找，车标的角度更准确
+    for (int i = dirInfo.m_curVtx; i >= 0; --i)
+    {
+      curView->Map2Scr(oneIndicator->m_vtxs[i], nextCoord);
+      if (nextCoord != oneCoord)
+      {
+        bFindNextCoord = true;
+        break;
+      }
+    }
+  }
+
+  if (!bFindNextCoord)
+  {      
+    //从下一条道路乃至下下条道路找不同点
+    for (int j = index - 1; j >= 0; j--)
+    {
+      GuidanceIndicator *oneIndicator = m_route->GetIndicator(curPair, j);
+      for (int k = oneIndicator->m_vtxNum - 1; k >= 0; k--)
+      {
+        curView->Map2Scr(oneIndicator->m_vtxs[k], nextCoord);
+        if (nextCoord != oneCoord)
+        {
+          bFindNextCoord = true;                    
+          break;
+        }                
+      }
+      if (bFindNextCoord)
+      {
+        break;
+      }
+    }   
   }
 }

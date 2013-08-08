@@ -80,7 +80,7 @@ namespace UeGui
 
     void MakeControls();
 
-    void SearchForResult(const char* keyword);
+    void SearchForResult();
 
     void ResetResultList();
 
@@ -98,6 +98,8 @@ namespace UeGui
     CUiBitButton m_infoBtn[4];
     CUiLabel m_poiLabel[4];
     CUiLabel m_addrLabel[4];
+
+    CUiBitButton m_returnBtn;
     
     CUiBitButton m_pageUpBtn;
     CUiBitButton m_pageDownBtn;

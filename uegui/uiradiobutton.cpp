@@ -4,22 +4,21 @@ using namespace UeGui;
 
 void CUiRadioButton::MouseDown()
 {
-  CUiButton::MouseDown();
   if (!IsVisible() || !IsEnable())
   {
     return;
   }  
+  CUiButton::MouseDown();
 }
 
 void CUiRadioButton::MouseUp()
 {
-  CUiButton::MouseUp();
-
   if (!IsVisible() || !IsEnable())
   {
     return;
-  }  
-  SetCheck(true);  
+  }
+  CUiButton::MouseUp();
+  DoCheck(true);  
 }
 
 void CUiRadioButton::MouseMove()
@@ -35,6 +34,15 @@ void CUiRadioButton::SetCheck( bool value )
   {
     return;
   }  
+  DoCheck(value);
+  if (m_atoRefresh)
+  {
+    RenderElements();
+  }
+}
+
+void UeGui::CUiRadioButton::DoCheck( bool value )
+{
   m_checked = value;
 
   if (m_iconElement)
@@ -63,4 +71,9 @@ void UeGui::CUiRadioButton::SetVisible( bool value )
 void UeGui::CUiRadioButton::SetEnable( bool value )
 {
   CUiBitButton::SetEnable(value);
+}
+
+void UeGui::CUiRadioButton::RenderElements()
+{
+  CUiBitButton::RenderElements();
 }

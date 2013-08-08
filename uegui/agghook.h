@@ -273,6 +273,21 @@ namespace UeGui
     * \brief 回退到指定类型的hook，里面没有调用Load和UnLoad方法。
     */
     void Fall(int hookType);
+
+    /**
+    * \只存放要刷新的按钮控件（暂时只是在设计阶段，还没有使用）
+    */ 
+    void ClearRenderElements();
+
+    /**
+    * \只存放要刷新的按钮控件（暂时只是在设计阶段，还没有使用）
+    */ 
+    void AddRenderElements(GuiElement* element);
+
+    /**
+    * \只存放要刷新的按钮控件（暂时只是在设计阶段，还没有使用）
+    */ 
+    void AddRenderUiControls(CUiControl* control);
   protected:
     //
     // GUI response functions
@@ -423,22 +438,7 @@ namespace UeGui
     /*
     * \根据事件名称来获取控件信息
     */
-    CViewHook::GuiElement* GetGuiElement(const char* elementName);
- 
-    /**
-    * \只存放要刷新的按钮控件（暂时只是在设计阶段，还没有使用）
-    */ 
-    void ClearRenderElements();
-
-    /**
-    * \只存放要刷新的按钮控件（暂时只是在设计阶段，还没有使用）
-    */ 
-    void AddRenderElements(GuiElement* element);
-
-    void AddRenderUiControls(CUiControl* control);
-
-    
-
+    CViewHook::GuiElement* GetGuiElement(const char* elementName); 
   private:
     /**
     * \从子hook列表中获取子hook

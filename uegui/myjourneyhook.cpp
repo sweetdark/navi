@@ -1,7 +1,8 @@
 #include "myjourneyhook.h"
 #include "messagedialoghook.h"
 #include "myjourneywrapper.h"
-
+#include "adjustroutehook.h"
+#include "viewwrapper.h"
 using namespace UeGui;
 
 #define DELETEJURNEY_MACRO(NUM) do              \
@@ -15,8 +16,20 @@ using namespace UeGui;
   {                                             \
     m_isNeedRefesh = false;                     \
   }                                             \
-} while (0);
+} while (0)
 
+#define EDITJURNEY_MACRO(NUM) do              \
+{                                               \
+  if (m_row##NUM##CenterCtrl.IsEnable()) \
+  {                                             \
+    m_row##NUM##CenterCtrl.MouseUp();    \
+    EditJourneyData(kRow##NUM##);           \
+  }                                             \
+  else                                          \
+  {                                             \
+    m_isNeedRefesh = false;                     \
+  }                                             \
+} while (0)
 
 bool CMyJourneyHook::CJourneyRowCtrl::IsValid()
 {
@@ -357,79 +370,73 @@ short CMyJourneyHook::MouseUp(CGeoPoint<short> &scrPoint)
   case myjourneyhook_DeleteJourney1Btn:
   case myjourneyhook_DeleteJourney1BtnIcon:
     {
-      DELETEJURNEY_MACRO(1)
+      DELETEJURNEY_MACRO(1);
     }
     break;
   case myjourneyhook_DeleteJourney2Btn:
   case myjourneyhook_DeleteJourney2BtnIcon:
     {
-      DELETEJURNEY_MACRO(2)
+      DELETEJURNEY_MACRO(2);
     }
     break;
   case myjourneyhook_DeleteJourney3Btn:
   case myjourneyhook_DeleteJourney3BtnIcon:
     {
-      DELETEJURNEY_MACRO(3)
+      DELETEJURNEY_MACRO(3);
     }
     break;
   case myjourneyhook_DeleteJourney4Btn:
   case myjourneyhook_DeleteJourney4BtnIcon:
     {
-      DELETEJURNEY_MACRO(4)
+      DELETEJURNEY_MACRO(4);
     }
     break;
   case myjourneyhook_DeleteJourney5Btn:
   case myjourneyhook_DeleteJourney5BtnIcon:
     {
-      DELETEJURNEY_MACRO(5)
+      DELETEJURNEY_MACRO(5);
     }
     break;
   case myjourneyhook_DeleteJourney6Btn:
   case myjourneyhook_DeleteJourney6BtnIcon:
     {
-      DELETEJURNEY_MACRO(6)
+      DELETEJURNEY_MACRO(6);
     }
     break;
   case myjourneyhook_Journey1Name:
   case myjourneyhook_Row1Center:
     {
-      m_journey1NameCtrl.MouseUp();
-      m_row1CenterCtrl.MouseUp();
+      EDITJURNEY_MACRO(1);
     }
     break;
   case myjourneyhook_Journey2Name:
   case myjourneyhook_Row2Center:
     {
-      m_journey2NameCtrl.MouseUp();
-      m_row2CenterCtrl.MouseUp();
+      EDITJURNEY_MACRO(2);
     }
     break;
   case myjourneyhook_Journey3Name:
   case myjourneyhook_Row3Center:
     {
-      m_journey3NameCtrl.MouseUp();
-      m_row3CenterCtrl.MouseUp();
+      EDITJURNEY_MACRO(3);
     }
     break;
   case myjourneyhook_Journey4Name:
   case myjourneyhook_Row4Center: 
     {
-      m_journey4NameCtrl.MouseUp();
-      m_row4CenterCtrl.MouseUp();
+      EDITJURNEY_MACRO(4);
     }
     break;
   case myjourneyhook_Journey5Name:
   case myjourneyhook_Row5Center:
     {
-      m_journey5NameCtrl.MouseUp();
-      m_row5CenterCtrl.MouseUp();
+      EDITJURNEY_MACRO(5);
     }
     break;
   case myjourneyhook_Journey6Name:
   case myjourneyhook_Row6Center:
     {
-      m_journey6NameCtrl.MouseUp();
-      m_row6CenterCtrl.MouseUp();
+      EDITJURNEY_MACRO(6);
     }
     break;
   case myjourneyhook_NextPage:
@@ -675,5 +682,18 @@ bool UeGui::CMyJourneyHook::AddJourneyData( const char *journeyName, unsigned in
   return false;
 }
 
-
+void CMyJourneyHook::EditJourneyData(RowTag row)
+{
+  if (row > kRowBegin && row < kRowEnd)
+  {
+    POIDataList dataList;
+    m_curPageJourneyDatas[row - 1].GetJourneyData(dataList);
+    CAdjustRouteHook *adjustHook = (CAdjustRouteHook*)CViewWrapper::Get().GetHook(DHT_AdjustRouteHook);
+    if (adjustHook)
+    {
+      adjustHook->SetPOIDataList(dataList);
+      TurnTo(DHT_AdjustRouteHook);
+    }
+  }
+}
 

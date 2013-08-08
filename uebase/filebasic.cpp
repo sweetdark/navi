@@ -501,7 +501,7 @@ bool CFileBasic::CreateMemoryMapping(const std::wstring &oneFile, void **fileHan
           // Exception
           long code = ::GetLastError();
           TIME_STAT;
-          timeLogger.Log(_T("Last Error Code: %d"), code);
+          //timeLogger.Log(_T("Last Error Code: %d"), code);
 
           //
           ::CloseHandle(*fileHandle);
@@ -517,7 +517,7 @@ bool CFileBasic::CreateMemoryMapping(const std::wstring &oneFile, void **fileHan
           // Exception
           long code = ::GetLastError();
           TIME_STAT;
-          timeLogger.Log(_T("Last Error Code: %d"), code);
+          //timeLogger.Log(_T("Last Error Code: %d"), code);
         }
 
         return  (*memoryData) ? true : false;

@@ -882,7 +882,8 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_soundBtn.MouseUp();
       needRefresh = true;
-      //TurnTo(DHT_SoundMenuHook);
+      //…˘“Ù…Ë÷√
+      TurnTo(DHT_SoundMenuHook, false);
     }
     break;
   case MapHook_GPSBack:
@@ -890,6 +891,7 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       m_GPSBtn.MouseUp();
       needRefresh = true;
+      //GPSΩÁ√Ê
       //TurnTo(DHT_GPSHook);
     }
     break;
@@ -2010,7 +2012,7 @@ bool UeGui::CMapHook::HaveNextQueryPoint( PosType posType )
 
 void UeGui::CMapHook::RestarGuiTimer()
 {
-  m_guiTimerInterval = TIMER_INTERVAL;
+  m_guiTimerInterval = TIMER_INTERVAL_6S;
 }
 
 void UeGui::CMapHook::CloseGuiTimer()

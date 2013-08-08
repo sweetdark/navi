@@ -599,7 +599,8 @@ namespace UeMap
     /**
     * \brief ‰÷»æ”•—€Õº
     */
-    virtual void RenderEagle(short scaleLevel, bool isRaster, bool is3d);
+    virtual void RenderEaglePolynAndLink(short scaleLevel, bool isRaster, bool is3d);
+    virtual void RenderEagleOther(short scaleLevel, bool isRaster, bool is3d);
   protected:
     //
     //

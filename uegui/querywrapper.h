@@ -109,6 +109,14 @@ namespace UeGui
     void SaveCurKeyWord(const char *pchKeyWord,bool bIsAcro);
     //获取之前检索输入的历史关键字
     void GetHistoryKeyword(std::vector<string> &vecHistoryKey,bool bIsAcro);
+    //把搜索条件放进vector里
+    void PushVecSQLSentence();
+    //释放vector最近一次的搜索条件
+    void PopVecSQLSentence();
+    //将搜索条件设置为vector中的最近一个
+    void SetSQLSentenceWithVec();
+    //清空搜索条件的vector
+    void ClearVecSQLSentence();
   private:
     CQueryWrapper(void);
     //是否无任何条件处理事件
@@ -116,6 +124,7 @@ namespace UeGui
     UeQuery::SQLSentence m_querySql;
     UeQuery::TCodeEntry m_curAdmInfo;
     UeQuery::TCodeEntry m_curKindInfo;
+    std::vector<UeQuery::SQLSentence> m_vecQuerySql;
   };
 }
 #endif

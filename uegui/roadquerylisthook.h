@@ -83,8 +83,6 @@ namespace UeGui
 
     virtual void Load();
 
-    virtual void UnLoad();
-
     SQLRecord* GetCurRoadInfo();
 
   protected:
@@ -93,7 +91,7 @@ namespace UeGui
 
     void MakeControls();
 
-    void SearchForResult(const char* keyword);
+    void SearchForResult();
 
     void ResetResultList();
 
@@ -113,6 +111,8 @@ namespace UeGui
     CUiButton m_crossBtn[4];
     CUiLabel m_AddrLabel[4];
     CUiButton m_interval[4];
+
+    CUiBitButton m_returnBtn;
 
     CUiBitButton m_pageUpBtn;
     CUiBitButton m_pageDownBtn;

@@ -1203,6 +1203,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\soundmenuhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\soundmenuhook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\systemsettinghook.cpp"
 				>
 			</File>
@@ -1535,6 +1543,38 @@
 				>
 			</File>
 			<File
+				RelativePath=".\editcharhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\editcharhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\edithandhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\edithandhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\editspellinghook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\editspellinghook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\editswitchhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\editswitchhook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\inputacronymhook.cpp"
 				>
 			</File>
@@ -1620,6 +1660,14 @@
 			</File>
 			<File
 				RelativePath=".\roadquerylisthook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\selectpointcallbackctrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\selectpointcallbackctrl.h"
 				>
 			</File>
 			<File

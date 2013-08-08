@@ -20,6 +20,10 @@
 #include "uebase/uesettingio.h"
 #endif
 
+#ifndef _UEGUI_QUERYWRAPPER_H
+#include "querywrapper.h"
+#endif
+
 using namespace UeGui;
 
 CInputSwitchHook::CInputSwitchHook()
@@ -256,23 +260,26 @@ bool CInputSwitchHook::operator ()()
 
 void CInputSwitchHook::SwitchInputMethod()
 {
-  int hookType;
+  SwitchIndexType();
+  int hookType = GetCurInputHookType();
+
+  //防止输入法界面间循环
+  CAggHook::Return(false);
+  CAggHook::Return(false);
+  CAggHook::TurnTo(hookType);
+  //先跳转再设置关键字
   switch(m_curInputMethod)
   {
   case IM_AcronymMethod:
-    hookType = DHT_InputAcronymHook;
     ((CInputAcronymHook *)m_view->GetHook(DHT_InputAcronymHook))->SetKeyWord(m_arcKeyword);
     break;
   case IM_SpellingMethod:
-    hookType = DHT_InputSpellingHook;
     ((CInputSpellingHook *)m_view->GetHook(DHT_InputSpellingHook))->SetKeyWord(m_keyword);
     break;
   case IM_CharMethod:
-    hookType = DHT_InputCharHook;
     ((CInputCharHook *)m_view->GetHook(DHT_InputCharHook))->SetKeyWord(m_keyword);
     break;
   case IM_HandMethod:
-    hookType = DHT_InputHandHook;
     ((CInputHandHook *)m_view->GetHook(DHT_InputHandHook))->SetKeyWord(m_keyword);
     break;
   }
@@ -282,11 +289,41 @@ void CInputSwitchHook::SwitchInputMethod()
   QuerySettings queryConfig;
   queryConfig.m_gridKinds = m_curInputMethod;
   configCtrl.UpdateSettings(CUeSettingsIO::ST_Query,&queryConfig,1);
+}
 
-  //防止输入法界面间循环
-  CAggHook::Return();
-  CAggHook::Return();
-  CAggHook::TurnTo(hookType);
+void CInputSwitchHook::SwitchIndexType()
+{
+  int indexType = CQueryWrapper::Get().GetSQLSentence().m_indexType;
+  if (m_curInputMethod == IM_AcronymMethod)
+  {
+    if (indexType == UeQuery::IT_PoiName)
+    {
+      CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiAcro);
+    }
+    else if (indexType == UeQuery::IT_RoadName)
+    {
+      CQueryWrapper::Get().SetQueryMode(UeQuery::IT_RoadAcro);
+    }
+    else if (indexType == UeQuery::IT_CityName)
+    {
+      CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityAcro);
+    }
+  }
+  else
+  {
+    if (indexType == UeQuery::IT_PoiAcro)
+    {
+      CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiName);
+    }
+    else if (indexType == UeQuery::IT_RoadAcro)
+    {
+      CQueryWrapper::Get().SetQueryMode(UeQuery::IT_RoadName);
+    }
+    else if (indexType == UeQuery::IT_CityAcro)
+    {
+      CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
+    }
+  }
 }
 
 char* CInputSwitchHook::GetKeyWord()

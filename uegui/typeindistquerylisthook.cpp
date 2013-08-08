@@ -8,6 +8,8 @@
 
 #include "districtselectionhook.h"
 
+#include "selectpointcallbackctrl.h"
+
 using namespace UeGui;
 
 CTypeInDistQueryListHook::CTypeInDistQueryListHook()
@@ -240,9 +242,19 @@ short CTypeInDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_AddrLabel[index].MouseUp();
       if(m_InfoBtn[index].IsEnable())
       {
-        CAggHook::TurnTo(DHT_MapHook);
         CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
-        pMapHook->SetPickPos(m_pointList, index);
+        CSelectPointCallBackCtrl &selectpointcbctrl(CSelectPointCallBackCtrl::Get());
+        if (selectpointcbctrl.IsCallBackFunExist())
+        {
+          CAggHook::TurnTo(DHT_MapHook);
+          pMapHook->SelectPoint(m_pointList[index].m_point, m_pointList[index].m_name, 
+            selectpointcbctrl.GetCallBackObj(), selectpointcbctrl.GetEvent());
+        }
+        else
+        {
+          CAggHook::TurnTo(DHT_MapHook);
+          pMapHook->SetPickPos(m_pointList, index);
+        }
       }
     } 
     else
@@ -262,20 +274,9 @@ short CTypeInDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
 
 void CTypeInDistQueryListHook::SearchForResult()
 {
-  //暂时处理，暂时设为搜索该行政区中心点周边10公里
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
-  CGeoPoint<long> geoCurPos;
-  SQLRecord m_record;
-  m_record.m_x = -1;
-  m_record.m_addrCode = queryWrapper.GetSQLSentence().m_addrOne;
-  const SQLRecord *pAdmCenterPoi(queryWrapper.GetAdmCenterPoi(&m_record));
-  geoCurPos.m_x = pAdmCenterPoi->m_x;
-  geoCurPos.m_y = pAdmCenterPoi->m_y;
-
-  queryWrapper.SetQueryMode(UeQuery::IndexType::IT_NearByPos);
+  queryWrapper.SetQueryMode(UeQuery::IndexType::IT_Kind);
   queryWrapper.SetMaxQueryRecordNum(500);
-  queryWrapper.SetRoundQueryRadius(RADIUS07);
-  queryWrapper.SetCenterPosOfRound(geoCurPos);
   m_pRecord = queryWrapper.DoQueryGetRecord();
 
   ResetResultList();
@@ -351,7 +352,6 @@ void CTypeInDistQueryListHook::DoDistSwitchCallBack(const SQLRecord *pResult)
   codeEntry.m_uCode = pResult->m_addrCode;
   ::strcpy(codeEntry.m_chName, pResult->m_asciiName);
   CQueryWrapper::Get().SetQueryAdmInfo(codeEntry);
-  Load();
 }
 
 void CTypeInDistQueryListHook::SetQueryTypeInfo(TCodeEntry *tcodeEntry)

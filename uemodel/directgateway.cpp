@@ -117,6 +117,14 @@ void CDirectGateWay::GetParcelID(CGeoRect<long> &mbr, CMemVector &ids)
   {
     return;
   }
+  else
+  {
+    // Exception: NO_SD
+    if(!IsExistMbrFile())
+    {
+      return;
+    }
+  }
 
   // Note:
   // It must define one efficient index mechansim here, for example, quad-tree algorithm for quick position
@@ -162,6 +170,12 @@ long CDirectGateWay::GetParcelID(CGeoPoint<long> &pos)
     }
   }
   assert(m_header && m_indexFile && m_mbrs);
+
+  CUeGridIndex gridIndex;
+  if(m_isUseGridIdx)
+  {
+    return gridIndex.GetParcelID(pos);
+  }
 
   // For mainland case
   int i = 0;

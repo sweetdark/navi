@@ -40,6 +40,9 @@ namespace UeGui
     GuiElement* GetLabelElement();
     //设置控件的长度
     void SetWidth(int width);
+  protected:
+    //渲染控件元素
+    virtual void RenderElements();
   private:
     GuiElement* m_labelElement; //按钮中间控件配置信息 可为NULL
   };

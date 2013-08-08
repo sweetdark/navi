@@ -4,6 +4,8 @@
 
 #include "maphook.h"
 
+#include "selectpointcallbackctrl.h"
+
 using namespace UeGui;
 
 CQueryAddressBookHook::CQueryAddressBookHook()
@@ -163,9 +165,19 @@ short CQueryAddressBookHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_listRecord[index].MouseUp();
       if(m_listRecord[index].IsEnable())
       {
-        CAggHook::TurnTo(DHT_MapHook);
         CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
-        pMapHook->SetPickPos(m_pointList, index);
+        CSelectPointCallBackCtrl &selectpointcbctrl(CSelectPointCallBackCtrl::Get());
+        if (selectpointcbctrl.IsCallBackFunExist())
+        {
+          CAggHook::TurnTo(DHT_MapHook);
+          pMapHook->SelectPoint(m_pointList[index].m_point, m_pointList[index].m_name, 
+            selectpointcbctrl.GetCallBackObj(), selectpointcbctrl.GetEvent());
+        }
+        else
+        {
+          CAggHook::TurnTo(DHT_MapHook);
+          pMapHook->SetPickPos(m_pointList, index);
+        }
       }
     } 
     else

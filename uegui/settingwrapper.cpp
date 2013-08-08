@@ -557,9 +557,7 @@ void UeGui::CSettingWrapper::SetIsLoudSpeakerMute( bool value )
   else
   {
     m_systemSettings.m_loudspeaker = 1;
-    //unsigned long maxVolume = 0xFFFFFFFF;
-    //ratioVol = maxVolume/7    省略计算时间
-    unsigned long ratioVol = 613566756;
+    unsigned long ratioVol = MAX_SYS_VOLUME / MAX_VOLUME;
     unsigned long volume = m_systemSettings.m_voice * ratioVol;
     ::waveOutSetVolume(0, volume);
   }   
@@ -573,15 +571,12 @@ unsigned short UeGui::CSettingWrapper::GetVoice()
 void UeGui::CSettingWrapper::SetVoice( unsigned short value )
 {
   //::waveOutGetVolume(0, &volume);
-  if (value > 6)
+  if (value > MAX_VOLUME)
   {
-    //可达理论最大音量值
-    ::waveOutSetVolume(0, 0xFFFFFFFF);
-    m_systemSettings.m_voice = 7;
-  }
-  //unsigned long maxVolume = ;
-  //ratioVol = maxVolume/7    省略计算时间
-  unsigned long ratioVol = 613566756;
+    ::waveOutSetVolume(0, MAX_SYS_VOLUME);
+    m_systemSettings.m_voice = MAX_VOLUME;
+  } 
+  unsigned long ratioVol = MAX_SYS_VOLUME / MAX_VOLUME;
   unsigned long volume = value * ratioVol;
   ::waveOutSetVolume(0, volume);
   m_systemSettings.m_voice = value;

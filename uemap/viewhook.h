@@ -201,6 +201,10 @@ namespace UeMap
       DHT_InputCharHook             = 0x1039,
       DHT_InputAcronymHook          = 0x103A,
       DHT_InputHandHook             = 0x103B,
+      DHT_EditSwitchHook            = 0x103C,
+      DHT_EditSpellingHook          = 0x103D,
+      DHT_EditCharHook              = 0x103E,
+      DHT_EditHandHook              = 0x103F,
       DHT_UserInfoHook              = 0x1060,
       // Â·Ïß²Ù×÷
       DHT_RouteOperationHook        = 0x1061,

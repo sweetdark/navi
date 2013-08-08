@@ -131,6 +131,16 @@ namespace UeMap
     *
     **/
     virtual void DrawClipped();
+    /**
+    *
+    **/
+    void ReservedAsFull();
+
+
+    /**
+    *
+    **/
+    void RedrawBackGround(unsigned int bkColor);
 
   protected:
     //
@@ -139,17 +149,7 @@ namespace UeMap
     /**
     *
     **/
-    void ReservedAsFull();
-
-    /**
-    *
-    **/
     void ReservedAsMap();
-
-    /**
-    *
-    **/
-    void RedrawBackGround(unsigned int bkColor);
 
     /**
     *

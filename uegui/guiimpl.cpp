@@ -104,6 +104,11 @@
 #include "queryaddressbookhook.h"
 #include "queryhistoryhook.h"
 #include "inputselecthook.h"
+#include "soundmenuhook.h"
+#include "editspellinghook.h"
+#include "editcharhook.h"
+#include "edithandhook.h"
+#include "editswitchhook.h"
 
 #if __FOR_FPC__
 #include "caphook.h"
@@ -209,7 +214,14 @@ void CGuiImpl::Update(short type, void *para)
 #endif
       //hnc?????????
       //((CKeyboardHook *)m_view->GetHook(CViewHook::DHT_KeyboardHook))->DoHandWriting(curTime);
-      ((CInputHandHook *)m_view->GetHook(CViewHook::m_curHookType))->DoHandWriting(curTime);
+      if (CViewHook::m_curHookType == CViewHook::DHT_InputHandHook)
+      {
+        ((CInputHandHook *)m_view->GetHook(CViewHook::m_curHookType))->DoHandWriting(curTime);
+      }
+      else if (CViewHook::m_curHookType == CViewHook::DHT_EditHandHook)
+      {
+        ((CEditHandHook *)m_view->GetHook(CViewHook::m_curHookType))->DoHandWriting(curTime);
+      }
     }
     break;
   case CViewHook::UHT_ForBlockCmd:
@@ -530,7 +542,7 @@ void CGuiImpl::MakeHooks()
   //刷新进度条
   view->UpdateProgress();
 
-  //系统设置界面里的语音设置界面
+  //声音设置界面
   //viewHook = new CVoiceSettingHook();
   //viewHook->SetHelpers(net, view, route, gps, query);
   //viewHook->LoadGUI();  
@@ -716,6 +728,26 @@ void CGuiImpl::MakeHooks()
   viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_InputHandHook,viewHook);
 
+  viewHook = new CEditSwitchHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_EditSwitchHook,viewHook);
+
+  viewHook = new CEditSpellingHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_EditSpellingHook,viewHook);
+
+  viewHook = new CEditCharHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_EditCharHook,viewHook);
+
+  viewHook = new CEditHandHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_EditHandHook,viewHook);
+
   viewHook = new CQCodeInputHook();
   viewHook->SetHelpers(net,view,route,gps,query);
   viewHook->LoadGUI();
@@ -836,6 +868,12 @@ void CGuiImpl::MakeHooks()
   viewHook->SetHelpers(net, view, route, gps, query);
   viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_RestoreDefaultshook, viewHook);
+
+  //声音设置界面
+  viewHook = new CSoundMenuHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_SoundMenuHook, viewHook);
 
 #if __FOR_TRUCK__
   //货车导航

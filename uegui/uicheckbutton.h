@@ -28,6 +28,12 @@ namespace UeGui
   public:
     void SetCheck(bool value);
     bool Checked();
+  protected:
+    //渲染控件元素
+    virtual void RenderElements();
+  private:
+    //执行选择动作
+    void DoCheck(bool value);
   private:
     bool m_checked;
   };

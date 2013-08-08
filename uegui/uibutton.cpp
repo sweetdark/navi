@@ -8,6 +8,7 @@ void CUiButton::MouseDown()
   {
     return;
   }
+  CUiControl::MouseDown();
   if (m_leftElement)
   {
     m_leftElement->m_textStyle = m_leftElement->m_focusTextStyle;
@@ -31,6 +32,7 @@ void CUiButton::MouseUp()
   {
     return;
   }
+  CUiControl::MouseUp();
   if (m_leftElement)
   {
     m_leftElement->m_textStyle = m_leftElement->m_normalTextStylpe;
@@ -107,6 +109,7 @@ void UeGui::CUiButton::SetVisible( bool value )
 
 void UeGui::CUiButton::SetCaption( const char* caption )
 {
+  CUiControl::SetCaption(caption);
   if (m_centerElement)
   {
     if (caption)
@@ -177,10 +180,11 @@ char* UeGui::CUiButton::GetCaption()
 
 void UeGui::CUiButton::ClearCaption()
 {
+  CUiControl::ClearCaption();
   if (m_centerElement)
   {
     memset(m_centerElement->m_label, 0, sizeof(m_centerElement->m_label));
-  }
+  }  
 }
 
 void UeGui::CUiButton::SetWidth( int width )
@@ -193,37 +197,46 @@ void UeGui::CUiButton::SetWidth( int width )
       m_centerElement->m_width = 0;
     }
   }
+  //if (m_atoRefresh)
+  //{
+  //  RenderElements();
+  //}
 }
 
 void UeGui::CUiButton::SetFocusKey( const unsigned char* fkey )
 {
+  CUiControl::SetFocusKey(fkey);
   if (m_parent)
   {
-    m_haveFocusKey = true;
     m_parent->AddFocusTextElements(m_centerElement, fkey);
   }
 }
 
 void UeGui::CUiButton::ClearFocusKey()
 {
-  m_haveFocusKey = false;
+  CUiControl::ClearFocusKey();
   if (m_parent)
   {
     m_parent->EraseFocusTextElements(m_centerElement);
   }
 }
 
+void UeGui::CUiButton::RenderElements()
+{
+  AddRenderElement(m_leftElement);
+  AddRenderElement(m_rightElement);
+  AddRenderElement(m_centerElement);
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 void UeGui::CUiBitButton::MouseDown()
 {
-  CUiButton::MouseDown();
-
   if (!IsVisible() || !IsEnable())
   {
     return;
   }
-
+  CUiButton::MouseDown();
   if (m_labelElement)
   {
     if (!m_haveFocusKey)
@@ -243,11 +256,11 @@ void UeGui::CUiBitButton::MouseDown()
 
 void UeGui::CUiBitButton::MouseUp()
 {
-  CUiButton::MouseUp();
   if (!IsVisible() || !IsEnable())
   {
     return;
   }
+  CUiButton::MouseUp();
   if (m_labelElement)
   {
     if (!m_haveFocusKey)
@@ -274,6 +287,7 @@ void UeGui::CUiBitButton::MouseMove()
 
 void UeGui::CUiBitButton::SetCaption( const char* caption )
 {
+  CUiControl::SetCaption(caption);
   if (caption)
   {
     if (m_labelElement)
@@ -309,13 +323,10 @@ char* UeGui::CUiBitButton::GetCaption()
 
 void UeGui::CUiBitButton::ClearCaption()
 {
+  CUiButton::ClearCaption();
   if (m_labelElement)
   {
     memset(m_labelElement->m_label, 0, sizeof(m_labelElement->m_label));
-  }  
-  if (GetCenterElement())
-  {
-    memset(GetCenterElement()->m_label, 0, sizeof(m_labelElement->m_label));
   }
 }
 
@@ -361,7 +372,7 @@ void UeGui::CUiBitButton::SetVisible( bool value )
   if (m_iconElement)
   {
     m_iconElement->m_isVisible = value;
-  }  
+  }
 }
 
 GuiElement* UeGui::CUiBitButton::GetLabelElement()
@@ -382,4 +393,11 @@ void UeGui::CUiBitButton::SetLabelElement( GuiElement* labelElement )
 void UeGui::CUiBitButton::SetIconElement( GuiElement* iconElement )
 {
   m_iconElement = iconElement;
+}
+
+void UeGui::CUiBitButton::RenderElements()
+{
+  CUiButton::RenderElements();
+  AddRenderElement(m_labelElement);
+  AddRenderElement(m_iconElement);
 }

@@ -152,6 +152,8 @@ namespace UeGui
     CUiBitButton m_pageLeftBtn;
     CUiBitButton m_pageRightBtn;
 
+    CUiBitButton m_returnBtn;
+
     int m_iCurCursorIndex;
     tstring m_tstrKeyWords;
     std::vector<int> m_vecWordPosX;

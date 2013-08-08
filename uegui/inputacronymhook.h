@@ -125,6 +125,8 @@ namespace UeGui
 
     CUiButton m_inputCode[INPUTCODENUM];
 
+    CUiBitButton m_returnBtn;
+
     int m_iCurCursorIndex;
     tstring m_tstrKeyWords;
     std::vector<int> m_vecWordPosX;

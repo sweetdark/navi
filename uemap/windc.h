@@ -53,22 +53,22 @@ namespace UeMap
     /**
     *
     */
-    CWinDC(CGeoRect<short> &layout, CGeoPoint<short> &bufBase, DWORD bkColor = RGB(255, 255, 255/*128, 128, 0*/))
+    CWinDC(CGeoRect<short> &layout, CGeoPoint<short> &bufBase, DWORD bkColor = RGB(255, 255, 255/*128, 128, 0*/), bool isCreateBitMap = false)
       : CViewDC(layout, bufBase, bkColor)
     {
       if(m_bufWidth > 2 && m_bufHeight > 2)
       {
         //
         m_memDC = ::CreateCompatibleDC(0);
-        //if(m_memDC && CreateBitmap())
-        //{
-        // int line = (m_bufWidth * 3);
-        // m_pixelCoff = ((line % 4) == 0) ? line : (line + 4 - (line % 4));
-        //    m_oldBitmap = static_cast<HBITMAP>(::SelectObject(reinterpret_cast<HDC>(m_memDC), m_bitmap));
+        if(m_memDC && isCreateBitMap && CreateBitmap())
+        {
+          int line = (m_bufWidth * 3);
+          m_pixelCoff = ((line % 4) == 0) ? line : (line + 4 - (line % 4));
+          m_oldBitmap = static_cast<HBITMAP>(::SelectObject(reinterpret_cast<HDC>(m_memDC), m_bitmap));
 
-        //    ::SetBkMode(reinterpret_cast<HDC>(m_memDC), TRANSPARENT);
-        //     DrawBackGround(0);
-        //}
+          ::SetBkMode(reinterpret_cast<HDC>(m_memDC), TRANSPARENT);
+          DrawBackGround(0);
+        }
       }
     }
 
@@ -78,11 +78,17 @@ namespace UeMap
     virtual ~CWinDC()
     {
       //Swap back the original bitmap.
-      //::DeleteObject(::SelectObject(reinterpret_cast<HDC>(m_memDC), m_oldBitmap));
-      //m_oldBitmap = 0;
-
-      //::DeleteObject(m_bitmap);
-      //m_bitmap = 0;
+      if (m_oldBitmap)
+      {
+        ::DeleteObject(::SelectObject(reinterpret_cast<HDC>(m_memDC), m_oldBitmap));
+        m_oldBitmap = 0;
+      }
+      
+      if (m_bitmap)
+      {
+        ::DeleteObject(m_bitmap);
+        m_bitmap = 0;
+      }
 
       ::DeleteDC(reinterpret_cast<HDC>(m_memDC));
       m_memDC = 0;
@@ -90,8 +96,11 @@ namespace UeMap
       // As promised, it should be release when deleting m_bitmap
       // Note: Below memory is directly up to the lifetime of m_bitmap
       //
-      //::free(m_bitmapBits);
-      //m_bitmapBits = 0;
+      //if (m_bitmapBits)
+      //{
+      //  free(m_bitmapBits);
+      //  m_bitmapBits = 0;
+      //}
     }
 
   public:
@@ -151,30 +160,30 @@ namespace UeMap
     /**
     *
     */
-    //bool CreateBitmap()
-    //{
-    //  BITMAPINFO BI = {0,};
-    //  BI.bmiHeader.biSize = sizeof(BITMAPINFO);
-    //  BI.bmiHeader.biWidth = m_bufWidth;
-    //  BI.bmiHeader.biHeight = m_bufHeight;
-    //  BI.bmiHeader.biPlanes = 1;
-    //  BI.bmiHeader.biBitCount = SYSTEM_BPP;
-    //  BI.bmiHeader.biCompression = BI_RGB;
-    //  BI.bmiHeader.biSizeImage = 0;
-    //  BI.bmiHeader.biXPelsPerMeter = 1;
-    //  BI.bmiHeader.biYPelsPerMeter = 1;
-    //  BI.bmiHeader.biClrUsed = 0;
-    //  BI.bmiHeader.biClrImportant = 0;
+    bool CreateBitmap()
+    {
+      BITMAPINFO BI = {0,};
+      BI.bmiHeader.biSize = sizeof(BITMAPINFO);
+      BI.bmiHeader.biWidth = m_bufWidth;
+      BI.bmiHeader.biHeight = m_bufHeight;
+      BI.bmiHeader.biPlanes = 1;
+      BI.bmiHeader.biBitCount = SYSTEM_BPP;
+      BI.bmiHeader.biCompression = BI_RGB;
+      BI.bmiHeader.biSizeImage = 0;
+      BI.bmiHeader.biXPelsPerMeter = 1;
+      BI.bmiHeader.biYPelsPerMeter = 1;
+      BI.bmiHeader.biClrUsed = 0;
+      BI.bmiHeader.biClrImportant = 0;
 
-    //  m_bitmap = ::CreateDIBSection(reinterpret_cast<HDC>(m_memDC), &BI, DIB_RGB_COLORS, (void**)&m_bitmapBits, NULL, 0);
-    //  assert(m_bitmap != 0);
+      m_bitmap = ::CreateDIBSection(reinterpret_cast<HDC>(m_memDC), &BI, DIB_RGB_COLORS, (void**)&m_bitmapBits, NULL, 0);
+      assert(m_bitmap != 0);
 
-    //  // TODO:
-    //  // If there aren't enough memory for executing above function ...
-    //  //
+      // TODO:
+      // If there aren't enough memory for executing above function ...
+      //
 
-    //  return m_bitmap != 0;
-    //}
+      return m_bitmap != 0;
+    }
   };
 }
 

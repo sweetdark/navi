@@ -871,6 +871,10 @@ CViewDC *CViewState::AllocateDC()
       {
         oneDC = new CWinDC(m_mapping.m_scrLayout.m_extent, m_mapping.m_scrLayout.m_bufBase, RGB(107, 107, 107));
       }
+      else if (m_type == VT_Eagle)
+      {
+        oneDC = new CWinDC(m_mapping.m_scrLayout.m_extent, m_mapping.m_scrLayout.m_bufBase, m_canvas.GetBKColor(), true);
+      }
       else
       {
         //

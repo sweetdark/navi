@@ -79,6 +79,8 @@ namespace UeGui
 
     void SwitchInputMethod();
 
+    void SwitchIndexType();
+
     void ClearSelection();
 
   private:

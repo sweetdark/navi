@@ -355,7 +355,6 @@ void UeGui::CAggHook::AddRenderElements(GuiElement* element )
   }  
 }
 
-
 void UeGui::CAggHook::AddRenderUiControls(CUiControl* control) 
 {
 

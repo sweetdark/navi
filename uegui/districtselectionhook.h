@@ -47,8 +47,6 @@ namespace UeGui
       districtselectionhook_GPSAreaBtn,
       districtselectionhook_CountryBtn,
       districtselectionhook_CommonUsebtn,
-      districtselectionhook_Split,
-      districtselectionhook_VSplit,
       districtselectionhook_Area1Btn,
       districtselectionhook_Area2Btn,
       districtselectionhook_Area3Btn,
@@ -67,7 +65,6 @@ namespace UeGui
       districtselectionhook_Area16Btn,
       districtselectionhook_PrevPageBtn,
       districtselectionhook_NextPageBtn,
-      districtselectionhook_vsplit2,
       districtselectionhook_PrePageArrowBtn,
       districtselectionhook_NextPageArrowBtn,
       districtselectionhook_CurrentPageLable,
@@ -187,10 +184,7 @@ namespace UeGui
     CUiButton m_prePageArrowBtnCtrl;
     CUiButton m_prevPageBtnCtrl;
     CUiButton m_searchAreaBtnCtrl;
-    CUiButton m_splitCtrl;
     CUiButton m_totalPageLableCtrl;
-    CUiButton m_vSplitCtrl;
-    CUiButton m_vsplit2Ctrl;
   };
 }
 #endif

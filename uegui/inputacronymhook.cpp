@@ -45,7 +45,7 @@ void CInputAcronymHook::Load()
   CInputSwitchHook *inputHook = (CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook);
   if (inputHook->GetCurInputMethod() != CInputSwitchHook::IM_AcronymMethod)
   {
-    Return();
+    Return(false);
     TurnTo(inputHook->GetCurInputHookType());
     return;
   }
@@ -56,6 +56,10 @@ void CInputAcronymHook::Load()
 
 void CInputAcronymHook::UnLoad()
 {
+  if (CAggHook::GetPrevHookType() == DHT_DistQueryListHook)
+  {
+    return;
+  }
   if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityAcro)
   {
     ::memcpy(m_distKeyWord, m_keyWordBox.GetCaption(), sizeof(m_distKeyWord));
@@ -141,6 +145,9 @@ void CInputAcronymHook::MakeControls()
   m_pWordCursor = GetGuiElement(InputAcronymHook_WordSeparation);
 
   m_distSwitchBtn.SetCaption(CQueryWrapper::Get().GetQueryAdmName());
+
+  m_returnBtn.SetCenterElement(GetGuiElement(MenuBackgroundHook_ReturnBtn));
+  m_returnBtn.SetIconElement(GetGuiElement(MenuBackgroundHook_ReturnBtnIcon));
 }
 
 short CInputAcronymHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -148,6 +155,13 @@ short CInputAcronymHook::MouseDown(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
+  case MenuBackgroundHook_ReturnBtn:
+  case MenuBackgroundHook_ReturnBtnIcon:
+    {
+      m_returnBtn.MouseDown();
+      AddRenderUiControls(&m_returnBtn);
+    }
+    break;
   case InputAcronymHook_DistSwitchBtn:
     {
       m_distSwitchBtn.MouseDown();
@@ -233,6 +247,13 @@ short CInputAcronymHook::MouseUp(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
+  case MenuBackgroundHook_ReturnBtn:
+  case MenuBackgroundHook_ReturnBtnIcon:
+    {
+      m_returnBtn.MouseUp();
+      Return(false);
+    }
+    break;
   case InputAcronymHook_DistSwitchBtn:
     {
       m_distSwitchBtn.MouseUp();
@@ -280,12 +301,14 @@ short CInputAcronymHook::MouseUp(CGeoPoint<short> &scrPoint)
         if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityAcro)
         {
           ::memcpy(m_distKeyWord, m_keyWordBox.GetCaption(), sizeof(m_distKeyWord));
+          CQueryWrapper::Get().SetQueryKeyword(m_distKeyWord);
           CQueryWrapper::Get().SaveCurKeyWord(m_distKeyWord, true);
           CAggHook::TurnTo(DHT_DistQueryListHook);
         }
         else
         {
           ::memcpy(m_poiKeyWord, m_keyWordBox.GetCaption(), sizeof(m_poiKeyWord));
+          CQueryWrapper::Get().SetQueryKeyword(m_poiKeyWord);
           CQueryWrapper::Get().SaveCurKeyWord(m_poiKeyWord, true);
           CAggHook::TurnTo(DHT_PoiQueryListHook);
         }
@@ -538,27 +561,15 @@ void CInputAcronymHook::DoInputSelectCallBack(char *keyword)
 
 void CInputAcronymHook::SetQueryMode()
 {
-  if (CAggHook::GetPrevHookType() == DHT_MapHook)
+  if (CAggHook::GetPrevHookType() == DHT_MapHook || 
+    CAggHook::GetPrevHookType() == DHT_UsuallyHook || 
+    CAggHook::GetPrevHookType() == DHT_AdjustRouteHook)
   {
     CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiAcro);
   }
 
   //根据搜索类型切换界面
   int indexType = CQueryWrapper::Get().GetSQLSentence().m_indexType;
-  //因为其它hook默认选择name, 首字母特殊处理
-  if (indexType == UeQuery::IT_PoiName)
-  {
-    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiAcro);
-  }
-  else if (indexType == UeQuery::IT_RoadName)
-  {
-    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_RoadAcro);
-  }
-  else if (indexType == UeQuery::IT_CityName)
-  {
-    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityAcro);
-  }
-
   if (indexType == UeQuery::IT_PoiAcro || indexType == UeQuery::IT_RoadAcro)
   {
     ResetKeyWord(m_poiKeyWord);

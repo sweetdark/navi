@@ -27,7 +27,7 @@ namespace UeGui
   class CUiControl
   {
   protected:
-    CUiControl() : m_parent(NULL), m_isEnable(true), m_isVisible(true), m_haveFocusKey(false) {}
+    CUiControl() : m_parent(NULL), m_isEnable(true), m_isVisible(true), m_haveFocusKey(false), m_atoRefresh(false) {}
   public:           
     virtual ~CUiControl() {}        
   public:
@@ -37,21 +37,49 @@ namespace UeGui
       m_parent = parent;
     }
     /// 鼠标down事件
-    virtual void MouseDown() = 0;
+    virtual void MouseDown()
+    {
+      if (m_atoRefresh)
+      {
+        if (IsVisible() || IsEnable())
+        {
+          RenderElements();
+        }   
+      }   
+    }
     /// 鼠标up事件
-    virtual void MouseUp() = 0;
+    virtual void MouseUp()
+    {
+      if (m_atoRefresh)
+      {
+        if (IsVisible() || IsEnable())
+        {
+          RenderElements();
+        }   
+      }      
+    }
     /// 鼠标mouve事件4
     virtual void MouseMove() = 0;
     /// 设置控件显示文字
-    virtual void SetCaption(const char* caption) = 0;
+    virtual void SetCaption(const char* caption)
+    {
+      if (m_atoRefresh && caption)
+      {
+        RenderElements();
+      }
+    }
     /// 清空控件显示文字
-    virtual void ClearCaption() = 0;
+    virtual void ClearCaption()
+    {
+      //RenderElements();
+    }
     /// 获取控件上显示的文字
     virtual char* GetCaption() = 0;
     /// 设置控件是否可用
     virtual void SetEnable(bool value)
     {
       m_isEnable = value;
+      //RenderElements();
     }
     /// 设置控件的可见性
     virtual void SetVisible(bool value)
@@ -69,14 +97,43 @@ namespace UeGui
       return m_isVisible;
     }
     //设置需要变色的文字位置信息
-    virtual void SetFocusKey(const unsigned char* fkey) = 0;
+    virtual void SetFocusKey(const unsigned char* fkey)
+    {
+      m_haveFocusKey = true;
+    }
     //清除需要变色的文字位置信息
-    virtual void ClearFocusKey() = 0;
+    virtual void ClearFocusKey()
+    {
+      m_haveFocusKey = false;
+    }
+    //刷新
+    virtual void Refresh()
+    {
+      RenderElements();
+    }
+    //设置是否自动实现局部刷新动作
+    void SetAutoRefresh(bool value)
+    {
+      m_atoRefresh = value;
+    }
+  protected:
+    //渲染控件元素
+    virtual void RenderElements() = 0;
+    //添加要渲染的控件元素
+    void AddRenderElement(GuiElement* element)
+    {
+      if (m_parent && element)
+      {
+        m_parent->AddRenderElements(element);
+      }
+    }
   protected:
     //控件对应的父类
     CAggHook* m_parent;
     //是否需要对文字实行焦点变色
     bool m_haveFocusKey;
+    //是否实现自动刷新
+    bool m_atoRefresh;
   private:
     //是否可用
     bool m_isEnable;

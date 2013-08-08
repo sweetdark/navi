@@ -36,6 +36,10 @@ long CUeGridIndex::GetParcelID(const CGeoPoint<long> &pos)
   int parcelID = 0;
   data = &parcelID;
   int gridOrder = GetGridOrder(gridHeader, pos);
+  if(gridOrder == -1)
+  {
+    return -1;
+  }
   CFileBasic::Get().SeekFile(file, (sizeof(gridHeader) + gridOrder * sizeof(int)), CFileBasic::UE_SEEK_BEGIN);
   CFileBasic::Get().ReadFile(file, (void **)(&data), sizeof(int), count);
   CFileBasic::Get().CloseFile(file);
@@ -78,6 +82,11 @@ bool CUeGridIndex::GetParcelID(const CGeoRect<long> &mbr, CMemVector &ids)
 
 int CUeGridIndex::GetGridOrder(const GridIndexHeader &gridHeader, const CGeoPoint<long> &pos)
 {
+  if(gridHeader.m_gridGapX == 0 || gridHeader.m_gridGapY == 0)
+  {
+    return -1;
+  }
+
   int orderX = (pos.m_x - gridHeader.m_mbr.m_minX) / gridHeader.m_gridGapX;
   int orderY = (pos.m_y - gridHeader.m_mbr.m_minY) / gridHeader.m_gridGapY;
   return orderY * gridHeader.m_gridNumX + orderX;
@@ -85,6 +94,11 @@ int CUeGridIndex::GetGridOrder(const GridIndexHeader &gridHeader, const CGeoPoin
 
 void CUeGridIndex::GetGridOrder(const GridIndexHeader &gridHeader, const CGeoRect<long> &mbr, CMemVector &ids)
 {
+  if(gridHeader.m_gridGapX == 0 || gridHeader.m_gridGapY == 0)
+  {
+    return;
+  }
+
   int minOrderX = (mbr.m_minX - gridHeader.m_mbr.m_minX) / gridHeader.m_gridGapX;
   int minOrderY = (mbr.m_minY - gridHeader.m_mbr.m_minY) / (gridHeader.m_gridGapY + 1/3.);
   int maxOrderX = (mbr.m_maxX - gridHeader.m_mbr.m_minX) / gridHeader.m_gridGapX;

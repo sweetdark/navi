@@ -388,7 +388,7 @@ void CGroundLayer::Draw(short type, const CViewDC *viewDC, CGeoRect<short> &scrE
   
 
   // Current view status
-  m_view->GetScale(m_curLevel, m_curScale);
+  m_view->GetScale(m_curLevel, m_curScale, type);
 
   //
   CGeoRect<long> renderingExtent;

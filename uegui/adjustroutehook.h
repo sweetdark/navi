@@ -113,6 +113,8 @@ namespace UeGui
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
     virtual void Load();
+    //设置调整路线的列表，用于我的行程的进入。
+    void SetPOIDataList(const POIDataList& poiList);
   protected:
 
     virtual void MakeNames();
@@ -123,7 +125,6 @@ namespace UeGui
     void ClearPOIList();
     //添加经由点
     void AddPOIData(const POIItem& poi);
-    void SetPOIDataList(const POIDataList& poiList);
     //添加经由点
     void InsertPOIData(int position, const UeQuery::SQLRecord* data);
     //读取要添加的POI位置,下标从0开始

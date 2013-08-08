@@ -61,7 +61,7 @@ void CInputCharHook::Load()
   CInputSwitchHook *inputHook = (CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook);
   if (inputHook->GetCurInputMethod() != CInputSwitchHook::IM_CharMethod)
   {
-    Return();
+    Return(false);
     TurnTo(inputHook->GetCurInputHookType());
     return;
   }
@@ -73,6 +73,10 @@ void CInputCharHook::Load()
 
 void CInputCharHook::UnLoad()
 {
+  if (CAggHook::GetPrevHookType() == DHT_DistQueryListHook)
+  {
+    return;
+  }
   if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
   {
     ::memcpy(m_distKeyWord, m_keyWordBox.GetCaption(), sizeof(m_distKeyWord));
@@ -187,6 +191,9 @@ void CInputCharHook::MakeControls()
   m_pWordCursor = GetGuiElement(InputCharHook_WordSeparation);
 
   m_distSwitchBtn.SetCaption(CQueryWrapper::Get().GetQueryAdmName());
+
+  m_returnBtn.SetCenterElement(GetGuiElement(MenuBackgroundHook_ReturnBtn));
+  m_returnBtn.SetIconElement(GetGuiElement(MenuBackgroundHook_ReturnBtnIcon));
 }
 
 short CInputCharHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -194,6 +201,13 @@ short CInputCharHook::MouseDown(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
+  case MenuBackgroundHook_ReturnBtn:
+  case MenuBackgroundHook_ReturnBtnIcon:
+    {
+      m_returnBtn.MouseDown();
+      AddRenderUiControls(&m_returnBtn);
+    }
+    break;
   case InputCharHook_DistSwitchBtn:
     {
       m_distSwitchBtn.MouseDown();
@@ -313,6 +327,13 @@ short CInputCharHook::MouseUp(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
+  case MenuBackgroundHook_ReturnBtn:
+  case MenuBackgroundHook_ReturnBtnIcon:
+    {
+      m_returnBtn.MouseUp();
+      Return(false);
+    }
+    break;
   case InputCharHook_DistSwitchBtn:
     {
       m_distSwitchBtn.MouseUp();
@@ -360,12 +381,14 @@ short CInputCharHook::MouseUp(CGeoPoint<short> &scrPoint)
         if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
         {
           ::memcpy(m_distKeyWord, m_keyWordBox.GetCaption(), sizeof(m_distKeyWord));
+          CQueryWrapper::Get().SetQueryKeyword(m_distKeyWord);
           CQueryWrapper::Get().SaveCurKeyWord(m_distKeyWord, false);
           CAggHook::TurnTo(DHT_DistQueryListHook);
         }
         else
         {
           ::memcpy(m_poiKeyWord, m_keyWordBox.GetCaption(), sizeof(m_poiKeyWord));
+          CQueryWrapper::Get().SetQueryKeyword(m_poiKeyWord);
           CQueryWrapper::Get().SaveCurKeyWord(m_poiKeyWord, false);
           CAggHook::TurnTo(DHT_PoiQueryListHook);
         }
@@ -726,7 +749,9 @@ void CInputCharHook::DoInputSelectCallBack(char *keyword)
 
 void CInputCharHook::SetQueryMode()
 {
-  if (CAggHook::GetPrevHookType() == DHT_MapHook)
+  if (CAggHook::GetPrevHookType() == DHT_MapHook || 
+    CAggHook::GetPrevHookType() == DHT_UsuallyHook || 
+    CAggHook::GetPrevHookType() == DHT_AdjustRouteHook)
   {
     CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiName);
   }

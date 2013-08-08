@@ -92,6 +92,8 @@ namespace UeGui
     CUiBitButton m_pageUpBtn;
     CUiBitButton m_pageDownBtn;
 
+    CUiBitButton m_returnBtn;
+
     CUiLabel m_curPageInfo;
     CUiLabel m_totalPageInfo;
 
