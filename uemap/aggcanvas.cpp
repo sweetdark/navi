@@ -7210,7 +7210,6 @@ inline void CAGGCanvas::DoRenderHookTexts(const CGeoRect<short> &scrExtent, cons
     for (const char *pchAsciiStr(oneElement.m_label); *pchAsciiStr; ++pchAsciiStr)
     {
       ++ uAsciiStrLen;
-      //这样判断有误，“\n”会被分割成\ 和n.
       if (*pchAsciiStr=='\n')
       {
         isMulti = true;
@@ -7278,9 +7277,10 @@ inline void CAGGCanvas::DoRenderHookTexts(const CGeoRect<short> &scrExtent, cons
         TCHAR uniText[256] = {};      
         m_stringBasic.Ascii2Chs(oneElement.m_label, uniText, 256);
         const agg::glyph_cache *glyph(m_grayFace.glyph(*uniText));
-        int iWordHeight = glyph->advance_y;
+        int iWordHeight = m_grayFont.height();
+        const int TOP_SPACE = 3;
 
-        unsigned int posY = oneElement.m_extent.m_minY -scrExtent.m_minY;
+        unsigned int posY = oneElement.m_extent.m_minY -scrExtent.m_minY + iWordHeight/2 + TOP_SPACE;
         for (int count = 0; count < token.GetCount(); ++count)
         {
           TCHAR uniText[256] = {};      
@@ -7290,10 +7290,10 @@ inline void CAGGCanvas::DoRenderHookTexts(const CGeoRect<short> &scrExtent, cons
           pos.m_x = oneElement.m_extent.m_minX - scrExtent.m_minX + oneElement.m_extent.Width()/2;
           pos.m_x -= iTextWidth/2;
           
-          posY += iWordHeight;
           pos.m_y = posY;
           pos.m_y += (textProp.m_height + (textProp.m_height << 1)) >> 3;
           TextOutA(uniText, fKey, pos, 0, 0, textProp.m_clr, ftextProp.m_clr, 0, true);
+          posY += iWordHeight;
         }
       }  
     }

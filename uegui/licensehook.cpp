@@ -29,6 +29,7 @@ void UeGui::CLicenseHook::Init()
 //       m_alwaysAcceptBtn.SetCheck(true);
 //     }
 //   }
+  m_alwaysAcceptBtn.SetCaption("测试换行\n我的换行\n换行读取\n文A字");
 }
 
 void UeGui::CLicenseHook::SaveCheckSetting(bool isAlways)
