@@ -1,46 +1,34 @@
 #ifndef _UEGUI_GPSHOOK_H
 #define _UEGUI_GPSHOOK_H
 
-// Refer to EXPORT & IMPORT macro definitions
 #ifndef _UEGUI_BASE_H
 #include "uegui.h"
 #endif
 
-// Refer to its parent
-#ifndef _UEGUI_AGGHOOK_H
-#include "agghook.h"
-#endif
+#include "menubackgroundhook.h"
 
-// Qcode
 #ifndef __Q_CODE_H__
 #include "QCode.h"
 #pragma comment(lib,"QCode.lib")
 #endif
 
+//#include "uilabel.h"
 #include "uibutton.h"
-#include "uilabel.h"
-
-
-// Compiler setting
-#pragma warning( push )
-#pragma warning( disable: 4251 )  // X needs to have dll-interface to be used by clients of class Z
-#pragma warning( disable: 4275 )  // X needs to have dll-interface to be used by clients of class Z
+//#include "uiradiobutton.h"
+//#include "uicheckbutton.h"
 
 namespace UeGui
 {
-  class UEGUI_CLASS CGpsHook : public CAggHook
+  class UEGUI_CLASS CGpsHook : public CMenuBackgroundHook
   {
   public:
     //最大信噪比值
-    static const int kMAXSNR = 99;
+    static const int kMAXSNR = 76;
 
-    enum GpsCtrlType
+    enum GpsHookCtrlType
     {
-      GpsHook_Begin = 0,
+      GpsHook_Begin = MenuBackgroundHook_End,
       GpsHook_Background,
-      GpsHook_Title,
-      GpsHook_GoToMapButton,
-      GpsHook_ReturnButton,
       GpsHook_DateLabel,
       GpsHook_Date,
       GpsHook_WeekLabel,
@@ -55,17 +43,10 @@ namespace UeGui
       GpsHook_ReceivingState,
       GpsHook_SpeedLabel,
       GpsHook_Speed,
-      GpsHook_TravelTimeLabel,
-      GpsHook_TravelTime,
-      GpsHook_RunningDistanceLabel,
-      GpsHook_RunningDistance,
       GpsHook_QCodeLabel,
       GpsHook_QCode,
       GpsHook_EarthMap,
       GpsHook_LocateStatus,
-      GpsHook_MarkCtrlLeft,
-      GpsHook_MarkCtrlCenter,
-      GpsHook_MarkCtrlRight,
       GpsHook_SNROne,
       GpsHook_SNRTwo,
       GpsHook_SNRThree,
@@ -78,18 +59,7 @@ namespace UeGui
       GpsHook_SNRTen,
       GpsHook_SNREleven,
       GpsHook_SNRTwelve,
-      GpsHook_SNROneBack,
-      GpsHook_SNRTwoBack,
-      GpsHook_SNRThreeBack,
-      GpsHook_SNRFourBack,
-      GpsHook_SNRFiveBack,
-      GpsHook_SNRSixBack,
-      GpsHook_SNRSevenBack,
-      GpsHook_SNREightBack,
-      GpsHook_SNRNineBack,
-      GpsHook_SNRTenBack,
-      GpsHook_SNRElevenBack,
-      GpsHook_SNRTwelveBack,
+      GpsHook_SNRBack,
       GpsHook_Point1,
       GpsHook_Point2,
       GpsHook_Point3,
@@ -109,35 +79,19 @@ namespace UeGui
 
     virtual ~CGpsHook();
 
-    virtual void MakeGUI();
-
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
     virtual short MouseMove(CGeoPoint<short> &scrPoint);
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual bool operator ()();
-
     virtual void Load();
 
     void Update();
 
-
-  public:
     void Gps2Scr(short elevation, short azimuth, CGeoPoint<int> &scrPt);
 
     short Elv2Rad(short elevation);
-
-  protected:
-
-    virtual tstring GetBinaryFileName();
-
-    virtual void MakeNames();
-
-    void MakeControls();
-
-  public:
     /**
     * \brief 设置当前定位个数
     **/
@@ -147,6 +101,12 @@ namespace UeGui
     * \brief 设置地图界面操作类型
     **/
     int GetCurLocationNum();
+
+  protected:
+
+    virtual void MakeNames();
+
+    void MakeControls();
 
   private:
     /**
@@ -187,11 +147,8 @@ namespace UeGui
     * 仅更新定位卫星个数
     */
     void UpdateLocationSatelliteNum();
+
   private:
-    //打开地图
-    CUiButton m_goToMapButtonCtrl;
-    //返回
-    CUiButton m_returnButtonCtrl;
     //日期
     CUiLabel m_dateCtrl;
     //星期
@@ -206,10 +163,6 @@ namespace UeGui
     CUiButton m_receivingStateCtrl;
     //瞬时速度
     CUiLabel m_speedCtrl;
-    //行驶时间
-    CUiLabel m_travelTimeCtrl;
-    //行驶距离
-    CUiLabel m_runningDistanceCtrl;
     //Q码
     CUiLabel m_qCodeCtrl;
     //定位状态
@@ -217,30 +170,8 @@ namespace UeGui
     //记录信号
     CUiButton m_markCtrl;
     //卫星信号强度
-    CUiButton m_sNROneCtrl;
-    CUiButton m_sNRTwoCtrl;
-    CUiButton m_sNRThreeCtrl;
-    CUiButton m_sNRFourCtrl;
-    CUiButton m_sNRFiveCtrl;
-    CUiButton m_sNRSixCtrl;
-    CUiButton m_sNRSevenCtrl;
-    CUiButton m_sNREightCtrl;
-    CUiButton m_sNRNineCtrl;
-    CUiButton m_sNRTenCtrl;
-    CUiButton m_sNRElevenCtrl;
-    CUiButton m_sNRTwelveCtrl;
-    CUiButton m_point1;
-    CUiButton m_point2;
-    CUiButton m_point3;
-    CUiButton m_point4;
-    CUiButton m_point5;
-    CUiButton m_point6;
-    CUiButton m_point7;
-    CUiButton m_point8;
-    CUiButton m_point9;
-    CUiButton m_point10;
-    CUiButton m_point11;
-    CUiButton m_point12;
+    CUiButton m_sNRCtrl[12];
+    CUiButton m_point[12];
   private:        
     //当前卫星的个数
     int m_curLocationNum;

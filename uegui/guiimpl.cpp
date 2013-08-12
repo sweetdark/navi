@@ -29,7 +29,7 @@
 //#include "messagehook.h"
 #include "maphook.h"
 //#include "favorhook.h"
-//#include "gpshook.h"
+#include "gpshook.h"
 //#include "settinghook.h"
 #include "mapsettinghook.h"
 //#include "querysettinghook.h"
@@ -59,7 +59,7 @@
 #include "mapnavigationhook.h"
 #include "basicfunctionhook.h"
 #include "ddtservicehelphook.h"
-//#include "ddtservicequeryhook.h"
+#include "ddtservicequeryhook.h"
 #include "ddtservicequerylisthook.h"
 #include "fasthandlehelphook.h"
 #include "Demonstration3Dhook.h"
@@ -109,6 +109,10 @@
 #include "editcharhook.h"
 #include "edithandhook.h"
 #include "editswitchhook.h"
+#include "roundtypeselecthook.h"
+#include "roundradiusselecthook.h"
+#include "itemselecthook.h"
+#include "distselecthook.h"
 
 #if __FOR_FPC__
 #include "caphook.h"
@@ -143,6 +147,10 @@ using namespace UeQuery;
 #include "userdatawrapper.h"
 #include "routewrapper.h"
 
+#include "functionupdatehook.h"
+#include "versioncheckhook.h"
+#include "updateservicehook.h"
+#include "ddtservicehook.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //
@@ -203,7 +211,7 @@ void CGuiImpl::Update(short type, void *para)
     break;
   case CViewHook::UHT_UpdateGPSHook:
     {
-      //((CGpsHook*)(m_view->GetHook(CViewHook::DHT_GPSHook)))->Update();
+      ((CGpsHook*)(m_view->GetHook(CViewHook::DHT_GPSHook)))->Update();
     }
     break;
   case CViewHook::UHT_UpdateKeyboardHook:
@@ -477,10 +485,10 @@ void CGuiImpl::MakeHooks()
   view->UpdateProgress();
 
   //卫星界面
-  //viewHook = new CGpsHook();
-  //viewHook->SetHelpers(net, view, route, gps, query);
-  //viewHook->LoadGUI();  
-  //view->AddHook(CViewHook::DHT_GPSHook, viewHook);
+  viewHook = new CGpsHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();  
+  view->AddHook(CViewHook::DHT_GPSHook, viewHook);
 
   ////旧Hook需要移除掉
   //viewHook = new CSettingHook();
@@ -632,6 +640,12 @@ void CGuiImpl::MakeHooks()
   viewHook->SetHelpers(net, view, route, gps, query);
   viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_DdtServiceQueryListHook, viewHook);
+
+  //景点查询
+  viewHook = new CDdtServiceQueryHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_DdtServiceQueryHook, viewHook);
 
   //通用对话框
   viewHook = new CMessageDialogHook();
@@ -789,6 +803,24 @@ void CGuiImpl::MakeHooks()
   //viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_TypeNoDistQueryListHook,viewHook);
 
+  viewHook = new CRoundTypeSelectHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  //切换界面时再动态加载
+  //viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_RoundTypeSelectHook,viewHook);
+
+  viewHook = new CRoundRadiusSelectHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  //切换界面时再动态加载
+  //viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_RoundRadiusSelectHook,viewHook);
+
+  viewHook = new CDistSelectHook();
+  viewHook->SetHelpers(net,view,route,gps,query);
+  //切换界面时再动态加载
+  //viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_DistSelectHook,viewHook);
+
   //地址簿
   viewHook = new CMyAddressBookHook();
   viewHook->SetHelpers(net,view,route,gps,query);
@@ -869,11 +901,41 @@ void CGuiImpl::MakeHooks()
   viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_RestoreDefaultshook, viewHook);
 
+  //功能-服务界面
+  viewHook = new CDdtServiceHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();  
+  view->AddHook(CViewHook::DHT_DdtserviceHook, viewHook);
+
+  //服务-增量更新界面
+  viewHook = new CFunctionUpdateHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();  
+  view->AddHook(CViewHook::DHT_FunctionUpdateHook, viewHook);
+
+  //服务-升级服务界面
+  viewHook = new CUpdateServiceHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();  
+  view->AddHook(CViewHook::DHT_UpdateServiceHook, viewHook);
+
+  //服务-正版验证界面
+  viewHook = new CVersionCheckHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();  
+  view->AddHook(CViewHook::DHT_VersionCheckHook, viewHook);
+
   //声音设置界面
   viewHook = new CSoundMenuHook();
   viewHook->SetHelpers(net, view, route, gps, query);
   viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_SoundMenuHook, viewHook);
+  
+  //通用类型选择界面
+  viewHook = new CItemSelectHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_ItemSelectHook, viewHook);
 
 #if __FOR_TRUCK__
   //货车导航

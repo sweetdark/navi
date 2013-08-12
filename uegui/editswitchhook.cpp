@@ -67,10 +67,16 @@ void CEditSwitchHook::Load()
   }
 }
 
-void CEditSwitchHook::SetEditCallBackFun(void *pDoCallBackObj, EditCallBack pCallBackEvent)
+void CEditSwitchHook::SetEditCallBackFun(void *pDoCallBackObj, const char *title, const char *keyword, EditCallBack pCallBackEvent)
 {
   m_callBackObject = pDoCallBackObj;
   m_editCallBack = pCallBackEvent;
+  ((CEditSpellingHook *)m_view->GetHook(DHT_EditSpellingHook))->SetKeyWord(keyword);
+  ((CEditSpellingHook *)m_view->GetHook(DHT_EditSpellingHook))->SetTitle(title);
+  ((CEditCharHook *)m_view->GetHook(DHT_EditCharHook))->SetKeyWord(keyword);
+  ((CEditCharHook *)m_view->GetHook(DHT_EditCharHook))->SetTitle(title);
+  ((CEditHandHook *)m_view->GetHook(DHT_EditHandHook))->SetKeyWord(keyword);
+  ((CEditHandHook *)m_view->GetHook(DHT_EditHandHook))->SetTitle(title);
 }
 
 void CEditSwitchHook::MakeNames()

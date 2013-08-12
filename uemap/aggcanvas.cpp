@@ -104,10 +104,11 @@ short CAGGCanvas::m_textTypes = 0;
 
 // Note:
 // The order of below variables' initialization
-CAGGCanvas::font_engine_type CAGGCanvas::m_lineFont;
-CAGGCanvas::font_manager_type CAGGCanvas::m_lineFace(m_lineFont);
-CAGGCanvas::font_engine_type CAGGCanvas::m_grayFont;
-CAGGCanvas::font_manager_type CAGGCanvas::m_grayFace(m_grayFont);
+// TODO: Extract font manage class.
+//CAGGCanvas::font_engine_type CAGGCanvas::m_lineFont;
+//CAGGCanvas::font_manager_type CAGGCanvas::m_lineFace(m_lineFont);
+//CAGGCanvas::font_engine_type CAGGCanvas::m_grayFont;
+//CAGGCanvas::font_manager_type CAGGCanvas::m_grayFace(m_grayFont);
 
 // For dynamically rendering
 short CAGGCanvas::m_dynRadius = 3;
@@ -142,12 +143,7 @@ GuidanceCar CAGGCanvas::m_gpsCar;
 /**
 *
 **/
-CAGGCanvas::CAGGCanvas() 
-#if __FOR_PC__
-#if __FOR_PC_VEDIO__
-: m_pGB(0), m_pMC(0), m_pME(0), m_pVW(0), m_pBA(0), m_pBV(0), m_pMS(0), m_pMP(0), m_pFS(0)
-#endif
-#endif
+CAGGCanvas::CAGGCanvas() : m_lineFont(), m_lineFace(m_lineFont), m_grayFont(), m_grayFace(m_grayFont)
 {
   m_roadNameTable = IRoadNetwork::GetNetwork()->GetNameTable(UeModel::UNT_Network);
   m_poiNameTable = IRoadNetwork::GetNetwork()->GetNameTable(UeModel::UNT_POI);
@@ -3278,7 +3274,7 @@ inline void CAGGCanvas::RenderAfnPolygons(short scaleLevel, bool isRaster)
       m_scanRas.add_path(onePath.m_path);
       unsigned int clr = (onePath.m_clrFill.r << 16) | (onePath.m_clrFill.g << 8) | (onePath.m_clrFill.b);
 
-      if(isRaster)
+      if(scaleLevel > 7 || isRaster)
       {
         m_renderBin->color(agg::rgb8_packed(clr));
         agg::render_scanlines(m_scanRas, m_binSL, *m_renderBin);
@@ -4255,7 +4251,7 @@ inline void CAGGCanvas::RenderPspRouteLine(AGGPath &onePath, short scaleLevel, b
     agg::conv_transform<agg::path_storage, agg::trans_perspective> fillPsp(onePath.m_path, CAGGView::m_mtxPsp);
     agg::conv_stroke<agg::conv_transform<agg::path_storage, agg::trans_perspective> > strokeLine(fillPsp);
     strokeLine.miter_limit(0.5);
-    if(scaleLevel < 3)
+    //if(scaleLevel < 3)
     {
       strokeLine.line_cap(agg::round_cap);
     }
@@ -4363,7 +4359,7 @@ inline void CAGGCanvas::RenderPspNormalLine(AGGPath &onePath, short scaleLevel, 
     agg::conv_stroke<agg::path_storage> strokePath(onePath.m_path);
     strokePath.miter_limit(1.3);
     strokePath.width(lineWidth);
-    if(scaleLevel < 3)
+    //if(scaleLevel < 3)
     {
       strokePath.line_cap(agg::round_cap);
     }
@@ -4457,7 +4453,7 @@ inline void CAGGCanvas::RenderAfnRouteLine(AGGPath &onePath, short scaleLevel, b
 
     //
     agg::conv_stroke<agg::path_storage> strokeLine(onePath.m_path);
-    if(scaleLevel < 3)
+    //if(scaleLevel < 3)
     {
       strokeLine.miter_limit(0.5);
       strokeLine.line_cap(agg::round_cap);
@@ -4609,7 +4605,7 @@ inline void CAGGCanvas::RenderAfnNormalLine(AGGPath &onePath, short scaleLevel, 
     //
     agg::conv_stroke<agg::path_storage> strokeLine(onePath.m_path);
     strokeLine.miter_limit(1.3);
-    if(scaleLevel < 3)
+    //if(scaleLevel < 3)
     {
       //strokeLine.inner_join(inner_round);
       //strokeLine.line_join(round_join);
@@ -4927,7 +4923,7 @@ inline void CAGGCanvas::RenderGuidanceLines(short scaleLevel, bool isRaster)
     {
       //
       agg::conv_stroke<agg::path_storage> strokeLine(onePath.m_path);
-      if(scaleLevel < 3)
+      //if(scaleLevel < 3)
       {
         strokeLine.miter_limit(0.5);
         strokeLine.line_cap(agg::round_cap);
@@ -7085,7 +7081,9 @@ inline void CAGGCanvas::DoRenderHookBtns(const CGeoRect<short> &scrExtent, const
     rRect.normalize_radius();
 
     // Whether need to render itself if there are picture buttons
-    if(oneElement.m_backStyle <= 0)
+    //ÅäÖÃÁË±ß¿òµÄÔò²»Ìî³äÑÕÉ«£¬Ö»»­±ß¿ò¡£
+    //TODO: add m_blttype to configure elements's alpha
+    if(oneElement.m_backStyle <= 0 && oneElement.m_borderStyle <= 0)
     {
       m_scanRas.reset();
       agg::path_storage onePath;

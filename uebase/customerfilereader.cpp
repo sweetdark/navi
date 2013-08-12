@@ -74,6 +74,10 @@ const char* UeBase::CCustomerFileReader::GetBlockData( const unsigned int dataIn
 
 bool UeBase::CCustomerFileReader::AddBlockData( const char* blockData, int whence )
 { 
+  if (NULL == blockData)
+  {
+    return false;
+  }
   bool connected(m_connected);
   if (m_connected)
   {
@@ -140,6 +144,96 @@ bool UeBase::CCustomerFileReader::AddBlockData( const char* blockData, int whenc
     m_fileBasic.WriteFile(fileHandle, blockData, m_blockSize, count);
   }
 
+  m_fileBasic.CloseFile(fileHandle);
+
+  if (connected)
+  {
+    ConnectFile();
+  }
+  return true;
+}
+
+bool UeBase::CCustomerFileReader::AddBlockDatas( unsigned int dataIndex, const char* blockData, int addCount )
+{
+  //注意：本函数是将数据添加到指定索引开始，会覆盖当前指定索引数据
+  if (NULL == blockData)
+  {
+    return false;
+  }
+  bool connected(m_connected);
+  if (m_connected)
+  {
+    DisconnectFile();
+  }
+
+  void *fileHandle = NULL;
+  if(m_pathBasic.IsFileExist(m_fileName))
+  {
+    fileHandle = m_fileBasic.OpenFile(m_fileName, CFileBasic::UE_FILE_ALL);
+  }
+  else
+  {
+    fileHandle = m_fileBasic.OpenFile(m_fileName, CFileBasic::UE_FILE_WRITE);
+  }
+
+  if(!m_fileBasic.IsValidHandle(fileHandle))
+  {
+    m_fileBasic.CloseFile(fileHandle);
+    return false;
+  }
+
+  int count = 1;
+  // 文件的前4个字节是文件的大小
+  void* dataCount = &m_dataCount;
+  m_fileBasic.SeekFile(fileHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+  m_fileBasic.ReadFile(fileHandle, &dataCount, sizeof(size_t), count);
+
+  // 修改写在头文件的数据大小  
+  m_dataCount += addCount;
+  m_fileBasic.SeekFile(fileHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+  m_fileBasic.WriteFile(fileHandle, &m_dataCount, sizeof(int), count);
+
+  if (dataIndex >= (m_dataCount - 1))
+  {
+    //写入文件结尾
+    m_fileBasic.SeekFile(fileHandle, GetPosition(m_dataCount - 1), CFileBasic::UE_SEEK_BEGIN);
+    m_fileBasic.WriteFile(fileHandle, blockData, m_blockSize * addCount, count);
+  }
+  else
+  {
+    //如果数据添加到文件头部(注意：由于新增数据后数据条数m_dataCount提前加1，所以文件中当前的实际数据是m_dataCount-1)
+    if (addCount > 0)
+    {
+      //要移动的数据大小
+      char* tempBuf = NULL;
+      unsigned int moveCount = m_dataCount - dataIndex;
+      unsigned int moveDataSize = moveCount * m_blockSize;
+      if (moveDataSize > 0)
+      {
+        //申请一个临时内存用来移动数据时使用
+        tempBuf = new char[moveDataSize];
+        ::memset(tempBuf, 0, m_blockSize);
+        void* bufPtr = (void*)tempBuf;
+        m_fileBasic.SeekFile(fileHandle, GetPosition(dataIndex), CFileBasic::UE_SEEK_BEGIN);
+        m_fileBasic.ReadFile(fileHandle, &bufPtr, moveDataSize, count);
+      }
+      //写人新增数据
+      m_fileBasic.SeekFile(fileHandle, GetPosition(dataIndex), CFileBasic::UE_SEEK_BEGIN);
+      m_fileBasic.WriteFile(fileHandle, blockData, m_blockSize * addCount, count);
+      if (moveDataSize > 0)
+      {
+        //写入旧数据
+        m_fileBasic.SeekFile(fileHandle, GetPosition(dataIndex + 1 + addCount), CFileBasic::UE_SEEK_BEGIN);
+        m_fileBasic.WriteFile(fileHandle, blockData, moveDataSize, count);
+      }
+      //释放缓存
+      if (tempBuf)
+      {
+        delete []tempBuf;
+        tempBuf = NULL;
+      }
+    }
+  }
   m_fileBasic.CloseFile(fileHandle);
 
   if (connected)
@@ -301,7 +395,14 @@ unsigned int UeBase::CCustomerFileReader::GetPosition( const unsigned int dataIn
 {  
   if (m_dataCount > 0)
   {
-    return sizeof(int) + dataIndex * m_blockSize;
+    if (dataIndex > m_dataCount - 1)
+    {
+      return sizeof(int) + m_dataCount * m_blockSize;
+    }
+    else
+    {
+      return sizeof(int) + dataIndex * m_blockSize;
+    }    
   }
   else
   {

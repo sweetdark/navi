@@ -12,7 +12,11 @@
 
 #include "inputselecthook.h"
 
+#include "distselecthook.h"
+
 #include "districtselectionhook.h"
+
+#include "selectpointcallbackctrl.h"
 
 using namespace UeGui;
 
@@ -269,6 +273,12 @@ short CInputAcronymHook::MouseUp(CGeoPoint<short> &scrPoint)
   case InputAcronymHook_DistSelectBtnIcon:
     {
       m_distSelectBtn.MouseUp();
+      CDistSelectHook* hook = (CDistSelectHook*)m_view->GetHook(DHT_DistSelectHook);
+      if (hook)
+      {
+        hook->SetCallBackFun(this, DistSwitchCallBack);
+      }
+      TurnTo(DHT_DistSelectHook);
     }
     break;
   case InputAcronymHook_EditSelectBtn:
@@ -561,11 +571,19 @@ void CInputAcronymHook::DoInputSelectCallBack(char *keyword)
 
 void CInputAcronymHook::SetQueryMode()
 {
-  if (CAggHook::GetPrevHookType() == DHT_MapHook || 
-    CAggHook::GetPrevHookType() == DHT_UsuallyHook || 
+  //目前搜索入口有三个, 根据入口的界面设置是否有回调函数
+  if (CAggHook::GetPrevHookType() == DHT_MapHook)
+  {
+    CQueryWrapper::Get().ClearVecSQLSentence();
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiAcro);
+    CSelectPointCallBackCtrl::Get().SetIsCallBackFunExist(false);
+  }
+  else if (CAggHook::GetPrevHookType() == DHT_UsuallyHook || 
     CAggHook::GetPrevHookType() == DHT_AdjustRouteHook)
   {
+    CQueryWrapper::Get().ClearVecSQLSentence();
     CQueryWrapper::Get().SetQueryMode(UeQuery::IT_PoiAcro);
+    CSelectPointCallBackCtrl::Get().SetIsCallBackFunExist(true);
   }
 
   //根据搜索类型切换界面

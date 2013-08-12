@@ -71,8 +71,9 @@ namespace UeGui
 
     virtual void Load();
 
-    //保存行程数据
-    void SaveJourneyData(const char* journeyName);
+    //保存行程数据的回调函数
+    static void SaveJourneyData(void *pDoCallBackObj, const char* journeyName);
+    void DoSaveJourneyData(const char* journeyName);
     //设置路线类型，这个类型不只包括高速优先，推荐，最短，还包括规避类型
     void SetRouteType(unsigned int routeType);
 

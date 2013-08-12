@@ -30,11 +30,15 @@
 using namespace UeBase;
 ////////////////////////////////////////////////////////////////////////////////
 // Singleton
-//
+CMathBasic *CMathBasic::m_mathBasic = 0;
 const CMathBasic &CMathBasic::Get()
 {
-  static CMathBasic m_mathBasic;
-  return m_mathBasic;
+  if(!m_mathBasic)
+  {
+    // TODO:...
+    m_mathBasic = new CMathBasic();
+  }
+  return *m_mathBasic;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

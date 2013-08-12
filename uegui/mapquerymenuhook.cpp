@@ -227,7 +227,7 @@ void UeGui::CMapQueryMenuHook::ExpandMenu( bool bExpand /*= true*/ )
         mapHook->ShowAddElecEyeBtn(true);
         mapHook->ShowMapAzimuthBtn(true);
         mapHook->ShowMapScalingBtn(true);
-        mapHook->ShowSetDestPointBtn(false);   
+        mapHook->ShowSetDestPointBtn(true);   
         mapHook->ShowFixedPostionBtn(true);
         mapHook->ShowDetailBtn1(false);
         mapHook->ShowDetailBtn2(true);
@@ -456,7 +456,9 @@ short CMapQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
         mapHook->Select();
+        mapHook->ReturnToPrevGUI();
       }
+      Return(false);
     }
     break;
   default:

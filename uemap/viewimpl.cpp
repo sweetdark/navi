@@ -35,12 +35,9 @@
 #include "networklayer.h"
 #include "pancommand.h"
 #include "viewhook.h"
-#include "planlog.h"
-#include "historyplanlayer.h"
 #include "timercommand.h"
 
 // For UeTool PC version
-#include "shplayer.h"
 #include "indexlayer.h"
 #include "aggcanvas.h"
 
@@ -1722,24 +1719,6 @@ bool CViewImpl::LoadMap(unsigned long schema, const tstring &file, short scaleLe
           AddLayer(m_views[0]->m_scales[i], planLayer);
           garbage->RegisterConsumer(CMemoryConsumer::CT_PlanLayer, planLayer);
         }
-
-#if __FOR_PC__
-        //
-        CViewLayer *planLogLayer = new CPlanLogLayer(m_views[0]->m_scales[i], this);
-        if(planLogLayer)
-        {
-          AddLayer(m_views[0]->m_scales[i], planLogLayer);
-          garbage->RegisterConsumer(CMemoryConsumer::CT_PlanLayer, planLogLayer);
-        }
-
-        //
-        CViewLayer *histPlanLayer = new CHistoryPlanLayer(m_views[0]->m_scales[i], this);
-        if(histPlanLayer)
-        {
-          AddLayer(m_views[0]->m_scales[i], histPlanLayer);
-          garbage->RegisterConsumer(CMemoryConsumer::CT_PlanLayer, histPlanLayer);
-        }
-#endif
       }
     }
 
@@ -2729,53 +2708,53 @@ bool CViewImpl::LoadIndexLayer(const tstring &file, short scaleLevel, double ang
 **/
 bool CViewImpl::LoadShapeLayer(const tstring &file, short scaleLevel, double angle)
 {
-  // Those layers should be one kind of memory consumer
-  CMemoryGarbage *garbage = IView::GetView()->GetGarbage();
-  assert(garbage);
+  //// Those layers should be one kind of memory consumer
+  //CMemoryGarbage *garbage = IView::GetView()->GetGarbage();
+  //assert(garbage);
 
-  // Exception
-  if(file.empty())
-  {
-    return false;
-  }
+  //// Exception
+  //if(file.empty())
+  //{
+  //  return false;
+  //}
 
-  //
-  int i = 0;
-  int size = static_cast<int>(m_views[0]->m_scales.size());
-  for(; i < size; i++)
-  {
-    int scale = m_views[0]->m_scales[i];
-    LayerVector &oneLayer = m_layers[scale];
+  ////
+  //int i = 0;
+  //int size = static_cast<int>(m_views[0]->m_scales.size());
+  //for(; i < size; i++)
+  //{
+  //  int scale = m_views[0]->m_scales[i];
+  //  LayerVector &oneLayer = m_layers[scale];
 
-    bool isLoaded = false;
-    int j = 0;
-    int layers = static_cast<int>(oneLayer.size());
-    for(; j < layers; j++)
-    {
-      if(oneLayer[j]->m_layerName == file)
-      {
-        isLoaded = true;
-        break;
-      }
-    }
+  //  bool isLoaded = false;
+  //  int j = 0;
+  //  int layers = static_cast<int>(oneLayer.size());
+  //  for(; j < layers; j++)
+  //  {
+  //    if(oneLayer[j]->m_layerName == file)
+  //    {
+  //      isLoaded = true;
+  //      break;
+  //    }
+  //  }
 
-    // Whether already exist
-    if(!isLoaded)
-    {
-      CShpLayer *shpLayer = new CShpLayer(i, m_views[0]->m_scales[i], this, file);
-      assert(shpLayer);
+  //  // Whether already exist
+  //  if(!isLoaded)
+  //  {
+  //    CShpLayer *shpLayer = new CShpLayer(i, m_views[0]->m_scales[i], this, file);
+  //    assert(shpLayer);
 
-      if(shpLayer->Prepare())
-      {
-        AddLayer(scale, shpLayer);
-        garbage->RegisterConsumer(CMemoryConsumer::CT_ShapeLayer, shpLayer);
-      }
-      else
-      {
-        delete shpLayer;
-      }
-    }
-  }
+  //    if(shpLayer->Prepare())
+  //    {
+  //      AddLayer(scale, shpLayer);
+  //      garbage->RegisterConsumer(CMemoryConsumer::CT_ShapeLayer, shpLayer);
+  //    }
+  //    else
+  //    {
+  //      delete shpLayer;
+  //    }
+  //  }
+  //}
 
   //// The first time to show map
   //short curLevel = (m_views[0]->m_curScaleLevel) ? m_views[0]->m_curScaleLevel : scaleLevel;

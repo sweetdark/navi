@@ -620,8 +620,31 @@ void CDistrictSelectionHook::OnClickGpsCityBtn()
   SQLRecord record;
   record.m_addrCode = m_gpsHighCodeEntry.m_uCode;
   record.m_asciiName = m_gpsHighCodeEntry.m_chName;
-  m_queryCallBack(m_callBackObject, &record);
-  Return();
+  const TCodeEntry *item = CCodeIndexCtrl::GetDistCodeCtrl().GetItemByCode(record.m_addrCode);
+  TCodeEntry tempItem;
+  ::memcpy(&tempItem, item, sizeof(TCodeEntry));
+  if (!(record.m_addrCode&0x00ffff))
+  {
+    m_itemLevel = SECONDE_LEVEL;
+    m_preCode = item->m_uCode;
+    m_pCurItemCtrl->GetLeve2Item(m_preCode,m_vecListItem);
+    if (m_vecListItem.size() == 0 && m_itemLevel < LAST_LEVEL)
+    {
+      ++ m_itemLevel;
+      GetLevelItem();
+    }
+    UpdatePageController();
+    ShowAreaList();
+  }
+  else
+  {
+    SQLRecord record;
+    record.m_addrCode = item->m_uCode;
+    record.m_asciiName = tempItem.m_chName;
+    m_queryCallBack(m_callBackObject, &record);
+    CCodeIndexCtrl::GetDistCodeCtrl().AddComItem(item->m_uCode);
+    Return();
+  }
 }
 
 void CDistrictSelectionHook::OnClickGpsAreaBtn()
@@ -629,6 +652,7 @@ void CDistrictSelectionHook::OnClickGpsAreaBtn()
   SQLRecord record;
   record.m_addrCode = m_gpsLowCodeEntry.m_uCode;
   record.m_asciiName = m_gpsLowCodeEntry.m_chName;
+  m_pCurItemCtrl->AddComItem(record.m_addrCode);
   m_queryCallBack(m_callBackObject, &record);
   Return();
 }
@@ -663,6 +687,12 @@ void CDistrictSelectionHook::DistQueryListCallBack(SQLRecord *sqlRecord)
     m_itemLevel = SECONDE_LEVEL;
     m_preCode = item->m_uCode;
     m_pCurItemCtrl->GetLeve2Item(m_preCode,m_vecListItem);
+    if (m_vecListItem.size() == 0 && m_itemLevel < LAST_LEVEL)
+    {
+      ++ m_itemLevel;
+      GetLevelItem();
+    }
+    UpdatePageController();
     ShowAreaList();
   }
   else

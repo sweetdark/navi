@@ -30,11 +30,16 @@ using namespace UeBase;
 
 //////////////////////////////////////////////////////////////////////////////////
 // Singleton
-//
+CStringMatch *CStringMatch::m_match = 0;
 CStringMatch &CStringMatch::Get()
 {
-  static CStringMatch m_match;
-  return m_match;
+  if(!m_match)
+  {
+    // TODO:...
+    m_match = new CStringMatch();
+  }
+
+  return *m_match;
 }
 
 //////////////////////////////////////////////////////////////////////////////////

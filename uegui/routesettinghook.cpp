@@ -1,6 +1,7 @@
 #include "routesettinghook.h"
 //#include "guisetting.h"
 #include "settingwrapper.h"
+#include "uebase/uesettings.h"
 
 using namespace UeGui;
 
@@ -238,143 +239,92 @@ bool CRouteSettingHook::operator ()()
 
 void CRouteSettingHook::SaveSetting()
 {
-  unsigned int planMethod = 0;
-  unsigned int methodForSetting = 0;
-
-  planMethod |= UeModel::VT_Car;
-  methodForSetting |= UeBase::RouteSettings::VT_Car;
-
-  UeBase::RouteSettings::RouteWay methodType;
-
-  if (m_optimumCtrl.Checked())
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+  unsigned char routetype = 0;
+  if (m_shortestCtrl.Checked())
   {
-    planMethod |= UeRoute::RW_Optimal;
-    methodForSetting |= UeBase::RouteSettings::RW_Optimal;
-    methodType = RouteSettings::RW_Optimal;    
-  } 
-  else if (m_shortestCtrl.Checked())
+    routetype |= RouteSettings::RouteWay::RW_Short;
+    //settingWrapper.SetRouteType(RouteWay::RW_Short);
+  }
+  else if (m_economyCtrl.Checked())
   {
-    planMethod |= UeRoute::RW_Short;
-    methodForSetting |= UeBase::RouteSettings::RW_Short;
-    methodType = RouteSettings::RW_Short;
-  } 
+    routetype |= RouteSettings::RouteWay::RW_Economic;
+    //settingWrapper.SetRouteType(RouteWay::RW_Economic);
+  }
+  else if (m_optimumCtrl.Checked())
+  {
+    routetype |= RouteSettings::RouteWay::RW_Optimal;
+    //settingWrapper.SetRouteType(RouteWay::RW_Optimal);
+  }
   else if (m_highwayCtrl.Checked())
   {
-    planMethod |= UeRoute::RW_Fast;
-    methodForSetting |= UeBase::RouteSettings::RW_Fast;
-    methodType = RouteSettings::RW_Fast;
+    routetype |= RouteSettings::RouteWay::RW_Fast;
+    //settingWrapper.SetRouteType(RouteWay::RW_Fast);
   }
-  else
-  {
-    planMethod |= UeRoute::RW_Economic;
-    methodForSetting |= UeBase::RouteSettings::RW_Economic;
-    methodType = RouteSettings::RW_Economic;
-  }
-  
-  planMethod |= UeRoute::RA_None;
-  methodForSetting |= UeBase::RouteSettings::RA_None;
-  if (m_avoidHighwayCtrl.Checked())
-  {
-    planMethod |= UeRoute::RA_HighWay;
-    methodForSetting |= UeBase::RouteSettings::RA_HighWay;
+  settingWrapper.SetRouteType(routetype);
+
+  unsigned int planMethod = 0;
+  if (m_avoidHighwayCtrl.IsEnable() && m_avoidHighwayCtrl.Checked())
+  {    
+    planMethod |= RouteSettings::RouteAvoidance::RA_HighWay;
   }
   if (m_avoidBoatCtrl.Checked())
   {
-    planMethod |= UeRoute::RA_Ferry;
-    methodForSetting |= UeBase::RouteSettings::RA_Ferry;
+    planMethod |= RouteSettings::RouteAvoidance::RA_Ferry;
   }
-  CSettingWrapper& settingWrapper = CSettingWrapper::Get();
-  settingWrapper.SetAvoidRoute(methodForSetting);
-  settingWrapper.SetRouteType(methodType);
+  settingWrapper.SetAvoidRoute(planMethod);
   settingWrapper.SaveAllSettings();
 }
 
 void CRouteSettingHook::ReadSetting()
 {
-	//
-  CUeSettingsIO settingIO;
-  void *ptr = &m_settings;
-  int count = 1;
-  settingIO.GetSettings(CUeSettingsIO::ST_Route, &ptr, count);
-  unsigned int planMethod = 0;
-  //
-  if(m_settings.m_vehicleType == 0)
-  {
-    planMethod |= UeModel::VT_Car;
-  }
-  else if(m_settings.m_vehicleType == 1)
-  {
-    planMethod |= UeModel::VT_Truck;
-  }
-  //
-  if(m_settings.m_methodType == UeBase::RouteSettings::RW_Optimal)
-  {
-    m_optimumCtrl.SetCheck(true);
-    m_economyCtrl.SetCheck(false);
-    m_highwayCtrl.SetCheck(false);
-    m_shortestCtrl.SetCheck(false);
-    
-    planMethod |= UeRoute::RW_Optimal;
-  }
-  else if(m_settings.m_methodType == UeBase::RouteSettings::RW_Short)
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+  unsigned char routeType = settingWrapper.GetRouteType();
+  if (routeType & RouteSettings::RouteWay::RW_Short)
   {
     m_optimumCtrl.SetCheck(false);
     m_shortestCtrl.SetCheck(true);
     m_highwayCtrl.SetCheck(false);
     m_economyCtrl.SetCheck(false);
-
-    planMethod |= UeRoute::RW_Short;
   }
-  else if(m_settings.m_methodType == UeBase::RouteSettings::RW_Fast)
+  if (routeType & RouteSettings::RouteWay::RW_Economic)
   {
     m_optimumCtrl.SetCheck(false);
-    m_economyCtrl.SetCheck(false);
-    m_highwayCtrl.SetCheck(true);
     m_shortestCtrl.SetCheck(false);
-
-    planMethod |= UeRoute::RW_Fast;
-  }
-  else if (m_settings.m_methodType == UeBase::RouteSettings::RW_Economic)
-  {
-    m_optimumCtrl.SetCheck(false);
-    m_economyCtrl.SetCheck(true);
     m_highwayCtrl.SetCheck(false);
-    m_shortestCtrl.SetCheck(false);
-
-    planMethod |= UeRoute::RW_Economic;
+    m_economyCtrl.SetCheck(true);
   }
-  //赋初值
-  planMethod |= UeRoute::RA_None;
-  //
-  if(m_settings.m_isAvoidHW == 1)
+  if (routeType & RouteSettings::RouteWay::RW_Optimal)
+  {
+    m_optimumCtrl.SetCheck(true);
+    m_shortestCtrl.SetCheck(false);
+    m_highwayCtrl.SetCheck(false);
+    m_economyCtrl.SetCheck(false);
+  }
+  if (routeType & RouteSettings::RouteWay::RW_Fast)
+  {
+    m_optimumCtrl.SetCheck(false);
+    m_shortestCtrl.SetCheck(false);
+    m_highwayCtrl.SetCheck(true);
+    m_economyCtrl.SetCheck(false);
+  }
+
+  unsigned int avoidRouteType = settingWrapper.GetAvoidRoute();
+  //选择道路规避类型
+  if (avoidRouteType & RouteSettings::RA_HighWay)
   {
     m_avoidHighwayCtrl.SetCheck(true);
-
-    // 规避高速
-    planMethod |= UeRoute::RA_HighWay;
   }
-  else if(m_settings.m_isAvoidHW == 0)
+  else
   {
     m_avoidHighwayCtrl.SetCheck(false);
   }
-
-  //
-  if(m_settings.m_isAvoidFerry == 1)
+  if (avoidRouteType & RouteSettings::RA_Ferry)
   {
-    // 不走轮渡
-    planMethod |= UeRoute::RA_Ferry;
     m_avoidBoatCtrl.SetCheck(true);
   }
-  else if(m_settings.m_isAvoidFerry == 0)
+  else
   {
     m_avoidBoatCtrl.SetCheck(false);
   }
-    //已判断
-  if(m_settings.m_isAvoidHW == 0 && m_settings.m_isAvoidFerry == 0 )
-  {
-    planMethod |= UeRoute::RA_None;
-    m_avoidHighwayCtrl.SetCheck(false);   
-    m_avoidBoatCtrl.SetCheck(false);
-  }
-  m_route->SetMethod(planMethod);
 }

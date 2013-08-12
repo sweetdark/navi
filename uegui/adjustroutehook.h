@@ -178,6 +178,14 @@ namespace UeGui
     void EditPOIData(RowTag row, const POIItem &item);
 
     void SetGpsPos();
+
+    void GetGpsItem(POIItem &item);
+
+    static void SelectPointEvent(void *callBackObj, const UeQuery::SQLRecord* data);
+
+    void DoEditOrAddPoi(RowTag row);
+    //初始化按钮的状态
+    void InitButtonState();
   private:
 
     //路线的经由点下标0为起点，目前加上起点和终点总共不超过6个经由点。
@@ -185,12 +193,14 @@ namespace UeGui
 
     //记录选中的行号
     RowTag m_selectRowTag;
-    //记录要添加数据的行号
-    RowTag m_addRowTag;
+    
 
     DataFrom m_dataFrom;
 
     unsigned int m_planMethod;
+
+    bool m_isFormRouteTypeSwitch;
+
   private:
     CUiBitButton m_addPOI1Ctrl;
     CUiBitButton m_addPOI2Ctrl;

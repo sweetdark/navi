@@ -1,6 +1,9 @@
 /*
 *
 */
+#include "ueroute\routebasic.h"
+#include "uebase\timebasic.h"
+#include "uemap\aggview.h"
 #include "gui.h"
 #include "maphook.h"
 #include "viewwrapper.h"
@@ -12,7 +15,7 @@
 #include "inputswitchhook.h"
 #include "detailmessagehook.h"
 #include "usuallyfile.h"
-#include "ueroute\routebasic.h"
+#include "itemselecthook.h"
 
 using namespace UeGui;
 //
@@ -22,16 +25,35 @@ using namespace UeGui;
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 UeGui::CMapHook::CMapHook() : CAggHook(), m_viewWrapper(CViewWrapper::Get()), m_routeWrapper(CRouteWrapper::Get()),
-m_settingWrapper(CSettingWrapper::Get()), m_userDataWrapper(CUserDataWrapper::Get()), m_selectPointObj(NULL), 
-m_selectPointEvent(NULL), m_curGuiType(GUI_None), m_preGuiType(GUI_None), m_queryPointIndex(-1), m_planType(Plan_Single),
-m_guiTimerInterval(0), m_curPlanmethodType(UeRoute::MT_Max), m_elecEyeStatus(false), m_bIsCompassShown(false),
-m_elecProgressBarWidth(0), m_elecMaxPromptDist(0), m_screenMode(SM_None), m_needRestoreRoute(false), 
-m_lanHight(50), m_lanWidth(0), m_firstDrawMap(true)
+m_settingWrapper(CSettingWrapper::Get()), m_userDataWrapper(CUserDataWrapper::Get()), m_queryWrapper(CQueryWrapper::Get()),
+m_selectPointObj(NULL), m_selectPointEvent(NULL), m_curGuiType(GUI_None), m_preGuiType(GUI_None), m_queryPointIndex(-1), 
+m_planType(Plan_Single),m_guiTimerInterval(0), m_curPlanmethodType(UeRoute::MT_Max), m_elecEyeStatus(false), m_bIsCompassShown(false),
+m_elecProgressBarWidth(0), m_elecMaxPromptDist(0), m_screenMode(SM_None), m_needRestoreRoute(false), m_lanHight(50), m_lanWidth(0), 
+m_firstDrawMap(true), m_sysTime(0), m_downTimeCount(0)
 {
   m_restorePoiList.clear();
   m_queryPointList.clear();
   //地图界面渲染完成后不需要释放图片资源，提高效率
   m_needReleasePic = false;
+
+  //初始化屏幕模式列表
+  CItemSelectHook::ItemInfo srcModalInfo;
+  ::strcpy(srcModalInfo.m_itemName, "鹰眼图");
+  srcModalInfo.m_enable = true;
+  srcModalInfo.m_showIcon = false;
+  m_srcModalItemList.push_back(srcModalInfo);
+  ::strcpy(srcModalInfo.m_itemName, "后续路口");
+  srcModalInfo.m_enable = true;
+  srcModalInfo.m_showIcon = false;
+  m_srcModalItemList.push_back(srcModalInfo);
+  ::strcpy(srcModalInfo.m_itemName, "高速看板");
+  srcModalInfo.m_enable = true;
+  srcModalInfo.m_showIcon = false;
+  m_srcModalItemList.push_back(srcModalInfo);
+  ::strcpy(srcModalInfo.m_itemName, "一般双屏");
+  srcModalInfo.m_enable = false;
+  srcModalInfo.m_showIcon = false;
+  m_srcModalItemList.push_back(srcModalInfo);
 }
 
 UeGui::CMapHook::~CMapHook()
@@ -201,6 +223,7 @@ void UeGui::CMapHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(MapHook_ZoomOutBack,	"ZoomOutBack"));
   m_ctrlNames.insert(GuiName::value_type(MapHook_ZoomOutIcon,	"ZoomOutIcon"));
   m_ctrlNames.insert(GuiName::value_type(MapHook_ScaleBack,	"ScaleBack"));
+  m_ctrlNames.insert(GuiName::value_type(MapHook_ScaleIcon,	"ScaleIcon"));
   m_ctrlNames.insert(GuiName::value_type(MapHook_ScaleLabel,	"ScaleLabel"));
   m_ctrlNames.insert(GuiName::value_type(MapHook_SoundBack,	"SoundBack"));
   m_ctrlNames.insert(GuiName::value_type(MapHook_SoundIcon,	"SoundIcon"));
@@ -285,6 +308,7 @@ void UeGui::CMapHook::MakeControls()
   m_zoomOutBtn.SetCenterElement(GetGuiElement(MapHook_ZoomOutBack));
   m_zoomOutBtn.SetIconElement(GetGuiElement(MapHook_ZoomOutIcon));
   m_scaleBtn.SetCenterElement(GetGuiElement(MapHook_ScaleBack));
+  m_scaleBtn.SetIconElement(GetGuiElement(MapHook_ScaleIcon));
   m_scaleBtn.SetLabelElement(GetGuiElement(MapHook_ScaleLabel));
   m_soundBtn.SetCenterElement(GetGuiElement(MapHook_SoundBack));
   m_soundBtn.SetIconElement(GetGuiElement(MapHook_SoundIcon));
@@ -393,6 +417,27 @@ void UeGui::CMapHook::MakeControls()
 
 void UeGui::CMapHook::Timer()
 {
+  //长按滚动
+  short planState = m_routeWrapper.GetPlanState();
+  if (m_downElementType == CT_Unknown && planState != UeRoute::PS_DemoGuidance && planState != UeRoute::PS_RealGuidance )
+  {
+    //长按超过1秒即滚动
+    if (IsMouseDown() && m_downTimeCount > 0) 
+    {
+      CViewState *curState = m_viewWrapper.GetMainViewState(); 
+      //启动线程进行滚动
+      curState->ScrollMap();
+    }
+    else
+    {
+      m_downTimeCount = 0;
+    }
+    if (IsMouseDown() && m_downTimeCount < 2)
+    {
+      m_downTimeCount++;
+    }
+  }
+
   //界面定时切换
   if (m_guiTimerInterval > 0)
   {
@@ -405,20 +450,9 @@ void UeGui::CMapHook::Timer()
       }      
     }
   }
-  //// 刷新当前时间
-  //if(m_gps->IsLive())
-  //{
-  //  GpsBasic pos;
-  //  m_gps->GetPos(pos, false);
-  //  m_mapStatusBarHook.RefreshTime(pos.m_localTime.m_hour, pos.m_localTime.m_min);
-  //}
-  //else
-  //{
-  //  CTimeBasic::TimeReport report;
-  //  CTimeBasic timer;
-  //  timer.GetNow(report);
-  //  m_mapStatusBarHook.RefreshTime(report.m_hour, report.m_minute);
-  //}
+
+  //刷新系统时间
+  RefreshSysTime();
 }
 
 void UeGui::CMapHook::Load()
@@ -828,9 +862,10 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
   case MapHook_AddElecEyeBack:
   case MapHook_AddElecEyeIcon:
     {
-      //添加电子眼
+      //添加用户电子眼
       m_addElecEyeBtn.MouseUp();
       needRefresh = true;
+      AddUserEEyeData();
     }
     break;
   case MapHook_MapAzimuthBack:
@@ -873,6 +908,7 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
   case MapHook_ScaleBack:
   case MapHook_ScaleLabel:
     {
+      //比例尺
       m_scaleBtn.MouseUp();
       needRefresh = true;
     }
@@ -892,7 +928,7 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_GPSBtn.MouseUp();
       needRefresh = true;
       //GPS界面
-      //TurnTo(DHT_GPSHook);
+      TurnTo(DHT_GPSHook);
     }
     break;
   case MapHook_ScreenMoadlBack:
@@ -900,15 +936,20 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
   case MapHook_DoubleScreenIcon:
     {
       m_screenMoadlBtn.MouseUp();
-      needRefresh = true;
-      if (SM_None == m_screenMode)
+      if (m_screenMoadlBtn.IsEnable())
       {
-        SetScreenMode(SM_EagelView);
+        needRefresh = true;
+        if (SM_None != m_screenMode)
+        {
+          SetScreenMode(SM_None);
+        }
+        else
+        {
+          CItemSelectHook* itemSelectHook = (CItemSelectHook*)m_viewWrapper.GetHook(DHT_ItemSelectHook);
+          itemSelectHook->SetSelectEvent(this, &OnSrcModalSelect, m_srcModalItemList);
+          TurnTo(DHT_ItemSelectHook);     
+        } 
       }
-      else
-      {
-        SetScreenMode(SM_None);
-      }      
     }
     break;
   case MapHook_SetStartBack:
@@ -962,6 +1003,7 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
   case MapHook_FixedPostionIcon:
   case MapHook_FixedPostionLabel:
     {
+      //定位
       m_fixedPostionBtn.MouseUp();
       needRefresh = true;
       MoveToGPS();
@@ -971,6 +1013,7 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
   case MapHook_DetailIcon1:
   case MapHook_DetailLabe1:
     {
+      //详情
       m_detailBtn1.MouseUp();
       needRefresh = true;
       OpenDetailHook();
@@ -1276,7 +1319,7 @@ unsigned int UeGui::CMapHook::DoRoutePlan( PlanType planType )
   {
     m_planType = Plan_Multiple;
     rt = m_routeWrapper.RoutePlan();
-    if (rt)
+    if (UeRoute::PEC_Success == rt)
     {
       rt = m_routeWrapper.MultiRoutePlan();
     }    
@@ -1461,11 +1504,29 @@ void UeGui::CMapHook::Select()
   if (m_selectPointObj && m_selectPointEvent)
   {
     CGeoPoint<long> pickPos;
-    m_view->GetPickPos(pickPos);
+    m_viewWrapper.GetPickPos(pickPos);
     SQLRecord record;
     record.m_x = pickPos.m_x;
     record.m_y = pickPos.m_y;
-    m_view->GetPickName(record.m_uniName);
+
+    // 拾取信息
+    char pickName[256];
+    m_viewWrapper.GetPickName(pickName);
+    if(::strlen(pickName) > 0)
+    {
+      pickName[::strlen(pickName) - 1] = '\0';
+    } 
+    else 
+    {
+      CGeoPoint<long> pickPos;    
+      m_viewWrapper.GetPickPos(pickPos);
+      IGui* gui = IGui::GetGui();
+      if (!gui->GetDistrictName(pickPos, pickName))
+      {
+        ::memset(pickName, 0, 256);
+      }
+    }
+    record.m_uniName = pickName;
     (*m_selectPointEvent)(m_selectPointObj, &record);
   }
 }
@@ -2207,6 +2268,8 @@ void UeGui::CMapHook::SetScreenMode(ScreenMode screenMode)
     case SM_RouteGuidance:
       {
         //打开后续路口
+        m_mapGuideInfoView.SetIsShowRouteGuideList(true);
+        m_mapGuideInfoView.Update(MUT_Normal);
         break;
       }
     case SM_HighWayBoard:
@@ -2235,6 +2298,8 @@ void UeGui::CMapHook::SetScreenMode(ScreenMode screenMode)
     case SM_RouteGuidance:
       {
         //关闭后续路口
+        m_mapGuideInfoView.SetIsShowRouteGuideList(false);
+        m_mapGuideInfoView.Update(MUT_Normal);
         break;
       }
     case SM_HighWayBoard:
@@ -2352,5 +2417,134 @@ void UeGui::CMapHook::ResetLanPos()
       }
     }
     m_viewWrapper.SetLanePos(scrPoint, m_lanWidth, m_lanHight);
+  }
+}
+
+void UeGui::CMapHook::SrcModalSelect( short selectIndex )
+{
+  SetScreenMode((ScreenMode)selectIndex);
+}
+
+void UeGui::CMapHook::OnSrcModalSelect( CAggHook* sender, short selectIndex )
+{
+  if (sender)
+  {
+    CMapHook* mapHook = dynamic_cast<CMapHook*>(sender);
+    mapHook->SrcModalSelect(selectIndex);
+  }
+}
+
+void UeGui::CMapHook::AddUserEEyeData()
+{
+  CMessageDialogEvent dialogEvent(this, DHT_MapHook, NULL);
+  CGeoPoint<long> pickPos; 
+  ViewOpeMode viewMode = m_viewWrapper.GetViewOpeMode();
+  if (VM_Browse == viewMode)
+  {
+    m_viewWrapper.GetPickPos(pickPos);
+  }
+  else
+  {
+    const UeMap::GpsCar gpsCar = m_viewWrapper.GetGpsCar();
+    pickPos.m_x = gpsCar.m_curPos.m_x;
+    pickPos.m_y = gpsCar.m_curPos.m_y;    
+  }      
+  const SQLRecord *record = m_queryWrapper.GetNearestPoi(pickPos);
+  if (record)
+  {
+    //用户电子眼数据结构
+    UserEEyeEntryData eEyeEntryData;
+    if (record->m_uniName)
+    {
+      ::strcpy((char*)eEyeEntryData.m_name, record->m_uniName);
+    }
+    if (record->m_pchAddrStr)
+    {
+      ::strcpy((char*)eEyeEntryData.m_address, record->m_pchAddrStr);
+    }
+    //如果没有具体地址，则显示省、市、区
+    if(eEyeEntryData.m_address[0] == 0)
+    {
+      //获取区域code
+      unsigned distcode(CCodeIndexCtrl::GetDistCode(pickPos.m_x, pickPos.m_y));
+      m_queryWrapper.GetComAdmNameByCode(distcode,(char*)eEyeEntryData.m_address);
+    }
+
+    eEyeEntryData.m_x = pickPos.m_x;
+    eEyeEntryData.m_y = pickPos.m_y;
+    eEyeEntryData.m_type = TVT_NormalCamera;
+    eEyeEntryData.m_linkId = record->m_linkIdx;
+    m_userDataWrapper.AddUserEEyeData(record->m_parcelIdx, eEyeEntryData);
+
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "保存成功！", dialogEvent);
+  }
+  else
+  {
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "保存失败！", dialogEvent);
+    Sleep(500);
+  }  
+  CMessageDialogHook::CloseMessageDialog();
+}
+
+void UeGui::CMapHook::RefreshSrcModalBtnStatus()
+{
+  m_screenMoadlBtn.SetEnable(true);
+  short planState = m_routeWrapper.GetPlanState();
+  if ((UeRoute::PS_DemoGuidance == planState) || (UeRoute::PS_RealGuidance == planState))
+  {
+    UeMap::ViewOpeMode viewMode = VM_Unknown;
+    CViewState* curViewState = m_viewWrapper.GetMainViewState();
+    if (curViewState)
+    {
+      viewMode = m_viewWrapper.GetViewOpeMode((UeMap::ViewType)curViewState->GetType());
+    }
+
+    if (UeMap::VM_Browse == viewMode)                                    
+    {
+      m_screenMoadlBtn.SetEnable(false);
+    }
+    else if (m_viewWrapper.IsGuidanceViewShown())
+    {
+      m_screenMoadlBtn.SetEnable(false);
+    }
+  }
+  else
+  {
+    m_screenMoadlBtn.SetEnable(false);
+  }
+}
+
+void UeGui::CMapHook::RefreshSysTime()
+{
+  //每分钟刷新一次
+  short hour(0), minute(0);
+  if(m_gps->IsLive())
+  {
+    GpsBasic pos;
+    m_gps->GetPos(pos, false);
+    hour = pos.m_localTime.m_hour;
+    minute = pos.m_localTime.m_min;
+  }
+  else
+  {
+    CTimeBasic::TimeReport report;
+    CTimeBasic timer;
+    timer.GetNow(report);
+    hour = report.m_hour;
+    minute = report.m_minute;
+  }
+  short curTime = hour * 100 + minute;
+  if (m_sysTime != curTime)
+  {    
+    m_sysTime = curTime;
+    char buf[8] = {};
+    ::sprintf(buf, "%02d:%02d", hour, minute);
+    m_timerBtn.SetCaption(buf);
+    //如果是导航过程中则不主动刷新，而是靠导航时的地图刷新来刷新时间
+    unsigned short planState = m_routeWrapper.GetPlanState();
+    if ((UeRoute::PS_RealGuidance != planState) && (UeRoute::PS_DemoGuidance != planState) && (!CAGGView::IsScrolling()))
+    {
+      Refresh();
+    }
   }
 }

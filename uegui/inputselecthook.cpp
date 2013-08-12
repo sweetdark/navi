@@ -57,6 +57,11 @@ void CInputSelectHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(InputSelectHook_List3Btn,	"List3Btn"));
   m_ctrlNames.insert(GuiName::value_type(InputSelectHook_List4Btn,	"List4Btn"));
   m_ctrlNames.insert(GuiName::value_type(InputSelectHook_List5Btn,	"List5Btn"));
+  m_ctrlNames.insert(GuiName::value_type(InputSelectHook_List1BtnLabel,	"List1BtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(InputSelectHook_List2BtnLabel,	"List2BtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(InputSelectHook_List3BtnLabel,	"List3BtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(InputSelectHook_List4BtnLabel,	"List4BtnLabel"));
+  m_ctrlNames.insert(GuiName::value_type(InputSelectHook_List5BtnLabel,	"List5BtnLabel"));
   m_ctrlNames.insert(GuiName::value_type(InputSelectHook_Line1,	"Line1"));
   m_ctrlNames.insert(GuiName::value_type(InputSelectHook_Line2,	"Line2"));
   m_ctrlNames.insert(GuiName::value_type(InputSelectHook_Line3,	"Line3"));
@@ -71,6 +76,7 @@ void CInputSelectHook::MakeControls()
   for (int i=0, j=InputSelectHook_List1Btn; i<5; i++)
   {
     m_listBtn[i].SetCenterElement(GetGuiElement(j++));
+    m_listBtn[i].SetLabelElement(GetGuiElement(j++));
   }
 }
 
@@ -86,11 +92,18 @@ short CInputSelectHook::MouseDown(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    if (ctrlType >= InputSelectHook_List1Btn && ctrlType <= InputSelectHook_List5Btn)
+    if (ctrlType >= InputSelectHook_List1Btn && ctrlType <= InputSelectHook_List5BtnLabel)
     {
-      int index = ctrlType - InputSelectHook_List1Btn;
-      m_listBtn[index].MouseDown();
-      AddRenderUiControls(&m_listBtn[index]);
+      int index = (ctrlType - InputSelectHook_List1Btn)/2;
+      if (m_listBtn[index].IsEnable())
+      {
+        m_listBtn[index].MouseDown();
+        AddRenderUiControls(&m_listBtn[index]);
+      }
+      else
+      {
+        m_isNeedRefesh = false;
+      }
     } 
     else
     {
@@ -125,14 +138,18 @@ short CInputSelectHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    if (ctrlType >= InputSelectHook_List1Btn && ctrlType <= InputSelectHook_List5Btn)
+    if (ctrlType >= InputSelectHook_List1Btn && ctrlType <= InputSelectHook_List5BtnLabel)
     {
-      int index = ctrlType - InputSelectHook_List1Btn;
-      m_listBtn[index].MouseUp();
+      int index = (ctrlType - InputSelectHook_List1Btn)/2;
       if (m_listBtn[index].IsEnable())
       {
+        m_listBtn[index].MouseUp();
         m_selectCallBack(m_callBackObject, m_listBtn[index].GetCaption());
         CAggHook::Return();
+      }
+      else
+      {
+        m_isNeedRefesh = false;
       }
     }
     else

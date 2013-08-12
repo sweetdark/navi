@@ -336,6 +336,20 @@ namespace UeMap
       DHT_QueryHistoryHook            = 0x130D,
       //历史输入选择界面
       DHT_InputSelectHook             = 0x130E,
+      //周边搜索类型选择界面
+      DHT_RoundTypeSelectHook         = 0x130F,
+      //周边搜索半径选择界面
+      DHT_RoundRadiusSelectHook       = 0x1310,
+      //服务-增量更新
+      DHT_FunctionUpdateHook          = 0x1311,
+      //服务-升级服务
+      DHT_UpdateServiceHook           = 0x1312,
+      //服务-正版验证
+      DHT_VersionCheckHook            = 0x1313,
+      //通用类型选择窗口
+      DHT_ItemSelectHook              = 0x1314,
+      //搜索区域快捷选择界面
+      DHT_DistSelectHook              = 0x1315,
       DHT_Outside					            = 0x2010,
     };
 

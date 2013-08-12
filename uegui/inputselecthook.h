@@ -26,10 +26,15 @@ namespace UeGui
       InputSelectHook_PopupListTop,
       InputSelectHook_PopupListBottom,
       InputSelectHook_List1Btn,
+      InputSelectHook_List1BtnLabel,
       InputSelectHook_List2Btn,
+      InputSelectHook_List2BtnLabel,
       InputSelectHook_List3Btn,
+      InputSelectHook_List3BtnLabel,
       InputSelectHook_List4Btn,
+      InputSelectHook_List4BtnLabel,
       InputSelectHook_List5Btn,
+      InputSelectHook_List5BtnLabel,
       InputSelectHook_Line1,
       InputSelectHook_Line2,
       InputSelectHook_Line3,
@@ -69,7 +74,7 @@ namespace UeGui
 
   private:
     CUiButton m_grayBackCtrl;
-    CUiButton m_listBtn[5];
+    CUiBitButton m_listBtn[5];
 
     std::vector<string> m_vecHistoryWord;
     std::vector<string> m_vecHistoryArcoWord;

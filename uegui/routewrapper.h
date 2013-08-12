@@ -329,6 +329,11 @@ namespace UeGui
     * \brief 取得当前需播报的电子眼信息
     */
     bool GetCurElecEye(EEyeProp &elecEye, double& distance);
+
+    /**
+    * \brief 读取道路名称
+    */
+    bool GetRoadName(int offset, char *roadName);
   private:
     /*
     * 设置起点或者终点或者经过点

@@ -9,21 +9,22 @@
 #include "agghook.h"
 #endif
 
+#include "uequery\querybasic.h"
+#include "ueroute\routebasic.h"
 #include "uilabel.h"
 #include "uibutton.h"
 #include "viewwrapper.h"
 #include "routewrapper.h"
 #include "settingwrapper.h"
 #include "userdatawrapper.h"
+#include "querywrapper.h"
 #include "mapmainmenuhook.h"
 #include "mapsimulationmenuhook.h"
 #include "mapoverviewmenuhook.h"
 #include "mapguideinfoviewhook.h"
 #include "mapquerymenuhook.h"
 #include "maproutecalcmenuhook.h"
-#include "uequery\querybasic.h"
-#include "ueroute\routebasic.h"
-
+#include "itemselecthook.h"
 
 //////////////////////////////////////////////////////////////////////////
 //旧引用
@@ -59,6 +60,7 @@ namespace UeGui
       MapHook_ZoomOutBack,
       MapHook_ZoomOutIcon,
       MapHook_ScaleBack,
+      MapHook_ScaleIcon,
       MapHook_ScaleLabel,
       MapHook_SoundBack,
       MapHook_SoundIcon,
@@ -166,11 +168,11 @@ namespace UeGui
     //屏幕模式
     enum ScreenMode
     {
-      SM_None,          //无选择
-      SM_DoubleScreen,  //双屏模式
-      SM_EagelView,     //鹰眼图
-      SM_RouteGuidance, //后续路口
-      SM_HighWayBoard,  //高速看板
+      SM_None = -1,          //无选择
+      SM_EagelView = 0,     //鹰眼图
+      SM_RouteGuidance = 1, //后续路口
+      SM_HighWayBoard = 2,  //高速看板
+      SM_DoubleScreen = 3,  //双屏模式
       SM_End
     };
   public:
@@ -436,6 +438,14 @@ namespace UeGui
     * \brief 回复路线
     */
     void CancelRestoreRote();
+    /**
+    * \brief 但双屏类型选择
+    */
+    void SrcModalSelect(short selectIndex);
+    /**
+    * \brief 设置双屏类型选择按钮状态
+    */
+    void RefreshSrcModalBtnStatus();
   protected:
     /**
     * \brief 返回皮肤配置文件名称
@@ -533,10 +543,6 @@ namespace UeGui
     */
     bool ChangeElementIcon(GuiElement* destElement, GuiElement* srcElement);
     /**
-    * \brief 回复路线
-    */
-    static void OnRestoreRote(CAggHook* sender, ModalResultType modalResult);
-    /**
     * \brief 设置车道位置
     */
     void ResetLanPos();
@@ -544,6 +550,23 @@ namespace UeGui
     * \brief 路线规划
     */
     unsigned int DoRoutePlan(PlanType planType);
+    /**
+    * \brief 添加用户电子眼
+    */
+    void AddUserEEyeData();
+    /**
+    * \brief 刷新系统时间
+    */
+    void RefreshSysTime();
+  private:
+    /**
+    * \brief 回复路线
+    */
+    static void OnRestoreRote(CAggHook* sender, ModalResultType modalResult);
+    /**
+    * \brief 但双屏类型选择
+    */
+    static void OnSrcModalSelect(CAggHook* sender, short selectIndex);
   private:
     //主页：最小化
     CUiBitButton m_miniMizeBtn;    
@@ -596,8 +619,10 @@ namespace UeGui
     CRouteWrapper& m_routeWrapper;
     //设置参数访问接口
     CSettingWrapper& m_settingWrapper;
+    //查询接口
+    CQueryWrapper& m_queryWrapper;
     //用户数据接口
-    const CUserDataWrapper& m_userDataWrapper;
+    const CUserDataWrapper& m_userDataWrapper;    
     //主菜单界面子hook（非导航和导航时界面）
     CMapMainMenuHook m_mapMainMenu;
     //路线计算菜单界面
@@ -649,7 +674,12 @@ namespace UeGui
     //车道图标的宽高
     short m_lanHight;
     short m_lanWidth;
-
+    //屏幕类型选择列表
+    CItemSelectHook::ItemInfoList m_srcModalItemList;
+    //当前系统时间
+    short m_sysTime;
+    //鼠标按下的时间计算
+    short m_downTimeCount; 
   //////////////////////////////////////////////////////////////////////////
   //旧代码
   public:

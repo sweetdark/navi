@@ -567,7 +567,7 @@ namespace UeBase
     void blend_samesize_rgbaimage(unsigned char **dest_rows, unsigned char **src_rows, const CGeoRect<int> &rect, unsigned int maskClr) const;
   private:
     // Singleton
-    static CPictureBasic m_pictureBasic;
+    static CPictureBasic *m_pictureBasic;
   };
 }
 #endif

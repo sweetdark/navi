@@ -46,6 +46,20 @@ namespace UeGui
       MapGuideInfoViewHook_HighSpeedBoardDistLabel3,
       MapGuideInfoViewHook_ShowGuideViewBack,
       MapGuideInfoViewHook_ShowGuideViewLabel,
+      MapGuideInfoViewHook_RouteGuideBack,
+      MapGuideInfoViewHook_RouteGuideCurName,
+      MapGuideInfoViewHook_RouteGuideIcon1,
+      MapGuideInfoViewHook_RouteGuideIcon2,
+      MapGuideInfoViewHook_RouteGuideIcon3,
+      MapGuideInfoViewHook_RouteGuideIcon4,
+      MapGuideInfoViewHook_RouteGuideName1,
+      MapGuideInfoViewHook_RouteGuideName2,
+      MapGuideInfoViewHook_RouteGuideName3,
+      MapGuideInfoViewHook_RouteGuideName4,
+      MapGuideInfoViewHook_RouteGuideDist1,
+      MapGuideInfoViewHook_RouteGuideDist2,
+      MapGuideInfoViewHook_RouteGuideDist3,
+      MapGuideInfoViewHook_RouteGuideDist4,
       MapGuideInfoViewHook_IconType1_1,
       MapGuideInfoViewHook_IconType1_2,
       MapGuideInfoViewHook_IconType1_3,
@@ -79,9 +93,51 @@ namespace UeGui
       MapGuideInfoViewHook_IconType2_26,
       MapGuideInfoViewHook_IconType2_27,
       MapGuideInfoViewHook_IconType2_28,
+      MapGuideInfoViewHook_IconType3_1,
+      MapGuideInfoViewHook_IconType3_2,
+      MapGuideInfoViewHook_IconType3_3,
+      MapGuideInfoViewHook_IconType3_4,
+      MapGuideInfoViewHook_IconType3_5,
+      MapGuideInfoViewHook_IconType4_1,
+      MapGuideInfoViewHook_IconType4_2,
+      MapGuideInfoViewHook_IconType4_3,
+      MapGuideInfoViewHook_IconType4_4,
+      MapGuideInfoViewHook_IconType4_5,
+      MapGuideInfoViewHook_IconType4_6,
+      MapGuideInfoViewHook_IconType4_7,
+      MapGuideInfoViewHook_IconType4_8,
+      MapGuideInfoViewHook_IconType4_9,
+      MapGuideInfoViewHook_IconType4_10,
+      MapGuideInfoViewHook_IconType4_11,
+      MapGuideInfoViewHook_IconType4_12,
+      MapGuideInfoViewHook_IconType4_13,
+      MapGuideInfoViewHook_IconType4_14,
+      MapGuideInfoViewHook_IconType4_15,
+      MapGuideInfoViewHook_IconType4_16,
+      MapGuideInfoViewHook_IconType4_17,
+      MapGuideInfoViewHook_IconType4_18,
+      MapGuideInfoViewHook_IconType4_19,
+      MapGuideInfoViewHook_IconType4_20,
+      MapGuideInfoViewHook_IconType4_21,
+      MapGuideInfoViewHook_IconType4_22,
+      MapGuideInfoViewHook_IconType4_23,
+      MapGuideInfoViewHook_IconType4_24,
+      MapGuideInfoViewHook_IconType4_25,
+      MapGuideInfoViewHook_IconType4_26,
+      MapGuideInfoViewHook_IconType4_27,
+      MapGuideInfoViewHook_IconType4_28,
       MapGuideInfoViewHook_End
     };
 
+    //后续路口行定义
+    enum RowItem
+    {
+      ROW1,
+      ROW2,
+      ROW3,
+      ROW4,
+      ROW_END,
+    };
     CMapGuideInfoViewHook();
 
     virtual ~CMapGuideInfoViewHook();
@@ -105,7 +161,10 @@ namespace UeGui
     * 设置父类hook
     */
     void SetParentHook(CAggHook* parentHook);
-
+    /*
+    * 设置是否显示后续路口
+    */
+    void SetIsShowRouteGuideList(bool show);
   protected:
     virtual tstring GetBinaryFileName();
 
@@ -117,6 +176,22 @@ namespace UeGui
     * \brief 隐藏所有引导图标
     */
     void HideAllCtrl();
+    /**
+    * \brief 更新底部状态栏导航信息
+    */
+    void UpdateGuideInfo(const GuidanceStatus& dirInfo);
+    /**
+    * \brief 更新导航时下一道路信息
+    */
+    void UpdateNextRouteInfo(const GuidanceStatus& dirInfo);
+    /**
+    * \brief 更新方向看板图标
+    */
+    void UpdateDirectionBoardInfo(const GuidanceStatus& dirInfo);
+    /**
+    * \brief 更新后续路口信息
+    */
+    void UpdateRouteGuideInfo(const GuidanceStatus& dirInfo);
     /**
     * \brief 改变两个元素的图片
     */
@@ -139,9 +214,28 @@ namespace UeGui
     * \brief 显示路口放大图
     */
     void ShowGuideView();
+    /**
+    * \brief 显示道路引导列表（后续路口）
+    */
+    void ShowRouteGuideList(bool isShow = true);
+    /**
+    * \brief 显示道路引导列表（后续路口）某行数据
+    */
+    void ShowRouteGuideData(RowItem row, int sndCode, const char* roadName, double dist);
+    /**
+    * \brief 清空后续路口某行数据
+    */
+    void ClearRouteGuideRow(RowItem row);
+    /**
+    * \brief 清空元素的图片
+    */
+    void ClearElementIcon(GuiElement* element);
+    /**
+    * \brief 清空元素的图片
+    */
+    bool ChangeCrossingIcon(CUiButton &IconButton, const int sndCode);
+
   private:
-    // 父hook
-    CAggHook* m_parentHook;
     //下一道路名称
     CUiBitButton m_routeInfoBtn;
     //当前路口方向看板
@@ -158,12 +252,32 @@ namespace UeGui
     CUiBitButton m_highSpeedBoard3;
     CUiLabel m_highSpeedBoardTypeLabel3;
     CUiLabel m_highSpeedBoardDistLabel3;
+    //后续路口
+    CUiButton m_routeGuideBack;
+    CUiLabel m_routeGuideCurName;
+    CUiLabel m_routeGuideName1;
+    CUiLabel m_routeGuideName2;
+    CUiLabel m_routeGuideName3;
+    CUiLabel m_routeGuideName4;
+    CUiLabel m_routeGuideDist1;
+    CUiLabel m_routeGuideDist2;
+    CUiLabel m_routeGuideDist3;
+    CUiLabel m_routeGuideDist4;
+    CUiButton m_routeGuideIcon1;
+    CUiButton m_routeGuideIcon2;
+    CUiButton m_routeGuideIcon3;
+    CUiButton m_routeGuideIcon4;    
+  private:
+    // 父hook
+    CAggHook* m_parentHook;
     //隐藏路口放大图
     CUiBitButton m_shwoGuideViewBtn;
     //路径规划访问接口
     CRouteWrapper& m_routeWrapper;
     //地图访问接口
     CViewWrapper& m_viewWrapper;
+    //是否显示后续路口
+    bool m_isShowRouteGuideList;
   };
 }
 #endif

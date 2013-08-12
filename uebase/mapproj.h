@@ -246,7 +246,7 @@ namespace UeBase
     SettingMap m_paras;
 
     //
-    static CMapProjection m_projection;
+    static CMapProjection *m_projection;
   };
 }
 

@@ -8,6 +8,7 @@
 #include "guioperationright.h"
 #include "uebase\stringbasic.h"
 #include "userdatawrapper.h"
+#include "editswitchhook.h"
 
 
 using namespace UeGui;
@@ -16,7 +17,7 @@ using namespace UeModel;
 using namespace UeBase;
 
 CHistoryInformationHook::CHistoryInformationHook() : m_selectRow(kROWNone), m_avtivePageIndex(kPageNone),
-m_canOpeHistoryRecrd(true), m_canOpeHistoryTrajectory(true), m_canOpeHistoryRoute(true),
+m_canOpeHistoryRecrd(true), m_canOpeHistoryTrajectory(true), m_canOpeHistoryRoute(true),m_editRoutReturn(false),
 m_userWrapper(CUserDataWrapper::Get())
 {
   m_strTitle = "历史记录";
@@ -154,23 +155,33 @@ void CHistoryInformationHook::MakeControls()
 
 void UeGui::CHistoryInformationHook::Load()
 {
-  //激活当前第一页
-  if (m_canOpeHistoryRecrd && (m_userWrapper.GetHistoryRecordCount() > 0))
+  if (m_editRoutReturn)
   {
-    ActivatePage(kPageHisRecord);
-  }
-  /*else if (m_canOpeHistoryTrajectory)
-  {
-    ActivatePage(kPageHisTrajectory);
-  }*/
-  else if (m_canOpeHistoryRoute && (m_userWrapper.GetRecentCount() > 0))
-  {
-    ActivatePage(kPageHisRoute);
+    m_editRoutReturn = false;
+    SetNavigatorStatus();
+    ShowPageInfo();
+    ShowHistoryRouteData();
   }
   else
   {
+    //激活当前第一页
+    if (m_canOpeHistoryRecrd && (m_userWrapper.GetHistoryRecordCount() > 0))
+    {
     ActivatePage(kPageHisRecord);
-  }
+    }
+    /*else if (m_canOpeHistoryTrajectory)
+    {
+      ActivatePage(kPageHisTrajectory);
+    }*/
+    else if (m_canOpeHistoryRoute && (m_userWrapper.GetRecentCount() > 0))
+    {
+      ActivatePage(kPageHisRoute);
+    }
+    else
+    {
+      ActivatePage(kPageHisRecord);
+    }
+  }  
 }
 
 short CHistoryInformationHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -866,7 +877,63 @@ void UeGui::CHistoryInformationHook::DoSelectRecord( RowTag row )
         else
         {*/
           //重新规划路线
-          DoPlanHistoryRoute();
+          //DoPlanHistoryRoute();
+        //获取选择的数据索引
+        int dataIndex = GetDataIndex(m_selectRow);
+        if (dataIndex < 0)
+        {
+          return;
+        }
+        m_userWrapper.ConnectToRecent();
+        const RecentEntry *tempEntry = m_userWrapper.GetRecent(dataIndex);
+        //因为Disconnect后会释放掉tempEntry，所以这里要拷贝一份数据
+        RecentEntry curEntry;
+        ::memcpy(&curEntry, tempEntry, sizeof(RecentEntry));
+        m_userWrapper.DisconnectRecent();
+
+        unsigned int rt = PEC_Success;
+        CGeoPoint<short> scrPoint;
+        CGeoPoint<long> point;
+        //设起点
+        PlanPosition startPos;
+        startPos.m_type = PT_Start;
+        startPos.m_pos.m_x = curEntry.m_routePos[0].m_X;
+        startPos.m_pos.m_y = curEntry.m_routePos[0].m_Y;
+        startPos.m_isGPS = false;
+        ::strcpy(startPos.m_name, (char*)curEntry.m_routePos[0].m_addrName);
+        if (rt = m_route->SetPosition(startPos) != PEC_Success)
+        {
+          return;
+        }
+
+        //设目的地
+        PlanPosition endPos;
+        endPos.m_type = PT_End;
+        endPos.m_pos.m_x = curEntry.m_routePos[curEntry.m_routePosCnt-1].m_X;
+        endPos.m_pos.m_y = curEntry.m_routePos[curEntry.m_routePosCnt-1].m_Y;
+        endPos.m_isGPS = false;
+        ::strcpy(endPos.m_name, (char*)curEntry.m_routePos[curEntry.m_routePosCnt-1].m_addrName);
+        if (rt = m_route->SetPosition(endPos) != PEC_Success)
+        {
+          return;
+        }
+
+        //设置经由点
+        for (int i = 1; i < curEntry.m_routePosCnt - 1; ++i)
+        {
+          PlanPosition middlePos;
+          middlePos.m_type = PT_Middle;
+          middlePos.m_pos.m_x = curEntry.m_routePos[i].m_X;
+          middlePos.m_pos.m_y = curEntry.m_routePos[i].m_Y;
+          middlePos.m_isGPS = false;
+          ::strcpy(middlePos.m_name, (char*)curEntry.m_routePos[i].m_addrName);
+          if (rt = m_route->SetPosition(middlePos) != PEC_Success)
+          {
+            return;
+          }
+        }
+        CMapHook* maphook = ((CMapHook*)m_view->GetHook(CViewHook::DHT_MapHook));
+        maphook->RoutePlan_StartGuidance();
         //}
       }
       break;
@@ -979,7 +1046,7 @@ void UeGui::CHistoryInformationHook::DoEditRecord( RowTag row )
   {
   case kPageHisRecord :
     {
-      /*unsigned int dataIndex = GetDataIndex(m_selectRow);
+      unsigned int dataIndex = GetDataIndex(m_selectRow);
       m_userWrapper.ConnectToHistoryRecord();
       const HistoryRecordEntry *curEntry = m_userWrapper.GetHistoryRecord(dataIndex);
       EditData data;
@@ -991,13 +1058,11 @@ void UeGui::CHistoryInformationHook::DoEditRecord( RowTag row )
       CDetailEditEvent editEvent(this,DHT_HistoryInformationHook);
       editHook.ShowDetailEditHook(&data,editEvent);
       editHook.DoRecordPosition(dataIndex);
-      TurnTo(DHT_DetailEditHook);*/
+      TurnTo(DHT_DetailEditHook);
       break;
     }
   case kPageHisTrajectory : 
     {
-
-
       break;
     }
   case kPageHisRoute :
@@ -1005,17 +1070,17 @@ void UeGui::CHistoryInformationHook::DoEditRecord( RowTag row )
       char recentName[RecentEntry::MAXRECENTS] = {};
       unsigned int dataIndex = GetDataIndex(m_selectRow);
       m_userWrapper.GetRecentName(dataIndex, recentName);
-      //打开名称输入对话框
-      //CInputHook::gotoCurInputMethod(CInputHook::IM_Edit,
-      //  CViewHook::DHT_HistoryInformationHook, this, OnGetRouteName, "编辑名称", recentName); 
+      CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(CAggHook::DHT_EditSwitchHook));
+      editSwitch->SetEditCallBackFun(this, m_strTitle.c_str(), recentName, EditHookCallBack);
+      TurnTo(editSwitch->GetCurEditHookType());
       break;
     }
   default:
     {
       assert(false);
     }
+    break;
   }
-
 }
 
 void UeGui::CHistoryInformationHook::OnGetRouteName( void* sender, const UeQuery::SQLRecord * data )
@@ -1662,4 +1727,15 @@ void UeGui::CHistoryInformationHook::ShowPageInfo()
   ::sprintf(totalPageInfo, "%d", m_pageTurning.GetTotalPage());
   m_currentPageInforCtrl.SetCaption(currentPageInfo);
   m_totalPageInforCtrl.SetCaption(totalPageInfo);
+}
+
+void CHistoryInformationHook::EditHookCallBack(void *pDoCallBackObj,const char *pResult)
+{
+  ((CHistoryInformationHook *)pDoCallBackObj)->DoEditHookCallBack(pResult);
+}
+void CHistoryInformationHook::DoEditHookCallBack(const char *pResult)
+{
+  int index = GetDataIndex(m_selectRow);
+  m_userWrapper.EditHistoryRouteData(index , pResult);
+  m_editRoutReturn = true;
 }

@@ -422,7 +422,7 @@ void CGroundLayer::Draw(short type, const CViewDC *viewDC, CGeoRect<short> &scrE
           // Note:
           // For current grid definition, two bytes still can't permit differenciated coords
           m_gate->GetGridBase(i, j, grdBase);
-          DrawGridLine(curView, grdBase, viewDC, isRotated, is3d, isRough);
+          //DrawGridLine(curView, grdBase, viewDC, isRotated, is3d, isRough);
           //if(curView->Map2Scr(gridBase, scrBase))
           {
             long cursor = 0;
@@ -430,7 +430,7 @@ void CGroundLayer::Draw(short type, const CViewDC *viewDC, CGeoRect<short> &scrE
             {
               if (m_type == LT_LandMark)
               {
-                DrawLandMark(curView, oneGrid, grdBase, cursor, viewDC, isRotated, is3d, isRough);
+                //DrawLandMark(curView, oneGrid, grdBase, cursor, viewDC, isRotated, is3d, isRough);
                 continue;
               }
               short type = GetGeomType(oneGrid->m_data[cursor]);
@@ -459,11 +459,11 @@ void CGroundLayer::Draw(short type, const CViewDC *viewDC, CGeoRect<short> &scrE
                   DrawPoly(curView, clipRect, oneGrid, grdBase, cursor, viewDC, isRotated, is3d, 0, isRough);
                 }
                 break;
-              case GT_LandMark:
+              /*case GT_LandMark:
                 {
                   DrawLandMark(curView, oneGrid, grdBase, cursor, viewDC, isRotated, is3d, isRough);
                 }
-                break;
+                break;*/
               default:
                 {
                   assert(false);
@@ -894,12 +894,12 @@ void CGroundLayer::DrawPoly(CViewState *curView, CGeoRect<int> &clipRect, CGroun
     if(coordCount > 2)
     {
       //
-      curView->m_clipTool.Prepare(coords);
-      bool rt = curView->m_clipTool.ClipPolygon(coords, clipRect);
+      //curView->m_clipTool.Prepare(coords);
+      //bool rt = curView->m_clipTool.ClipPolygon(coords, clipRect);
       coordCount = coords.GetCount();
 
       //
-      if(rt && coordCount > 2)
+      if(/*rt && */coordCount > 2)
       {
         // Note:
         // clrIndex = 1 means that background polygon and currently it no need to render them

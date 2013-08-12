@@ -30,12 +30,17 @@
 using namespace UeBase;
 ///////////////////////////////////////////////////////
 // Singleton
+CPictureBasic *CPictureBasic::m_pictureBasic = 0;
 const CPictureBasic &CPictureBasic::Get()
 {
   // Inialization untill the first time to call this function
-  static CPictureBasic m_pictureBasic;
-
-  return m_pictureBasic;
+  //static CPictureBasic m_pictureBasic;
+  if(!m_pictureBasic)
+  {
+    // TODO:...
+    m_pictureBasic = new CPictureBasic();
+  }
+  return *m_pictureBasic;
 }
 
 

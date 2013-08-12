@@ -123,12 +123,17 @@ namespace UeGui
 
     void DeleteUsually();
 
+    void EditRecord(const UeQuery::SQLRecord *data);
+
+    static void SelectPointEvent(void *pCallBackObj, const UeQuery::SQLRecord *data);
+
+    void DoEditEvent(unsigned int row);
   private:
     UeGui::CUsuallyFile *m_usuallyFile;
 
     std::vector<UsuallyRecord> m_usuallRecords;
 
-    unsigned int m_deleteRowNum;
+    unsigned int m_selectRowNum;
 
   private:
     CUiButton m_clearCenterCtrl;

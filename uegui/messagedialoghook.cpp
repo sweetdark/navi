@@ -2,8 +2,9 @@
 
 using namespace UeGui;
 
-CMessageDialogHook::CMessageDialogHook() : m_interval(0)
+CMessageDialogHook::CMessageDialogHook() : m_interval(0), m_lineTextCount(0)
 {
+  m_setting.MakeProperties();
 }
 
 CMessageDialogHook::~CMessageDialogHook()
@@ -33,6 +34,7 @@ void CMessageDialogHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(MessageDialogHook_DialogeBackground,	"DialogeBackground"));
   m_ctrlNames.insert(GuiName::value_type(MessageDialogHook_DialogeIcon,	"DialogeIcon"));
   m_ctrlNames.insert(GuiName::value_type(MessageDialogHook_DialogeText,	"DialogeText"));
+  m_ctrlNames.insert(GuiName::value_type(MessageDialogHook_DialogeText2,	"DialogeText2"));
   m_ctrlNames.insert(GuiName::value_type(MessageDialogHook_AffirmButtonLeft,	"AffirmButtonLeft"));
   m_ctrlNames.insert(GuiName::value_type(MessageDialogHook_AffirmButtonCenter,	"AffirmButtonCenter"));
   m_ctrlNames.insert(GuiName::value_type(MessageDialogHook_AffirmLabel,	"AffirmLabel"));
@@ -48,7 +50,6 @@ void CMessageDialogHook::MakeNames()
 
 void CMessageDialogHook::MakeControls()
 {
-  m_dialogText.SetLabelElement(GetGuiElement(MessageDialogHook_DialogeText));
   m_dialogeIcon.SetCenterElement(GetGuiElement(MessageDialogHook_DialogeIcon));
   m_affirmButton.SetLeftElement(GetGuiElement(MessageDialogHook_AffirmButtonLeft));
   m_affirmButton.SetCenterElement(GetGuiElement(MessageDialogHook_AffirmButtonCenter));  
@@ -60,7 +61,25 @@ void CMessageDialogHook::MakeControls()
   m_affirmButton2.SetLeftElement(GetGuiElement(MessageDialogHook_AffirmButton2Left));
   m_affirmButton2.SetCenterElement(GetGuiElement(MessageDialogHook_AffirmButton2Center));    
   m_affirmButton2.SetRightElement(GetGuiElement(MessageDialogHook_AffirmButton2Right));
-  m_affirmButton2.SetLabelElement(GetGuiElement(MessageDialogHook_AffirmLabel));  
+  m_affirmButton2.SetLabelElement(GetGuiElement(MessageDialogHook_AffirmLabel));
+
+  GuiElement* element = GetGuiElement(MessageDialogHook_DialogeText);
+  if (element)
+  {    
+    const MapsText &textProp = m_setting.GetTextProp(element->m_textStyle);
+    if (textProp.m_width > 0)
+    {
+      m_lineTextCount = element->m_width / textProp.m_width;
+    }
+    else
+    {
+      m_lineTextCount = 0;
+    }    
+  }
+  m_dialogText1.SetLabelElement(element);
+  m_dialogText1.ClearCaption();
+  m_dialogText2.SetLabelElement(GetGuiElement(MessageDialogHook_DialogeText2));
+  m_dialogText2.ClearCaption();
   m_cancelButton.SetVisible(false);
   m_affirmButton.SetVisible(false);
   m_delimiter.SetVisible(false);
@@ -175,8 +194,8 @@ bool CMessageDialogHook::operator ()()
 
 void UeGui::CMessageDialogHook::SetMessageDialogInfo( MessageBoxType type, const char* caption,const CMessageDialogEvent& dialogEvent, unsigned short interval )
 {
-  m_interval = interval;
-  m_dialogText.SetCaption(caption);
+  m_interval = interval;  
+  DoShowMessageText(caption);
   m_messageDialogEvent = dialogEvent;
   //根据消息类型显示窗口
   CViewHook::GuiElement* guiElement = GetGuiElement(MessageDialogHook_DialogeIcon);
@@ -310,5 +329,48 @@ void UeGui::CMessageDialogHook::Timer()
   if (NeedCountDown())
   {
     UpdateCountDown();
+  }
+}
+
+void UeGui::CMessageDialogHook::DoShowMessageText( const char* caption )
+{
+  //根据文本的宽度和控件的宽度判断是否要显示成2行
+  TCHAR uniText[MAX_NAME_LENGTH] = {};
+  m_stringBasic.Ascii2Chs(caption, uniText, MAX_NAME_LENGTH);
+  int textLen = ::_tcslen(uniText);
+  if (textLen <= m_lineTextCount)
+  {
+    m_dialogText1.SetCaption(caption);
+    m_dialogText2.ClearCaption();
+  }
+  else
+  {
+    //文字分割索引
+    int splitIndex = m_lineTextCount - 1;
+    if ((textLen - m_lineTextCount) <= 3)
+    {
+      //如果第二行少于2个字则至少显示2个字
+      splitIndex -= 3;
+    }
+    TCHAR tc1[MAX_NAME_LENGTH] = {};
+    TCHAR tc2[MAX_NAME_LENGTH] = {};
+    TCHAR* pc = tc1;
+    for (int i = 0; i <= splitIndex; ++i)
+    {
+      *pc = uniText[i];
+      pc++;
+    }
+    char asciiText[MAX_NAME_LENGTH] = {};
+    m_stringBasic.Wcs2Ascii(tc1, asciiText, MAX_NAME_LENGTH);
+    m_dialogText1.SetCaption(asciiText);
+
+    pc = tc2;
+    for (int i = splitIndex + 1; i < textLen; ++i)
+    {
+      *pc = uniText[i];
+      pc++;
+    }
+    m_stringBasic.Wcs2Ascii(tc2, asciiText, MAX_NAME_LENGTH);
+    m_dialogText2.SetCaption(asciiText);
   }
 }

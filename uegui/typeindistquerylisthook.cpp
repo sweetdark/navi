@@ -6,6 +6,8 @@
 
 #include "maphook.h"
 
+#include "distselecthook.h"
+
 #include "districtselectionhook.h"
 
 #include "selectpointcallbackctrl.h"
@@ -202,6 +204,12 @@ short CTypeInDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
   case TypeInDistQueryListHook_DistSelectBtnIcon:
     {
       m_distSelectBtn.MouseUp();
+      CDistSelectHook* hook = (CDistSelectHook*)m_view->GetHook(DHT_DistSelectHook);
+      if (hook)
+      {
+        hook->SetCallBackFun(this, DistSwitchCallBack);
+      }
+      TurnTo(DHT_DistSelectHook);
     }
     break;
   case TypeInDistQueryListHook_TypeSelectBtn:

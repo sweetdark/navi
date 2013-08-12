@@ -25,30 +25,50 @@ namespace UeBase
     CCustomerFileReader(tstring& fileName, unsigned int blockSize);
     virtual ~CCustomerFileReader() {}
   public:
-    //链接文件映射内存
+    /*
+    * 链接文件映射内存
+    */      
     bool ConnectFile();
-    //断开连接
+    /*
+    * 断开连接
+    */      
     bool DisconnectFile();
-    //根据数据索引从文件中读取数据 参数blockSize为读取的数据大小，只有读的使用才使用的ConnectFile()和DisconnectFile()
+    /*
+    * 根据数据索引从文件中读取数据 参数blockSize为读取的数据大小，只有读的使用才使用的ConnectFile()和DisconnectFile()
+    */      
     const char* GetBlockData(const unsigned int dataIndex, unsigned int& readSize);
-    //读取文件中数据量,调用之前必须要调用ConnectFile()和DisconnectFile()
+    /*
+    * 读取文件中数据量,调用之前必须要调用ConnectFile()和DisconnectFile()
+    */      
     unsigned int GetDataCount();
     /*
-    * 添加块数据
-    * parameter whence : UE_SEEK_END添加到文件末尾 UE_SEEK_BEGIN添加到文件头部 默认添加到文件结尾
+    * 添加块数据,每次添加一条
+    * parameter whence : UE_SEEK_END添加到文件末尾 UE_SEEK_BEGIN添加到文件头部 默认添加到文件头部
     */
     bool AddBlockData(const char* blockData, int whence = CFileBasic::UE_SEEK_BEGIN);
-    //删除块数据
+    /*
+    * 添加块数据,每次可添加多条
+    * param: dataIndex : 从指定位置开始添加数据，包括当前指定位置
+    * param: blockData 数据
+    * param: addCount 添加的数据条数
+    */
+    bool AddBlockDatas(unsigned int dataIndex, const char* blockData, int addCount);
+    /*
+    * 删除块数据
+    */    
     bool RemoveBlockData(const unsigned int dataIndex);
-    //删除所有数据
+    /*
+    * 删除所有数据
+    */    
     bool RemoveAllData();
     /*
     * 修改块数据
     * parameter whence : UE_SEEK_BEGIN修改后数据移到文件头 UE_SEEK_CUR 修改后数据仍然保存到当前位置
     */
     bool EditBlockData(const unsigned int dataIndex, const char* editData, int whence = CFileBasic::UE_SEEK_CUR);
-  private:
-    //根据数据索引获取当前数据在文件中的起始位置
+    /*
+    * 根据数据索引获取当前数据在文件中的起始位置
+    */  
     unsigned int GetPosition(const unsigned int dataIndex);
   private:
     //是否文件已经处于连接状态

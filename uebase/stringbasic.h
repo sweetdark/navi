@@ -232,7 +232,7 @@ private:
 		static CDbgLogger m_log;
 #endif
 	/// Singletion
-	static CStringBasic m_stringBasic;
+	static CStringBasic *m_stringBasic;
 	};
 }
 

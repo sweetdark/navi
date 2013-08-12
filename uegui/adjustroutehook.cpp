@@ -5,9 +5,28 @@
 #include "maphook.h"
 #include "querywrapper.h"
 #include "routetypeswitchhook.h"
+#include "inputswitchhook.h"
+#include "selectpointcallbackctrl.h"
 using namespace UeGui;
 
-CAdjustRouteHook::CAdjustRouteHook() : m_addRowTag(kROWEnd), m_selectRowTag(kROWBegin) , m_dataFrom(kFromRoute)
+#define ADDPOIMACRO(num) do                 \
+{                                           \
+  if (IsNeedRefresh(m_addPOI##num##Ctrl))   \
+  {                                         \
+    m_addPOI##num##Ctrl.MouseUp();          \
+    DoEditOrAddPoi(kROW##num##);            \
+  }                                         \
+} while (0)
+
+#define MOUSEDOWN_REFRESH(ctrl) do            \
+{                                           \
+  if (IsNeedRefresh(ctrl))                  \
+  {                                         \
+    ctrl.MouseDown();                       \
+  }                                         \
+} while (0)
+
+CAdjustRouteHook::CAdjustRouteHook() : m_selectRowTag(kROWBegin) , m_dataFrom(kFromRoute)
 {
   m_strTitle = "编辑路线";
   m_vecHookFile.push_back(_T("adjustroutehook.bin"));
@@ -166,12 +185,17 @@ void CAdjustRouteHook::MakeControls()
 
 void CAdjustRouteHook::Load()
 {
-  if (m_dataFrom == kFromRoute)
+  if (GetPrevHookType() != DHT_RouteTypeSwitchHook)
   {
-    GetRouteData();
+    if (m_dataFrom == kFromRoute)
+    {
+      GetRouteData();
+    }
+    InitButtonState();
+    m_planMethod = CRouteWrapper::Get().GetMethod();
+    SetRouteTypeCaption(m_planMethod);
+    ShowRouteData();
   }
-  m_planMethod = CRouteWrapper::Get().GetMethod();
-  ShowRouteData();
 }
 short CAdjustRouteHook::MouseDown(CGeoPoint<short> &scrPoint)
 {
@@ -181,42 +205,42 @@ short CAdjustRouteHook::MouseDown(CGeoPoint<short> &scrPoint)
   case adjustroutehook_AddPOI1:
   case adjustroutehook_AddPOI1Icon:
     {
-      m_addPOI1Ctrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_addPOI1Ctrl);
     }
     break;
   case adjustroutehook_AddPOI2:
   case adjustroutehook_AddPOI2Icon:
     {
-      m_addPOI2Ctrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_addPOI2Ctrl);
     }
     break;
   case adjustroutehook_AddPOI3:
   case adjustroutehook_AddPOI3Icon:
     {
-      m_addPOI3Ctrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_addPOI3Ctrl);
     }
     break;
   case adjustroutehook_AddPOI4:
   case adjustroutehook_AddPOI4Icon:
     {
-      m_addPOI4Ctrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_addPOI4Ctrl);
     }
     break;
   case adjustroutehook_AddPOI5:
   case adjustroutehook_AddPOI5Icon:
     {
-      m_addPOI5Ctrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_addPOI5Ctrl);
     }
     break;
   case adjustroutehook_AddPOI6:
   case adjustroutehook_AddPOI6Icon:
     {
-      m_addPOI6Ctrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_addPOI6Ctrl);
     }
     break;
   case adjustroutehook_DemoGuidanceBtn:
     {
-      m_demoGuidanceBtnCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_demoGuidanceBtnCtrl);
     }
     break;
   case adjustroutehook_POI1Btn:
@@ -233,7 +257,7 @@ short CAdjustRouteHook::MouseDown(CGeoPoint<short> &scrPoint)
   case adjustroutehook_POI1Gps:
   case adjustroutehook_POI1GpsIcon:
     {
-      m_pOI1GpsCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_pOI1GpsCtrl);
     }
     break;
   case adjustroutehook_POI2Btn:
@@ -250,7 +274,7 @@ short CAdjustRouteHook::MouseDown(CGeoPoint<short> &scrPoint)
   case adjustroutehook_POI2Delete:
   case adjustroutehook_POI2DeleteIcon:
     {
-      m_pOI2DeleteCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_pOI2DeleteCtrl);
     }
     break;
   case adjustroutehook_POI3Btn:
@@ -267,7 +291,7 @@ short CAdjustRouteHook::MouseDown(CGeoPoint<short> &scrPoint)
   case adjustroutehook_POI3Delete:
   case adjustroutehook_POI3DeleteIcon:
     {
-      m_pOI3DeleteCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_pOI3DeleteCtrl);
     }
     break;
   case adjustroutehook_POI4Btn:
@@ -284,7 +308,7 @@ short CAdjustRouteHook::MouseDown(CGeoPoint<short> &scrPoint)
   case adjustroutehook_POI4Delete:
   case adjustroutehook_POI4DeleteIcon:
     {
-      m_pOI4DeleteCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_pOI4DeleteCtrl);
     }
     break;
   case adjustroutehook_POI5Btn:
@@ -301,7 +325,7 @@ short CAdjustRouteHook::MouseDown(CGeoPoint<short> &scrPoint)
   case adjustroutehook_POI5Delete:
   case adjustroutehook_POI5DeleteIcon:
     {
-      m_pOI5DeleteCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_pOI5DeleteCtrl);
     }
     break;
   case adjustroutehook_POI6Btn:
@@ -318,33 +342,33 @@ short CAdjustRouteHook::MouseDown(CGeoPoint<short> &scrPoint)
   case adjustroutehook_POI6Delete:
   case adjustroutehook_POI6DeleteIcon:
     {
-      m_pOI6DeleteCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_pOI6DeleteCtrl);
     }
     break;
   case adjustroutehook_PlainLineBtn:
     {
-      m_plainLineBtnCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_plainLineBtnCtrl);
     }
     break;
   case adjustroutehook_RouteTypeBtn:
   case adjustroutehook_RouteTypeBtnIcon:
     {
-      m_routeTypeBtnCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_routeTypeBtnCtrl);
     }
     break;
   case adjustroutehook_RouteTypeLabel:
     {
-      m_routeTypeLabelCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_routeTypeLabelCtrl);
     }
     break;
   case adjustroutehook_SaveLineBtn:
     {
-      m_saveLineBtnCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_saveLineBtnCtrl);
     }
     break;
   case adjustroutehook_StartGuidanceBtn:
     {
-      m_startGuidanceBtnCtrl.MouseDown();
+      MOUSEDOWN_REFRESH(m_startGuidanceBtnCtrl);
     }
     break;
   default:
@@ -374,37 +398,37 @@ short CAdjustRouteHook::MouseUp(CGeoPoint<short> &scrPoint)
   case adjustroutehook_AddPOI1:
   case adjustroutehook_AddPOI1Icon:
     {
-      m_addPOI1Ctrl.MouseUp();
+      ADDPOIMACRO(1);
     }
     break;
   case adjustroutehook_AddPOI2:
   case adjustroutehook_AddPOI2Icon:
     {
-      m_addPOI2Ctrl.MouseUp();
+      ADDPOIMACRO(2);
     }
     break;
   case adjustroutehook_AddPOI3:
   case adjustroutehook_AddPOI3Icon:
     {
-      m_addPOI3Ctrl.MouseUp();
+      ADDPOIMACRO(3);
     }
     break;
   case adjustroutehook_AddPOI4:
   case adjustroutehook_AddPOI4Icon:
     {
-      m_addPOI4Ctrl.MouseUp();
+      ADDPOIMACRO(4);
     }
     break;
   case adjustroutehook_AddPOI5:
   case adjustroutehook_AddPOI5Icon:
     {
-      m_addPOI5Ctrl.MouseUp();
+      ADDPOIMACRO(5);
     }
     break;
   case adjustroutehook_AddPOI6:
   case adjustroutehook_AddPOI6Icon:
     {
-      m_addPOI6Ctrl.MouseUp();
+      ADDPOIMACRO(6);
     }
     break;
   case adjustroutehook_DemoGuidanceBtn:
@@ -531,10 +555,12 @@ short CAdjustRouteHook::MouseUp(CGeoPoint<short> &scrPoint)
   case adjustroutehook_RouteTypeBtnIcon:
   case adjustroutehook_RouteTypeLabel:
     {
-      m_routeTypeBtnCtrl.MouseUp();
-      m_routeTypeLabelCtrl.MouseUp();
-      CRouteTypeSwitchHook::SetRouteTypeCallBackFun(this, &CAdjustRouteHook::OnRouteTypeSelect);
-      TurnTo(DHT_RouteTypeSwitchHook);
+      if (IsNeedRefresh(m_routeTypeBtnCtrl))
+      {
+        m_routeTypeBtnCtrl.MouseUp();
+        CRouteTypeSwitchHook::SetRouteTypeCallBackFun(this, &CAdjustRouteHook::OnRouteTypeSelect);
+        TurnTo(DHT_RouteTypeSwitchHook);
+      }
     }
     break;
   case adjustroutehook_SaveLineBtn:
@@ -555,8 +581,10 @@ short CAdjustRouteHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    m_isNeedRefesh = false;
-    assert(false);
+    {
+      m_isNeedRefesh = false;
+      assert(false);
+    }
     break;
   }
   if (m_isNeedRefesh)
@@ -566,7 +594,6 @@ short CAdjustRouteHook::MouseUp(CGeoPoint<short> &scrPoint)
   m_isNeedRefesh = true;
   return ctrlType;
 }
-
 void CAdjustRouteHook::ClearPOIList()
 {
   m_POIList.clear();
@@ -594,6 +621,7 @@ void CAdjustRouteHook::SetPOIDataList( const POIDataList& poiList )
 
 void CAdjustRouteHook::InsertPOIData( int position, const UeQuery::SQLRecord* data )
 { 
+  m_dataFrom = kFromOutside;
   //在指定位置添加数据,超过最大数目后不允许再添加
   if (m_POIList.size() >= 6)
   {
@@ -606,7 +634,10 @@ void CAdjustRouteHook::InsertPOIData( int position, const UeQuery::SQLRecord* da
   //将查询数据赋值给POI节点
   POIItem poi;
   poi.m_type = PT_Middle;
-  ::strcpy(poi.m_name, data->m_uniName);
+  if (data->m_uniName)
+  {
+    ::strcpy(poi.m_name, data->m_uniName);
+  }
   int len = ::strlen(poi.m_name);
   if(poi.m_name[len] == 0)
   {
@@ -632,7 +663,6 @@ void CAdjustRouteHook::InsertPOIData( int position, const UeQuery::SQLRecord* da
       m_POIList.insert(iter + position, poi);
     }
   }
-  m_addRowTag = kROWEnd;
 }
 
 
@@ -771,6 +801,11 @@ void UeGui::CAdjustRouteHook::GetRouteData()
   {
     m_POIList.push_back(startPos);
   }
+  else
+  {
+    GetGpsItem(startPos);
+    m_POIList.push_back(startPos);
+  }
   //获取中间经由点
   int posCount = m_route->GetPosCount();
   if(posCount > 2)
@@ -815,7 +850,7 @@ void CAdjustRouteHook::ShowRouteData()
   if (m_POIList.size() > 2)
   {
     int row = kROW2;
-    for (unsigned int i = 1; i < m_POIList.size(); ++i)
+    for (unsigned int i = 1; i < m_POIList.size() - 1; ++i)
     {
       if (row > kROW6)
       {
@@ -912,6 +947,18 @@ void CAdjustRouteHook::OnClearAll( CAggHook* sender, ModalResultType modalResult
   }
 }
 
+void UeGui::CAdjustRouteHook::DoEditOrAddPoi(RowTag row)
+{
+  m_selectRowTag = row;
+
+  CInputSwitchHook *inputHook = (CInputSwitchHook *)CViewWrapper::Get().GetHook(DHT_InputSwitchHook);
+  if (inputHook)
+  {
+    CSelectPointCallBackCtrl::Get().SetCallBackFun((void*)this, &CAdjustRouteHook::SelectPointEvent);
+    TurnTo(inputHook->GetCurInputHookType());
+  }
+}
+
 void CAdjustRouteHook::OnInsertPOIData( void* sender, const UeQuery::SQLRecord * data )
 {
   if (NULL == sender)
@@ -953,21 +1000,19 @@ void CAdjustRouteHook::SetRouteTypeCaption(unsigned int routeType)
     m_routeTypeLabelCtrl.SetCaption("经济路线"); 
   }
   m_planMethod = routeType;
+  CRouteWrapper::Get().SetMethod(m_planMethod);
 }
 
 //读取要添加的POI位置,下标从0开始
 unsigned int CAdjustRouteHook::GetInsertPosition()
 {
-  return GetDataIndex(m_addRowTag);
+  return GetDataIndex(m_selectRowTag);
 }
 
 void CAdjustRouteHook::ClearAll()
 {
   ClearAllRow();
   ClearPOIList();  
-  //定位到地图界面起点
-  /*CViewHook::m_prevHookType = CViewHook::m_curHookType;
-  CViewHook::m_curHookType = CViewHook::DHT_MapHook;*/
 }
 
 void UeGui::CAdjustRouteHook::OnDeletePOI( CAggHook* sender, ModalResultType modalResult )
@@ -983,6 +1028,7 @@ void CAdjustRouteHook::DeletePOI()
 {
   
   DeleteRouteData(m_selectRowTag);
+  InitButtonState();
   //删除POI之后重新显示数据
   ShowRouteData();
 }
@@ -1071,18 +1117,23 @@ void CAdjustRouteHook::StartDemo()
 
 void CAdjustRouteHook::SetGpsPos()
 {
+  POIItem item1;
+  GetGpsItem(item1);
+  EditPOIData(kROW1, item1);
+  ShowRouteData();
+}
+
+void CAdjustRouteHook::GetGpsItem(POIItem &item)
+{
   CViewWrapper &viewWrapper = CViewWrapper::Get();
   const GpsCar &gpsCar = viewWrapper.GetGpsCar();
   CGeoPoint<long> mapPos;
   mapPos.m_x = gpsCar.m_curPos.m_x;
   mapPos.m_y = gpsCar.m_curPos.m_y;
-  POIItem item1;
-  item1.m_pos = mapPos;
-  item1.m_type = PT_Start;
+  item.m_pos = mapPos;
+  item.m_type = PT_Start;
   CQueryWrapper &queryWrapper = CQueryWrapper::Get();
-  queryWrapper.GetPlaceName(mapPos, item1.m_name);
-  EditPOIData(kROW1, item1);
-  ShowRouteData();
+  queryWrapper.GetPlaceName(mapPos, item.m_name);
 }
 
 void CAdjustRouteHook::EditPOIData(RowTag row, const POIItem &item)
@@ -1090,5 +1141,37 @@ void CAdjustRouteHook::EditPOIData(RowTag row, const POIItem &item)
   if (row > kROWBegin && row < kROWEnd)
   {
     m_POIList[row - 1] = item;
+  }
+}
+void CAdjustRouteHook::SelectPointEvent(void *callBackObj, const UeQuery::SQLRecord* data)
+{
+  CAdjustRouteHook *hook = static_cast<CAdjustRouteHook*>(callBackObj);
+  if (hook)
+  {
+    hook->InsertPOIData(hook->GetInsertPosition(), data);
+    hook->Fall(CViewHook::DHT_AdjustRouteHook);
+    hook->ShowRouteData();
+  }
+}
+
+void CAdjustRouteHook::InitButtonState()
+{
+  if (m_POIList.size() < 2)
+  {
+    m_startGuidanceBtnCtrl.SetEnable(false);
+    m_demoGuidanceBtnCtrl.SetEnable(false);
+    m_routeTypeBtnCtrl.SetEnable(false);
+    m_routeTypeLabelCtrl.SetEnable(false);
+    m_plainLineBtnCtrl.SetEnable(false);
+    m_saveLineBtnCtrl.SetEnable(false);
+  }
+  else
+  {
+    m_startGuidanceBtnCtrl.SetEnable(true);
+    m_demoGuidanceBtnCtrl.SetEnable(true);
+    m_routeTypeBtnCtrl.SetEnable(true);
+    m_routeTypeLabelCtrl.SetEnable(true);
+    m_plainLineBtnCtrl.SetEnable(true);
+    m_saveLineBtnCtrl.SetEnable(true);
   }
 }

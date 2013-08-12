@@ -301,6 +301,7 @@ void UeGui::CMapSimulationMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     mapHook->ShowFixedPostionBtn(false);
     mapHook->ShowCompass(false);
     mapHook->ShowElecEye(false);
+    mapHook->RefreshSrcModalBtnStatus();
     
     //ÊÇ·ñÊÇ·ÖÆÁ×´Ì¬
     if (mapHook->IsSplitScreen())
@@ -411,7 +412,8 @@ void UeGui::CMapSimulationMenuHook::Update( short type )
       {
         mapHook->ShowTimeBtn();
       } 
-    } 
+    }
+    mapHook->RefreshSrcModalBtnStatus();
   }
   else
   {

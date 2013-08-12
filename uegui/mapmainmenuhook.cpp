@@ -314,6 +314,7 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     mapHook->ShowGuideInfoBtn(false);
     mapHook->ShowCompass(false);
     mapHook->ShowElecEye(false);
+    mapHook->RefreshSrcModalBtnStatus();
 
     if ((UeRoute::PS_RealGuidance == planState) && (UeMap::VM_Guidance == viewMode))
     {
@@ -477,6 +478,7 @@ void UeGui::CMapMainMenuHook::Update( short type )
         mapHook->ShowTimeBtn();
       }
     }
+    mapHook->RefreshSrcModalBtnStatus();
   }
   else
   {

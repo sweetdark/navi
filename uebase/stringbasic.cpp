@@ -36,6 +36,7 @@
 using namespace UeBase;
 // Initialize until the first time to call this function
 CMemVector CStringBasic::m_spellingTable(sizeof(SpellingItem), 400);
+CStringBasic *CStringBasic::m_stringBasic = 0;
 
 //
 #if __FOR_PC__
@@ -224,8 +225,13 @@ CStringBasic::~CStringBasic()
 const CStringBasic &CStringBasic::Get()
 {
   // Initialize this static variable until the first time to call this function
-  static CStringBasic m_stringBasic;
-  return m_stringBasic;
+  if(!m_stringBasic)
+  {
+    // TODO: ...
+    m_stringBasic = new CStringBasic();
+  }
+
+  return *m_stringBasic;
 }
 /**
 * TODO:

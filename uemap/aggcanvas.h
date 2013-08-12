@@ -1305,10 +1305,11 @@ namespace UeMap
     static agg::scanline_bin m_binSL;
 
     // True type fonts
-    static font_engine_type m_lineFont;
-    static font_manager_type m_lineFace;
-    static font_engine_type m_grayFont;
-    static font_manager_type m_grayFace;
+    // TODO: Extract class.
+    /*static */font_engine_type m_lineFont;
+    /*static */font_manager_type m_lineFace;
+    /*static */font_engine_type m_grayFont;
+    /*static */font_manager_type m_grayFace;
 
     // Different path storages
     static PathMap m_linePathes;

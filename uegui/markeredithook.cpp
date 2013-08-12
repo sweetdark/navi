@@ -15,25 +15,9 @@ CMarkerEditHook::~CMarkerEditHook()
   m_imageNames.clear();
 }
 
-void CMarkerEditHook::MakeGUI()
-{
-  FetchWithBinary();
-  MakeNames();
-  MakeControls();
-}
-
-//tstring CMarkerEditHook::GetBinaryFileName()
-//{
-//  return _T("markeredithook.bin");
-//}
-
 void CMarkerEditHook::MakeNames()
 {
   CMenuBackgroundHook::MakeNames();
-  m_ctrlNames.insert(GuiName::value_type(MarkerEditHook_BackGround,	"BackGround"));
-  m_ctrlNames.insert(GuiName::value_type(MarkerEditHook_BackGroundText,	"BackGroundText"));
-  m_ctrlNames.insert(GuiName::value_type(MarkerEditHook_GotoMapBtn,	"GotoMapBtn"));
-  m_ctrlNames.insert(GuiName::value_type(MarkerEditHook_BackButton,	"BackButton"));
   m_ctrlNames.insert(GuiName::value_type(MarkerEditHook_mark01,	"mark01"));
   m_ctrlNames.insert(GuiName::value_type(MarkerEditHook_mark02,	"mark02"));
   m_ctrlNames.insert(GuiName::value_type(MarkerEditHook_mark03,	"mark03"));
@@ -97,121 +81,145 @@ short CMarkerEditHook::MouseDown(CGeoPoint<short> &scrPoint)
   case MarkerEditHook_mark01:
     {
       m_mark01Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark01Ctrl);
     }
     break;
   case MarkerEditHook_mark02:
     {
       m_mark02Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark02Ctrl);
     }
     break;
   case MarkerEditHook_mark03:
     {
       m_mark03Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark03Ctrl);
     }
     break;
   case MarkerEditHook_mark04:
     {
       m_mark04Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark04Ctrl);
     }
     break;
   case MarkerEditHook_mark05:
     {
       m_mark05Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark05Ctrl);
     }
     break;
   case MarkerEditHook_mark06:
     {
       m_mark06Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark06Ctrl);
     }
     break;
   case MarkerEditHook_mark07:
     {
       m_mark07Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark07Ctrl);
     }
     break;
   case MarkerEditHook_mark08:
     {
       m_mark08Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark08Ctrl);
     }
     break;
   case MarkerEditHook_mark09:
     {
       m_mark09Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark09Ctrl);
     }
     break;
   case MarkerEditHook_mark10:
     {
       m_mark10Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark10Ctrl);
     }
     break;
   case MarkerEditHook_mark11:
     {
       m_mark11Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark11Ctrl);
     }
     break;
   case MarkerEditHook_mark12:
     {
       m_mark12Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark12Ctrl);
     }
     break;
   case MarkerEditHook_mark13:
     {
       m_mark13Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark13Ctrl);
     }
     break;
   case MarkerEditHook_mark14:
     {
       m_mark14Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark14Ctrl);
     }
     break;
   case MarkerEditHook_mark15:
     {
       m_mark15Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark15Ctrl);
     }
     break;
   case MarkerEditHook_mark16:
     {
       m_mark16Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark16Ctrl);
     }
     break;
   case MarkerEditHook_mark17:
     {
       m_mark17Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark17Ctrl);
     }
     break;
   case MarkerEditHook_mark18:
     {
       m_mark18Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark18Ctrl);
     }
     break;
   case MarkerEditHook_mark19:
     {
       m_mark19Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark19Ctrl);
     }
     break;
   case MarkerEditHook_mark20:
     {
       m_mark20Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark20Ctrl);
     }
     break;
   case MarkerEditHook_mark21:
     {
       m_mark21Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark21Ctrl);
     }
     break;
   case MarkerEditHook_mark22:
     {
       m_mark22Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark22Ctrl);
     }
     break;
   case MarkerEditHook_mark23:
     {
       m_mark23Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark23Ctrl);
     }
     break;
   case MarkerEditHook_mark24:
     {
       m_mark24Ctrl.MouseDown();
+      AddRenderUiControls(&m_mark24Ctrl);
     }
     break;
   default:
@@ -242,7 +250,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark01Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -252,7 +260,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark02Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -262,7 +270,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark03Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -272,7 +280,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark04Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -282,7 +290,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark05Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -292,7 +300,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark06Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -302,7 +310,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark07Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -312,7 +320,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark08Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -322,7 +330,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark09Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -332,7 +340,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark10Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -342,7 +350,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark11Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -352,7 +360,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark12Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -362,7 +370,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark13Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -372,7 +380,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark14Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -382,7 +390,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark15Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -392,7 +400,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark16Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -402,7 +410,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark17Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -412,7 +420,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark18Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -422,7 +430,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark19Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -432,7 +440,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark20Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -442,7 +450,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark21Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -452,7 +460,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark22Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -462,7 +470,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark23Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -472,7 +480,7 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         edithook.SetMark(m_mark24Ctrl.GetCenterElement()->m_backStyle);
-        CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
+        Return();
       }
     }
     break;
@@ -487,9 +495,3 @@ short CMarkerEditHook::MouseUp(CGeoPoint<short> &scrPoint)
   m_isNeedRefesh = true;
   return ctrlType;
 }
-
-bool CMarkerEditHook::operator ()()
-{
-  return false;
-}
-

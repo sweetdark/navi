@@ -5,43 +5,52 @@
 #include "uegui.h"
 #endif
 
-#ifndef _UEGUI_AGGHOOK_H
-#include "agghook.h"
-#endif
+#include "menubackgroundhook.h"
 
+//#include "uilabel.h"
 #include "uibutton.h"
 //#include "uiradiobutton.h"
 //#include "uicheckbutton.h"
-#include "uebase\geombasic.h"
 
 namespace UeGui
 {
-  class UEGUI_CLASS CDdtServiceHook : public CAggHook
+  class UEGUI_CLASS CDdtServiceHook : public CMenuBackgroundHook
   {
   public:
-    enum DdtServiceHookCtrlType
+    enum ddtservicehookCtrlType
     {
-      DdtServiceHook_Begin = 0,
-      DdtServiceHook_DdtserviceBackGround,
-      DdtServiceHook_DdtserviceText,
-      DdtServiceHook_GotoMapBtn,
-      DdtServiceHook_BackButton,
-      DdtServiceHook_Position4SBtn,
-      DdtServiceHook_Position4SText,
-      DdtServiceHook_SceneryBtn,
-      DdtServiceHook_SceneryText,
-      DdtServiceHook_HelpBtn,
-      DdtServiceHook_HelpText,
-      DdtServiceHook_UpdateBtn,
-      DdtServiceHook_UpdateText,
-      DdtServiceHook_End
+      ddtservicehook_Begin = MenuBackgroundHook_End,
+      ddtservicehook_OperationHelpBtn,
+      ddtservicehook_OperationLabel,
+      ddtservicehook_OperationBack,
+
+      ddtservicehook_FunctionUpdateBtn,
+      ddtservicehook_FunctionUpdateLabel,
+      ddtservicehook_FunctionUpdateBack,
+
+      ddtservicehook_UpdateServiceBack,
+      ddtservicehook_UpdateServiceLabel,
+      ddtservicehook_UpdateServiceBtn,
+
+      ddtservicehook_VersionCheckBack,
+      ddtservicehook_VersionCheckLabel,
+      ddtservicehook_VersionCheckBtn,
+
+      ddtservicehook_LongSplit,
+      ddtservicehook_VerticalSplit1,
+      ddtservicehook_VerticalSplit2,
+      ddtservicehook_VerticalSplit3,
+
+      ddtservicehook_Back1,
+      ddtservicehook_Back2,
+      ddtservicehook_Back3,
+      ddtservicehook_Back4,
+      ddtservicehook_End
     };
 
     CDdtServiceHook();
 
     virtual ~CDdtServiceHook();
-
-    virtual void MakeGUI();
 
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
@@ -49,42 +58,30 @@ namespace UeGui
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual void Init();
-
     virtual void Load();
 
-    virtual bool operator ()();
   protected:
-    virtual tstring GetBinaryFileName();
 
     virtual void MakeNames();
 
     void MakeControls();
+
   private:
-    //打开4S店
-    void Open4SShopeHook();
-    //打开景点查询
-    void OpenViewSpotHook();
+    CUiButton m_functionUpdateBtnCtrl;
+    CUiButton m_functionUpdateLabelCtrl;
+    CUiButton m_functionUpdateBackCtrl;
 
-    //4S店hook鼠标触发事件
-    static void On4SShopListQuery(const char* keyValue1, const char* keyValue2,  const CGeoPoint<long>& point);
-    //旅游景点hook触发事件
-    static void OnViewSpotListQuery(const char* keyValue1, const char* keyValue2, const CGeoPoint<long>& point);
-    //4S店查询结果列表hook的返回事件
-    static void On4SShopListHookReturn();
-    //4S店查询结果列表hook的景点选择事件
-    static void On4SShopListHookPOISelect(const char* keyValue1, const char* keyValue2,const CGeoPoint<long>& point);
-  private:
-    CUiButton m_gotoMapBtnCtrl;
-    CUiButton m_backButtonCtrl;
-    
-    CUiBitButton m_helpBtnCtrl;
+    CUiButton m_operationHelpBtnCtrl;
+    CUiButton m_operationLabelCtrl;
+    CUiButton m_operationBackCtrl;
 
-    CUiBitButton m_position4SBtnCtrl;
+    CUiButton m_updateServiceBtnCtrl;
+    CUiButton m_updateServiceLabelCtrl;
+    CUiButton m_updateServiceBackCtrl;
 
-    CUiBitButton m_sceneryBtnCtrl;
-
-    CUiBitButton m_updateBtnCtrl;
+    CUiButton m_versionCheckBtnCtrl;
+    CUiButton m_versionCheckLabelCtrl;
+    CUiButton m_versionCheckBackCtrl;
   };
 }
 #endif

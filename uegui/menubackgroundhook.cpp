@@ -1,9 +1,5 @@
 #include "menubackgroundhook.h"
 
-#ifndef _UEGUI_QUERYWRAPPER_H
-#include "querywrapper.h"
-#endif
-
 using namespace UeGui;
 
 CMenuBackgroundHook::CMenuBackgroundHook() : m_uCurHookFileIdx(0)
@@ -98,7 +94,6 @@ short CMenuBackgroundHook::MouseUp(CGeoPoint<short> &scrPoint)
   case MenuBackgroundHook_GoToMapBtnIcon:
     {
       m_goToMapBtnCtrl.MouseUp();
-      CQueryWrapper::Get().ClearVecSQLSentence();
       GoToMapHook();
     }
     break;

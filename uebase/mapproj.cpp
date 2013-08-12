@@ -24,7 +24,7 @@
 #include "mapproj.h"
 using namespace UeBase;
 
-
+CMapProjection *CMapProjection::m_projection = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
 /**
@@ -111,8 +111,12 @@ CMapProjection::~CMapProjection()
 */
 CMapProjection &CMapProjection::Get()
 {
-  static CMapProjection m_projection;
-  return m_projection;
+  if(!m_projection)
+  {
+    // TODO:...
+    m_projection = new CMapProjection();
+  }
+  return *m_projection;
 }
 
 

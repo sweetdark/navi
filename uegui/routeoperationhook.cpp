@@ -3,6 +3,7 @@
 #include "maphook.h"
 #include "messagedialoghook.h"
 #include "myjourneyhook.h"
+#include "editswitchhook.h"
 using namespace UeGui;
 
 CRouteOperationHook::CRouteOperationHook()
@@ -334,8 +335,9 @@ short CRouteOperationHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_eighthBtnBackgroundCtrl.MouseUp();
       m_saveJurneyBtnCtrl.MouseUp();
       GetRouteData();
-      char* test = "rout";
-      SaveJourneyData(test);
+      CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(DHT_EditSwitchHook));
+      editSwitch->SetEditCallBackFun(this, m_strTitle.c_str(), "", SaveJourneyData);
+      TurnTo(editSwitch->GetCurEditHookType());
     }
     break;
   default:
@@ -455,7 +457,11 @@ void CRouteOperationHook::OnClickNavigation()
     m_isNeedRefesh = false;
   }
 }
-void UeGui::CRouteOperationHook::SaveJourneyData( const char* journeyName )
+void UeGui::CRouteOperationHook::SaveJourneyData(void *pDoCallBackObj, const char* journeyName)
+{
+  ((CRouteOperationHook*)pDoCallBackObj)->DoSaveJourneyData(journeyName);
+}
+void UeGui::CRouteOperationHook::DoSaveJourneyData(const char* journeyName )
 {
   CMessageDialogEvent dialogEvent;
   dialogEvent.m_senderHookType = CViewHook::DHT_RouteOperationHook;

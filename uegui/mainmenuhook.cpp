@@ -229,6 +229,7 @@ short CMainMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case mainmenuhook_ServeLable:
     {
       m_serveBackgroundCtrl.MouseUp();
+      TurnTo(DHT_DdtserviceHook);
     }
     break;
   case mainmenuhook_SettingBackground:

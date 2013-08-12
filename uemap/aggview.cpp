@@ -68,7 +68,7 @@ agg::trans_perspective CAGGView::m_invPsp;
 double CAGGView::m_scaleY = 1.5;
 double CAGGView::m_maxPspVarious = 0.88;
 // Macro 
-#define SCROLL_SPEED 15
+#define SCROLL_SPEED 10
 
 // AGG view singleton
 CAGGView *CAGGView::m_mainView = 0;
@@ -784,7 +784,7 @@ void CAGGView::QuickDraw(bool isRaster, bool isTransforming)
 {
   //MEMORY_STAT
   //TIME_STAT;
-  //CTimerCommand::m_synObject.Lock();
+  CTimerCommand::m_synObject.Lock();
 
   //
   CViewDC *curDC = GetDC();
@@ -836,7 +836,7 @@ void CAGGView::QuickDraw(bool isRaster, bool isTransforming)
   //
   ::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
 
-  //CTimerCommand::m_synObject.UnLock();
+  CTimerCommand::m_synObject.UnLock();
 }
 
 /**
@@ -844,7 +844,7 @@ void CAGGView::QuickDraw(bool isRaster, bool isTransforming)
 **/
 void CAGGView::OnDraw(short style)
 {
-  //CTimerCommand::m_synObject.Lock();
+  CTimerCommand::m_synObject.Lock();
   //MEMORY_STAT
   //TIME_STAT;
   CViewDC *curDC = GetDC();
@@ -889,7 +889,7 @@ void CAGGView::OnDraw(short style)
       ::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
 
       //
-      //CTimerCommand::m_synObject.UnLock();
+      CTimerCommand::m_synObject.UnLock();
       return;
     }
 
@@ -928,7 +928,7 @@ void CAGGView::OnDraw(short style)
       //在模拟导航，模拟导航，滚动时刷新
       //bool flag = (CViewHook::m_curHookType == CViewHook::DHT_MapHook && (planState == UeRoute::PS_DemoGuidance || planState == UeRoute::PS_RealGuidance));
       //通过refreshUI提升刷新效率，去掉mouseDown的局部刷新。局部刷新带来的按钮闪烁问题。
-      if (CViewHook::m_curHookType == CViewHook::DHT_MapHook/*  || flag || m_isScrolling*/)
+      if (NeedDrawMap()/*  || flag || m_isScrolling*/)
       {
         //TIME_STAT;
         stackDC.RedrawBackGround(m_canvas.m_setting.m_bkColor);
@@ -1113,7 +1113,7 @@ void CAGGView::OnDraw(short style)
   }
   
   
-  //CTimerCommand::m_synObject.UnLock();
+  CTimerCommand::m_synObject.UnLock();
 }
 
 void CAGGView::DrawProgress(short step)
@@ -1514,6 +1514,14 @@ void UeMap::CAGGView::LoadGridData()
     }    
   }
 }
+
+bool UeMap::CAGGView::NeedDrawMap()
+{
+  return (CViewHook::DHT_MapHook == CViewHook::m_curHookType);
+  //return (CViewHook::DHT_MapHook == CViewHook::m_curHookType) || 
+  //       (CViewHook::DHT_SoundMenuHook == CViewHook::m_curHookType);
+}
+
 void CAGGView::ScrollMap()
 {
   if (!sThreadHandle)

@@ -4,6 +4,8 @@
 #include "querywrapper.h"
 #endif
 
+#include "distselecthook.h"
+
 #include "districtselectionhook.h"
 
 #include "typeindistquerylisthook.h"
@@ -230,6 +232,12 @@ short CTypeInDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
   case TypeInDistSelectionHook_DistSelectBtnIcon:
     {
       m_distSelectBtn.MouseUp();
+      CDistSelectHook* hook = (CDistSelectHook*)m_view->GetHook(DHT_DistSelectHook);
+      if (hook)
+      {
+        hook->SetCallBackFun(this, DistSwitchCallBack);
+      }
+      TurnTo(DHT_DistSelectHook);
     }
     break;
   case TypeInDistSelectionHook_MainPageUpBtn:

@@ -230,8 +230,11 @@ void UeGui::CDetailMessageHook::SaveToAddressBook()
   unsigned int rt = m_userDataWrapper.AddFavorite(favorData);
   if (UeQuery::SQL_Success == rt)
   {
+    char msg[MAX_NAME_LENGTH] = {};
+    ::strcpy(msg, m_detailInfo.m_name);
+    ::strcat(msg, "已存入地址簿");
     CMessageDialogEvent dialogEvent(this, DHT_DetailMessageHook, NULL);
-    CMessageDialogHook::ShowMessageDialog(MB_NONE, "已存入地址簿", dialogEvent);
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, msg, dialogEvent);
     Sleep(1000);
     CMessageDialogHook::CloseMessageDialog();
   }
@@ -252,8 +255,11 @@ void UeGui::CDetailMessageHook::SaveToUsuallyRecord( UsuallyRecordType type )
     int rt = SaveUsuallyRecord(type);
     if (0 == rt)
     {
+      char msg[MAX_NAME_LENGTH] = {};
+      ::strcpy(msg, m_detailInfo.m_name);
+      ::strcat(msg, GetUsuallyRecordMsgInfo2(type));
       CMessageDialogEvent dialogEvent(this, DHT_DetailMessageHook, NULL);
-      CMessageDialogHook::ShowMessageDialog(MB_NONE, "已保存为常用点", dialogEvent);
+      CMessageDialogHook::ShowMessageDialog(MB_NONE, msg, dialogEvent);
       Sleep(1000);
       CMessageDialogHook::CloseMessageDialog();
     }
@@ -308,6 +314,37 @@ const char* UeGui::CDetailMessageHook::GetUsuallyRecordMsgInfo( UsuallyRecordTyp
   default:
     {
       return "是否替换已保存的数据？";
+    }
+  }
+}
+
+const char* UeGui::CDetailMessageHook::GetUsuallyRecordMsgInfo2( UsuallyRecordType type )
+{
+  switch (type)
+  {
+  case RT_HOME:
+    {
+      return "已保存为家.";
+    }
+  case RT_COMPANY:
+    {
+      return "已保存为单位.";
+    }
+  case RT_ONE:
+    {
+      return "已保存为常用点1.";
+    }
+  case RT_TWO:
+    {
+      return "已保存为常用点2.";
+    }
+  case RT_THREE:
+    {
+      return "已保存为常用点3.";
+    }
+  default:
+    {
+      return "已保存到常用点.";
     }
   }
 }

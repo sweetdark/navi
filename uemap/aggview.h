@@ -262,6 +262,10 @@ namespace UeMap
     //
     CAggStackDC &GetAggDC(CViewDC *saveDC);
 
+    /**
+    * 是否需要渲染地图
+    **/
+    bool NeedDrawMap();
     
 //Test Thread
   public:

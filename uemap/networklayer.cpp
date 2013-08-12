@@ -323,7 +323,7 @@ void CNetworkLayer::Draw(short type, const CViewDC *viewDC, CGeoRect<short> &scr
                 // Only when rendering all in detail way and selection action is only limited to scale level 3
                 unsigned int nameOffset = oneLink->GetNameOffset();
                 CGeoPoint<int> *ptsHead = reinterpret_cast<CGeoPoint<int> *>(coords.GetHead());
-                m_canvas.RenderLink(viewDC, ptsHead, coordCount, category, nameOffset, roadClass, level);
+                m_canvas.RenderLine(viewDC, ptsHead, coordCount, category, nameOffset, roadClass);
                 if(!isRough && curView->m_curScaleLevel < m_canvas.m_setting.m_settingBasic.m_layerNetwork)
                 {
                   // Exception: some map operation no need to get those temporary geometry primitives

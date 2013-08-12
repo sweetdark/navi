@@ -663,14 +663,6 @@
 			Name="layer"
 			>
 			<File
-				RelativePath=".\fpclayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\fpclayer.h"
-				>
-			</File>
-			<File
 				RelativePath=".\groundgate.cpp"
 				>
 			</File>
@@ -684,14 +676,6 @@
 			</File>
 			<File
 				RelativePath=".\groundlayer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\historyplanlayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\historyplanlayer.h"
 				>
 			</File>
 			<File
@@ -716,22 +700,6 @@
 			</File>
 			<File
 				RelativePath=".\planlayer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\planlog.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\planlog.h"
-				>
-			</File>
-			<File
-				RelativePath=".\shplayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\shplayer.h"
 				>
 			</File>
 			<File

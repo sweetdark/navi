@@ -545,3 +545,26 @@ bool UeGui::CRouteWrapper::GetCurElecEye( EEyeProp &elecEye, double& distance )
   }
   return rt;
 }
+
+bool UeGui::CRouteWrapper::GetRoadName( int offset, char *roadName )
+{
+  if (roadName && m_net)
+  {
+    short length = 0;
+    char* str;
+    bool rt = m_net->GetNameTable(UeModel::UNT_Network)->GetContent(offset, &str, length);
+    if (rt && (length > 1))
+    {
+      unsigned char chLen = str[0];
+      str++;
+      str[chLen] = 0;
+      ::strcpy(roadName, str);
+    }
+    else
+    {
+      ::strcpy(roadName, "Ò»°ãµÀÂ·");
+    }
+    return true;
+  }
+  return false;
+}

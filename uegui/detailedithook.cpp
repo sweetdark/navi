@@ -5,14 +5,16 @@
 #include "myinformationhook.h"
 #include "settingwrapper.h"
 #include "messagedialoghook.h"
+#include "editswitchhook.h"
 
 using namespace UeGui;
 
 CDetailEditHook::CDetailEditHook():m_userWrapper(CUserDataWrapper::Get())
 {
-  m_strTitle = "详细";
+  m_strTitle = "详细信息";
   m_vecHookFile.push_back(_T("detailedithook.bin"));
 }
+int CDetailEditHook::m_recpos = 0;
 
 CDetailEditHook::~CDetailEditHook()
 {
@@ -21,22 +23,15 @@ CDetailEditHook::~CDetailEditHook()
   m_imageNames.clear();
 }
 
-//void CDetailEditHook::MakeGUI()
-//{
-//  ClearElements();
-//  FetchWithBinary();
-//  MakeNames();
-//  MakeControls();
-//}
-
-//tstring CDetailEditHook::GetBinaryFileName()
-//{
-//  return _T("detailedithook.bin");
-//}
 
 void CDetailEditHook::Load()
 {
-
+  if (m_detailEditEvent.m_senderHookType == CViewHook::DHT_HistoryInformationHook)
+  {
+    m_markCtrl.SetVisible(false);
+    m_markPicCtrl.SetVisible(false);
+    m_markLabel.SetVisible(false);
+  }
 };
 void CDetailEditHook::MakeNames()
 {
@@ -61,6 +56,7 @@ void CDetailEditHook::MakeControls()
   m_telephoneCtrl.SetCenterElement(GetGuiElement(DetailEditHook_Telephone));
   m_markPicCtrl.SetCenterElement(GetGuiElement(DetailEditHook_MarkPic));
   m_markCtrl.SetCenterElement(GetGuiElement(DetailEditHook_Mark));
+  m_markLabel.SetCenterElement(GetGuiElement(DetailEditHook_MarkLabel));
   m_determineCtrl.SetCenterElement(GetGuiElement(DetailEditHook_Determine));
 }
 
@@ -72,21 +68,23 @@ short CDetailEditHook::MouseDown(CGeoPoint<short> &scrPoint)
   case DetailEditHook_Name:
     {
       m_nameCtrl.MouseDown();
+      AddRenderUiControls(&m_nameCtrl);
     }
     break;
   case DetailEditHook_Address:
     {
       m_addressCtrl.MouseDown();
+      AddRenderUiControls(&m_addressCtrl);
     }
     break;
   case DetailEditHook_Telephone:
     {
       m_telephoneCtrl.MouseDown();
+      AddRenderUiControls(&m_telephoneCtrl);
     }
     break;
   case DetailEditHook_Mark:
   case DetailEditHook_MarkPic:
-  case DetailEditHook_MarkLabel:
     {
       m_markCtrl.MouseDown();
       AddRenderUiControls(&m_markCtrl);
@@ -96,6 +94,7 @@ short CDetailEditHook::MouseDown(CGeoPoint<short> &scrPoint)
   case DetailEditHook_Determine:
     {
       m_determineCtrl.MouseDown();
+      AddRenderUiControls(&m_determineCtrl);
     }
     break;
   default:
@@ -125,7 +124,9 @@ short CDetailEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_nameCtrl.MouseUp();
       if (ctrlType == m_downElementType)
       {
-        DoMouseUp(OT_NAME);
+        CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(CAggHook::DHT_EditSwitchHook));
+        editSwitch->SetEditCallBackFun(this, m_strTitle.c_str(), m_nameCtrl.GetCaption(), EditHookNameCallBack);
+        TurnTo(editSwitch->GetCurEditHookType());
       }
     }
     break;
@@ -134,7 +135,9 @@ short CDetailEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_addressCtrl.MouseUp();
       if (ctrlType == m_downElementType)
       {
-        DoMouseUp(OT_ADDRESS);
+        CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(CAggHook::DHT_EditSwitchHook));
+        editSwitch->SetEditCallBackFun(this, m_strTitle.c_str(), m_addressCtrl.GetCaption(), EditHookAddressCallBack);
+        TurnTo(editSwitch->GetCurEditHookType());
       }
     }
     break;
@@ -143,7 +146,9 @@ short CDetailEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_telephoneCtrl.MouseUp();
       if (ctrlType == m_downElementType)
       {
-        DoMouseUp(OT_TELEPHONE);
+        CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(CAggHook::DHT_EditSwitchHook));
+        editSwitch->SetEditCallBackFun(this, m_strTitle.c_str(), m_telephoneCtrl.GetCaption(), EditHookTelephoneCallBack);
+        TurnTo(editSwitch->GetCurEditHookType());
       }
     }
     break;
@@ -178,11 +183,6 @@ short CDetailEditHook::MouseUp(CGeoPoint<short> &scrPoint)
   return ctrlType;
 }
 
-//bool CDetailEditHook::operator ()()
-//{
-//  return false;
-//}
-
 void UeGui::CDetailEditHook::DoMouseUp(HandleType resultType)
 {
   switch(resultType)
@@ -198,11 +198,7 @@ void UeGui::CDetailEditHook::DoMouseUp(HandleType resultType)
           if (CUserDataWrapper::Get().EditData2FavoriteEntry(&eData, &curEntry))
           {
             const FavoriteEntry& curEntry1 = curEntry;
-           /* UeQuery::SQLSetting setting;
-            m_query->ConnectTo(UeQuery::DT_Favorite, setting);
-            m_query->RemoveFavorite(recpos);*/
-            //如果新添加的地址薄中信息设置了开机位置，则去掉旧的开机位置信息设置
-            m_userWrapper.RemoveFavorite(recpos);
+            m_userWrapper.RemoveFavorite(m_recpos);
             int icount = m_userWrapper.GetFavoriteCount();
             if(curEntry1.m_kind & 0x1)
             {
@@ -224,7 +220,7 @@ void UeGui::CDetailEditHook::DoMouseUp(HandleType resultType)
             m_userWrapper.AddFavorite(curEntry1);
             CMyAddressBookHook::MyAddressBookCallBack();
           }
-          CAggHook::Return();
+          Return();
           Refresh();
         }
         else if (CViewHook::DHT_DetailMessageHook == m_detailEditEvent.m_senderHookType)
@@ -246,62 +242,18 @@ void UeGui::CDetailEditHook::DoMouseUp(HandleType resultType)
           curEntry.m_Y = eData.m_y;
           ::memcpy(&curEntry.m_addrName, &eData.m_name,128);
           m_userWrapper.ConnectToHistoryRecord();
-          m_userWrapper.UpdateHistoryRecord(curEntry, recpos);
+          m_userWrapper.RemoveHistoryRocord(m_recpos);
+          m_userWrapper.AddHistoryRecord(curEntry);
           m_userWrapper.DisconnectHistoryRecord();
-          CAggHook::Return();
+          Return();
         }        
       }
 
       break;
     }
-  case OT_PREVIOUS:
-    {
-      if (CViewHook::DHT_Unknown != m_detailEditEvent.m_senderHookType)
-      {
-        CViewHook::m_curHookType = m_detailEditEvent.m_senderHookType;
-        if (m_detailEditEvent.m_senderHookType == CViewHook::DHT_DetailMessageHook)
-        {
-          CViewHook::m_curHookType = CViewHook::DHT_MapHook;
-        }
-        Refresh();
-      }
-      break;
-    }
-  case OT_GOTOMAP:
-    {
-      /*CViewHook::m_curHookType = CViewHook::DHT_MapHook;*/
-      CAggHook::GoToMapHook();
-      Refresh();
-      break;
-    }
-  case OT_NAME:
-    {
-      //CInputSwitchHook *inputHook = dynamic_cast<CInputSwitchHook*>(m_view->GetHook(CViewHook::DHT_InputSwitchHook));
-      //inputHook->SetInputMethod(CInputSwitchHook::IM_SpellingMethod);
-      //CInputHook::gotoCurInputMethod(CInputHook::IM_Edit,
-      //  CViewHook::DHT_DetailEditHook,this,EditHookNameCallBack,"编辑名称",m_nameCtrl.GetCenterElement()->m_label);
-      break;
-    }
-  case OT_ADDRESS:
-    {
-      //CInputSwitchHook *inputHook = dynamic_cast<CInputSwitchHook*>(m_view->GetHook(CViewHook::DHT_InputSwitchHook));
-      //inputHook->SetInputMethod(CInputSwitchHook::IM_SpellingMethod);
-      //CInputHook::gotoCurInputMethod(CInputHook::IM_Edit,
-      //  CViewHook::DHT_DetailEditHook,this,EditHookAddressCallBack,"编辑地址",m_addressCtrl.GetCenterElement()->m_label);
-      break;
-    }
-  case OT_TELEPHONE:
-    {
-      //CInputSwitchHook *inputHook = dynamic_cast<CInputSwitchHook*>(m_view->GetHook(CViewHook::DHT_InputSwitchHook));
-      //inputHook->SetInputMethod(CInputSwitchHook::IM_CharMethod);
-      //CInputHook::gotoCurInputMethod(CInputHook::IM_Edit,
-      //  CViewHook::DHT_DetailEditHook,this,EditHookTelephoneCallBack,"编辑电话",m_telephoneCtrl.GetCenterElement()->m_label);
-      break;
-    }
   case OT_MARKER:
     {
-      CViewHook::m_curHookType = CViewHook::DHT_MarkerEditHook;
-      //CAggHook::SkipToHook(CViewHook::DHT_MarkerEditHook);
+      TurnTo(DHT_MarkerEditHook);
       Refresh();
       break;
     }
@@ -315,8 +267,6 @@ void UeGui::CDetailEditHook::SetMark(short& n)
   IView *view = IView::GetView();
   CDetailEditHook* edithook=(CDetailEditHook *)(view->GetHook(CViewHook::DHT_DetailEditHook));
   edithook->DoSetMark(n);
-  CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
-  //CAggHook::SkipToHook(CViewHook::DHT_DetailEditHook);
 }
 void UeGui::CDetailEditHook::DoSetMark(short& n)
 {
@@ -338,8 +288,6 @@ bool UeGui::CDetailEditHook::ShowDetailEditHook(const EditData* caption, CDetail
   {
     retval=false;
   }
-  //CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
-  //CAggHook::SkipToHook(CViewHook::DHT_DetailEditHook);
   return retval;
 }
 
@@ -365,16 +313,8 @@ bool UeGui::CDetailEditHook::DoShowDetailEditHook(const EditData* caption, CDeta
   {
     m_markPicCtrl.GetCenterElement()->m_backStyle = caption->m_kind >> 3;
   }
-
-  /*m_mapMarkCtrl.SetCheck(caption->m_isMapshow);
-  m_voiceBroadCastCtrl.SetCheck(caption->m_isVoice);
-  m_bootPositionCtrl.SetCheck(caption->m_isStartpos);*/
   return true;
 }
-//void UeGui::CDetailEditHook::Init()
-//{
-//  return;
-//}
 
 //编辑界面数据类型赋值
 void UeGui::CDetailEditHook::SetEditData()
@@ -383,45 +323,36 @@ void UeGui::CDetailEditHook::SetEditData()
   ::strcpy((char *)eData.m_addrCode, m_addressCtrl.GetCaption());
   ::strcpy((char *)eData.m_telephone, m_telephoneCtrl.GetCaption());
   eData.m_kind = m_markPicCtrl.GetCenterElement()->m_backStyle;
-  /*eData.m_isMapshow = m_mapMarkCtrl.Checked();
-  eData.m_isVoice = m_voiceBroadCastCtrl.Checked();
-  eData.m_isStartpos = m_bootPositionCtrl.Checked();*/
 }
 
 //编辑名称的回调函数
-void CDetailEditHook::EditHookNameCallBack(void *pDoCallBackObj,const SQLRecord *pResult)
+void CDetailEditHook::EditHookNameCallBack(void *pDoCallBackObj,const char *pResult)
 {
   ((CDetailEditHook *)pDoCallBackObj)->DoEditHookNameCallBack(pResult);
 }
-void CDetailEditHook::DoEditHookNameCallBack(const SQLRecord *pResult)
+void CDetailEditHook::DoEditHookNameCallBack(const char *pResult)
 {
-  m_nameCtrl.SetCaption(pResult->m_asciiName);
-  CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
-  //CAggHook::SkipToHook(CViewHook::DHT_DetailEditHook);
+  m_nameCtrl.SetCaption(pResult);
 }
 
 //编辑地址的回调函数
-void CDetailEditHook::EditHookAddressCallBack(void *pDoCallBackObj,const SQLRecord *pResult)
+void CDetailEditHook::EditHookAddressCallBack(void *pDoCallBackObj,const char *pResult)
 {
   ((CDetailEditHook *)pDoCallBackObj)->DoEditHookAddressCallBack(pResult);
 }
-void CDetailEditHook::DoEditHookAddressCallBack(const SQLRecord *pResult)
+void CDetailEditHook::DoEditHookAddressCallBack(const char *pResult)
 {
-  m_addressCtrl.SetCaption(pResult->m_asciiName);
-  CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
-  //CAggHook::SkipToHook(CViewHook::DHT_DetailEditHook);
+  m_addressCtrl.SetCaption(pResult);
 }
 
 //编辑电话的回调函数
-void CDetailEditHook::EditHookTelephoneCallBack(void *pDoCallBackObj,const SQLRecord *pResult)
+void CDetailEditHook::EditHookTelephoneCallBack(void *pDoCallBackObj,const char *pResult)
 {
   ((CDetailEditHook *)pDoCallBackObj)->DoEditHookTelephoneCallBack(pResult);
 }
-void CDetailEditHook::DoEditHookTelephoneCallBack(const SQLRecord *pResult)
+void CDetailEditHook::DoEditHookTelephoneCallBack(const char *pResult)
 {
-  m_telephoneCtrl.SetCaption(pResult->m_asciiName);
-  CViewHook::m_curHookType=CViewHook::DHT_DetailEditHook;
-  //CAggHook::SkipToHook(CViewHook::DHT_DetailEditHook);
+  m_telephoneCtrl.SetCaption(pResult);
 }
 
 bool UeGui::CDetailEditHook::EditData2FavoriteEntry(EditData* edata, FavoriteEntry* fEntry)
@@ -463,9 +394,10 @@ void UeGui::CDetailEditHook::RecordPosition(int n)
   CDetailEditHook* edithook=(CDetailEditHook *)(view->GetHook(CViewHook::DHT_DetailEditHook));
   edithook->DoRecordPosition(n);
 }
+
 void UeGui::CDetailEditHook::DoRecordPosition(int n)
 {
-  recpos = n;
+  m_recpos = n;
 }
 
 bool UeGui::CDetailEditHook::SaveFavoriteEntryData( const FavoriteEntry& data )
@@ -508,14 +440,6 @@ bool UeGui::CDetailEditHook::SaveFavoriteEntryData( const FavoriteEntry& data )
         }
       }
     }
-
-    //暂时不主动移除记录
-    //if (favoriteDataCount >= maxDataCount)
-    //{
-    //  //移除最后一条记录，并添加最新记录
-    //  m_query->RemoveFavorite(favoriteDataCount - 1);
-    //}
-
     m_query->AddFavorite(data);
     m_query->Disconnect(UeQuery::DT_Favorite);
     return true;

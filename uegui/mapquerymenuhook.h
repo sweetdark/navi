@@ -122,6 +122,7 @@ namespace UeGui
     CUiButton m_delimiter1;
     CUiButton m_delimiter2;
     CUiButton m_delimiter3;
+  private:
     //²Ëµ¥×´Ì¬
     bool m_expandStatus;
   };

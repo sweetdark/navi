@@ -2,7 +2,10 @@
 #include "usuallyfile.h"
 #include "maphook.h"
 #include "messagedialoghook.h"
+#include "selectpointcallbackctrl.h"
+#include "inputswitchhook.h"
 using namespace UeGui;
+
 
 CUsuallyHook::CUsuallyHook()
 {
@@ -375,31 +378,51 @@ short CUsuallyHook::MouseUp(CGeoPoint<short> &scrPoint)
   case usuallyhook_EditFavourit1Btn:
   case usuallyhook_EditFavourit1BtnIcon:
     {
-      m_editFavourit1BtnCtrl.MouseUp();
+      if (IsNeedRefresh(m_editFavourit1BtnCtrl))
+      {
+        m_editFavourit1BtnCtrl.MouseUp();
+        DoEditEvent(kROW3);
+      }
     }
     break;
   case usuallyhook_EditFavourit2Btn:
   case usuallyhook_EditFavourit2BtnIcon:
     {
-      m_editFavourit2BtnCtrl.MouseUp();
+      if (IsNeedRefresh(m_editFavourit2BtnCtrl))
+      {
+        m_editFavourit2BtnCtrl.MouseUp();
+        DoEditEvent(kROW4);
+      }
     }
     break;
   case usuallyhook_EditFavourit3Btn:
   case usuallyhook_EditFavourit3BtnIcon:
     {
-      m_editFavourit3BtnCtrl.MouseUp();
+      if (IsNeedRefresh(m_editFavourit3BtnCtrl))
+      {
+        m_editFavourit3BtnCtrl.MouseUp();
+        DoEditEvent(kROW5);
+      }
     }
     break;
   case usuallyhook_EditHomeBtn:
   case usuallyhook_EditHomeBtnIcon:
     {
-      m_editHomeBtnCtrl.MouseUp();
+      if (IsNeedRefresh(m_editHomeBtnCtrl))
+      {
+        m_editHomeBtnCtrl.MouseUp();
+        DoEditEvent(kROW1);
+      }
     }
     break;
   case usuallyhook_EditWorkBtn:
   case usuallyhook_EditWorkBtnIcon:
     {
-      m_editWorkBtnCtrl.MouseUp();
+      if (IsNeedRefresh(m_editWorkBtnCtrl))
+      {
+        m_editWorkBtnCtrl.MouseUp();
+        DoEditEvent(kROW2);
+      }
     }
     break;
   case usuallyhook_Favourit1Btn:
@@ -583,7 +606,7 @@ void CUsuallyHook::SelectRow(unsigned int row)
 
 void CUsuallyHook::OnClickDeleteBtn(unsigned int row)
 {
-  m_deleteRowNum = row;
+  m_selectRowNum = row;
   CMessageDialogEvent deleteUsuallyEvt(this, DHT_UsuallyHook, &UeGui::CUsuallyHook::DealDeleteUsuallyEvent);
   CMessageDialogHook::ShowMessageDialog(MB_WARNING, "所选记录将被删除！", deleteUsuallyEvt);
 }
@@ -602,6 +625,40 @@ void CUsuallyHook::DealDeleteUsuallyEvent(CAggHook *sender, ModalResultType moda
 
 void CUsuallyHook::DeleteUsually()
 {
-  m_usuallyFile->RemoveRecord(m_deleteRowNum);
+  m_usuallyFile->RemoveRecord(m_selectRowNum);
   RefreshData();
+}
+
+void CUsuallyHook::EditRecord(const UeQuery::SQLRecord *data)
+{
+  UsuallyRecord record;
+  record.m_x = data->m_x;
+  record.m_y = data->m_y;
+  if (data->m_uniName)
+  {
+    ::strcpy((char*)record.m_name, data->m_uniName);
+  }
+  m_usuallyFile->UpdateRecord(m_selectRowNum, &record);
+}
+
+void CUsuallyHook::SelectPointEvent(void *pCallBackObj, const UeQuery::SQLRecord *data)
+{
+  CUsuallyHook *hook = static_cast<CUsuallyHook*> (pCallBackObj);
+  if (hook)
+  {
+    hook->EditRecord(data);
+    hook->Fall(CViewHook::DHT_UsuallyHook);
+    hook->RefreshData();
+  }
+}
+
+void CUsuallyHook::DoEditEvent(unsigned int row)
+{
+  m_selectRowNum = row;
+  CInputSwitchHook *inputHook = (CInputSwitchHook *)CViewWrapper::Get().GetHook(DHT_InputSwitchHook);
+  if (inputHook)
+  {
+    CSelectPointCallBackCtrl::Get().SetCallBackFun((void*)this, &CUsuallyHook::SelectPointEvent);
+    TurnTo(inputHook->GetCurInputHookType());
+  }
 }

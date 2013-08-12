@@ -10,6 +10,7 @@
 #endif
 
 #include "uibutton.h"
+#include "uemap/canvassetting.h"
 
 //CViewHook::DHT_MessageDialogeHook
 
@@ -63,6 +64,7 @@ namespace UeGui
       MessageDialogHook_DialogeBackground,
       MessageDialogHook_DialogeIcon,
       MessageDialogHook_DialogeText,
+      MessageDialogHook_DialogeText2,
       MessageDialogHook_AffirmButtonLeft,
       MessageDialogHook_AffirmButtonCenter,
       MessageDialogHook_AffirmLabel,
@@ -130,12 +132,17 @@ namespace UeGui
     void MakeControls();
   private:
     void DoMouseUp(ModalResultType resultType);
+    void DoShowMessageText(const char* caption);
   private:
     //对话框定时关闭时间 单位：秒
     unsigned short m_interval;
     CMessageDialogEvent m_messageDialogEvent;
-
-    CUiLabel m_dialogText;
+    //每行显示多少个文字
+    short m_lineTextCount;
+    CCanvasSetting m_setting;
+  private:
+    CUiLabel m_dialogText1;
+    CUiLabel m_dialogText2;
     CUiButton m_dialogeIcon;
     CUiBitButton m_affirmButton;
     CUiBitButton m_cancelButton;

@@ -13,6 +13,8 @@
 
 #include "menubackgroundhook.h"
 
+#include "roundtypeselecthook.h"
+
 //#include "uilabel.h"
 #include "uibutton.h"
 //#include "uiradiobutton.h"
@@ -22,15 +24,6 @@ namespace UeGui
 {
   class UEGUI_CLASS CTypeNoDistQueryListHook : public CMenuBackgroundHook
   {
-  
-    enum RoundQueryType
-    {
-      MapCenter = 0,
-      CurPos,
-      EndPoint,
-      Route
-    };
-
   public:
     enum TypeNoDistQueryListHookCtrlType
     {
@@ -115,6 +108,10 @@ namespace UeGui
 
     void ResetResultList();
 
+    void SetBtnEnable();
+
+    void SetRadiusLabel();
+
   private:
     CUiButton m_mapCenterBtn;
     CUiButton m_curPosBtn;
@@ -142,11 +139,13 @@ namespace UeGui
 
     PointList m_pointList;
 
-    RoundQueryType m_queryType;
+    CRoundTypeSelectHook::RoundType m_curRoundType;
 
     TCodeEntry m_tCodeEntry;
     //刚在地图界面进入的时候记录地图中心点
     CGeoPoint<long> m_mapCenterPos;
+    //当前选择的搜索半径
+    int m_curRadius;
   };
 }
 #endif

@@ -65,6 +65,10 @@ namespace UeGui
 
     void MakeControls();
 
+    void DoSearchOnMap();
+
+    void DoDistSearch();
+
   private:
     CUiBitButton m_addressBookBtn;
     CUiBitButton m_historyRecordBtn;

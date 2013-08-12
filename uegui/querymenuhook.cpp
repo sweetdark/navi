@@ -8,6 +8,12 @@
 
 #include "distquerylisthook.h"
 
+#include "maphook.h"
+
+#include "selectpointcallbackctrl.h"
+
+#include "viewwrapper.h"
+
 using namespace UeGui;
 
 CQueryMenuHook::CQueryMenuHook()
@@ -244,6 +250,7 @@ short CQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case QueryMenuHook_TravelSearchLabel:
     {
       m_travelSearchBtn.MouseUp();
+      CAggHook::TurnTo(DHT_DdtServiceQueryHook);
     }
     break;
   case QueryMenuHook_SixthBtnBackground:
@@ -259,6 +266,7 @@ short CQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case QueryMenuHook_SearchOnMapLabel:
     {
       m_searchOnMapBtn.MouseUp();
+      DoSearchOnMap();
     }
     break;
   case QueryMenuHook_EighthBtnBackground:
@@ -266,22 +274,7 @@ short CQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case QueryMenuHook_DistSearchLabel:
     {
       m_distSearchBtn.MouseUp();
-      int curInputMethod = ((CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
-      if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
-      {
-        CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityAcro);
-      }
-      else
-      {
-        CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
-      }
-      CInputSwitchHook *inputHook = (CInputSwitchHook *)m_view->GetHook(DHT_InputSwitchHook);
-      if (inputHook)
-      {
-        TurnTo(inputHook->GetCurInputHookType());
-      }
-      //不是回调则设置为unknown
-      ((CDistQueryListHook *)m_view->GetHook(DHT_DistQueryListHook))->SetReturnHookType(DHT_Unknown);
+      DoDistSearch();
     }
     break;
   default:
@@ -297,4 +290,47 @@ short CQueryMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   return ctrlType;
 }
 
+void CQueryMenuHook::DoSearchOnMap()
+{
+  CViewWrapper &viewWrapper(CViewWrapper::Get());
+  CQueryWrapper &queryWrapper(CQueryWrapper::Get());
+  CMapHook *pMapHook = (CMapHook *)viewWrapper.GetHook(CViewHook::DHT_MapHook);
+  CSelectPointCallBackCtrl &selectpointcbctrl(CSelectPointCallBackCtrl::Get());
+  PointList pointList;
+  PointInfo pointInfo;
+  viewWrapper.GetScreenCenter(pointInfo.m_point);
+  queryWrapper.GetPlaceName(pointInfo.m_point,pointInfo.m_name);
+  pointList.push_back(pointInfo);
+  if (selectpointcbctrl.IsCallBackFunExist())
+  {
+    CAggHook::TurnTo(DHT_MapHook);
+    pMapHook->SelectPoint(pointList[0].m_point, pointList[0].m_name, 
+      selectpointcbctrl.GetCallBackObj(), selectpointcbctrl.GetEvent());
+  }
+  else
+  {
+    CAggHook::TurnTo(DHT_MapHook);
+    pMapHook->SetPickPos(pointList, 0);
+  }
+}
 
+void CQueryMenuHook::DoDistSearch()
+{
+  CViewWrapper &viewWrapper(CViewWrapper::Get());
+  int curInputMethod = ((CInputSwitchHook *)viewWrapper.GetHook(DHT_InputSwitchHook))->GetCurInputMethod();
+  if (curInputMethod == CInputSwitchHook::IM_AcronymMethod)
+  {
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityAcro);
+  }
+  else
+  {
+    CQueryWrapper::Get().SetQueryMode(UeQuery::IT_CityName);
+  }
+  CInputSwitchHook *inputHook = (CInputSwitchHook *)viewWrapper.GetHook(DHT_InputSwitchHook);
+  if (inputHook)
+  {
+    TurnTo(inputHook->GetCurInputHookType());
+  }
+  //不是回调则设置为unknown
+  ((CDistQueryListHook *)viewWrapper.GetHook(DHT_DistQueryListHook))->SetReturnHookType(DHT_Unknown);
+}

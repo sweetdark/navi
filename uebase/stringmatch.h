@@ -156,7 +156,7 @@ namespace UeBase
     unsigned int m_T[m_alphabets];	// The subscript is corresponding to the value of general ascii character
 
     /// static object as a singleton
-    static CStringMatch m_match;
+    static CStringMatch *m_match;
 
   };
 }

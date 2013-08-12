@@ -899,6 +899,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ddtservicehook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ddtservicehook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ddtservicequeryhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ddtservicequeryhook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ddtservicequerylisthook.cpp"
 				>
 			</File>
@@ -955,6 +971,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\functionupdatehook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\functionupdatehook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gpshook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\gpshook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\guidanceviewhook.cpp"
 				>
 			</File>
@@ -992,6 +1024,14 @@
 			</File>
 			<File
 				RelativePath=".\historyinformationhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\itemselecthook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\itemselecthook.h"
 				>
 			</File>
 			<File
@@ -1187,6 +1227,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\roundradiusselecthook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\roundradiusselecthook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\routeguidancehook.cpp"
 				>
 			</File>
@@ -1227,6 +1275,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\updateservicehook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\updateservicehook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\upwardordownwardhook.cpp"
 				>
 			</File>
@@ -1240,6 +1296,14 @@
 			</File>
 			<File
 				RelativePath=".\userinfohook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\versioncheckhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\versioncheckhook.h"
 				>
 			</File>
 			<File
@@ -1543,6 +1607,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\distselecthook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\distselecthook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\editcharhook.cpp"
 				>
 			</File>
@@ -1660,6 +1732,14 @@
 			</File>
 			<File
 				RelativePath=".\roadquerylisthook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\roundtypeselecthook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\roundtypeselecthook.h"
 				>
 			</File>
 			<File

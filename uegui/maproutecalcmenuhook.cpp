@@ -541,7 +541,8 @@ void UeGui::CMapRouteCalcMenuHook::ShowDestInfo(UeRoute::MethodType methType)
   double totalDist = m_planResult[methType].totalLength;  
   if (totalDist > 1000)
   {
-    ::sprintf(buf, "%.1fkm | %d:%2d", totalDist / 1000, hours, minutes);
+    //::sprintf(buf, "%.1fkm | %d:%2d", totalDist / 1000, hours, minutes);
+    ::sprintf(buf, "%dkm | %d:%2d", static_cast<int>(totalDist / 1000), hours, minutes);    
   }
   else
   {

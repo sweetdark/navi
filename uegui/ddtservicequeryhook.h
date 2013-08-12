@@ -5,38 +5,91 @@
 #include "uegui.h"
 #endif
 
-#ifndef _UEGUI_AGGHOOK_H
-#include "agghook.h"
-#endif
+#include "menubackgroundhook.h"
 
-#include "uilabel.h"
+//#include "uilabel.h"
 #include "uibutton.h"
+//#include "uiradiobutton.h"
+//#include "uicheckbutton.h"
 #include "uipageturningctrl.h"
-#include "uebase\geombasic.h"
+#include "uequery/codeindexctrl.h"
 
 namespace UeGui
 {
-  typedef void (*ServiceListQueryEvent)(const char* keyValue1, const char* keyValue2, const CGeoPoint<long>& point);
+  class CViewspotMgr
+  {
 
-  typedef void (*OnSwitchAreaEvent)();
-  class UEGUI_CLASS CDdtServiceQueryHook : public CAggHook
+#pragma pack(push)
+#pragma pack(4)
+    struct ViewSpotFileBlock
+    {
+      ViewSpotFileBlock() {}
+      ViewSpotFileBlock(int id, long offset,unsigned int dist, double x, double y)
+        : m_id(id), m_offSet(offset), m_distCode(dist), m_x(x), m_y(y) {}
+      int m_id;
+      long m_offSet;
+      unsigned int m_distCode;
+      double m_x;
+      double m_y;
+    };
+#pragma pack(pop)
+
+    struct ViewSpotList
+    {
+      const static int MAXNAMELENGTH = 256;
+      char m_name[MAXNAMELENGTH];
+      char m_distName[45];
+      CGeoPoint<long> m_point;
+      ViewSpotList()
+      {
+        ::memset(this, 0x00, sizeof(struct ViewSpotList));
+      }
+    };
+  public:
+    CViewspotMgr(void);
+    ~CViewspotMgr(void);
+
+    //打开景点查询
+    void OpenViewSpotHook();
+
+    //读取文件并根据区域编码进行过滤
+    static void ReadFile(const unsigned int distCode);
+    //清除数据
+    static void ReleaseData();
+  private:
+    //读取主数据文件，并根据dostCode进行过滤
+    static void ReadMainFile(const tstring& fileName, const unsigned int distCode);
+    //打包数据，nameFileName参数是名称文件的文件名
+    static void PackData(const tstring& fileName);
+
+    //旅游景点hook触发事件
+    static void OnViewSpotListQuery(const char* keyValue1, const char* keyValue2, const CGeoPoint<long>& point);
+    //当区域改变时，重新查询数据
+    static void OnAreaChange();
+  private:
+    static vector<ViewSpotFileBlock*> m_mainVec;
+    static vector<ViewSpotList*> m_list;
+
+  };
+
+  struct ServiceInfo
+  {
+    char m_value1[128];
+    char m_value2[45];
+    CGeoPoint<long> m_point;
+    ServiceInfo()
+    {
+      ::memset(m_value1, 0, sizeof(m_value1));
+      ::memset(m_value2, 0, sizeof(m_value2));
+      ::memset(&m_point, 0, sizeof(m_point));
+    }
+
+  };
+  typedef std::vector<ServiceInfo> ServiceList;
+
+  class UEGUI_CLASS CDdtServiceQueryHook : public CMenuBackgroundHook
   {
   public:
-    struct ServiceInfo
-    {
-      char m_Value1[128];
-      char m_Value2[45];
-      CGeoPoint<long> m_point;
-      ServiceInfo()
-      {
-        ::memset(m_Value1, 0, sizeof(m_Value1));
-        ::memset(m_Value2, 0, sizeof(m_Value2));
-        ::memset(&m_point, 0, sizeof(m_point));
-      }
-      
-    };
-    typedef std::vector<ServiceInfo> ServiceList;
-
     enum RowTag
     {
       kROWBegin = 0,
@@ -44,66 +97,56 @@ namespace UeGui
       kROW2,
       kROW3,
       kROW4,
-      kROW5,
       kROWEnd
     };
-
-    enum DdtServiceQueryHookCtrlType
+    enum ddtservicequeryhookCtrlType
     {
-      DdtServiceQueryHook_Begin = 0,
-      DdtServiceQueryHook_Background,
-      DdtServiceQueryHook_ViewMap,
-      DdtServiceQueryHook_ViewPrevious,
-      DdtServiceQueryHook_NavigationTitle,
-      DdtServiceQueryHook_QueryAreaLeft,
-      DdtServiceQueryHook_QueryAreaCenter,
-      DdtServiceQueryHook_QueryAreaRight,
-      DdtServiceQueryHook_Row1Left,
-      DdtServiceQueryHook_Row1Center,
-      DdtServiceQueryHook_Row1Right,
-      DdtServiceQueryHook_Row2Left,
-      DdtServiceQueryHook_Row2Center,
-      DdtServiceQueryHook_Row2Right,
-      DdtServiceQueryHook_Row3Left,
-      DdtServiceQueryHook_Row3Center,
-      DdtServiceQueryHook_Row3Right,
-      DdtServiceQueryHook_Row4Left,
-      DdtServiceQueryHook_Row4Center,
-      DdtServiceQueryHook_Row4Right,
-      DdtServiceQueryHook_Row5Left,
-      DdtServiceQueryHook_Row5Center,
-      DdtServiceQueryHook_Row5Right,
-      DdtServiceQueryHook_QueryAreaLabel1,
-      DdtServiceQueryHook_QueryAreaName,
-      DdtServiceQueryHook_QueryAreaLabel2,
-      DdtServiceQueryHook_POI1Name,
-      DdtServiceQueryHook_POI1Separater,
-      DdtServiceQueryHook_POI1Area,
-      DdtServiceQueryHook_POI2Name,
-      DdtServiceQueryHook_POI2Separater,
-      DdtServiceQueryHook_POI2Area,
-      DdtServiceQueryHook_POI3Name,
-      DdtServiceQueryHook_POI3Separater,
-      DdtServiceQueryHook_POI3Area,
-      DdtServiceQueryHook_POI4Name,
-      DdtServiceQueryHook_POI4Separater,
-      DdtServiceQueryHook_POI4Area,
-      DdtServiceQueryHook_POI5Name,
-      DdtServiceQueryHook_POI5Separater,
-      DdtServiceQueryHook_POI5Area,
-      DdtServiceQueryHook_NextPage,
-      DdtServiceQueryHook_NextPageIcon,
-      DdtServiceQueryHook_PreviousPage,
-      DdtServiceQueryHook_PreviousPageIcon,
-      DdtServiceQueryHook_PageInfo,
-      DdtServiceQueryHook_End
+      ddtservicequeryhook_Begin = MenuBackgroundHook_End,
+
+      ddtservicequeryhook_DistSwitchBtn,
+      ddtservicequeryhook_DistSelectBtn,
+      ddtservicequeryhook_DistSelectIcon,
+      ddtservicequeryhook_DistLabel,
+      ddtservicequeryhook_TagBack,
+      ddtservicequeryhook_TagAllBtn,
+      ddtservicequeryhook_Tag5ABtn,
+      ddtservicequeryhook_Tag4ABtn,
+      ddtservicequeryhook_Tag3ABtn,
+      ddtservicequeryhook_TagOtherBtn,
+      ddtservicequeryhook_List1Btn,
+      ddtservicequeryhook_List2Btn,
+      ddtservicequeryhook_List3Btn,
+      ddtservicequeryhook_List4Btn,
+      ddtservicequeryhook_Search1,
+      ddtservicequeryhook_Search2,
+      ddtservicequeryhook_Search3,
+      ddtservicequeryhook_Search4,
+      ddtservicequeryhook_Name1Up,
+      ddtservicequeryhook_Name2Up,
+      ddtservicequeryhook_Name3Up,
+      ddtservicequeryhook_Name4Up,
+      ddtservicequeryhook_Address1Down,
+      ddtservicequeryhook_Address2Down,
+      ddtservicequeryhook_Address3Down,
+      ddtservicequeryhook_Address4Down,
+      ddtservicequeryhook_Phone1,
+      ddtservicequeryhook_Phone2,
+      ddtservicequeryhook_Phone3,
+      ddtservicequeryhook_Phone4,
+      ddtservicequeryhook_PageCenter,
+      ddtservicequeryhook_PageUpBtn,
+      ddtservicequeryhook_PageDownBtn,
+      ddtservicequeryhook_PageUpIcon,
+      ddtservicequeryhook_PageDownIcon,
+      ddtservicequeryhook_CurrentPage,
+      ddtservicequeryhook_TotalPage,
+      ddtservicequeryhook_PageSeparator,
+      ddtservicequeryhook_End
     };
 
     CDdtServiceQueryHook();
 
     virtual ~CDdtServiceQueryHook();
-
-    virtual void MakeGUI();
 
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
@@ -111,100 +154,107 @@ namespace UeGui
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual bool operator ()();
-  public:
-    //清空显示内容
-    void Clear();
-    //修改hook标题
-    void SetTitle(const char* title);
-    //设置查询地区
-    void SetQueryArea(const char* area);
-    //设置查询内容分类说明
-    void SetTypeContent(const char* content);
-    //设置鼠标响应事件
-    void SetServiceListQueryEvent(ServiceListQueryEvent serviceListQueryEvent);
-    //添加显示数据
-    void AddServiceData(const char* value1, const char* value2, CGeoPoint<long> point);
-    //显示数据
-    void ShowData();
-    //设置查询区域编码
-    void SetQueryAreaCode(unsigned int code) { m_addrCode = code; }
-    unsigned int GetQueryAreaCode() { return m_addrCode; }
-    //设置区域改变的函数。交给回调函数处理
-    void SetSwitchAraeEvent(OnSwitchAreaEvent event);
-    //清除数据
-    void ClearDatas();
+    void Load();
+
+    void AllCode();
+
+    static void AddServiceData(const char* value1, const char* value2, CGeoPoint<long> point);
 
   protected:
-    virtual tstring GetBinaryFileName();
+    static void DistSwitchCallBack(void *pDoCallBackObj, const SQLRecord *pResult);
+
+    void DoDistSwitchCallBack(const SQLRecord *pResult);
+
+    void SelectRecord(RowTag);
+
+    void ShowRowData(RowTag);
+
+    void ShowData();
+    
+    void ClearData();
+
+    //设置查询区域编码
+    void SetQueryAreaCode(unsigned int code) { m_code = code; }
+
+    int GetQueryAreaCode()
+    {
+      return m_code;
+    }
+
+    void SetPageControl();
+
+    void SwitchPage();
+
+    void SetPageInfo();
+
+    void SetRowEnabel(RowTag, bool);
+
+    void CleanRow(RowTag);
+
+    void ClearAllRow();
+
+    void SwitchTabStatus(ddtservicequeryhookCtrlType, bool);
 
     virtual void MakeNames();
 
     void MakeControls();
+
   private:
-    void DoMouseUpEvent(const char* keyValue1, const char* keyValue2, int row);
-    //清空谋行
-    void ClearRow(RowTag tag);
-    //清空显示信息
-    void ClearAllRow();
-    //设置行的有效性
-    void SetRowEnbale(RowTag tag, bool enable);
-    //根据起点显示数据
-    void DoShowData();
-    //将数据显示到某行上
-    void DoShowRowData(RowTag tag, const char* value1, const char* value2);
-  private:
+    static ServiceList m_dataList;
 
-    static void DoDistSwitchCallBack(void *pDoCallBackObj,const SQLRecord *pResult);
-    //翻页控制器
-    CPageTurning m_pageTurning;
-    //鼠标响应事件及4S店列表查询事件
-    ServiceListQueryEvent m_ServiceListQueryEvent;
-    //设置区域改变时的回调函数
-    static OnSwitchAreaEvent m_switchAreaEvent;
-    //数据列表
-    ServiceList m_serviceList;
-  private:
-    unsigned int m_addrCode;
+    static void DoDistSwitchCallBack(void *pDoCallBackObj, const SQLRecord *pResult);
 
-    CUiLabel m_navigationTitleCtrl;
-    CUiButton m_viewMapCtrl;
-    CUiButton m_viewPreviousCtrl;    
-    CUiLabel m_pageInfoCtrl;
-    CUiBitButton m_nextPageCtrl;
-    CUiBitButton m_previousPageCtrl;
+    int m_code;
 
-    CUiButton m_queryAreaLabel1Ctrl;
-    CUiButton m_queryAreaLabel2Ctrl;
-    CUiButton m_queryAreaCtrl;
-    CUiButton m_queryAreaNameCtrl;
+    CPageController m_pageTurning;
 
-    CUiLabel m_pOI1NameCtrl;
-    CUiLabel m_pOI1AreaCtrl;    
-    CUiButton m_pOI1SeparaterCtrl;
+    CCodeIndexCtrl *m_pCurItemCtrl;
 
+    std::vector<UeQuery::TCodeEntry> m_vecListItem;
+    std::vector<UeQuery::TCodeEntry> m_vecListItem2;
+    std::vector<UeQuery::TCodeEntry> m_vecListItem3;
+    std::vector<UeQuery::TCodeEntry> m_vecListItem4;
+
+    std::vector<char*> m_special;
+
+    CUiButton m_address1DownCtrl;
+    CUiButton m_address2DownCtrl;
+    CUiButton m_address3DownCtrl;
+    CUiButton m_address4DownCtrl;
+
+    CUiBitButton m_distSelectBtnCtrl;
+
+    CUiButton m_distSwitchBtnCtrl;
+    CUiButton m_list1BtnCtrl;
+    CUiButton m_list2BtnCtrl;
+    CUiButton m_list3BtnCtrl;
+    CUiButton m_list4BtnCtrl;
+    CUiButton m_name1UpCtrl;
+    CUiButton m_name2UpCtrl;
+    CUiButton m_name3UpCtrl;
+    CUiButton m_name4UpCtrl;
+
+    CUiButton m_search1Ctrl;
+    CUiButton m_search2Ctrl;
+    CUiButton m_search3Ctrl;
+    CUiButton m_search4Ctrl;
+
+    CUiBitButton m_pageDownBtnCtrl;
+    CUiBitButton m_pageUpBtnCtrl;
+    CUiBitButton m_currentPageCtrl;
+    CUiBitButton m_totalPageCtrl;
+
+    CUiButton m_phone1Ctrl;
+    CUiButton m_phone2Ctrl;
+    CUiButton m_phone3Ctrl;
+    CUiButton m_phone4Ctrl;
     
-    CUiLabel m_pOI2NameCtrl;
-    CUiLabel m_pOI2AreaCtrl;
-    CUiButton m_pOI2SeparaterCtrl;
-    
-    CUiLabel m_pOI3NameCtrl;
-    CUiLabel m_pOI3AreaCtrl;
-    CUiButton m_pOI3SeparaterCtrl;
+    CUiButton m_tag3ABtnCtrl;
+    CUiButton m_tag4ABtnCtrl;
+    CUiButton m_tag5ABtnCtrl;
+    CUiButton m_tagAllBtnCtrl;
 
-    CUiLabel m_pOI4AreaCtrl;
-    CUiLabel m_pOI4NameCtrl;
-    CUiButton m_pOI4SeparaterCtrl;
-    
-    CUiLabel m_pOI5NameCtrl;
-    CUiLabel m_pOI5AreaCtrl;
-    CUiButton m_pOI5SeparaterCtrl;
-
-    CUiButton m_row1Ctrl;
-    CUiButton m_row2Ctrl;
-    CUiButton m_row3Ctrl;
-    CUiButton m_row4Ctrl;
-    CUiButton m_row5Ctrl;
+    CUiButton m_tagOtherBtnCtrl;
   };
 }
 #endif

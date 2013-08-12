@@ -10,6 +10,10 @@
 
 #include "selectpointcallbackctrl.h"
 
+#include "routewrapper.h"
+
+#include "roundradiusselecthook.h"
+
 using namespace UeGui;
 
 CTypeNoDistQueryListHook::CTypeNoDistQueryListHook()
@@ -36,22 +40,10 @@ void CTypeNoDistQueryListHook::Load()
   queryWrapper.SetQueryKindInfo(m_tCodeEntry);
   queryWrapper.GetQueryKindName(m_typeSelectBtn.GetCaption());
 
-  //暂时设置为不可用
-  m_curPosBtn.SetEnable(false);
-  m_endPointBtn.SetEnable(false);
-  m_routeBtn.SetEnable(false);
-
-  //默认查找地图中心周边
-  m_queryType = MapCenter;
-  //如果有GPS信号且是从搜索->其它搜索->附近检索进来则显示当前位置周边
-  if (m_gps!=0 && m_gps->IsLive())
-  {
-    m_curPosBtn.SetEnable(true);
-    if (((CRoundSelectionHook *)m_view->GetHook(DHT_RoundSelectionHook))->IsFromMap())
-    {
-      m_queryType = CurPos;
-    }
-  }
+  m_curRoundType = ((CRoundTypeSelectHook *)m_view->GetHook(DHT_RoundTypeSelectHook))->GetCurRoundType();
+  m_curRadius = ((CRoundRadiusSelectHook *)m_view->GetHook(DHT_RoundRadiusSelectHook))->GetCurSelectedRadius();
+  SetRadiusLabel();
+  SetBtnEnable();
   SetFocusBtn();
   SearchForResult();
 }
@@ -273,7 +265,8 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_mapCenterBtn.MouseUp();
       if (m_mapCenterBtn.IsEnable())
       {
-        m_queryType = MapCenter;
+        m_curRoundType = CRoundTypeSelectHook::RT_MapCenter;
+        ((CRoundTypeSelectHook *)m_view->GetHook(DHT_RoundTypeSelectHook))->SetCurRoundType(m_curRoundType);
         SetFocusBtn();
         SearchForResult();
       }
@@ -284,7 +277,8 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_curPosBtn.MouseUp();
       if (m_curPosBtn.IsEnable())
       {
-        m_queryType = CurPos;
+        m_curRoundType = CRoundTypeSelectHook::RT_CurPos;
+        ((CRoundTypeSelectHook *)m_view->GetHook(DHT_RoundTypeSelectHook))->SetCurRoundType(m_curRoundType);
         SetFocusBtn();
         SearchForResult();
       }
@@ -295,7 +289,8 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_endPointBtn.MouseUp();
       if (m_endPointBtn.IsEnable())
       {
-        m_queryType = EndPoint;
+        m_curRoundType = CRoundTypeSelectHook::RT_EndPoint;
+        ((CRoundTypeSelectHook *)m_view->GetHook(DHT_RoundTypeSelectHook))->SetCurRoundType(m_curRoundType);
         SetFocusBtn();
         SearchForResult();
       }
@@ -306,7 +301,8 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_routeBtn.MouseUp();
       if (m_routeBtn.IsEnable())
       {
-        m_queryType = Route;
+        m_curRoundType = CRoundTypeSelectHook::RT_Route;
+        ((CRoundTypeSelectHook *)m_view->GetHook(DHT_RoundTypeSelectHook))->SetCurRoundType(m_curRoundType);
         SetFocusBtn();
         SearchForResult();
       }
@@ -345,6 +341,7 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
   case TypeNoDistQueryListHook_RadiusSelectBtnLabel:
     {
       m_radiusSelectBtn.MouseUp();
+      TurnTo(DHT_RoundRadiusSelectHook);
     }
     break;
   case TypeNoDistQueryListHook_PageDownBtn:
@@ -414,18 +411,18 @@ void CTypeNoDistQueryListHook::SetFocusBtn()
   m_routeFocusBtn.SetVisible(false);
   m_endPointFocusBtn.SetVisible(false);
 
-  switch (m_queryType)
+  switch (m_curRoundType)
   {
-  case MapCenter:
+  case CRoundTypeSelectHook::RT_MapCenter:
     m_mapCenterFocusBtn.SetVisible(true);
     break;
-  case CurPos:
+  case CRoundTypeSelectHook::RT_CurPos:
     m_curPosFocusBtn.SetVisible(true);
     break;
-  case Route:
+  case CRoundTypeSelectHook::RT_Route:
     m_routeFocusBtn.SetVisible(true);
     break;
-  case EndPoint:
+  case CRoundTypeSelectHook::RT_EndPoint:
     m_endPointFocusBtn.SetVisible(true);
     break;
   }
@@ -434,14 +431,15 @@ void CTypeNoDistQueryListHook::SetFocusBtn()
 void CTypeNoDistQueryListHook::SearchForResult()
 {
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
+  queryWrapper.SetQueryKindInfo(m_tCodeEntry);
   CGeoPoint<long> geoCurPos;
-  switch (m_queryType)
+  switch (m_curRoundType)
   {
-  case MapCenter:
+  case CRoundTypeSelectHook::RT_MapCenter:
     geoCurPos = m_mapCenterPos;
     break;
-  case CurPos:
-  case Route:
+  case CRoundTypeSelectHook::RT_CurPos:
+  case CRoundTypeSelectHook::RT_Route:
     if (m_gps!=0 && m_gps->IsLive())
     {
       const GpsCar &carInfo(m_view->GetGpsCar());
@@ -449,19 +447,19 @@ void CTypeNoDistQueryListHook::SearchForResult()
       geoCurPos.m_y = carInfo.m_curPos.m_y;
     }
     break;
-  case EndPoint:
+  case CRoundTypeSelectHook::RT_EndPoint:
     {
       //获取目的地中心点
       PlanPosition onePos;
       onePos.m_type = PT_End;
-      m_route->GetPosition(onePos);
+      CRouteWrapper::Get().GetPosition(onePos);
       //
       geoCurPos = onePos.m_pos;
     }
     break;
   }
 
-  if (m_queryType == Route)
+  if (m_curRoundType == CRoundTypeSelectHook::RT_Route)
   {
     CQueryWrapper::Get().SetQueryMode(IT_NearByRoute);
   }
@@ -471,7 +469,7 @@ void CTypeNoDistQueryListHook::SearchForResult()
   }
 
   queryWrapper.SetMaxQueryRecordNum(500);
-  queryWrapper.SetRoundQueryRadius(RADIUS08);
+  queryWrapper.SetRoundQueryRadius(m_curRadius);
   queryWrapper.SetCenterPosOfRound(geoCurPos);
   m_pRecord = queryWrapper.DoQueryGetRecord();
 
@@ -537,4 +535,56 @@ void CTypeNoDistQueryListHook::ResetResultList()
 void CTypeNoDistQueryListHook::SetQueryTypeInfo(TCodeEntry *tcodeEntry)
 {
   ::memcpy(&m_tCodeEntry, tcodeEntry, sizeof(TCodeEntry));
+}
+
+void CTypeNoDistQueryListHook::SetBtnEnable()
+{
+  m_mapCenterBtn.SetEnable(true);
+  m_curPosBtn.SetEnable(true);
+  m_endPointBtn.SetEnable(true);
+  m_routeBtn.SetEnable(true);
+
+  if (m_gps == 0 || !m_gps->IsLive())
+  {
+    m_curPosBtn.SetEnable(false);
+    m_routeBtn.SetEnable(false);
+    if (m_curRoundType == CRoundTypeSelectHook::RT_CurPos || m_curRoundType == CRoundTypeSelectHook::RT_Route)
+    {
+      m_curRoundType = CRoundTypeSelectHook::RT_MapCenter;
+    }
+  }
+
+  PlanPosition endPos;
+  endPos.m_type = UeRoute::PT_End;
+  unsigned int rt = CRouteWrapper::Get().GetPosition(endPos);
+  if ((UeRoute::PT_Invalid == endPos.m_type) || (!endPos.IsValid()))
+  {
+    m_endPointBtn.SetEnable(false);
+    if (m_curRoundType == CRoundTypeSelectHook::RT_EndPoint)
+    {
+      m_curRoundType = CRoundTypeSelectHook::RT_MapCenter;
+    }
+  }
+}
+
+void CTypeNoDistQueryListHook::SetRadiusLabel()
+{
+  switch(m_curRadius)
+  {
+  case RADIUS06:
+    m_radiusSelectBtn.SetCaption("范围: 50km");
+    break;
+  case RADIUS07:
+    m_radiusSelectBtn.SetCaption("范围: 10km");
+    break;
+  case RADIUS08:
+    m_radiusSelectBtn.SetCaption("范围: 5km");
+    break;
+  case RADIUS09:
+    m_radiusSelectBtn.SetCaption("范围: 2km");
+    break;
+  case RADIUS10:
+    m_radiusSelectBtn.SetCaption("范围: 1km");
+    break;
+  }
 }

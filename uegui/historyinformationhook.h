@@ -130,6 +130,10 @@ namespace UeGui
 
     virtual void Load();
 
+    //编辑历史线路的回调函数
+    static void EditHookCallBack(void *pDoCallBackObj,const char *pResult);
+    void DoEditHookCallBack(const char *pResult);
+
   protected:
     virtual void MakeNames();
 
@@ -143,6 +147,7 @@ namespace UeGui
     void DeleteAllRecord();
     //选择历史路线
     void SelectHistoryRoute();
+    
   private:
     //处理删除轨迹事件
     static void OnDeleteRecord(CAggHook* sender, ModalResultType modalResult);
@@ -282,6 +287,7 @@ namespace UeGui
     //是否允许操作历史路线
     bool m_canOpeHistoryRoute;
 
+    bool m_editRoutReturn;
     const CUserDataWrapper& m_userWrapper;
   };
 }

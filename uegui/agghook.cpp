@@ -1096,6 +1096,7 @@ void UeGui::CAggHook::TurnTo( int hookType, bool bUnLoadCurHook /*= true*/ )
     hook->UnLoad();
   }
 
+  m_prevHookType = m_curHookType;
   m_hookTypeStack.push_back(m_curHookType);
   m_curHookType = hookType;
 
@@ -1119,6 +1120,7 @@ void UeGui::CAggHook::Return( bool bLoadPreHook /*= true*/ )
     hook->UnLoad();
   }
 
+  m_prevHookType = m_curHookType;
   m_curHookType = m_hookTypeStack.back();
   m_hookTypeStack.pop_back();
 
@@ -1134,7 +1136,7 @@ void UeGui::CAggHook::Return( bool bLoadPreHook /*= true*/ )
 */
 int UeGui::CAggHook::GetPrevHookType()
 {
-  return m_hookTypeStack.size() ? m_hookTypeStack.back() : DHT_Unknown;
+  return m_prevHookType;
 }
 //返回地图的按钮调用，并清空栈。
 void UeGui::CAggHook::GoToMapHook()
@@ -1161,6 +1163,7 @@ void UeGui::CAggHook::Fall(int hookType)
   {
     m_hookTypeStack.erase(pos + 1, m_hookTypeStack.end());
   }
+  m_curHookType = hookType;
 }
 
 const unsigned char* UeGui::CAggHook::GetFocusText( CViewHook::GuiElement* guielement )

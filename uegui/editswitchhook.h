@@ -63,7 +63,13 @@ namespace UeGui
 
     int GetCurEditHookType();
 
-    void SetEditCallBackFun(void *pDoCallBackObj, EditCallBack pCallBackEvent);
+    /* 设置回调函数
+		 * pDoCallBackObj: 要传递给回调函数操作对象
+     * title: 界面标题
+     * keyword: 一开始要放到输入框里的字
+		 * pCallBackEvent: 回调函数
+		*/
+    void SetEditCallBackFun(void *pDoCallBackObj, const char *title, const char *keyword, EditCallBack pCallBackEvent);
 
     void DoEditCallBack(const char* keyword);
 

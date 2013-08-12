@@ -1,12 +1,14 @@
 #include "gpshook.h"
-#include "comportsettinghook.h"
 #include "uebase\timebasic.h"
 #include "guisetting.h"
+#include "settingwrapper.h"
 
 using namespace UeGui;
 
-CGpsHook::CGpsHook() : m_curLocationNum(0), m_maxSNRWidth(100)
+CGpsHook::CGpsHook() : m_curLocationNum(0), m_maxSNRWidth(76)
 {
+  m_strTitle = "信号状态";
+  m_vecHookFile.push_back(_T("gpshook.bin"));
 }
 
 CGpsHook::~CGpsHook()
@@ -16,25 +18,16 @@ CGpsHook::~CGpsHook()
   m_imageNames.clear();
 }
 
-void CGpsHook::MakeGUI()
+void CGpsHook::Load() 
 {
-  FetchWithBinary();
-  MakeNames();
-  MakeControls();
-}
-
-tstring CGpsHook::GetBinaryFileName()
-{
-  return _T("gpshook.bin");
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+  m_timeStatus = settingWrapper.GetIsOpenTimeCalibration();
 }
 
 void CGpsHook::MakeNames()
 {
-  m_ctrlNames.erase(m_ctrlNames.begin(), m_ctrlNames.end());
+  CMenuBackgroundHook::MakeNames();
   m_ctrlNames.insert(GuiName::value_type(GpsHook_Background,	"Background"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_Title,	"Title"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_GoToMapButton,	"GoToMapButton"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_ReturnButton,	"ReturnButton"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_DateLabel,	"DateLabel"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_Date,	"Date"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_WeekLabel,	"WeekLabel"));
@@ -49,17 +42,10 @@ void CGpsHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(GpsHook_ReceivingState,	"ReceivingState"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_SpeedLabel,	"SpeedLabel"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_Speed,	"Speed"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_TravelTimeLabel,	"TravelTimeLabel"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_TravelTime,	"TravelTime"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_RunningDistanceLabel,	"RunningDistanceLabel"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_RunningDistance,	"RunningDistance"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_QCodeLabel,	"QCodeLabel"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_QCode,	"QCode"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_EarthMap,	"EarthMap"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_LocateStatus,	"LocateStatus"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_MarkCtrlLeft,	"MarkCtrlLeft"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_MarkCtrlCenter,	"MarkCtrlCenter"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_MarkCtrlRight,	"MarkCtrlRight"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_SNROne,	"SNROne"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRTwo,	"SNRTwo"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRThree,	"SNRThree"));
@@ -72,18 +58,7 @@ void CGpsHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRTen,	"SNRTen"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_SNREleven,	"SNREleven"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRTwelve,	"SNRTwelve"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNROneBack,	"SNROneBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRTwoBack,	"SNRTwoBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRThreeBack,	"SNRThreeBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRFourBack,	"SNRFourBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRFiveBack,	"SNRFiveBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRSixBack,	"SNRSixBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRSevenBack,	"SNRSevenBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNREightBack,	"SNREightBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRNineBack,	"SNRNineBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRTenBack,	"SNRTenBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRElevenBack,	"SNRElevenBack"));
-  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRTwelveBack,	"SNRTwelveBack"));
+  m_ctrlNames.insert(GuiName::value_type(GpsHook_SNRBack,	"SNRBack"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_Point1,	"Point1"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_Point2,	"Point2"));
   m_ctrlNames.insert(GuiName::value_type(GpsHook_Point3,	"Point3"));
@@ -98,20 +73,9 @@ void CGpsHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(GpsHook_Point12,	"Point12"));
 }
 
-void CGpsHook::Load() 
-{
-  CGuiSettings* ueSetting= CGuiSettings::GetGuiSettings();
-  if (ueSetting)
-  {
-     m_timeStatus = ueSetting->GetIsOpenTimeCalibration();
-  }
-}
-
 void CGpsHook::MakeControls()
 {
-  m_goToMapButtonCtrl.SetCenterElement(GetGuiElement(GpsHook_GoToMapButton));
-  m_returnButtonCtrl.SetCenterElement(GetGuiElement(GpsHook_ReturnButton));
-
+  CMenuBackgroundHook::MakeControls();
   m_dateCtrl.SetLabelElement(GetGuiElement(GpsHook_Date));  
   m_weekCtrl.SetLabelElement(GetGuiElement(GpsHook_Week));
   m_timeCtrl.SetLabelElement(GetGuiElement(GpsHook_Time));
@@ -119,53 +83,24 @@ void CGpsHook::MakeControls()
   m_locationNumCtrl.SetLabelElement(GetGuiElement(GpsHook_LocationNum));
   m_receivingStateCtrl.SetCenterElement(GetGuiElement(GpsHook_ReceivingState));  
   m_receivingStateCtrl.SetEnable(false);
-  m_speedCtrl.SetLabelElement(GetGuiElement(GpsHook_Speed));         
-  m_travelTimeCtrl.SetLabelElement(GetGuiElement(GpsHook_TravelTime));
-  m_runningDistanceCtrl.SetLabelElement(GetGuiElement(GpsHook_RunningDistance));  
+  m_speedCtrl.SetLabelElement(GetGuiElement(GpsHook_Speed));
   m_qCodeCtrl.SetLabelElement(GetGuiElement(GpsHook_QCode));
   m_locateStatusCtrl.SetCenterElement(GetGuiElement(GpsHook_LocateStatus));  
-  //记录信号按钮
-  m_markCtrl.SetLeftElement(GetGuiElement(GpsHook_MarkCtrlLeft));
-  m_markCtrl.SetCenterElement(GetGuiElement(GpsHook_MarkCtrlCenter));  
-  m_markCtrl.SetRightElement(GetGuiElement(GpsHook_MarkCtrlRight));
   //卫星信噪比显示列表控件
-  m_sNROneCtrl.SetCenterElement(GetGuiElement(GpsHook_SNROne));  
-  m_sNRTwoCtrl.SetCenterElement(GetGuiElement(GpsHook_SNRTwo));
-  m_sNRThreeCtrl.SetCenterElement(GetGuiElement(GpsHook_SNRThree));
-  m_sNRFourCtrl.SetCenterElement(GetGuiElement(GpsHook_SNRFour));
-  m_sNRFiveCtrl.SetCenterElement(GetGuiElement(GpsHook_SNRFive));
-  m_sNRSixCtrl.SetCenterElement(GetGuiElement(GpsHook_SNRSix));
-  m_sNRSevenCtrl.SetCenterElement(GetGuiElement(GpsHook_SNRSeven));
-  m_sNREightCtrl.SetCenterElement(GetGuiElement(GpsHook_SNREight));
-  m_sNRNineCtrl.SetCenterElement(GetGuiElement(GpsHook_SNRNine));
-  m_sNRTenCtrl.SetCenterElement(GetGuiElement(GpsHook_SNRTen));
-  m_sNRElevenCtrl.SetCenterElement(GetGuiElement(GpsHook_SNREleven));  
-  m_sNRTwelveCtrl.SetCenterElement(GetGuiElement(GpsHook_SNRTwelve));
+  for (int i=0, j=GpsHook_SNROne; i<12; i++)
+  {
+    m_sNRCtrl[i].SetCenterElement(GetGuiElement(j++));
+  }
   //卫星图标
-  m_point1.SetCenterElement(GetGuiElement(GpsHook_Point1));
-  m_point2.SetCenterElement(GetGuiElement(GpsHook_Point2));
-  m_point3.SetCenterElement(GetGuiElement(GpsHook_Point3));
-  m_point4.SetCenterElement(GetGuiElement(GpsHook_Point4));
-  m_point5.SetCenterElement(GetGuiElement(GpsHook_Point5));
-  m_point6.SetCenterElement(GetGuiElement(GpsHook_Point6));
-  m_point7.SetCenterElement(GetGuiElement(GpsHook_Point7));
-  m_point8.SetCenterElement(GetGuiElement(GpsHook_Point8));
-  m_point9.SetCenterElement(GetGuiElement(GpsHook_Point9));
-  m_point10.SetCenterElement(GetGuiElement(GpsHook_Point10));
-  m_point11.SetCenterElement(GetGuiElement(GpsHook_Point11));
-  m_point12.SetCenterElement(GetGuiElement(GpsHook_Point12));
+  for (int i=0, j=GpsHook_SNROne; i<12; i++)
+  {
+    m_point[i].SetCenterElement(GetGuiElement(j++));
+  }
 
   GuiElement* guiElement;
   //读取信号强度最大宽度
-  guiElement = GetGuiElement(GpsHook_SNROneBack);
-  if (guiElement)
-  {
-    m_maxSNRWidth = guiElement->m_width;
-  }
-  else
-  {
-    m_maxSNRWidth = 100;
-  }  
+  m_maxSNRWidth = 76;
+
   //计算卫星图标渲染坐标
   guiElement = GetGuiElement(GpsHook_EarthMap);
   if (guiElement)
@@ -176,112 +111,30 @@ void CGpsHook::MakeControls()
   }
 }
 
+short CGpsHook::MouseDown(CGeoPoint<short> &scrPoint)
+{
+  return CMenuBackgroundHook::MouseDown(scrPoint);
+}
+
 short CGpsHook::MouseMove(CGeoPoint<short> &scrPoint)
 {
   return -1;
 }
 
-short CGpsHook::MouseDown(CGeoPoint<short> &scrPoint)
-{
-  short ctrlType = CAggHook::MouseDown(scrPoint);
-  switch (ctrlType)
-  {
-  case GpsHook_GoToMapButton:
-    {
-      m_goToMapButtonCtrl.MouseDown();
-    }
-    break;
-  case GpsHook_ReturnButton:
-    {
-      m_returnButtonCtrl.MouseDown();
-    }
-    break;
-  case GpsHook_MarkCtrlCenter:
-  case GpsHook_MarkCtrlLeft:
-  case GpsHook_MarkCtrlRight:
-    {
-      m_markCtrl.MouseDown();
-    }
-    break;
-  default:
-    m_isNeedRefesh = false;
-    assert(false);
-    break;
-  }
-  if (m_isNeedRefesh)
-  {
-    this->Refresh();
-  }
-  m_isNeedRefesh = true;
-  return ctrlType;
-}
-
 short CGpsHook::MouseUp(CGeoPoint<short> &scrPoint)
 {
-  short ctrlType = CAggHook::MouseUp(scrPoint);
-  bool sameElement = ctrlType == m_downElementType;
-
-  switch(m_downElementType)
-  {
-  case GpsHook_GoToMapButton:  
-    {
-      m_goToMapButtonCtrl.MouseUp();
-      if (sameElement)
-      {
-        CAggHook::GoToMapHook();
-        ((CAggHook *)m_view->GetHook(CViewHook::DHT_MapHook))->ComeBack();
-      }
-    }
-    break;
-  case GpsHook_ReturnButton:
-    {
-      m_returnButtonCtrl.MouseUp();
-      if (sameElement)
-      {
-        CAggHook::Return();
-      }
-    }
-    break;
-  case GpsHook_MarkCtrlCenter:
-  case GpsHook_MarkCtrlLeft:
-  case GpsHook_MarkCtrlRight:
-    {
-      m_markCtrl.MouseUp();
-      if (sameElement)
-      {
-        CAggHook::TurnTo(CViewHook::DHT_COMPortSettingHook);
-        CAggHook* aggHook = (CAggHook*)m_view->GetHook(CViewHook::DHT_COMPortSettingHook);
-        aggHook->Load();
-      }
-    }
-    break;
-  default:
-    m_isNeedRefesh = false;
-    assert(false);
-    break;
-  }
-  if (m_isNeedRefesh)
-  {
-    this->Refresh();
-  }
-  m_isNeedRefesh = true;
-  return ctrlType;
-}
-
-bool CGpsHook::operator ()()
-{
-  return false;
+  return CMenuBackgroundHook::MouseUp(scrPoint);
 }
 
 void CGpsHook::Update()
 {
-  if (CViewHook::m_curHookType != CViewHook::DHT_GPSHook && CViewHook::m_curHookType != CViewHook::DHT_MapHook)
+  if (CViewHook::m_curHookType != DHT_GPSHook && CViewHook::m_curHookType != DHT_MapHook)
   {
     return;
   }
 
   //如果停留在地图界面则只更新卫星个数
-  if (CViewHook::DHT_MapHook == CViewHook::m_curHookType)
+  if (DHT_MapHook == CViewHook::m_curHookType)
   {
     UpdateLocationSatelliteNum();
     return;
@@ -431,7 +284,7 @@ void CGpsHook::Update()
   }
 }
 
-int UeGui::CGpsHook::IsLeapYear( int year )
+int CGpsHook::IsLeapYear( int year )
 {
   if ( (year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0) )
   {
@@ -443,7 +296,7 @@ int UeGui::CGpsHook::IsLeapYear( int year )
   }
 }
 
-int UeGui::CGpsHook::DateToWeek( int year,int month,int day )
+int CGpsHook::DateToWeek( int year,int month,int day )
 {
   long int n;
   // 计算公元1年1月1日到输入日期的天数
@@ -480,7 +333,7 @@ int UeGui::CGpsHook::DateToWeek( int year,int month,int day )
   return n;
 }
 
-void UeGui::CGpsHook::OutputWeek( int week )
+void CGpsHook::OutputWeek( int week )
 {
   switch(week)
   {
@@ -508,46 +361,26 @@ void UeGui::CGpsHook::OutputWeek( int week )
   }
 }
 
-void UeGui::CGpsHook::SetCurLocationNum( int curLocationNum )
+void CGpsHook::SetCurLocationNum( int curLocationNum )
 {
   m_curLocationNum = curLocationNum;
 }
 
-int UeGui::CGpsHook::GetCurLocationNum()
+int CGpsHook::GetCurLocationNum()
 {
   return m_curLocationNum;
 }
 
-void UeGui::CGpsHook::InitSatelliteStatus()
+void CGpsHook::InitSatelliteStatus()
 {
-  m_sNROneCtrl.SetVisible(false);
-  m_sNRTwoCtrl.SetVisible(false);
-  m_sNRThreeCtrl.SetVisible(false);
-  m_sNRFourCtrl.SetVisible(false);
-  m_sNRFiveCtrl.SetVisible(false);
-  m_sNRSixCtrl.SetVisible(false);
-  m_sNRSevenCtrl.SetVisible(false);
-  m_sNREightCtrl.SetVisible(false);
-  m_sNRNineCtrl.SetVisible(false);
-  m_sNRTenCtrl.SetVisible(false);
-  m_sNRElevenCtrl.SetVisible(false);
-  m_sNRTwelveCtrl.SetVisible(false);
-
-  m_point1.SetVisible(false);
-  m_point2.SetVisible(false);
-  m_point3.SetVisible(false);
-  m_point4.SetVisible(false);
-  m_point5.SetVisible(false);
-  m_point6.SetVisible(false);
-  m_point7.SetVisible(false);
-  m_point8.SetVisible(false);
-  m_point9.SetVisible(false);
-  m_point10.SetVisible(false);
-  m_point11.SetVisible(false);
-  m_point12.SetVisible(false);
+  for (int i=0; i<12; i++)
+  {
+    m_sNRCtrl[i].SetVisible(false);
+    m_point[i].SetVisible(false);
+  }
 }
 
-int UeGui::CGpsHook::GetWidth( int snr )
+int CGpsHook::GetWidth( int snr )
 {
   int exSNR = 2 * snr;
   if (exSNR >= kMAXSNR)
@@ -560,169 +393,39 @@ int UeGui::CGpsHook::GetWidth( int snr )
   }
 }
 
-void UeGui::CGpsHook::SetSatelliteStatus( int id, int snr )
+void CGpsHook::SetSatelliteStatus( int id, int snr )
 {  
   //注意调用该方法之前先要调用 InitSatelliteStatus()初始化信号
-  if (snr <= 0)
+  int index = id - 1;
+  if (snr <= 0 || index >= 12 || index < 0)
   {
     return;
   }
-
-  char buf[10] = {};  
-  int width = GetWidth(snr);  
-
-  switch(id)
-  {
-  case 1:
-    {
-      m_sNROneCtrl.SetVisible(true);  
-      m_sNROneCtrl.SetWidth(width);          
-      m_sNROneCtrl.SetCaption(buf);        
-    }
-    break;
-  case 2:
-    {
-      m_sNRTwoCtrl.SetVisible(true);
-      m_sNRTwoCtrl.SetWidth(width);      
-      m_sNRTwoCtrl.SetCaption(buf);
-    }
-    break;
-  case 3:
-    {
-      m_sNRThreeCtrl.SetVisible(true);
-      m_sNRThreeCtrl.SetWidth(width);      
-      m_sNRThreeCtrl.SetCaption(buf);
-    }
-    break;
-  case 4:
-    {
-      m_sNRFourCtrl.SetVisible(true);
-      m_sNRFourCtrl.SetWidth(width);      
-      m_sNRFourCtrl.SetCaption(buf);
-    }
-    break;
-  case 5:
-    {
-      m_sNRFiveCtrl.SetVisible(true);
-      m_sNRFiveCtrl.SetWidth(width);      
-      m_sNRFiveCtrl.SetCaption(buf);
-    }
-    break;
-  case 6:
-    {
-      m_sNRSixCtrl.SetVisible(true);
-      m_sNRSixCtrl.SetWidth(width);      
-      m_sNRSixCtrl.SetCaption(buf);
-    }
-    break;
-  case 7:
-    {
-      m_sNRSevenCtrl.SetVisible(true);
-      m_sNRSevenCtrl.SetWidth(width);      
-      m_sNRSevenCtrl.SetCaption(buf);
-    }
-    break;
-  case 8:
-    {
-      m_sNREightCtrl.SetVisible(true);
-      m_sNREightCtrl.SetWidth(width);      
-      m_sNREightCtrl.SetCaption(buf);
-    }
-    break;
-  case 9:
-    {
-      m_sNRNineCtrl.SetVisible(true);
-      m_sNRNineCtrl.SetWidth(width);      
-      m_sNRNineCtrl.SetCaption(buf);
-    }
-    break;
-  case 10:
-    {
-      m_sNRTenCtrl.SetVisible(true);
-      m_sNRTenCtrl.SetWidth(width);      
-      m_sNRTenCtrl.SetCaption(buf);
-    }
-    break;
-  case 11:
-    {
-      m_sNRElevenCtrl.SetVisible(true);
-      m_sNRElevenCtrl.SetWidth(width);      
-      m_sNRElevenCtrl.SetCaption(buf);
-    }
-    break;
-  case 12:
-    {
-      m_sNRTwelveCtrl.SetVisible(true);
-      m_sNRTwelveCtrl.SetWidth(width);      
-      m_sNRTwelveCtrl.SetCaption(buf);
-    }
-    break;
-  }
+  int width = GetWidth(snr);
+  m_sNRCtrl[index].SetVisible(true);
+  m_sNRCtrl[index].SetWidth(width);
 }
 
-GuiElement* UeGui::CGpsHook::GetSatlliteElement( int id )
+GuiElement* CGpsHook::GetSatlliteElement( int id )
 {
-  switch (id)
+  int index = id - 1;
+  if (index >= 12 || index < 0)
   {
-  case 1:
-    {
-      return m_point1.GetCenterElement();
-    }
-  case 2:
-    {
-      return m_point2.GetCenterElement();
-    }
-  case 3:
-    {
-     return m_point3.GetCenterElement();
-    }
-  case 4:
-    {
-      return m_point4.GetCenterElement();
-    }
-  case 5:
-    {
-      return m_point5.GetCenterElement();
-    }
-  case 6:
-    {
-      return m_point6.GetCenterElement();
-    }
-  case 7:
-    {
-      return m_point7.GetCenterElement();
-    }
-  case 8:
-    {
-      return m_point8.GetCenterElement();
-    }
-  case 9:
-    {
-      return m_point9.GetCenterElement();
-    }
-  case 10:
-    {
-      return m_point10.GetCenterElement();
-    }
-  case 11:
-    {
-      return m_point11.GetCenterElement();
-    }
-  case 12:
-    {
-      return m_point12.GetCenterElement();
-    }
+    return NULL;
   }
-  return NULL;
+  else
+  {
+    return m_point[id].GetCenterElement();
+  }
 }
 
-short UeGui::CGpsHook::Elv2Rad( short elevation )
+short CGpsHook::Elv2Rad( short elevation )
 {
   double fact = m_earthRadius / 90.;
   return  m_earthRadius - (int) (fact * elevation + 0.5);
 }
 
-void UeGui::CGpsHook::Gps2Scr( short elevation, short azimuth, CGeoPoint<int> &scrPt )
+void CGpsHook::Gps2Scr( short elevation, short azimuth, CGeoPoint<int> &scrPt )
 {
   short rad = Elv2Rad(elevation);
   scrPt.m_x = (int)(m_earthCenterX + rad * ::sin(Deg2Rad(azimuth)) + 0.5);
@@ -733,7 +436,7 @@ void UeGui::CGpsHook::Gps2Scr( short elevation, short azimuth, CGeoPoint<int> &s
   //LogMessage(msgBuf);
 }
 
-void UeGui::CGpsHook::ShowSatellite( int id, short elevation, short azimuth )
+void CGpsHook::ShowSatellite( int id, short elevation, short azimuth )
 {
   //卫星方位角范围0－90度
   if ((elevation >= 0) && (elevation <= 90) && (azimuth >= 0) && (azimuth <= 359))
@@ -753,7 +456,7 @@ void UeGui::CGpsHook::ShowSatellite( int id, short elevation, short azimuth )
   }
 }
 
-void UeGui::CGpsHook::UpdateLocationSatelliteNum()
+void CGpsHook::UpdateLocationSatelliteNum()
 {
   //读取GPS信号
   GpsBasic pos;

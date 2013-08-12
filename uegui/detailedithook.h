@@ -17,8 +17,8 @@
 #include "menubackgroundhook.h"
 
 //标识图标起始ID
-#define   MARKPICBEGIN 424 
-#define   MARKPICEND 471
+#define   MARKPICBEGIN 307
+#define   MARKPICEND 354
 
 namespace UeGui
 {
@@ -115,14 +115,14 @@ namespace UeGui
     static void RecordPosition(int);
     void DoRecordPosition(int);
     
-    static void EditHookNameCallBack(void *pDoCallBackObj,const SQLRecord *pResult);
-    void DoEditHookNameCallBack(const SQLRecord *pResult);
+    static void EditHookNameCallBack(void *pDoCallBackObj,const char *pResult);
+    void DoEditHookNameCallBack(const char *pResult);
 
-    static void EditHookAddressCallBack(void *pDoCallBackObj,const SQLRecord *pResult);
-    void DoEditHookAddressCallBack(const SQLRecord *pResult);
+    static void EditHookAddressCallBack(void *pDoCallBackObj,const char *pResult);
+    void DoEditHookAddressCallBack(const char *pResult);
 
-    static void EditHookTelephoneCallBack(void *pDoCallBackObj,const SQLRecord *pResult);
-    void DoEditHookTelephoneCallBack(const SQLRecord *pResult);
+    static void EditHookTelephoneCallBack(void *pDoCallBackObj,const char *pResult);
+    void DoEditHookTelephoneCallBack(const char *pResult);
 
 
   protected:
@@ -147,11 +147,12 @@ namespace UeGui
     CUiButton m_telephoneCtrl;
     CUiButton m_markCtrl;
     CUiButton m_markPicCtrl;
+    CUiButton m_markLabel;
     CUiButton m_determineCtrl;
 
     CDetailEditEvent m_detailEditEvent;
     EditData eData;
-    int recpos;
+    static int m_recpos;
 
     const CUserDataWrapper& m_userWrapper;
   };

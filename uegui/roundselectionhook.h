@@ -67,8 +67,6 @@ namespace UeGui
 
     virtual void Load();
 
-    bool IsFromMap();
-
   protected:
 
     virtual void MakeNames();
@@ -77,6 +75,8 @@ namespace UeGui
 
     void PutItemToList();
 
+    void SetTypeName();
+
   private:
     CUiBitButton m_listBtn[12];
     CUiBitButton m_switchBtn;
@@ -84,9 +84,6 @@ namespace UeGui
     CCodeIndexCtrl *m_pCurItemCtrl;
     std::vector<TCodeEntry> m_vecListItem;
     std::vector<TCodeEntry> m_vecQueryListItem;
-    //判断是否从地图进入
-    //以此来决定搜索结果列表是优先显示地图中心周边还是当前位置周边
-    bool m_isFromMap;
     //用于记录常用分类的个数, 最多11个, 最后一个放 更多分类 按钮
     int m_comSize;
   };

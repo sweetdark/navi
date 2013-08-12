@@ -23,6 +23,7 @@ using namespace UeModel;
 using namespace UeBase;
 
 #include "usuallyfile.h"
+#include "uebase/customerfilereader.h"
 
 
 
@@ -72,6 +73,49 @@ namespace UeGui
     {
       return !(m_x != other.m_x || m_y != other.m_y ||
         ::strcmp((char *)m_name, (char *)other.m_name));
+    }
+  };
+
+  //用户电子眼数据每次增加条数
+  const static short USER_EEYE_BLOCK_COUNT = 10;
+
+  //用户电子眼数据顺序索引：主要用户用户电子眼管理时按照添加顺序读取数据
+  struct UserEEye_Seq_Index
+  {
+    int m_indexID;  //当前数据ID
+    int m_offset;   //在文件中的位置
+    UserEEye_Seq_Index(): m_indexID(0), m_offset(0)
+    {
+    }
+  };
+
+  //用户电子眼数据索引结构
+  struct UserEEyeIndexData
+  {
+    int m_parcelId;  //网格索引
+    int m_capacity;  //当前网格对应的电子眼数据容量：采用增量递增，默认有10条数据，写满后再增10条
+    int m_dataCount; //当前已存数据量
+    int m_offset;    //数据在文件中的位置偏移量
+    UserEEyeIndexData() : m_parcelId(0), m_capacity(0), m_dataCount(0), m_offset(0)
+    {
+    }
+  };
+
+  //用户电子眼实体数据结构
+  struct UserEEyeEntryData
+  {
+    int m_linkId;                 //路网ID
+    unsigned int m_x;             //经度
+    unsigned int m_y;             //维度
+    unsigned short m_type;        //电子眼类型
+    unsigned short m_speed;       //电子眼限速值
+    unsigned short m_direction;   //电子眼方向
+    unsigned char m_name[128];    //名称
+    unsigned char m_address[128]; //地址
+    UserEEyeEntryData() : m_linkId(0), m_x(0), m_y(0), m_type(0), m_speed(0), m_direction(0)
+    {
+      ::memset(m_name, 0x00, 128);
+      ::memset(m_address, 0x00, 128);
     }
   };
 
@@ -211,11 +255,28 @@ namespace UeGui
     * \brief 清除上次保存的未导航完成路线
     */
     bool ClearLastRoute() const;
+
+    /*
+    * \brief 内存映射用户的电子眼数据文件
+    */
+    bool ConnectToUserEEyeDataFile() const;
+    /*
+    * \brief 内存映射用户的电子眼数据文件
+    */
+    bool DisconnectUserEEyeDataFile() const;
+    /*
+    * \brief 添加用户电子眼数据
+    */
+    bool AddUserEEyeData(int parcelID, const UserEEyeEntryData& entryData) const;
   private:
     //设置地址名称
     void SetAddrName(const PlanPosition& planPos, char *addrName) const;
     //读取最后一次未导航完成的路线保存文件名称
     tstring GetLastRouteBackFilename() const;
+    //读取用户电子眼索引文件名
+    tstring GetUserEEyeIndexFileName() const;
+    //读取用户电子眼数据文件名
+    tstring GetUserEEyeEntryFileName() const;
   private:
     UeMap::IView *m_view;
     UeRoute::IRoute *m_route;
@@ -227,6 +288,11 @@ namespace UeGui
     UeQuery::SQLSetting setting;
     const CPathBasic &m_pathBasic;
     const CFileBasic &m_fileBasic;
+
+    //用户电子眼索引文件读写对象
+    CCustomerFileReader* m_userEEyeIndexFile;
+    //用户电子眼数据文件读写对象
+    CCustomerFileReader* m_userEEyeEntryFile;
   };
 }
 

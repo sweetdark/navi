@@ -94,6 +94,8 @@ namespace UeGui
     void SaveToUsuallyRecord(UsuallyRecordType type);
     //读取提示消息
     const char* GetUsuallyRecordMsgInfo(UsuallyRecordType type);
+    //读取提示消息
+    const char* GetUsuallyRecordMsgInfo2(UsuallyRecordType type);
     //设为开机位置
     void SaveToSysStartPosition();
   private:

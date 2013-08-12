@@ -182,6 +182,86 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
+			OutputDirectory="$(SolutionDir)Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
+			IntermediateDirectory="Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\include\agg\include;..\..\..\include\png;..\..\..\include\zlib"
+				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;_DEBUG;DEBUG;_WINDOWS;_USRDLL;UEBASE_EXPORTS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
+				MinimalRebuild="true"
+				RuntimeLibrary="1"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions=" /subsystem:windowsce,5.00"
+				OutputFile="..\..\..\outputs\winarm\uebased.dll"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\..\lib\winarm"
+				GenerateDebugInformation="true"
+				SubSystem="0"
+				ImportLibrary="..\..\..\lib\winarm\uebased.lib"
+				TargetMachine="0"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCCodeSignTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="copy .\uebase.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\geombasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\vectop.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\platinfo.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\pathbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\filebasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dynlib.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\membasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\memvector.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\simplelru.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\segmentpool.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\simplepool.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\stringbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\stringmatch.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\functor.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\mediator.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\garbage.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dbglogger.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dbgmacro.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dynlib.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\mapproj.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\mathbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\tokenstring.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\synobject.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\winsynobject.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\timebasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\cliptool.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\bmpbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\picturebasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\pictureloader.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\pngbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\uepicture.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\shpbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\shpreader.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\shpwriter.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dbfbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dbfwriter.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dbfreader.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\uemaps.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\uesettings.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\uesettingio.h ..\..\..\include\uebase&#x0D;&#x0A;"
+			/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
@@ -341,86 +421,6 @@
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory="SDMMC\RtNavi"
-				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
-			OutputDirectory="$(SolutionDir)Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
-			IntermediateDirectory="Windows Mobile 5.0 Pocket PC SDK (ARMV4I)\$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				ExecutionBucket="7"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\include;..\..\..\include\agg\include;..\..\..\include\png;..\..\..\include\zlib"
-				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;_DEBUG;DEBUG;_WINDOWS;_USRDLL;UEBASE_EXPORTS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
-				MinimalRebuild="true"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions=" /subsystem:windowsce,5.00"
-				OutputFile="..\..\..\outputs\winarm\uebased.dll"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib\winarm"
-				GenerateDebugInformation="true"
-				SubSystem="0"
-				ImportLibrary="..\..\..\lib\winarm\uebased.lib"
-				TargetMachine="0"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCCodeSignTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy .\uebase.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\geombasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\vectop.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\platinfo.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\pathbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\filebasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dynlib.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\membasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\memvector.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\simplelru.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\segmentpool.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\simplepool.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\stringbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\stringmatch.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\functor.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\mediator.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\garbage.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dbglogger.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dbgmacro.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dynlib.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\mapproj.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\mathbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\tokenstring.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\synobject.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\winsynobject.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\timebasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\cliptool.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\bmpbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\picturebasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\pictureloader.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\pngbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\uepicture.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\shpbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\shpreader.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\shpwriter.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dbfbasic.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dbfwriter.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\dbfreader.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\uemaps.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\uesettings.h ..\..\..\include\uebase&#x0D;&#x0A;copy .\uesettingio.h ..\..\..\include\uebase&#x0D;&#x0A;"
-			/>
-			<DeploymentTool
-				ForceDirty="-1"
-				RemoteDirectory=""
 				RegisterOutput="0"
 				AdditionalFiles=""
 			/>

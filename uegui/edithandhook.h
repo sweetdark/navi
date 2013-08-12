@@ -63,7 +63,9 @@ namespace UeGui
 
     char* GetKeyWord();
 
-    void SetKeyWord(char* keyword);
+    void SetKeyWord(const char* keyword);
+
+    void SetTitle(const char* title);
 
     void SetQueryMode();
 

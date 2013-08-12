@@ -4,9 +4,11 @@
 #include "querywrapper.h"
 #endif
 
-#include "typenodistquerylisthook.h"
-
 #include "maphook.h"
+
+#include "roundtypeselecthook.h"
+
+#include "typenodistquerylisthook.h"
 
 using namespace UeGui;
 
@@ -25,15 +27,7 @@ CRoundSelectionHook::~CRoundSelectionHook()
 
 void CRoundSelectionHook::Load()
 {
-  if (CAggHook::GetPrevHookType() == DHT_MapHook)
-  {
-    m_isFromMap = true;
-  }
-  else
-  {
-    m_isFromMap = false;
-  }
-
+  SetTypeName();
   m_pCurItemCtrl = &CCodeIndexCtrl::GetKindCodeCtrl();
   m_pCurItemCtrl->GetComItem(m_vecListItem);
   m_comSize = m_vecListItem.size();
@@ -140,6 +134,7 @@ short CRoundSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
   case RoundSelectionHook_TypeSelectBtnLabel:
     {
       m_switchBtn.MouseUp();
+      TurnTo(DHT_RoundTypeSelectHook);
     }
     break;
   default:
@@ -202,7 +197,24 @@ void CRoundSelectionHook::PutItemToList()
   }
 }
 
-bool CRoundSelectionHook::IsFromMap()
+void CRoundSelectionHook::SetTypeName()
 {
-  return m_isFromMap;
+  CRoundTypeSelectHook::RoundType roundType;
+  ((CRoundTypeSelectHook *)m_view->GetHook(DHT_RoundTypeSelectHook))->SetBtnEnable();
+  roundType = ((CRoundTypeSelectHook *)m_view->GetHook(DHT_RoundTypeSelectHook))->GetCurRoundType();
+  switch(roundType)
+  {
+  case CRoundTypeSelectHook::RT_MapCenter:
+    m_switchBtn.SetCaption("地图中心周边");
+    break;
+  case CRoundTypeSelectHook::RT_CurPos:
+    m_switchBtn.SetCaption("当前位置周边");
+    break;
+  case CRoundTypeSelectHook::RT_EndPoint:
+    m_switchBtn.SetCaption("目的地周边");
+    break;
+  case CRoundTypeSelectHook::RT_Route:
+    m_switchBtn.SetCaption("路线周边");
+    break;
+  }
 }

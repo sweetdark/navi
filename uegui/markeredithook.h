@@ -21,11 +21,7 @@ namespace UeGui
   public:
     enum MarkerEditHookCtrlType
     {
-      MarkerEditHook_Begin = 0,
-      MarkerEditHook_BackGround,
-      MarkerEditHook_BackGroundText,
-      MarkerEditHook_GotoMapBtn,
-      MarkerEditHook_BackButton,
+      MarkerEditHook_Begin = MenuBackgroundHook_End,
       MarkerEditHook_mark01,
       MarkerEditHook_mark02,
       MarkerEditHook_mark03,
@@ -57,18 +53,13 @@ namespace UeGui
 
     virtual ~CMarkerEditHook();
 
-    virtual void MakeGUI();
-
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
     virtual short MouseMove(CGeoPoint<short> &scrPoint);
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual bool operator ()();
-
   protected:
-    //virtual tstring GetBinaryFileName();
 
     virtual void MakeNames();
 

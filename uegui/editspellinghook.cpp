@@ -235,6 +235,7 @@ short CEditSpellingHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_saveBtn.MouseUp();
       if (m_saveBtn.IsEnable())
       {
+        ::memcpy(m_keyWord, m_keyWordBox.GetCaption(), sizeof(m_keyWord));
         ((CEditSwitchHook *)m_view->GetHook(DHT_EditSwitchHook))->DoEditCallBack(m_keyWord);
       }
     }
@@ -630,7 +631,13 @@ char* CEditSpellingHook::GetKeyWord()
   return m_keyWord;
 }
 
-void CEditSpellingHook::SetKeyWord(char* keyword)
+void CEditSpellingHook::SetKeyWord(const char* keyword)
 {
   ::memcpy(m_keyWord, keyword, sizeof(m_keyWord));
+}
+
+void CEditSpellingHook::SetTitle(const char* title)
+{
+  m_strTitle = title;
+  ::strcpy(GetGuiElement(MenuBackgroundHook_TitleLable)->m_label, m_strTitle.c_str());
 }

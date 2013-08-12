@@ -136,7 +136,7 @@ namespace UeBase
 
   private:
     /// Singleton
-    static CMathBasic m_mathBasic;
+    static CMathBasic *m_mathBasic;
   };
 }
 #endif

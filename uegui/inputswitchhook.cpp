@@ -263,11 +263,6 @@ void CInputSwitchHook::SwitchInputMethod()
   SwitchIndexType();
   int hookType = GetCurInputHookType();
 
-  //防止输入法界面间循环
-  CAggHook::Return(false);
-  CAggHook::Return(false);
-  CAggHook::TurnTo(hookType);
-  //先跳转再设置关键字
   switch(m_curInputMethod)
   {
   case IM_AcronymMethod:
@@ -283,6 +278,11 @@ void CInputSwitchHook::SwitchInputMethod()
     ((CInputHandHook *)m_view->GetHook(DHT_InputHandHook))->SetKeyWord(m_keyword);
     break;
   }
+
+  //防止输入法界面间循环
+  CAggHook::Return(false);
+  CAggHook::Return(false);
+  CAggHook::TurnTo(hookType);
 
   //记录最后一次使用的输入法
   CUeSettingsIO configCtrl;

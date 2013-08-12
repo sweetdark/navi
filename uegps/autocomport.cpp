@@ -35,51 +35,54 @@ void UeGps::CAutoCOMPort::InitCOMPortList()
 
 void UeGps::CAutoCOMPort::LogMessage( const char* msg )
 {
-  const CFileBasic &fileBasic = CFileBasic::Get();
-  const CPathBasic &pathBasic = CPathBasic::Get();
-
-  tstring fileName(CPathConfig::GetRootPath());
-  pathBasic.GetPathSeperator(fileName);
-  fileName += _T("logs");
-  pathBasic.GetPathSeperator(fileName);
-  fileName += _T("autoport");
-  if (!pathBasic.IsDirExist(fileName))
+  if (__LOG_GPS__)
   {
-    pathBasic.CreateDir(fileName);
-  }  
-  pathBasic.GetPathSeperator(fileName);
+    const CFileBasic &fileBasic = CFileBasic::Get();
+    const CPathBasic &pathBasic = CPathBasic::Get();
 
-  SYSTEMTIME st;
-  ::GetLocalTime(&st);
+    tstring fileName(CPathConfig::GetRootPath());
+    pathBasic.GetPathSeperator(fileName);
+    fileName += _T("logs");
+    pathBasic.GetPathSeperator(fileName);
+    fileName += _T("autoport");
+    if (!pathBasic.IsDirExist(fileName))
+    {
+      pathBasic.CreateDir(fileName);
+    }  
+    pathBasic.GetPathSeperator(fileName);
 
-  TCHAR logFile[512] = {0, };
-  ::swprintf(logFile, _T("%04d%02d%02d%02d%02d.log"), st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute);
-  fileName += tstring(logFile);
+    SYSTEMTIME st;
+    ::GetLocalTime(&st);
 
-  void *fileHandle = NULL;
-  if (pathBasic.IsFileExist(fileName))
-  {
-    fileHandle = fileBasic.OpenFile(fileName, CFileBasic::UE_FILE_APPEND);
+    TCHAR logFile[512] = {0, };
+    ::swprintf(logFile, _T("%04d%02d%02d%02d%02d.log"), st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute);
+    fileName += tstring(logFile);
+
+    void *fileHandle = NULL;
+    if (pathBasic.IsFileExist(fileName))
+    {
+      fileHandle = fileBasic.OpenFile(fileName, CFileBasic::UE_FILE_APPEND);
+    }
+    else
+    {
+      fileHandle = fileBasic.OpenFile(fileName, CFileBasic::UE_FILE_WRITE);
+    }  
+    if (fileHandle)
+    {
+      SYSTEMTIME sysTime;
+      ::GetLocalTime(&sysTime);
+      char logMsg[10] = {};
+      ::sprintf(logMsg, "%02d:%02d:%02d  ", sysTime.wHour, sysTime.wMinute, sysTime.wSecond); 
+
+      int count = 1;
+      string writedata;
+      writedata.append(logMsg);
+      writedata.append(msg);
+      writedata += "\r\n";
+      fileBasic.WriteFile(fileHandle, writedata.c_str(), (int)writedata.size(), count);
+    }
+    fileBasic.CloseFile(fileHandle);
   }
-  else
-  {
-    fileHandle = fileBasic.OpenFile(fileName, CFileBasic::UE_FILE_WRITE);
-  }  
-  if (fileHandle)
-  {
-    SYSTEMTIME sysTime;
-    ::GetLocalTime(&sysTime);
-    char logMsg[10] = {};
-    ::sprintf(logMsg, "%02d:%02d:%02d  ", sysTime.wHour, sysTime.wMinute, sysTime.wSecond); 
-
-    int count = 1;
-    string writedata;
-    writedata.append(logMsg);
-    writedata.append(msg);
-    writedata += "\r\n";
-    fileBasic.WriteFile(fileHandle, writedata.c_str(), (int)writedata.size(), count);
-  }
-  fileBasic.CloseFile(fileHandle);
 }
 
 bool UeGps::CAutoCOMPort::SearchCOMPort()
