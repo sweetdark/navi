@@ -848,8 +848,8 @@ void CAGGView::OnDraw(short style)
   //MEMORY_STAT
   //TIME_STAT;
   CViewDC *curDC = GetDC();
-  HDC dc = GetWholeMapDC();
-  if(curDC && dc)
+  HDC mapDC = GetWholeMapDC();
+  if(curDC && mapDC)
   {
     //
     //RECT rect;
@@ -1037,20 +1037,20 @@ void CAGGView::OnDraw(short style)
         //CAggStackDC::m_curBuf.copy_from(CAggStackDC::m_prevBuf);
       }
     }
-    int bitsPerPixel = ::GetDeviceCaps(dc, BITSPIXEL);
+    int bitsPerPixel = ::GetDeviceCaps(mapDC, BITSPIXEL);
     if(bitsPerPixel >= SYSTEM_BPP)
     {
-      ::BitBlt(dc, minX, minY, maxX - minX, maxY - minY, (HDC)(stackDC.GetDC()), curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, SRCCOPY);
+      ::BitBlt(mapDC, minX, minY, maxX - minX, maxY - minY, (HDC)(stackDC.GetDC()), curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, SRCCOPY);
     }
     else
     {
-      HBITMAP hbmp = ::CreateCompatibleBitmap(dc, maxX - minX, maxY - minY);
+      HBITMAP hbmp = ::CreateCompatibleBitmap(mapDC, maxX - minX, maxY - minY);
       if(hbmp)
       {
-        HDC memdc = ::CreateCompatibleDC(dc);
+        HDC memdc = ::CreateCompatibleDC(mapDC);
         HGDIOBJ hold = ::SelectObject(memdc, hbmp);
         ::BitBlt(memdc, minX, minY, maxX - minX, maxY - minY, (HDC)(stackDC.GetDC()), 0, 0, SRCCOPY);
-        ::BitBlt(dc, minX, minY, maxX - minX, maxY - minY, memdc, 0, 0, SRCCOPY);
+        ::BitBlt(mapDC, minX, minY, maxX - minX, maxY - minY, memdc, 0, 0, SRCCOPY);
 
         ::DeleteObject(::SelectObject(memdc,hold));
         ::DeleteObject(hbmp);

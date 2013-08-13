@@ -40,7 +40,7 @@ void CEagleView::SetScrLayout(const ScreenLayout &layout)
 void CEagleView::OnDraw(short style)
 {
   CViewDC *curDC = GetDC();
-  HDC dc = GetWholeMapDC();
+  HDC mapDC = GetWholeMapDC();
   
   CGeoRect<short> extent = m_mapping.GetScrLayout().m_extent;
   
@@ -90,20 +90,20 @@ void CEagleView::OnDraw(short style)
   }
   m_canvas.RenderEagleOther(m_curScaleLevel, false, false);
   
-  int bitsPerPixel = ::GetDeviceCaps(dc, BITSPIXEL);
+  int bitsPerPixel = ::GetDeviceCaps(mapDC, BITSPIXEL);
   if(bitsPerPixel >= SYSTEM_BPP)
   {
-    ::BitBlt(dc, minX, minY, maxX - minX, maxY - minY, reinterpret_cast<HDC>(stackDC.GetDC()), curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, SRCCOPY);
+    ::BitBlt(mapDC, minX, minY, maxX - minX, maxY - minY, reinterpret_cast<HDC>(stackDC.GetDC()), curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, SRCCOPY);
   }
   else
   {
-    HBITMAP hbmp = ::CreateCompatibleBitmap(dc, maxX - minX, maxY - minY);
+    HBITMAP hbmp = ::CreateCompatibleBitmap(mapDC, maxX - minX, maxY - minY);
     if(hbmp)
     {
-      HDC memdc = ::CreateCompatibleDC(dc);
+      HDC memdc = ::CreateCompatibleDC(mapDC);
       HGDIOBJ hold = ::SelectObject(memdc, hbmp);
       ::BitBlt(memdc, 0, 0, maxX - minX, maxY - minY, (HDC)(stackDC.GetDC()), curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, SRCCOPY);
-      ::BitBlt(dc, minX, minY, maxX - minX, maxY - minY, memdc, 0, 0, SRCCOPY);
+      ::BitBlt(mapDC, minX, minY, maxX - minX, maxY - minY, memdc, 0, 0, SRCCOPY);
 
       ::DeleteObject(::SelectObject(memdc,hold));
       ::DeleteObject(hbmp);
