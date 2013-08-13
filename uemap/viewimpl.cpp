@@ -1346,55 +1346,55 @@ inline void CViewImpl::Refresh()
 
 inline void CViewImpl::RefreshUI(short type)
 {
-  int i = 0;
-  int count = static_cast<int>(m_views.size());
-  for(; i < count; i++)
-  {
-    m_views[i]->GetDC()->m_isRefresh = true;
-  }
+  //int i = 0;
+  //int count = static_cast<int>(m_views.size());
+  //for(; i < count; i++)
+  //{
+  //  m_views[i]->GetDC()->m_isRefresh = true;
+  //}
 
-  // Whether need to redraw
-  if(m_idleOP & IOP_ZoomIn || m_idleOP & IOP_ZoomOut)
-  {
-    return;
-  }
+  //// Whether need to redraw
+  //if(m_idleOP & IOP_ZoomIn || m_idleOP & IOP_ZoomOut)
+  //{
+  //  return;
+  //}
 
-  if (type == VT_Guidance)
-  {
-    i = 0;
-    for(; i < count; i++)
-    {
-      if(m_views[i]->m_type == VT_Guidance)
-      {
-        m_views[i]->OnDraw(CViewState::RS_Existed);
-      }
-      count = static_cast<int>(m_views.size());
-    }
-  }
-  else
-  {
-    // Here should firstly render states in VS_Floating style
-    i = 0;
-    for(; i < count; i++)
-    {
-      if(m_views[i]->m_style == VS_Floating)
-      {
-        m_views[i]->OnDraw(CViewState::RS_Existed);
-      }
-      count = static_cast<int>(m_views.size());
-    }
+  //if (type == VT_Guidance)
+  //{
+  //  i = 0;
+  //  for(; i < count; i++)
+  //  {
+  //    if(m_views[i]->m_type == VT_Guidance)
+  //    {
+  //      m_views[i]->OnDraw(CViewState::RS_Existed);
+  //    }
+  //    count = static_cast<int>(m_views.size());
+  //  }
+  //}
+  //else
+  //{
+  //  // Here should firstly render states in VS_Floating style
+  //  i = 0;
+  //  for(; i < count; i++)
+  //  {
+  //    if(m_views[i]->m_style == VS_Floating)
+  //    {
+  //      m_views[i]->OnDraw(CViewState::RS_Existed);
+  //    }
+  //    count = static_cast<int>(m_views.size());
+  //  }
 
-    // Secondly render states in VS_Docable style
-    i = 0;
-    for(; i < count; i++)
-    {
-      if(m_views[i]->m_style != VS_Floating)
-      {
-        m_views[i]->OnDraw(CViewState::RS_Existed);
-      }
-      count = static_cast<int>(m_views.size());
-    }
-  }
+  //  // Secondly render states in VS_Docable style
+  //  i = 0;
+  //  for(; i < count; i++)
+  //  {
+  //    if(m_views[i]->m_style != VS_Floating)
+  //    {
+  //      m_views[i]->OnDraw(CViewState::RS_Existed);
+  //    }
+  //    count = static_cast<int>(m_views.size());
+  //  }
+  //}
   DrawGui();
 
 }

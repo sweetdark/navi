@@ -22,7 +22,8 @@ namespace UeMap
     virtual void OnDraw(short style);
 
     virtual void SetScrLayout(const ScreenLayout &layout);
-
+  private:
+    bool IsNeedRefreshData(short type);
   private:
     bool m_isSaved; 
   };

@@ -18,8 +18,17 @@ void CGuiView::OnDraw(short style)
   HDC dc = ::GetDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd));
   CAggStackDC& stackDC = CAggStackDC::GetAggDC(GetDCType(), curDC);
 
-  ::BitBlt((HDC)(stackDC.GetDC()), 0, 0, m_srcWidth, m_srcHeitht, GetWholeMapDC(), 0, 0, SRCCOPY);
+  if (!curDC->m_isRefresh && curDC->m_clipBox.IsEmpty())
+  {
+    ::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
+    return;
+  }
+  if (CViewHook::m_curHookType == CViewHook::DHT_MapHook)
+  {
+    ::BitBlt((HDC)(stackDC.GetDC()), 0, 0, m_srcWidth, m_srcHeitht, GetWholeMapDC(), 0, 0, SRCCOPY);
+  }
 
+  //::BitBlt(dc, 0, 0, m_srcWidth, m_srcHeitht, GetWholeMapDC(), 0, 0, SRCCOPY);
 #if __FOR_DEVICE__
   // It no needs to render GUI element for other UeTool settings except for demo
   if(m_viewImpl->m_mapSchema & LSH_GUI  /*&& !m_isScrolling*/)

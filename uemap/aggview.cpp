@@ -852,8 +852,8 @@ void CAGGView::OnDraw(short style)
   if(curDC && dc)
   {
     //
-    RECT rect;
-    ::GetClientRect(reinterpret_cast<HWND>(m_viewImpl->m_wnd), &rect);
+    //RECT rect;
+    //::GetClientRect(reinterpret_cast<HWND>(m_viewImpl->m_wnd), &rect);
     short minX = m_mapping.m_scrLayout.m_extent.m_minX;
     short minY = m_mapping.m_scrLayout.m_extent.m_minY;
     short maxX = m_mapping.m_scrLayout.m_extent.m_maxX;
@@ -863,33 +863,26 @@ void CAGGView::OnDraw(short style)
       maxY = static_cast<short>(maxY / m_scaleY);
     }
 
-    // TODO: ...
-    // Should know the order of hooks
-    // Note:
-    // Below two functions are passed by different DC context
-    // ...
-    CGeoRect<short> excludeRect;
-    m_viewImpl->ExcludeRegions(dc, m_type, excludeRect);
 
     // Decide which circumstance it only directly copy existing bitmap not follow below steps
     // ...
     if(!curDC->m_isRefresh && curDC->m_clipBox.IsEmpty())
     {
       //
-      CGeoPoint<short> start, end;
-      start.m_x = minX;
-      start.m_y = minY;
-      end.m_x = maxX;
-      end.m_y = maxY;
+      //CGeoPoint<short> start, end;
+      //start.m_x = minX;
+      //start.m_y = minY;
+      //end.m_x = maxX;
+      //end.m_y = maxY;
 
-      //
-      //curDC->CopyTo(dc, start, end);
-      CAggStackDC &stackDC = GetAggDC(curDC);
-      ::BitBlt(dc, minX, minY, maxX - minX, maxY - minY, (HDC)(stackDC.GetDC()), curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, SRCCOPY);
-      ::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
+      ////
+      ////curDC->CopyTo(dc, start, end);
+      //CAggStackDC &stackDC = GetAggDC(curDC);
+      //::BitBlt(dc, minX, minY, maxX - minX, maxY - minY, (HDC)(stackDC.GetDC()), curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, SRCCOPY);
+      //::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
 
-      //
-      CTimerCommand::m_synObject.UnLock();
+      ////
+      //CTimerCommand::m_synObject.UnLock();
       return;
     }
 
@@ -920,7 +913,6 @@ void CAGGView::OnDraw(short style)
           CThread::EndThread(sThreadHandle);
           sThreadHandle = 0;
           style = (short)RS_All;
-          //curDC->m_isRefresh = true; 
         }
       }
       short planState = IRoute::GetRoute()->GetPlanState();
@@ -1071,7 +1063,7 @@ void CAGGView::OnDraw(short style)
     curDC->m_clipBox = CGeoRect<short>(0,0,0,0);
     curDC->m_offset = CGeoPoint<short>(0,0);
     curDC->m_isRefresh = false;
-    ::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
+    //::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
   }
   
   

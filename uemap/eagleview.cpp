@@ -40,11 +40,7 @@ void CEagleView::SetScrLayout(const ScreenLayout &layout)
 void CEagleView::OnDraw(short style)
 {
   CViewDC *curDC = GetDC();
-  HWND wnd = reinterpret_cast<HWND>(m_viewImpl->GetWndHandle());
-  HDC dc = ::GetDC(wnd);
-  
-  RECT rect;
-  ::GetClientRect(wnd, &rect);
+  HDC dc = GetWholeMapDC();
   
   CGeoRect<short> extent = m_mapping.GetScrLayout().m_extent;
   
@@ -55,7 +51,6 @@ void CEagleView::OnDraw(short style)
 
   if (!curDC->m_isRefresh && curDC->m_clipBox.IsEmpty())
   {
-    ::ReleaseDC(wnd, dc);
     return;
   }
   
@@ -85,8 +80,7 @@ void CEagleView::OnDraw(short style)
       CViewLayer *layer = m_viewImpl->GetLayer(scale, i);
       if (layer)
       {
-        short type = layer->GetType();
-        if (type == LT_Road_One || type == LT_Road_Two || type == LT_Road_Three ||type == LT_LandMark || type == LT_Politic || type == LT_Poi || type == LT_RoutePlan)
+        if (IsNeedRefreshData(layer->GetType()))
         {
           layer->Draw(m_type, &stackDC, scrExtent, curDC->m_clipBox, false);
         }
@@ -116,5 +110,13 @@ void CEagleView::OnDraw(short style)
       ::DeleteDC(memdc);
     }
   }
+  curDC->m_clipBox = CGeoRect<short>(0,0,0,0);
+  curDC->m_offset = CGeoPoint<short>(0,0);
+  curDC->m_isRefresh = false;
+}
 
+bool CEagleView::IsNeedRefreshData(short type)
+{
+  return (type == LT_Road_One || type == LT_Road_Two || type == LT_Road_Three ||type == LT_LandMark 
+      || type == LT_Politic || type == LT_Poi || type == LT_RoutePlan || type == LT_Network);
 }

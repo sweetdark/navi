@@ -156,8 +156,8 @@ void UeMap::CGuidanceView::OnDraw( short style /*= RS_All*/ )
 void UeMap::CGuidanceView::DoDrawCross()
 {
   CViewDC *curDC = GetDC();
-  HDC dc = ::GetDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd));
-
+  //HDC dc = ::GetDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd));
+  HDC dc = GetWholeMapDC();
   if(curDC && dc)
   {
     //
@@ -181,14 +181,6 @@ void UeMap::CGuidanceView::DoDrawCross()
 
     if (!curDC->m_isRefresh && curDC->m_clipBox.IsEmpty())
     {
-      CGeoPoint<short> start, end;
-      start.m_x = minX;
-      start.m_y = minY;
-      end.m_x = maxX;
-      end.m_y = maxY;
-
-      //curDC->CopyTo(dc, start, end);
-      ::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
       return;
     }
 
@@ -266,27 +258,8 @@ void UeMap::CGuidanceView::DoDrawCross()
         ::DeleteDC(memdc);
       }
     }
-    stackDC.ReservedAsFull();
-
-    //::StretchBlt(dc, minX, minY, maxX - minX, maxY - minY, reinterpret_cast<HDC>(stackDC.GetDC()), 
-    //  curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, curDC->m_bufWidth, curDC->m_bufHeight/2, SRCCOPY);
-    //CGeoRect<short> scrExtent = m_mapping.m_scrLayout.m_extent;
-    //scrExtent.m_maxX = (scrExtent.m_maxX > m_viewImpl->m_scrLayout.m_extent.m_maxX) ? m_viewImpl->m_scrLayout.m_extent.m_maxX : scrExtent.m_maxX;
-    //scrExtent.m_maxY = (scrExtent.m_maxY > m_viewImpl->m_scrLayout.m_extent.m_maxY) ? m_viewImpl->m_scrLayout.m_extent.m_maxY : scrExtent.m_maxY;
-    //m_canvas.RenderHooks(scrExtent);
-    //GuiElements::iterator iter = m_guiElements.begin();
-
-    //stackDC.ReservedAsFull();
-    //::BitBlt(reinterpret_cast<HDC>(stackDC.GetDC()), curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, curDC->m_bufWidth, curDC->m_bufHeight, dc, minX, minY, SRCCOPY);
-
-    //::BitBlt(dc, minX, minY, maxX - minX, maxY - minY, reinterpret_cast<HDC>(stackDC.GetDC()), curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, SRCCOPY);
-    /* ::StretchBlt(dc, minX, minY, maxX - minX, maxY - minY, reinterpret_cast<HDC>(stackDC.GetDC()), 
-    curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, curDC->m_bufWidth, curDC->m_bufHeight/2, SRCCOPY);*/
-    // From fresh status ...
-
     curDC->m_clipBox = CGeoRect<short>(0,0,0,0);
     curDC->m_offset = CGeoPoint<short>(0,0);
     curDC->m_isRefresh = false;
-    ::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
   }
 }

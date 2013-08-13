@@ -840,13 +840,14 @@ HDC UeMap::CViewState::GetWholeMapDC()
   if (!m_mapDC)
   {
     HDC dc = ::GetDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd));
-    static HBITMAP hbmp = ::CreateCompatibleBitmap(dc, m_viewImpl->m_scrLayout.m_width, m_viewImpl->m_scrLayout.m_height);
+    HBITMAP hbmp = ::CreateCompatibleBitmap(dc, m_viewImpl->m_scrLayout.m_width, m_viewImpl->m_scrLayout.m_height);
     if(hbmp)
     {
       m_mapDC = ::CreateCompatibleDC(dc);
       ::SelectObject(m_mapDC, hbmp);
     }
   }
+
   return m_mapDC;
 }
 /**
