@@ -100,6 +100,7 @@ namespace UeMap
     friend class CAGGView;
     friend class CImageView;
     friend class CGuidanceView;
+    friend class CGuiView;
 
     friend class CViewLayer;
     friend class CGroundLayer;
@@ -757,6 +758,9 @@ namespace UeMap
     * 开始显示系统加载进度
     */
     void StartProgress();
+
+    void DrawGui();
+
   private:
     /**
     *
@@ -853,6 +857,8 @@ namespace UeMap
     void SetFullViewPort(CViewState *curView);
 
     CViewState *GetMapView();
+    
+    void InitGuiState();
   protected:
     // Belonged window
     void *m_wnd;
@@ -972,6 +978,8 @@ namespace UeMap
     bool m_isEagleOn;
 
     MapLayout m_eagleLayout;
+
+    CViewState *m_guiView;
   };
 }
 

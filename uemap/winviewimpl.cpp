@@ -288,6 +288,7 @@ void CWinViewImpl::OnPaint()
   {
     (*(*hookFirst).second)();
   }
+  CViewImpl::DrawGui();
   //CTimerCommand::m_synObject.UnLock();
 }
 

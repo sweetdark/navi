@@ -595,6 +595,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\guiview.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\guiview.h"
+				>
+			</File>
+			<File
 				RelativePath=".\viewmapping.h"
 				>
 			</File>

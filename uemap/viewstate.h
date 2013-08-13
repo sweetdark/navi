@@ -513,6 +513,8 @@ namespace UeMap
     *
     **/
     double GetZoomCoff();
+
+    HDC GetWholeMapDC();
   protected:
     // Belonged view
     CViewImpl *m_viewImpl;
@@ -576,6 +578,8 @@ namespace UeMap
 
     //»’÷æ≤‚ ‘
     static CDbgLogger  m_dbgLogger;
+
+    static HDC m_mapDC;
   };
 }
 

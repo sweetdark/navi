@@ -36,6 +36,7 @@
 #include "pancommand.h"
 #include "viewhook.h"
 #include "timercommand.h"
+#include "guiview.h"
 
 // For UeTool PC version
 #include "indexlayer.h"
@@ -75,6 +76,7 @@ m_pathBasic(CPathBasic::Get()), m_fileBasic(CFileBasic::Get()), m_stringBasic(CS
 m_isReadyForOperation(true), m_sidePicCode(-1), m_sidePicType(-1), m_sideArrowCode(-1), m_isDrawSidePic(false), 
 m_picWndHandle(0), m_sampleID(0), m_isDrawPlanLayer(true), m_carIcon(0), m_3DCarIcon(0), m_compassIcon(0), m_compassIndicatorIcon(0),
 m_isProductActivation(false), m_needShowGuidanceView(true),m_isMapLayoutChange(false), m_bubbleIcon(0),m_isScallingMapLock(false),m_isEagleOn(false)
+,m_guiView(0)
 {
   m_carInfo.m_curPos.m_x = 11639142;
   m_carInfo.m_curPos.m_y = 3991655;
@@ -164,6 +166,7 @@ bool CViewImpl::Attach(void *oneWnd, ScreenLayout &scrLayout)
   InitState();
 
   AddDC(VT_Gui | DC_Whole);
+  InitGuiState();
 
   //根据屏幕分辨率获取配置文件存放路径
   TCHAR path[CPathBasic::MAXPATHLENGTH] = {0, }; 
@@ -297,6 +300,11 @@ void CViewImpl::Detach()
   // Release view states which are singletons
   CAGGView::Release();
   m_views.clear();
+  if (m_guiView)
+  {
+    delete m_guiView;
+    m_guiView = NULL;
+  }
 
   // Release all DCs
   dc_citr dcFirst = m_memDCs.begin();
@@ -1387,7 +1395,7 @@ inline void CViewImpl::RefreshUI(short type)
       count = static_cast<int>(m_views.size());
     }
   }
-
+  DrawGui();
 
 }
 
@@ -2781,10 +2789,10 @@ void CViewImpl::SetMapCenterMoveFlag(bool hasMoved)
 void CViewImpl::UpdateProgress( short step )
 {
   //TIME_STAT;
-  CViewState* aggView = MainState();
-  if (aggView)
+  //CViewState* aggView = MainState();
+  if (m_guiView)
   {
-    aggView->DrawProgress(step);
+    m_guiView->DrawProgress(step);
   }
 }
 
@@ -3448,4 +3456,22 @@ CViewState* CViewImpl::GetMapView()
     }
   }
   return mapView;
+}
+
+void CViewImpl::InitGuiState()
+{
+  if (!m_guiView)
+  {
+    bool isLand = (GetScrMode() == SM_Land) ? true : false;
+    m_guiView = new CGuiView(isLand, this);
+  }
+}
+
+void CViewImpl::DrawGui()
+{
+  if (m_guiView)
+  {
+    m_guiView->GetDC()->m_isRefresh = true;
+    m_guiView->OnDraw();
+  }
 }

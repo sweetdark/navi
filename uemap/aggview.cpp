@@ -848,7 +848,7 @@ void CAGGView::OnDraw(short style)
   //MEMORY_STAT
   //TIME_STAT;
   CViewDC *curDC = GetDC();
-  HDC dc = ::GetDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd));
+  HDC dc = GetWholeMapDC();
   if(curDC && dc)
   {
     //
@@ -1045,44 +1045,6 @@ void CAGGView::OnDraw(short style)
         //CAggStackDC::m_curBuf.copy_from(CAggStackDC::m_prevBuf);
       }
     }
-
-#if __FOR_DEVICE__
-    // It no needs to render GUI element for other UeTool settings except for demo
-    if(m_viewImpl->m_mapSchema & LSH_GUI  && !m_isScrolling)
-    {
-      //TIME_STAT;
-      CGeoRect<short> scrExtent = m_mapping.m_scrLayout.m_extent;
-      scrExtent.m_maxX = (scrExtent.m_maxX > m_viewImpl->m_scrLayout.m_extent.m_maxX) ? m_viewImpl->m_scrLayout.m_extent.m_maxX : scrExtent.m_maxX;
-      scrExtent.m_maxY = (scrExtent.m_maxY > m_viewImpl->m_scrLayout.m_extent.m_maxY) ? m_viewImpl->m_scrLayout.m_extent.m_maxY : scrExtent.m_maxY;
-      m_canvas.RenderHooks(scrExtent);
-      // Since some GUIs reponse is too slow, it need to remove those redundant mouse events
-      // ...
-      // Note:
-      // During the process of real or demo guidance, timer maybe not correctly recognize the status of m_isReadyForOperation,
-      // it doesn't ignore those messages actived in that process in order to decrease the rendering race caused by PAN & TIMER,
-      // ...
-#if __FOR_FPC__
-      if((CViewHook::m_curHookType != CViewHook::DHT_MapHook && CViewHook::m_curHookType != CViewHook::DHT_KeyboardHook && CViewHook::m_curHookType != CViewHook::DHT_CapHook) ||
-        (IRoute::GetRoute()->GetPlanState() == UeRoute::PS_None && CViewHook::m_curHookType == CViewHook::DHT_MapHook && !m_viewImpl->m_isReadyForOperation) ||
-        (IRoute::GetRoute()->GetPlanState() == UeRoute::PS_None && CViewHook::m_curHookType == CViewHook::DHT_CapHook && !m_viewImpl->m_isReadyForOperation))
-#else
-      if((CViewHook::m_curHookType != CViewHook::DHT_MapHook && CViewHook::m_curHookType != CViewHook::DHT_GPSHook && 
-        CViewHook::m_curHookType != CViewHook::DHT_InputHandHook && CViewHook::m_curHookType != CViewHook::DHT_EditHandHook) 
-        || (IRoute::GetRoute()->GetPlanState() == UeRoute::PS_None && CViewHook::m_curHookType == CViewHook::DHT_MapHook && !m_viewImpl->m_isReadyForOperation))
-#endif
-      {
-        MSG msg;
-        if(::PeekMessage(&msg, 0, 0, 0, PM_NOREMOVE))
-        {
-          if(msg.message == WM_LBUTTONDOWN)
-          {
-            while(::PeekMessage(&msg, 0, 0, 0, PM_REMOVE));
-          }
-        }
-      }
-    }
-#endif
-
     int bitsPerPixel = ::GetDeviceCaps(dc, BITSPIXEL);
     if(bitsPerPixel >= SYSTEM_BPP)
     {
@@ -1510,7 +1472,7 @@ void UeMap::CAGGView::LoadGridData()
     m_viewImpl->m_layers[scale][i]->LoadGridData(m_type, scrExtent);
     if ((i % 3 == 0) || (i == size - 1))
     {
-      DrawProgress();
+      //DrawProgress();
     }    
   }
 }
