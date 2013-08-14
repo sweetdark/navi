@@ -114,7 +114,7 @@ namespace UeGui
 
     virtual void Load();
     //设置调整路线的列表，用于我的行程的进入。
-    void SetPOIDataList(const POIDataList& poiList);
+    void SetPOIDataList(const POIDataList& poiList, const int dataIndex);
   protected:
 
     virtual void MakeNames();
@@ -137,9 +137,16 @@ namespace UeGui
     void DeleteRouteData( RowTag row );
 
     void PlanRoute();
+
     void SetPosition();
+
     void StartGuidance();
+
     void StartDemo();
+
+    static void OnSaveJourneyData(void *pDoCallBackObj, const char* journeyName);
+
+    void DoSaveJourneyData(const char *journeyName);
   private:
     
     //处理删除指定POI
@@ -193,13 +200,14 @@ namespace UeGui
 
     //记录选中的行号
     RowTag m_selectRowTag;
-    
-
-    DataFrom m_dataFrom;
 
     unsigned int m_planMethod;
 
     bool m_isFormRouteTypeSwitch;
+
+    DataFrom m_dataFrom;
+
+    int m_dataIndex;
 
   private:
     CUiBitButton m_addPOI1Ctrl;

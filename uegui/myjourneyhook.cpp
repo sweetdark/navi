@@ -653,34 +653,6 @@ void CMyJourneyHook::DeleteJourneyRecord()
   m_journeyWrapper.DeleteJourneyData(GetDataIndex(m_deleteRowNum));
   Load();
 }
-bool UeGui::CMyJourneyHook::AddJourneyData( const char *journeyName, unsigned int routeType, const POIDataList &poiList )
-{
-  if (journeyName)
-  {
-    std::string dataBuf;
-    CMyJourneyData myJourneyData;
-    myJourneyData.AddJourneyData(journeyName, routeType, poiList);    
-    myJourneyData.DataToString(dataBuf);
-
-    m_journeyWrapper.m_journeyFileReader->AddBlockData(dataBuf.c_str(), CFileBasic::UE_SEEK_BEGIN);
-
-    //控制数据量
-    if (m_journeyWrapper.m_maxSize > 0)
-    {
-      while (m_journeyWrapper.m_journeyFileReader->GetDataCount() > m_journeyWrapper.m_maxSize)
-      {
-        size_t dataIndex = m_journeyWrapper.m_journeyFileReader->GetDataCount() - 1;
-        m_journeyWrapper.m_journeyFileReader->RemoveBlockData(dataIndex);
-      }
-    }
-
-    //添加数据后重新修改翻页控制信息
-    m_pageController.SetTotal(m_journeyWrapper.m_journeyFileReader->GetDataCount());
-    m_pageController.Reset();
-    return true;
-  }
-  return false;
-}
 
 void CMyJourneyHook::EditJourneyData(RowTag row)
 {
@@ -691,7 +663,7 @@ void CMyJourneyHook::EditJourneyData(RowTag row)
     CAdjustRouteHook *adjustHook = (CAdjustRouteHook*)CViewWrapper::Get().GetHook(DHT_AdjustRouteHook);
     if (adjustHook)
     {
-      adjustHook->SetPOIDataList(dataList);
+      adjustHook->SetPOIDataList(dataList, GetDataIndex(row));
       TurnTo(DHT_AdjustRouteHook);
     }
   }

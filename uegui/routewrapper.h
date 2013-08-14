@@ -6,6 +6,7 @@
 #define _UEGUI_ROUTEWRAPPER_H
 
 #include "uegui.h"
+#include "guibasic.h"
 #include "ueroute/routebasic.h"
 #include "ueroute/route.h"
 #include "uemodel/network.h"
@@ -23,11 +24,11 @@ namespace UeGui
 {
   struct RouteInfo
   {
-    char m_routeName[128];            //道路名称
-    UeBase::CGeoPoint<long> m_point;  //道路坐标
-    float m_mileages;                 //道路里程
-    unsigned char m_direction;        //方向
-    unsigned short m_parcelIdx;       //道路在地图中的块索引
+    char m_routeName[MAX_NAME_LENGTH]; //道路名称
+    UeBase::CGeoPoint<long> m_point;   //道路坐标
+    float m_mileages;                  //道路里程
+    unsigned char m_direction;         //方向
+    unsigned short m_parcelIdx;        //道路在地图中的块索引
     unsigned short m_linkIdx;         //道路在地图中的ID
     short m_begin;  //从哪个位置开始
     short m_end;   //到哪个位置结束，即不同的路位置。区间为[m_begin,m_end)
@@ -65,6 +66,15 @@ namespace UeGui
   typedef RouteList::iterator RouteListItr;
 
   typedef std::vector<UeRoute::PlanPosition> PlanPositionList;
+
+  //高速看板数据结构
+  struct HighwayOutlet
+  {
+    char m_name[UeRoute::eSideEntry::MAXSIDEPROPLENGTH];     //高速路出口名称
+    char m_typeName[UeRoute::eSideEntry::MAXSIDEPROPLENGTH]; //出口类型名称
+    double m_distance;                                       //距离路出口距离
+  };
+  typedef std::vector<HighwayOutlet> HighwayOutletList;
 
   class CRouteWrapper
   {
@@ -334,6 +344,11 @@ namespace UeGui
     * \brief 读取道路名称
     */
     bool GetRoadName(int offset, char *roadName);
+
+    /**
+    * \brief 获取高速看板数据
+    */
+    bool GetHighwayOutlets(HighwayOutletList &dataList);
   private:
     /*
     * 设置起点或者终点或者经过点

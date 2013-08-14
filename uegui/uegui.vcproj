@@ -1051,59 +1051,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\mapguideinfoviewhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\mapguideinfoviewhook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\maphook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\maphook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mapmainmenuhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\mapmainmenuhook.h"
-				>
-			</File>
-			<File
 				RelativePath=".\mapnavigationhook.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\mapnavigationhook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mapoverviewmenuhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\mapoverviewmenuhook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mapquerymenuhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\mapquerymenuhook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\maproutecalcmenuhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\maproutecalcmenuhook.h"
 				>
 			</File>
 			<File
@@ -1120,14 +1072,6 @@
 			</File>
 			<File
 				RelativePath=".\mapsettinghook.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mapsimulationmenuhook.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\mapsimulationmenuhook.h"
 				>
 			</File>
 			<File
@@ -1764,6 +1708,66 @@
 			</File>
 			<File
 				RelativePath=".\typenodistquerylisthook.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="maphooks"
+			>
+			<File
+				RelativePath=".\mapguideinfoviewhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapguideinfoviewhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\maphook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\maphook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mapmainmenuhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapmainmenuhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mapoverviewmenuhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapoverviewmenuhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mapquerymenuhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapquerymenuhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\maproutecalcmenuhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\maproutecalcmenuhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mapsimulationmenuhook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapsimulationmenuhook.h"
 				>
 			</File>
 		</Filter>

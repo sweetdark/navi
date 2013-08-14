@@ -6,7 +6,7 @@
 using namespace UeGui;
 
 CMapGuideInfoViewHook::CMapGuideInfoViewHook() : m_parentHook(NULL), m_routeWrapper(CRouteWrapper::Get()),
-m_viewWrapper(CViewWrapper::Get()), m_isShowRouteGuideList(false)
+m_viewWrapper(CViewWrapper::Get()), m_isShowRouteGuideList(false), m_isShowHightSpeedBoard(false)
 {
   //地图界面渲染完成后不需要释放图片资源，提高效率
   m_needReleasePic = false;
@@ -198,6 +198,11 @@ void UeGui::CMapGuideInfoViewHook::SetIsShowRouteGuideList( bool show )
   m_isShowRouteGuideList = show;
 }
 
+void UeGui::CMapGuideInfoViewHook::SetIsShowHightSpeedBoard( bool show )
+{
+  m_isShowHightSpeedBoard = show;
+}
+
 short CMapGuideInfoViewHook::MouseDown(CGeoPoint<short> &scrPoint)
 {
   //是否需要刷新
@@ -302,57 +307,58 @@ void UeGui::CMapGuideInfoViewHook::Update( short type )
     HideAllCtrl();
     return;
   }
-
-  //显示引导图标
-  if (dirInfo.m_curIndicator >= 0 && dirInfo.m_curIndicator < m_routeWrapper.GetIndicatorNum(dirInfo.m_curPair))
+  
+  //如果显示路口放大图
+  if (m_viewWrapper.IsGuidanceViewShown())
   {
-    if (m_isShowRouteGuideList)
-    {
-      //更新后续路口
-      UpdateRouteGuideInfo(dirInfo);
-      ShowRouteGuideList(true);
-    }
-    else
-    {
-      ShowRouteGuideList(false);
-      //更新底部状态栏当前导航信息
-      UpdateGuideInfo(dirInfo);
-      //更新下一道路信息
-      UpdateNextRouteInfo(dirInfo);
-      //更新方向看板
-      UpdateDirectionBoardInfo(dirInfo);
-    }
-  }
-
-  //如果是分屏模式
-  if (mapHook->IsSplitScreen() || m_isShowRouteGuideList)
-  {
-    m_shwoGuideViewBtn.SetVisible(false);
+    //如果是分屏模式(鹰眼图或者路口放大图)
     m_routeInfoBtn.SetVisible(false);
     ShowCurGuidanceIcon(false);
     ShowNextGuidanceIcon(false);
-    if (m_isShowRouteGuideList)
-    {
-      if (m_viewWrapper.IsNeedRenderGuidanceView())
-      {
-        m_shwoGuideViewBtn.SetVisible(true);
-      }
-      else
-      {
-        m_shwoGuideViewBtn.SetVisible(false);
-      }
-    }
+  }
+  else if (m_isShowRouteGuideList)
+  {
+    //如果显示后续路口
+    m_routeInfoBtn.SetVisible(false);
+    ShowCurGuidanceIcon(false);
+    ShowNextGuidanceIcon(false);
+
+    UpdateRouteGuideInfo(dirInfo);
+    ShowRouteGuideList(true);
+  }
+  else if (m_isShowHightSpeedBoard)
+  {
+    //如果显示高速看板
+    //更新下一道路信息
+    UpdateNextRouteInfo(dirInfo);
+    //更新方向看板
+    UpdateDirectionBoardInfo(dirInfo);
+    ShowNextGuidanceIcon(false);
+    UpdateHighSpeedBoard();
   }
   else
   {
-    if (m_viewWrapper.IsNeedRenderGuidanceView())
-    {
-      m_shwoGuideViewBtn.SetVisible(true);
-    }
-    else
-    {
-      m_shwoGuideViewBtn.SetVisible(false);
-    }
+    //更新底部状态栏当前导航信息
+    UpdateGuideInfo(dirInfo);
+    //更新下一道路信息
+    UpdateNextRouteInfo(dirInfo);
+    //更新方向看板
+    UpdateDirectionBoardInfo(dirInfo);
+
+    //隐藏方向看板
+    ShowRouteGuideList(false);
+    //隐藏高速看板
+    HideHightSpeedBoard();
+  }
+
+  //非分屏状态都要判断是否显示“显示路口放大图”按钮
+  if (!m_viewWrapper.IsGuidanceViewShown() && m_viewWrapper.IsNeedRenderGuidanceView())
+  {
+    m_shwoGuideViewBtn.SetVisible(true);
+  }
+  else
+  {
+    m_shwoGuideViewBtn.SetVisible(false);
   }
 }
 
@@ -394,7 +400,12 @@ void UeGui::CMapGuideInfoViewHook::UpdateGuideInfo( const GuidanceStatus& dirInf
     if (mapHook)
     {
       GpsCar gpsCar = m_viewWrapper.GetGpsCar();
-      mapHook->UpdateGuideInfo(roadName, gpsCar.m_speed, curRoad->m_leftDist);
+      double leftDist = curRoad->m_leftDist;
+      if (leftDist < 0)
+      {
+        leftDist = 0;
+      }
+      mapHook->UpdateGuideInfo(roadName, gpsCar.m_speed, leftDist);
     }
   }
 }
@@ -522,7 +533,6 @@ void UeGui::CMapGuideInfoViewHook::UpdateDirectionBoardInfo( const GuidanceStatu
     {       
       ::sprintf(buf, "%dm", turnDist);
     }
-
   }
   m_curDirectionBoard.SetCaption(buf);
   //显示下一路口方向看板
@@ -544,59 +554,62 @@ void UeGui::CMapGuideInfoViewHook::UpdateRouteGuideInfo( const GuidanceStatus& d
 {
   //显示当前道路名称
   UeRoute::GuidanceIndicator *curIndicator = m_routeWrapper.GetIndicator(dirInfo.m_curPair, dirInfo.m_curIndicator);
-  //虚拟路口则取下一道路
-  if (curIndicator->m_roadType == RT_Virtual)
-  {
-    curIndicator = m_routeWrapper.GetIndicator(dirInfo.m_curPair, dirInfo.m_curOrderForSnd - 1);
-  }
-
-  //显示当前道路名
-  char roadName[MAX_NAME_LENGTH];
   if (curIndicator)
   {
-    ::memset(roadName, 0, MAX_NAME_LENGTH);
-    bool rt = m_routeWrapper.GetRoadName(curIndicator->m_nameOffset, roadName);
-    m_routeGuideCurName.SetCaption(roadName);
-  }
-
-  int dataIndex = -1;
-  int curPair = dirInfo.m_curPair;
-  int totalPairs = m_routeWrapper.GetPairs();
-  float totalDist = dirInfo.m_curDistForSnd;
-  for (; curPair < totalPairs; ++curPair)
-  {
-    int indicatorIndex = (curPair == dirInfo.m_curPair) ? (dirInfo.m_curIndicator - 1) : (m_route->GetIndicatorNum(curPair) - 1);
-    for (int i = indicatorIndex; i >= 0; i--)
+    //虚拟路口则取下一道路
+    if (curIndicator->m_roadType == RT_Virtual)
     {
-      curIndicator = m_route->GetRoute()->GetIndicator(curPair, i);
-      if (curIndicator)
+      curIndicator = m_routeWrapper.GetIndicator(dirInfo.m_curPair, dirInfo.m_curOrderForSnd - 1);
+    }
+
+    //显示当前道路名
+    char roadName[MAX_NAME_LENGTH];
+    if (curIndicator)
+    {
+      ::memset(roadName, 0, MAX_NAME_LENGTH);
+      bool rt = m_routeWrapper.GetRoadName(curIndicator->m_nameOffset, roadName);
+      m_routeGuideCurName.SetCaption(roadName);
+    }
+
+    int dataIndex = -1;
+    int curPair = dirInfo.m_curPair;
+    int totalPairs = m_routeWrapper.GetPairs();
+    float totalDist = dirInfo.m_curDistForSnd;
+    for (; curPair < totalPairs; ++curPair)
+    {
+      int indicatorIndex = (curPair == dirInfo.m_curPair) ? (dirInfo.m_curIndicator - 1) : (m_route->GetIndicatorNum(curPair) - 1);
+      for (int i = indicatorIndex; i >= 0; i--)
       {
-        if ((UeRoute::DVT_Unknown == curIndicator->m_snd.m_dirCode) ||
-            (UeRoute::DVT_DirectGo == curIndicator->m_snd.m_dirCode) ||
-            (UeRoute::DVT_MiddleGo == curIndicator->m_snd.m_dirCode) ||
-            (UeRoute::DVT_LeftDirect == curIndicator->m_snd.m_dirCode) ||
-            (UeRoute::DVT_RightDirect == curIndicator->m_snd.m_dirCode))
+        curIndicator = m_route->GetRoute()->GetIndicator(curPair, i);
+        if (curIndicator)
         {
-          totalDist += curIndicator->m_curDist;
-        }
-        else
-        {
-          ::memset(roadName, 0, MAX_NAME_LENGTH);
-          bool rt = m_routeWrapper.GetRoadName(curIndicator->m_nameOffset, roadName);
-          ++dataIndex;
-          ShowRouteGuideData((RowItem)dataIndex, curIndicator->m_snd.m_dirCode, roadName, totalDist);
-          if (dataIndex >= ROW4)
+          if ((UeRoute::DVT_Unknown == curIndicator->m_snd.m_dirCode) ||
+              (UeRoute::DVT_DirectGo == curIndicator->m_snd.m_dirCode) ||
+              (UeRoute::DVT_MiddleGo == curIndicator->m_snd.m_dirCode) ||
+              (UeRoute::DVT_LeftDirect == curIndicator->m_snd.m_dirCode) ||
+              (UeRoute::DVT_RightDirect == curIndicator->m_snd.m_dirCode))
           {
-            break;
+            totalDist += curIndicator->m_curDist;
+          }
+          else
+          {
+            ::memset(roadName, 0, MAX_NAME_LENGTH);
+            bool rt = m_routeWrapper.GetRoadName(curIndicator->m_nameOffset, roadName);
+            ++dataIndex;
+            ShowRouteGuideData((RowItem)dataIndex, curIndicator->m_snd.m_dirCode, roadName, totalDist);
+            if (dataIndex >= ROW4)
+            {
+              break;
+            }
           }
         }
       }
     }
-  }
-  //清空没有数据的行
-  for (int i = dataIndex + 1; i <= ROW4; ++i)
-  {
-    ClearRouteGuideRow((RowItem)i);
+    //清空没有数据的行
+    for (int i = dataIndex + 1; i <= ROW4; ++i)
+    {
+      ClearRouteGuideRow((RowItem)i);
+    }
   }
 }
 
@@ -617,6 +630,7 @@ void UeGui::CMapGuideInfoViewHook::HideAllCtrl()
   m_highSpeedBoardDistLabel3.SetVisible(false);
   m_shwoGuideViewBtn.SetVisible(false);
   ShowRouteGuideList(false);
+  HideHightSpeedBoard();
 }
 
 bool UeGui::CMapGuideInfoViewHook::ChangeElementIcon( GuiElement* destElement, GuiElement* srcElement )
@@ -1076,4 +1090,106 @@ bool UeGui::CMapGuideInfoViewHook::ChangeCrossingIcon( CUiButton &IconButton, co
     rt = false;
   }
   return rt;
+}
+
+void UeGui::CMapGuideInfoViewHook::HideHightSpeedBoard()
+{
+  ShowHightSpeedBoard(HB_One, false);
+  ShowHightSpeedBoard(HB_Two, false);
+  ShowHightSpeedBoard(HB_Three, false);
+}
+
+void UeGui::CMapGuideInfoViewHook::ShowHightSpeedBoard( HighSpeedBoardIndex boardIndex, bool isShow /*= true*/ )
+{
+  switch (boardIndex)
+  {
+  case HB_One:
+    {
+      m_highSpeedBoard1.SetVisible(isShow);
+      m_highSpeedBoardTypeLabel1.SetVisible(isShow);
+      m_highSpeedBoardDistLabel1.SetVisible(isShow);
+      break;
+    }
+  case HB_Two:
+    {
+      m_highSpeedBoard2.SetVisible(isShow);
+      m_highSpeedBoardTypeLabel2.SetVisible(isShow);
+      m_highSpeedBoardDistLabel2.SetVisible(isShow);
+      break;
+    }
+  case HB_Three:
+    {
+      m_highSpeedBoard3.SetVisible(isShow);
+      m_highSpeedBoardTypeLabel3.SetVisible(isShow);
+      m_highSpeedBoardDistLabel3.SetVisible(isShow);
+      break;
+    }
+  }
+}
+
+void UeGui::CMapGuideInfoViewHook::UpdateHighSpeedBoard()
+{
+  HighwayOutletList dataList;
+  if (m_routeWrapper.GetHighwayOutlets(dataList))
+  {
+    for (unsigned short i = HB_One; i < HB_End; ++i)
+    {
+      if (i < dataList.size())
+      {
+        RefreshHighSpeedBoardData((HighSpeedBoardIndex)i, dataList[i]);
+        ShowHightSpeedBoard((HighSpeedBoardIndex)i, true);
+      }
+      else
+      {
+        ShowHightSpeedBoard((HighSpeedBoardIndex)i, false);
+      }
+    }
+  }
+  else
+  {
+    HideHightSpeedBoard();
+  }
+}
+
+void UeGui::CMapGuideInfoViewHook::RefreshHighSpeedBoardData( HighSpeedBoardIndex boardIndex, const HighwayOutlet& data )
+{
+  char buf[32] = {};
+  double distance = data.m_distance;
+  if (distance < 0)
+  {
+    distance = 0;
+  }
+  if(data.m_distance > 1000)
+  {
+    ::sprintf(buf, "%dkm", distance / 1000);
+  }
+  else
+  {       
+    ::sprintf(buf, "%dm", distance);
+  }
+
+  switch (boardIndex)
+  {
+  case HB_One:
+    {
+      m_highSpeedBoard1.SetCaption(data.m_name);
+      m_highSpeedBoardTypeLabel1.SetCaption(data.m_typeName);
+      m_highSpeedBoardDistLabel1.SetCaption(buf);
+      break;
+    }
+  case HB_Two:
+    {
+      m_highSpeedBoard2.SetCaption(data.m_name);
+      m_highSpeedBoardTypeLabel2.SetCaption(data.m_typeName);
+      m_highSpeedBoardDistLabel2.SetCaption(buf);
+      break;
+    }
+  case HB_Three:
+    {
+      m_highSpeedBoard3.SetCaption(data.m_name);
+      m_highSpeedBoardTypeLabel3.SetCaption(data.m_typeName);
+      m_highSpeedBoardDistLabel3.SetCaption(buf);
+      break;
+    }
+  }
 }

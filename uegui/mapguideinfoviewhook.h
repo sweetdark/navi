@@ -138,6 +138,16 @@ namespace UeGui
       ROW4,
       ROW_END,
     };
+
+    //高速看板枚举定义
+    enum HighSpeedBoardIndex
+    {
+      HB_One,
+      HB_Two,
+      HB_Three,
+      HB_End
+    };
+
     CMapGuideInfoViewHook();
 
     virtual ~CMapGuideInfoViewHook();
@@ -165,6 +175,10 @@ namespace UeGui
     * 设置是否显示后续路口
     */
     void SetIsShowRouteGuideList(bool show);
+    /*
+    * 设置是否显示高速看板
+    */
+    void SetIsShowHightSpeedBoard(bool show);
   protected:
     virtual tstring GetBinaryFileName();
 
@@ -234,7 +248,22 @@ namespace UeGui
     * \brief 清空元素的图片
     */
     bool ChangeCrossingIcon(CUiButton &IconButton, const int sndCode);
-
+    /**
+    * \brief 显示高速看板
+    */
+    void HideHightSpeedBoard();
+    /**
+    * \brief 显示高速看板
+    */
+    void ShowHightSpeedBoard(HighSpeedBoardIndex boardIndex, bool isShow = true);
+    /**
+    * \brief 更新高速看板数据
+    */
+    void UpdateHighSpeedBoard();
+    /**
+    * \brief 显示高速看板数据
+    */
+    void RefreshHighSpeedBoardData(HighSpeedBoardIndex boardIndex, const HighwayOutlet& data);
   private:
     //下一道路名称
     CUiBitButton m_routeInfoBtn;
@@ -278,6 +307,8 @@ namespace UeGui
     CViewWrapper& m_viewWrapper;
     //是否显示后续路口
     bool m_isShowRouteGuideList;
+    //是否显示高速看板
+    bool m_isShowHightSpeedBoard;
   };
 }
 #endif

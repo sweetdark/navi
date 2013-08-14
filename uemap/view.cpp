@@ -972,3 +972,8 @@ void UeMap::IView::SetEagleState(bool isEagleOn)
 {
   m_viewImpl->SetEagleState(isEagleOn);
 }
+
+CViewState* UeMap::IView::GetMapView()
+{
+  return m_viewImpl->GetMapView();
+}

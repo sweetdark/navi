@@ -350,7 +350,12 @@ namespace UeMap
       DHT_ItemSelectHook              = 0x1314,
       //搜索区域快捷选择界面
       DHT_DistSelectHook              = 0x1315,
-      DHT_Outside					            = 0x2010,
+      //快捷面板
+      DHT_StartUpHook                 = 0x1316,
+      //导航帮助图片1
+      DHT_MapNavigationPic1Hook       = 0x1317,
+
+      DHT_Outside                     = 0x2010
     };
 
     /**

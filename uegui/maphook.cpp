@@ -35,25 +35,43 @@ m_firstDrawMap(true), m_sysTime(0), m_downTimeCount(0)
   m_queryPointList.clear();
   //地图界面渲染完成后不需要释放图片资源，提高效率
   m_needReleasePic = false;
-
+  
+  CItemSelectHook::ItemInfo itemInfo;
   //初始化屏幕模式列表
-  CItemSelectHook::ItemInfo srcModalInfo;
-  ::strcpy(srcModalInfo.m_itemName, "鹰眼图");
-  srcModalInfo.m_enable = true;
-  srcModalInfo.m_showIcon = false;
-  m_srcModalItemList.push_back(srcModalInfo);
-  ::strcpy(srcModalInfo.m_itemName, "后续路口");
-  srcModalInfo.m_enable = true;
-  srcModalInfo.m_showIcon = false;
-  m_srcModalItemList.push_back(srcModalInfo);
-  ::strcpy(srcModalInfo.m_itemName, "高速看板");
-  srcModalInfo.m_enable = true;
-  srcModalInfo.m_showIcon = false;
-  m_srcModalItemList.push_back(srcModalInfo);
-  ::strcpy(srcModalInfo.m_itemName, "一般双屏");
-  srcModalInfo.m_enable = false;
-  srcModalInfo.m_showIcon = false;
-  m_srcModalItemList.push_back(srcModalInfo);
+  ::strcpy(itemInfo.m_itemName, "鹰眼图");
+  itemInfo.m_enable = true;
+  itemInfo.m_showIcon = false;
+  m_srcModalItemList.push_back(itemInfo);
+  ::strcpy(itemInfo.m_itemName, "后续路口");
+  itemInfo.m_enable = true;
+  itemInfo.m_showIcon = false;
+  m_srcModalItemList.push_back(itemInfo);
+  ::strcpy(itemInfo.m_itemName, "高速看板");
+  itemInfo.m_enable = true;
+  itemInfo.m_showIcon = false;
+  m_srcModalItemList.push_back(itemInfo);
+  //::strcpy(itemInfo.m_itemName, "一般双屏");
+  //itemInfo.m_enable = false;
+  //itemInfo.m_showIcon = false;
+  //m_srcModalItemList.push_back(itemInfo);
+
+  //初始化快捷比例尺名称列表  
+  ::strcpy(itemInfo.m_itemName, "街道");
+  itemInfo.m_enable = true;
+  itemInfo.m_showIcon = false;
+  m_scaleItemList.push_back(itemInfo);
+  ::strcpy(itemInfo.m_itemName, "城市");
+  itemInfo.m_enable = true;
+  itemInfo.m_showIcon = false;
+  m_scaleItemList.push_back(itemInfo);
+  ::strcpy(itemInfo.m_itemName, "省");
+  itemInfo.m_enable = true;
+  itemInfo.m_showIcon = false;
+  m_scaleItemList.push_back(itemInfo);
+  ::strcpy(itemInfo.m_itemName, "全国");
+  itemInfo.m_enable = true;
+  itemInfo.m_showIcon = false;
+  m_scaleItemList.push_back(itemInfo);
 }
 
 UeGui::CMapHook::~CMapHook()
@@ -116,11 +134,12 @@ void UeGui::CMapHook::Init()
     CViewState* curViewState = m_viewWrapper.GetMainViewState();
     if (curViewState)
     {
+      //curViewState->RefreshLayerData();
       const ScreenLayout& srcLayout = curViewState->GetScrLayout();
       CGeoPoint<short> scrPoint = srcLayout.m_base;
       //屏幕选点，读取当前选点的名称
       CMemVector objects(sizeof(CViewCanvas::RenderedPrimitive), 10);
-      m_viewWrapper.Pick(scrPoint, objects, true);
+      m_viewWrapper.Pick(scrPoint, objects, false);
       RefreshLocationInfo();
     }   
   }
@@ -882,6 +901,7 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
   case MapHook_ZoomInBack:
   case MapHook_ZoomInIcon:
     {
+      //放大地图
       m_zoomInBtn.MouseUp();
       needRefresh = true;
       if (m_zoomInBtn.IsEnable())
@@ -895,6 +915,7 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
   case MapHook_ZoomOutBack:
   case MapHook_ZoomOutIcon:
     {
+      //缩小地图
       m_zoomOutBtn.MouseUp();
       needRefresh = true;
       if (m_zoomOutBtn.IsEnable())
@@ -907,10 +928,19 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
     break;
   case MapHook_ScaleBack:
   case MapHook_ScaleLabel:
+  case MapHook_ScaleIcon:
     {
       //比例尺
       m_scaleBtn.MouseUp();
       needRefresh = true;
+      CItemSelectHook* itemSelectHook = (CItemSelectHook*)m_viewWrapper.GetHook(DHT_ItemSelectHook);
+      if (itemSelectHook)
+      {
+        itemSelectHook->SetSelectEvent(this, &OnShortcutScaleSelect, m_scaleItemList);
+        //窗口探在左边
+        itemSelectHook->SetDlgCoordinateDefault(CItemSelectHook::DFT_Coordinate2);
+        TurnTo(DHT_ItemSelectHook, false);
+      }
     }
     break;
   case MapHook_SoundBack:
@@ -939,6 +969,7 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (m_screenMoadlBtn.IsEnable())
       {
         needRefresh = true;
+        //鹰眼图、后续路口选择
         if (SM_None != m_screenMode)
         {
           SetScreenMode(SM_None);
@@ -946,8 +977,13 @@ short UeGui::CMapHook::MouseUp(CGeoPoint<short> &scrPoint)
         else
         {
           CItemSelectHook* itemSelectHook = (CItemSelectHook*)m_viewWrapper.GetHook(DHT_ItemSelectHook);
-          itemSelectHook->SetSelectEvent(this, &OnSrcModalSelect, m_srcModalItemList);
-          TurnTo(DHT_ItemSelectHook);     
+          if (itemSelectHook)
+          {
+            itemSelectHook->SetSelectEvent(this, &OnSrcModalSelect, m_srcModalItemList);
+            //窗口弹在中间
+            itemSelectHook->SetDlgCoordinateDefault(CItemSelectHook::DFT_Coordinate1);
+            TurnTo(DHT_ItemSelectHook, false);
+          }
         } 
       }
     }
@@ -1444,6 +1480,10 @@ unsigned int UeGui::CMapHook::StopDemo()
   //切换到浏览菜单
   SwitchingGUI(GUI_MapBrowse);
   UpdateMenu();
+  //更新底部状态栏
+  UpdateGuideInfo(NULL, 0, -1);
+  //刷新底部状态栏
+  RefreshLocationInfo();
   return rt;
 }
 
@@ -1473,6 +1513,10 @@ unsigned int UeGui::CMapHook::StopGuidance()
   //切换到浏览状态状态菜单
   SwitchingGUI(GUI_MapBrowse);
   UpdateMenu();
+  //更新底部状态栏
+  UpdateGuideInfo(NULL, 0, -1);
+  //刷新底部状态栏
+  RefreshLocationInfo();
   return rt;
 }
 
@@ -1540,7 +1584,7 @@ void UeGui::CMapHook::SetPickPos( const CGeoPoint<long> &point, const char* name
 
 void UeGui::CMapHook::SetPickPos( PointList pointList, unsigned short posIndex )
 {
-  m_viewWrapper.SwitchTo(SCALE_200M, 0);  
+  m_viewWrapper.SwitchTo(SCALE_200M, 0);
   RefreshZoomingInfo();
   ClearQueryPointList();
   if ((posIndex >= 0) && (posIndex < pointList.size()))
@@ -1892,10 +1936,6 @@ void UeGui::CMapHook::UpdateGuideInfo( const char* routeName, double speed, doub
   {
     speed = 0;
   }
-  if (distance < 0)
-  {
-    distance = 0;
-  }
   //车子行驶速度
   char buf[32] = {};
   ::sprintf(buf, "%0.0f km/h", speed);
@@ -1903,19 +1943,22 @@ void UeGui::CMapHook::UpdateGuideInfo( const char* routeName, double speed, doub
   //当前行驶道路名称
   m_guideInfoCenterBtn.SetCaption(routeName);
   //距离终点距离
-  if (distance < 0)
+  if (distance >= 0)
   {
-    distance = 0;
+    if (distance <= 1000)
+    {
+      ::sprintf(buf, "%dm", static_cast<int>(distance));
+    } 
+    else
+    {
+      ::sprintf(buf, "%.1fkm", distance / 1000.0);
+    }
+    m_guideInfoRightBtn.SetCaption(buf);
   }
-  if (distance <= 1000)
-  {
-    ::sprintf(buf, "%dm", static_cast<int>(distance));
-  } 
   else
   {
-    ::sprintf(buf, "%.1fkm", distance / 1000.0);
+    m_guideInfoRightBtn.SetCaption("--:--");
   }
-  m_guideInfoRightBtn.SetCaption(buf);
 }
 
 void UeGui::CMapHook::MoveToStart()
@@ -2275,6 +2318,8 @@ void UeGui::CMapHook::SetScreenMode(ScreenMode screenMode)
     case SM_HighWayBoard:
       {
         //打开高速看板
+        m_mapGuideInfoView.SetIsShowHightSpeedBoard(true);
+        m_mapGuideInfoView.Update(MUT_Normal);
         break;
       }
     }
@@ -2305,6 +2350,9 @@ void UeGui::CMapHook::SetScreenMode(ScreenMode screenMode)
     case SM_HighWayBoard:
       {
         //关闭高速看板
+        //打开高速看板
+        m_mapGuideInfoView.SetIsShowHightSpeedBoard(false);
+        m_mapGuideInfoView.Update(MUT_Normal);
         break;
       }
     }
@@ -2431,6 +2479,44 @@ void UeGui::CMapHook::OnSrcModalSelect( CAggHook* sender, short selectIndex )
   {
     CMapHook* mapHook = dynamic_cast<CMapHook*>(sender);
     mapHook->SrcModalSelect(selectIndex);
+  }
+}
+
+void UeGui::CMapHook::ShortcutScaleSelect( short selectIndex )
+{
+  switch (selectIndex)
+  {
+  case 0:
+    {
+      m_viewWrapper.SwitchTo(SCALE_100M, 0);
+      break;
+    }
+  case 1:
+    {
+      m_viewWrapper.SwitchTo(SCALE_2KM, 0);
+      break;
+    }
+  case 2:
+    {
+      m_viewWrapper.SwitchTo(SCALE_50KM, 0);
+      break;
+    }
+  case 3:
+    {
+      m_viewWrapper.SwitchTo(SCALE_1000KM, 0);
+      break;
+    }
+  }
+  RefreshZoomingInfo();
+  m_viewWrapper.Refresh();
+}
+
+void UeGui::CMapHook::OnShortcutScaleSelect( CAggHook* sender, short selectIndex )
+{
+  if (sender)
+  {
+    CMapHook* mapHook = dynamic_cast<CMapHook*>(sender);
+    mapHook->ShortcutScaleSelect(selectIndex);
   }
 }
 

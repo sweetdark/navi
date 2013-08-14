@@ -3,6 +3,7 @@ using namespace UeGui;
 
 CItemSelectHook::CItemSelectHook() : m_senderHook(NULL), m_itemSelectEvent(NULL)
 {
+  ::memset(m_coordinates, 0, ItemSelectHook_End * sizeof(Coordinate));
 }
 
 CItemSelectHook::~CItemSelectHook()
@@ -39,6 +40,8 @@ void CItemSelectHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(ItemSelectHook_Line1,	"Line1"));
   m_ctrlNames.insert(GuiName::value_type(ItemSelectHook_Line2,	"Line2"));
   m_ctrlNames.insert(GuiName::value_type(ItemSelectHook_Line3,	"Line3"));
+  m_ctrlNames.insert(GuiName::value_type(ItemSelectHook_Position1,	"Position1"));
+  m_ctrlNames.insert(GuiName::value_type(ItemSelectHook_Position2,	"Position2"));
 }
 
 void CItemSelectHook::MakeControls()
@@ -60,6 +63,31 @@ void CItemSelectHook::MakeControls()
   m_item2_Icon.SetVisible(false);
   m_item3_Icon.SetVisible(false);
   m_item4_Icon.SetVisible(false);
+
+  //初始化界面坐标
+  GuiElement* guielemment = NULL;
+  guielemment = GetGuiElement(ItemSelectHook_Position1);
+  if (guielemment)
+  {
+    m_dlgDefaultCoordinate1.x = guielemment->m_startX;
+    m_dlgDefaultCoordinate1.y = guielemment->m_startY;
+  }
+  guielemment = GetGuiElement(ItemSelectHook_Position2);
+  if (guielemment)
+  {
+    m_dlgDefaultCoordinate2.x = guielemment->m_startX;
+    m_dlgDefaultCoordinate2.y = guielemment->m_startY;
+  }
+
+  for (short i = ItemSelectHook_Begin + 1; i < ItemSelectHook_End; ++i)
+  {
+    guielemment = GetGuiElement(i);
+    if (guielemment)
+    {
+      m_coordinates[i].x = guielemment->m_startX;
+      m_coordinates[i].y = guielemment->m_startY;
+    }
+  }
 }
 
 short CItemSelectHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -125,28 +153,56 @@ short CItemSelectHook::MouseUp(CGeoPoint<short> &scrPoint)
   case ItemSelectHook_Item1_Icon:
     {
       m_item1.MouseUp();
-      DoSelect(ITEM1);
+      if (m_item1.IsEnable())
+      {
+        DoSelect(ITEM1);
+      }
+      else
+      {
+        m_isNeedRefesh = false;
+      }
     }
     break;
   case ItemSelectHook_Item2:
   case ItemSelectHook_Item2_Icon:
     {
       m_item2.MouseUp();
-      DoSelect(ITEM2);
+      if (m_item2.IsEnable())
+      {
+        DoSelect(ITEM2);
+      }
+      else
+      {
+        m_isNeedRefesh = false;
+      }
     }
     break;
   case ItemSelectHook_Item3:
   case ItemSelectHook_Item3_Icon:
     {
       m_item3.MouseUp();
-      DoSelect(ITEM3);
+      if (m_item3.IsEnable())
+      {
+        DoSelect(ITEM3);
+      }
+      else
+      {
+        m_isNeedRefesh = false;
+      }
     }
     break;
   case ItemSelectHook_Item4:
   case ItemSelectHook_Item4_Icon:
     {
       m_item4.MouseUp();
-      DoSelect(ITEM4);
+      if (m_item4.IsEnable())
+      {
+        DoSelect(ITEM4);
+      }
+      else
+      {
+        m_isNeedRefesh = false;
+      }
     }
     break;
   default:
@@ -162,6 +218,44 @@ short CItemSelectHook::MouseUp(CGeoPoint<short> &scrPoint)
   }
   m_isNeedRefesh = true;
   return ctrlType;
+}
+
+void UeGui::CItemSelectHook::SetDlgCoordinateDefault(DFTDlgCoordinateIndex index)
+{
+  switch (index)
+  {
+  case DFT_Coordinate1:
+    {
+      SetDlgCoordinate(m_dlgDefaultCoordinate1.x, m_dlgDefaultCoordinate1.y);
+      break;
+    }
+  case DFT_Coordinate2:
+    {
+      SetDlgCoordinate(m_dlgDefaultCoordinate2.x, m_dlgDefaultCoordinate2.y);
+      break;
+    }
+  default:
+    {
+      SetDlgCoordinate(m_dlgDefaultCoordinate1.x, m_dlgDefaultCoordinate1.y);
+    }
+  }
+}
+
+void UeGui::CItemSelectHook::SetDlgCoordinate( unsigned short x, unsigned short y )
+{
+  short x_Offset = x - m_dlgDefaultCoordinate1.x;
+  short y_Offset = y - m_dlgDefaultCoordinate1.y;
+
+  GuiElement* guielemment = NULL;
+  for (short i = ItemSelectHook_PopupListTop; i < ItemSelectHook_End; ++i)
+  {
+    guielemment = GetGuiElement(i);
+    if (guielemment)
+    {
+      guielemment->m_startX = m_coordinates[i].x + x_Offset;
+      guielemment->m_startY = m_coordinates[i].y + y_Offset;
+    }
+  }
 }
 
 void UeGui::CItemSelectHook::SetSelectEvent( CAggHook* senderHook, ItemSelectEvent selectEvent, const ItemInfoList& itemInfoList )
@@ -204,11 +298,12 @@ void UeGui::CItemSelectHook::DoSelect( ItemType type )
 {
   if ((type >= ITEM1) && (type <= ITEM4))
   {
+    //先关闭自己然后再执行指定的方法
+    DoClose();
     if (m_itemSelectEvent)
     {
       m_itemSelectEvent(m_senderHook, type);
     }
-    DoClose();
   }
 }
 

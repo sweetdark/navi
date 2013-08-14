@@ -79,7 +79,9 @@ namespace UeQuery
 		//recents.db数据
 		DT_Recents,
 		//hisrecords.db数据
-		DT_HistoryRecords
+		DT_HistoryRecords,
+    //addrbook.db数据
+    DT_Addrbook
 	};
 
 	/**

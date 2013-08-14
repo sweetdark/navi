@@ -85,6 +85,13 @@ namespace UeGui
 
     virtual bool operator ()();
 
+    void SetTitle(const char *title)
+    {
+      if (title)
+      {
+        ::strcpy(GetGuiElement(MenuBackgroundHook_TitleLable)->m_label, title); 
+      }
+    }
   protected:
     virtual tstring GetBinaryFileName()
     {

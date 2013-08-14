@@ -125,7 +125,7 @@ short CDetailEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(CAggHook::DHT_EditSwitchHook));
-        editSwitch->SetEditCallBackFun(this, m_strTitle.c_str(), m_nameCtrl.GetCaption(), EditHookNameCallBack);
+        editSwitch->SetEditCallBackFun(this, "编辑名称", m_nameCtrl.GetCaption(), EditHookNameCallBack);
         TurnTo(editSwitch->GetCurEditHookType());
       }
     }
@@ -136,7 +136,7 @@ short CDetailEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(CAggHook::DHT_EditSwitchHook));
-        editSwitch->SetEditCallBackFun(this, m_strTitle.c_str(), m_addressCtrl.GetCaption(), EditHookAddressCallBack);
+        editSwitch->SetEditCallBackFun(this, "编辑地址", m_addressCtrl.GetCaption(), EditHookAddressCallBack);
         TurnTo(editSwitch->GetCurEditHookType());
       }
     }
@@ -147,7 +147,7 @@ short CDetailEditHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (ctrlType == m_downElementType)
       {
         CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(CAggHook::DHT_EditSwitchHook));
-        editSwitch->SetEditCallBackFun(this, m_strTitle.c_str(), m_telephoneCtrl.GetCaption(), EditHookTelephoneCallBack);
+        editSwitch->SetEditCallBackFun(this, "编辑电话", m_telephoneCtrl.GetCaption(), EditHookTelephoneCallBack);
         TurnTo(editSwitch->GetCurEditHookType());
       }
     }
@@ -333,6 +333,7 @@ void CDetailEditHook::EditHookNameCallBack(void *pDoCallBackObj,const char *pRes
 void CDetailEditHook::DoEditHookNameCallBack(const char *pResult)
 {
   m_nameCtrl.SetCaption(pResult);
+  Return();
 }
 
 //编辑地址的回调函数
@@ -343,6 +344,7 @@ void CDetailEditHook::EditHookAddressCallBack(void *pDoCallBackObj,const char *p
 void CDetailEditHook::DoEditHookAddressCallBack(const char *pResult)
 {
   m_addressCtrl.SetCaption(pResult);
+  Return();
 }
 
 //编辑电话的回调函数
@@ -353,6 +355,7 @@ void CDetailEditHook::EditHookTelephoneCallBack(void *pDoCallBackObj,const char 
 void CDetailEditHook::DoEditHookTelephoneCallBack(const char *pResult)
 {
   m_telephoneCtrl.SetCaption(pResult);
+  Return();
 }
 
 bool UeGui::CDetailEditHook::EditData2FavoriteEntry(EditData* edata, FavoriteEntry* fEntry)

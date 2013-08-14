@@ -320,13 +320,19 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     {
       m_stopGuide.SetVisible(true);
       mapHook->ShowAddElecEyeBtn(false);        
-      mapHook->ShowSetDestPointBtn(false);
-      mapHook->ShowFixedPostionBtn(false);
     }
     else
     {
       m_stopGuide.SetVisible(false);
       mapHook->ShowAddElecEyeBtn();        
+    }
+    if (UeMap::VM_Guidance == viewMode)
+    {
+      mapHook->ShowSetDestPointBtn(false);
+      mapHook->ShowFixedPostionBtn(false);
+    }
+    else
+    {
       mapHook->ShowSetDestPointBtn();
       mapHook->ShowFixedPostionBtn();
     }
@@ -340,29 +346,6 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     {
       m_routeOpe.SetVisible(false);
     }
-
-    //是否是分屏状态
-    if (mapHook->IsSplitScreen())
-    {
-      //隐藏菜单栏
-      ShowMenuBar(false, bExpand);
-      mapHook->ShowDetailBtn1(false);
-      mapHook->ShowTimeBtn(false);
-    }
-    else
-    {
-      //显示菜单栏
-      ShowMenuBar(true, bExpand);
-      mapHook->ShowDetailBtn1();
-      if (m_viewWrapper.IsNeedRenderGuidanceView())
-      {
-        mapHook->ShowTimeBtn(false);
-      }
-      else
-      {
-        mapHook->ShowTimeBtn();
-      }
-    }
   }
   else
   {
@@ -371,6 +354,7 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     mapHook->ShowMinimizeBtn(false);
     mapHook->ShowAddElecEyeBtn();
     mapHook->ShowDetailBtn1(false);
+
     if (VM_Browse == viewMode)
     {
       mapHook->ShowMapAzimuthBtn();
@@ -381,59 +365,36 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
     }
     else
     {
-      if (mapHook->HaveElecEyePrompt())
-      {
-        mapHook->ShowCompass(false);
-        mapHook->ShowElecEye();
-      }
-      else
-      {
-        mapHook->ShowCompass();
-        mapHook->ShowElecEye(false);
-      }
       mapHook->ShowMapAzimuthBtn(false);
       mapHook->ShowMapScalingBtn(false);
       mapHook->ShowSetDestPointBtn(false);
       mapHook->ShowFixedPostionBtn(false);
       mapHook->ShowDetailBtn2(false);
     }
-
-    //如果是分屏模式
-    if (mapHook->IsSplitScreen())
-    {
-      //隐藏菜单
-      ShowMenuBar(false, bExpand);
-      mapHook->ShowGuideInfoBtn(false);
-      mapHook->ShowTimeBtn(false);
-    }
-    else
-    {
-      //显示菜单栏
-      ShowMenuBar(true, bExpand);
-      if (VM_Browse == viewMode)
-      {
-        mapHook->ShowGuideInfoBtn(false);
-      }
-      else
-      {
-        mapHook->ShowGuideInfoBtn();
-      }
-      
-      if (m_viewWrapper.IsNeedRenderGuidanceView())
-      {
-        mapHook->ShowTimeBtn(false);
-      }
-      else
-      {
-        mapHook->ShowTimeBtn();
-      } 
-    }
     m_stopGuide.SetVisible(false);
     m_routeOpe.SetVisible(false);
   }
+
+  //动态更新界面
+  DynamicUpdate(bExpand, planState, viewMode);
 }
 
 void UeGui::CMapMainMenuHook::Update( short type )
+{
+  //读取当前地图操作模式
+  UeMap::ViewOpeMode viewMode = UeMap::VM_Unknown;
+  CViewState* curViewState = m_viewWrapper.GetMainViewState();
+  if (curViewState)
+  {
+    viewMode = m_viewWrapper.GetViewOpeMode((UeMap::ViewType)curViewState->GetType());
+  }
+  //读取当前规划状态
+  short planState = m_routeWrapper.GetPlanState();
+  //动态更新界面
+  DynamicUpdate(m_expandStatus, planState, viewMode);
+}
+
+void UeGui::CMapMainMenuHook::DynamicUpdate( bool bExpand, short planState, UeMap::ViewOpeMode viewMode )
 {
   CMapHook* mapHook = NULL;
   if (m_parentHook)
@@ -444,40 +405,24 @@ void UeGui::CMapMainMenuHook::Update( short type )
   {
     return;
   }
-  //读取当前地图操作模式
-  UeMap::ViewOpeMode viewMode = UeMap::VM_Unknown;
-  CViewState* curViewState = m_viewWrapper.GetMainViewState();
-  if (curViewState)
-  {
-    viewMode = m_viewWrapper.GetViewOpeMode((UeMap::ViewType)curViewState->GetType());
-  }
-  //读取当前规划状态
-  short planState = m_routeWrapper.GetPlanState();
+
   //执行展开或者收缩
-  if (m_expandStatus)
+  if (bExpand)
   {
-    //如果是分屏模式
-    if (mapHook->IsSplitScreen())
+    //如果显示路口放大图
+    if (m_viewWrapper.IsGuidanceViewShown())
     {
       //隐藏菜单栏
-      ShowMenuBar(false, m_expandStatus);
+      ShowMenuBar(false, bExpand);
       mapHook->ShowDetailBtn1(false);
-      mapHook->ShowTimeBtn(false);
     }
     else
     {
       //显示菜单栏
-      ShowMenuBar(true, m_expandStatus);
-      mapHook->ShowDetailBtn1();
-      if (m_viewWrapper.IsNeedRenderGuidanceView())
-      {
-        mapHook->ShowTimeBtn(false);
-      }
-      else
-      {
-        mapHook->ShowTimeBtn();
-      }
+      ShowMenuBar(true, bExpand);
+      mapHook->ShowDetailBtn1();      
     }
+    //更新切换屏幕模式按钮状态
     mapHook->RefreshSrcModalBtnStatus();
   }
   else
@@ -496,18 +441,17 @@ void UeGui::CMapMainMenuHook::Update( short type )
       }
     }
 
-    //是否是分屏状态
-    if (mapHook->IsSplitScreen())
+    //如果显示路口放大图
+    if (m_viewWrapper.IsGuidanceViewShown())
     {
       //隐藏菜单栏
-      ShowMenuBar(false, m_expandStatus);
+      ShowMenuBar(false, bExpand);
       mapHook->ShowGuideInfoBtn(false);
-      mapHook->ShowTimeBtn(false);
     }
     else
     {
       //显示菜单栏
-      ShowMenuBar(true, m_expandStatus);
+      ShowMenuBar(true, bExpand);
       if (VM_Browse == viewMode)
       {
         mapHook->ShowGuideInfoBtn(false);
@@ -516,14 +460,23 @@ void UeGui::CMapMainMenuHook::Update( short type )
       {
         mapHook->ShowGuideInfoBtn();
       }
-      if (m_viewWrapper.IsNeedRenderGuidanceView())
-      {
-        mapHook->ShowTimeBtn(false);
-      }
-      else
-      {
-        mapHook->ShowTimeBtn();
-      }
+    }
+  }
+
+  //判断是否要显示时间按钮
+  if (m_viewWrapper.IsGuidanceViewShown())
+  {
+    mapHook->ShowTimeBtn(false);
+  }
+  else
+  {
+    if (m_viewWrapper.IsNeedRenderGuidanceView())
+    {
+      mapHook->ShowTimeBtn(false);
+    }
+    else
+    {
+      mapHook->ShowTimeBtn();
     }
   }
 }

@@ -35,6 +35,7 @@ void CEditHandHook::Init()
 {
   ::memset(m_keyWord, 0x00, sizeof(m_keyWord));
   m_iCurCursorIndex = 0;
+  m_wordPosOffset = 0;
   m_vecWordPosX.clear();
   m_vecWordPosX.push_back(m_keyWordBox.GetLabelElement()->m_startX-2);
 }
@@ -57,7 +58,10 @@ void CEditHandHook::Load()
 
 void CEditHandHook::UnLoad()
 {
-  ::memcpy(m_keyWord, m_keyWordBox.GetCaption(), sizeof(m_keyWord));
+  TCHAR uniText[512];
+  ::_tcscpy(uniText,m_tstrKeyWords.c_str());
+  m_stringBasic.Chs2Ascii(uniText,m_keyWord,MAXELEMENTNAME);
+
   m_isNewChar = true;
   if (m_renderingDC!=0)
   {
@@ -105,6 +109,8 @@ void CEditHandHook::MakeControls()
 {
   CMenuBackgroundHook::MakeControls();
   m_keyWordBox.SetLabelElement(GetGuiElement(EditHandHook_KeyWordBox));
+  m_orinBoxPos = m_keyWordBox.GetLabelElement()->m_startX;
+  m_limitPoxX = m_keyWordBox.GetLabelElement()->m_startX+m_keyWordBox.GetLabelElement()->m_width-5;
 
   m_saveBtn.SetCenterElement(GetGuiElement(EditHandHook_SaveBtn));
   m_saveBtn.SetEnable(false);
@@ -262,7 +268,9 @@ short CEditHandHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_saveBtn.MouseUp();
       if (m_saveBtn.IsEnable())
       {
-        ::memcpy(m_keyWord, m_keyWordBox.GetCaption(), sizeof(m_keyWord));
+        TCHAR uniText[512];
+        ::_tcscpy(uniText,m_tstrKeyWords.c_str());
+        m_stringBasic.Chs2Ascii(uniText,m_keyWord,MAXELEMENTNAME);
         ((CEditSwitchHook *)m_view->GetHook(DHT_EditSwitchHook))->DoEditCallBack(m_keyWord);
       }
     }
@@ -322,8 +330,15 @@ short CEditHandHook::MouseUp(CGeoPoint<short> &scrPoint)
       }
       if (curIndex!=m_iCurCursorIndex)
       {
-        SetCursorPosX(curIndex);
-        m_isIdentify = false;
+        if (curIndex == 0 && !m_isShowFullKeyWords)
+        {
+          break;
+        }
+        else
+        {
+          SetCursorPosX(curIndex);
+          m_isIdentify = false;
+        }
       }
     }
     break;
@@ -340,7 +355,10 @@ short CEditHandHook::MouseUp(CGeoPoint<short> &scrPoint)
       }
       else
       {
-        AddOneKeyWord(m_inputCode[tempcode].GetCaption());
+        if (m_tstrKeyWords.length() < MAXWORDNUM)
+        {
+          AddOneKeyWord(m_inputCode[tempcode].GetCaption());
+        }
       }
       break;
     }
@@ -380,31 +398,8 @@ bool CEditHandHook::EraseOneKeyWord(void)
   if (m_iCurCursorIndex)
   {
     -- m_iCurCursorIndex;
-    m_vecWordPosX.clear();
-    //
     m_tstrKeyWords.erase(m_iCurCursorIndex,1);
-    //
-    m_vecWordPosX.push_back(m_keyWordBox.GetLabelElement()->m_startX-2);
-    //
-    UeMap::CViewCanvas *aggCanvas(UeMap::CViewCanvas::GetCanvas(UeMap::CT_AGG));
-    //
-    for (short i(0),cursorPosX(m_keyWordBox.GetLabelElement()->m_startX); i!=m_tstrKeyWords.size(); ++i)
-    {
-      aggCanvas->GetCurCursorPos(m_keyWordBox.GetLabelElement()->m_textStyle,m_tstrKeyWords[i],
-        cursorPosX);
-      m_vecWordPosX.push_back(cursorPosX-2);
-    }
-    //
-    SetCursorPosX(m_iCurCursorIndex);
-    //
-    TCHAR uniText[512];
-    ::_tcscpy(uniText,m_tstrKeyWords.c_str());
-    m_stringBasic.Chs2Ascii(uniText,m_keyWordBox.GetLabelElement()->m_label,MAXELEMENTNAME);
-    //
-    if (m_tstrKeyWords.size()<1)
-    {
-      m_saveBtn.SetEnable(false);
-    }
+    ShowKeyWord();
   }
   return m_tstrKeyWords.size();
 }
@@ -419,33 +414,8 @@ bool CEditHandHook::AddOneKeyWord(const char *pchLabelText)
 }
 bool CEditHandHook::doAddOneKeyWord(TCHAR oneWord)
 {
-  UeMap::CViewCanvas *aggCanvas(UeMap::CViewCanvas::GetCanvas(UeMap::CT_AGG));
-  {
-    short sCursorPosX(*(m_vecWordPosX.rbegin()));
-    //
-    aggCanvas->GetCurCursorPos(m_keyWordBox.GetLabelElement()->m_textStyle,oneWord,sCursorPosX);
-    //
-    if (sCursorPosX>(m_keyWordBox.GetLabelElement()->m_startX+m_keyWordBox.GetLabelElement()->m_width-5))
-    {
-      return false;
-    }
-  }
   m_tstrKeyWords.insert(m_iCurCursorIndex++,1,oneWord);
-  //
-  m_vecWordPosX.clear();
-  m_vecWordPosX.push_back(m_keyWordBox.GetLabelElement()->m_startX-2);
-  for (short i(0),cursorPosX(m_keyWordBox.GetLabelElement()->m_startX); i!=m_tstrKeyWords.size(); ++i)
-  {
-    aggCanvas->GetCurCursorPos(m_keyWordBox.GetLabelElement()->m_textStyle,m_tstrKeyWords[i],cursorPosX);
-    m_vecWordPosX.push_back(cursorPosX-2);
-  }
-  m_saveBtn.SetEnable(m_tstrKeyWords.size()>0);
-  //
-  SetCursorPosX(m_iCurCursorIndex);
-  //
-  TCHAR uniText[512];
-  ::_tcscpy(uniText,m_tstrKeyWords.c_str());
-  m_stringBasic.Chs2Ascii(uniText,m_keyWordBox.GetLabelElement()->m_label,MAXELEMENTNAME);
+  ShowKeyWord();
   return true;
 }
 
@@ -455,8 +425,10 @@ void CEditHandHook::ClearKeyWord(void)
   //
   m_saveBtn.SetEnable(false);
   //
+  m_iCurCursorIndex = 0;
+  m_wordPosOffset = 0;
   m_vecWordPosX.clear();
-  m_vecWordPosX.push_back(m_keyWordBox.GetLabelElement()->m_startX-2);
+  m_vecWordPosX.push_back(m_orinBoxPos);
   //
   SetCursorPosX(0);
   m_tstrKeyWords.clear();
@@ -480,10 +452,60 @@ void CEditHandHook::ResetKeyWord(const char *pchKeyWord)
 
 void CEditHandHook::SetCursorPosX(int curIndex)
 {
-  m_iCurCursorIndex = curIndex;
+  m_iCurCursorIndex = curIndex + m_wordPosOffset;
   m_deleteBtn.SetEnable(curIndex);
   m_pWordCursor->m_startX = m_vecWordPosX[curIndex];
 }
+
+void CEditHandHook::ShowKeyWord()
+{
+  UeMap::CViewCanvas *aggCanvas(UeMap::CViewCanvas::GetCanvas(UeMap::CT_AGG));
+  //先记录完整关键字的光标
+  m_wordPosOffset = 0;
+  m_keyWordBox.GetLabelElement()->m_startX = m_orinBoxPos;
+  m_vecWordPosX.clear();
+  m_vecWordPosX.push_back(m_orinBoxPos);
+  for (short i(0),cursorPosX(m_orinBoxPos); i!=m_tstrKeyWords.size(); ++i)
+  {
+    aggCanvas->GetCurCursorPos(m_keyWordBox.GetLabelElement()->m_textStyle,m_tstrKeyWords[i],cursorPosX);
+    m_vecWordPosX.push_back(cursorPosX);
+  }
+  //如果最后一个光标位置超出输入框则不显示完整关键字
+  int beyondPosX = *(m_vecWordPosX.rbegin()) - m_limitPoxX;
+  if (beyondPosX>0)
+  {
+    for (int i=0; i!=m_vecWordPosX.size(); i++)
+    {
+      m_vecWordPosX[i] -= beyondPosX;
+    }
+    while (*(m_vecWordPosX.begin()) < m_orinBoxPos)
+    {
+      m_wordPosOffset++;
+      m_vecWordPosX.erase(m_vecWordPosX.begin());
+    }
+    m_cutKeyWords = m_tstrKeyWords.substr(m_wordPosOffset, m_tstrKeyWords.length()-m_wordPosOffset);
+    m_keyWordBox.GetLabelElement()->m_startX = m_vecWordPosX[0] + 2;
+  }
+  //
+  SetCursorPosX(m_iCurCursorIndex-m_wordPosOffset);
+  //
+  m_saveBtn.SetEnable(m_tstrKeyWords.size()>0);
+  //
+  TCHAR uniText[512];
+  if (m_wordPosOffset == 0)
+  {
+    m_isShowFullKeyWords = true;
+    ::_tcscpy(uniText,m_tstrKeyWords.c_str());
+  }
+  else
+  {
+    m_isShowFullKeyWords = false;
+    ::_tcscpy(uniText,m_cutKeyWords.c_str());
+  }
+  m_stringBasic.Chs2Ascii(uniText,m_keyWordBox.GetLabelElement()->m_label,MAXELEMENTNAME);
+}
+
+
 
 void CEditHandHook::SetAssociateBtnLabels()
 {
@@ -540,8 +562,11 @@ void CEditHandHook::DoHandWriting(int curTime)
         SetAssociateBtnLabels();
         if (iWordNum!=0)
         {
-          AddOneKeyWord(m_inputCode[0].GetCaption());
-          m_isIdentify = true;
+          if (m_tstrKeyWords.length() < MAXWORDNUM)
+          {
+            AddOneKeyWord(m_inputCode[0].GetCaption());
+            m_isIdentify = true;
+          }
         }
         delete[] pusWordBuf;
       }

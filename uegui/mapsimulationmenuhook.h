@@ -95,6 +95,10 @@ namespace UeGui
     void MakeControls();
   private:
     /**
+    * \brief 根据当前菜单展开状态、导航状态、屏幕状态等动态更新界面
+    */
+    void DynamicUpdate(bool bExpand, short planState, UeMap::ViewOpeMode viewMode);
+    /**
     * \brief 显示和隐藏菜单栏
     * param bShow 显示还是隐藏
     * param bExpand 展开还是收缩

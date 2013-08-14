@@ -14,6 +14,7 @@
 
 #define INPUTCODENUM 26
 #define ASSOCIATEBTNNUM 6
+#define MAXWORDNUM 30
 
 namespace UeGui
 {
@@ -108,6 +109,8 @@ namespace UeGui
     void ClearKeyWord(void);
     void SetCursorPosX(int curIndex);
 
+    void ShowKeyWord();
+
     void SetAssociateBtnLabels();
 
     void SetKeyBoardBtnsEnable();
@@ -145,6 +148,17 @@ namespace UeGui
     unsigned char m_posBuffer[10];
     //保存字符串
     char m_keyWord[128];
+
+    //关键字过长显示不全时, 标识从第几个字开始显示
+    int m_wordPosOffset;
+    //用于保存截取后用于显示的字符串
+    tstring m_cutKeyWords;
+    //记录关键字输入框的原始位置
+    int m_orinBoxPos;
+    //光标可以移动到的最后位置
+    int m_limitPoxX;
+    //记录当前是否显示完整的关键字
+    bool m_isShowFullKeyWords;
   };
 }
 #endif

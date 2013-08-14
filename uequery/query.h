@@ -130,6 +130,12 @@ namespace UeQuery
     unsigned SaveCurKeyWord(const char *pchKeyWord,bool bIsAcro);
     //获取之前检索输入的历史关键字
     unsigned GetHistoryKeyword(std::vector<string> &vecHistoryKey,bool bIsAcro);
+    //导出备份地址簿
+    unsigned ExportAddrbook();
+    //获取索引为order的备份地址簿记录
+    const FavoriteEntry *GetAddrbookData(int order);
+    //判断是否存在备份地址簿
+    bool IsIOAddrbookExist();
 		//
 		//
 		//

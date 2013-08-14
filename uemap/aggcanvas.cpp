@@ -1534,7 +1534,8 @@ void UeMap::CAGGCanvas::RenderBubble( short scaleLevel )
         if (oneIndicator)
         {
           CGeoPoint<short> oneCoord;
-          m_view->Map2Scr(oneIndicator->m_vtxs[oneIndicator->m_vtxNum - 1], oneCoord);
+          //TODO:: 把viewstate作为参数传入
+          m_view->GetMapView()->Map2Scr(oneIndicator->m_vtxs[oneIndicator->m_vtxNum - 1], oneCoord);
 
           short bubbleIcon = m_view->GetViewIcon(VI_BUBBLEICON); 
           CUePicture *poiPicture = const_cast<CUePicture *>(m_view->GetUePicture(CViewHook::IT_GuiBegin + bubbleIcon));
@@ -6475,15 +6476,8 @@ inline void CAGGCanvas::RenderGpsCar(short scaleLevel)
     return;
   }
 
-  CViewState *curView = m_view->GetState(VT_North);
-  if (!curView)
-  {
-    curView = m_view->GetState(VT_Heading);
-    if(!curView)
-    {
-      curView = m_view->GetState(VT_Perspective);
-    }
-  }
+  //TODO:: 把viewstate作为参数传入
+  CViewState *curView = m_view->GetMapView();
   if (!curView)
   {
     return;
@@ -6742,7 +6736,8 @@ void CAGGCanvas::RenderRoutePosition(void *dc, CGeoPoint<long> &pos, char *name)
       int height = tRows * ftHeight + 6;
       int width = tCols * ftWidth + 6;
       CGeoPoint<short> scrPoint;
-      m_view->Map2Scr(pos, scrPoint);
+      //TODO:: 把viewstate作为参数传入
+      m_view->GetMapView()->Map2Scr(pos, scrPoint);
       double sourceX = 0;
       double sourceY = 0;
       sourceX = scrPoint.m_x;
@@ -7907,7 +7902,8 @@ void CAGGCanvas::RenderElecEye(bool is3D)
   {
     CGeoPoint<long> mapPoint(eyeProp.m_x, eyeProp.m_y);
     CGeoPoint<short> scrPoint;
-    m_view->Map2Scr(mapPoint, scrPoint);
+    //TODO:: 把viewstate作为参数传入
+    m_view->GetMapView()->Map2Scr(mapPoint, scrPoint);
     if (is3D)
     {
       double x = scrPoint.m_x;
@@ -7986,15 +7982,8 @@ void CAGGCanvas::RenderMarkPic(short scaleLevel, bool is3d)
   {
     return ;
   }
-  CViewState *curView = m_view->GetState(VT_North);
-  if (!curView)
-  {
-    curView = m_view->GetState(VT_Heading);
-    if(!curView)
-    {
-      curView = m_view->GetState(VT_Perspective);
-    }
-  }
+  //TODO:: 把viewstate作为参数传入
+  CViewState *curView = m_view->GetMapView();
   if (!curView)
   {
     return;
@@ -8237,7 +8226,7 @@ void CAGGCanvas::RenderMainViewFlag(PlanPosition& onePos, const int picNum, cons
     if (onePicture)
     {
       CGeoPoint<short> scrPoint;
-      m_view->Map2Scr(onePos.m_pos, scrPoint);
+      m_view->GetMapView()->Map2Scr(onePos.m_pos, scrPoint);
       double x = scrPoint.m_x;
       double y = scrPoint.m_y;
       CAGGView::m_mtxPsp.transform(&x, &y);

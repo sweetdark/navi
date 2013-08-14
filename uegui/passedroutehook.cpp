@@ -870,7 +870,14 @@ void CPassedRouteHook::CRouteRow::Show(const char* routeName, const char* mileag
   {
     m_rowFlagBtn->SetVisible(false);
     m_rowAvoidBtn->SetVisible(true);
-    m_rowAvoidBtn->SetEnable(true);
+    if (CRouteWrapper::Get().GetPlanState() == UeRoute::PS_RealGuidance)
+    {
+      m_rowAvoidBtn->SetEnable(true);
+    }
+    else
+    {
+      m_rowAvoidBtn->SetEnable(false);
+    }
   }
   m_rowNameBtn->SetCaption(routeName);
   m_rowDistBtn->SetCaption(mileages);

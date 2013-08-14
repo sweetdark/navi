@@ -306,6 +306,5 @@ void CEditSwitchHook::DoEditCallBack(const char* keyword)
       m_editCallBack(m_callBackObject, keyword);
       m_editCallBack = NULL;
     }
-    Return();
   }
 }

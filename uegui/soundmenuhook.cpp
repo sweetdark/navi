@@ -330,7 +330,7 @@ void UeGui::CSoundMenuHook::BroadcastRadioCheck( RadioButtonIndex index )
 
 void UeGui::CSoundMenuHook::ChangeVolume( bool bIncrease )
 {
-  unsigned short step = m_maxSoundBarWidth / 10;
+  unsigned short step = m_maxSoundBarWidth / (double)10;
   if (bIncrease)
   {
     if ((m_curSoundBarWidth + step) > m_maxSoundBarWidth)
@@ -354,6 +354,8 @@ void UeGui::CSoundMenuHook::ChangeVolume( bool bIncrease )
     }
   }
   SetSoundBar(m_curSoundBarWidth);
+  unsigned short volume = GetVoume(m_curSoundBarWidth);
+  m_settingWrapper.SetVoice(volume);
 }
 
 void UeGui::CSoundMenuHook::ClickOnSoundBar( CGeoPoint<short> &scrPoint )
@@ -408,7 +410,7 @@ void UeGui::CSoundMenuHook::SetVolume( unsigned short volume )
   {
     volume = CSettingWrapper::MAX_VOLUME;
   }
-  unsigned short barWidth = (m_maxSoundBarWidth * volume) / CSettingWrapper::MAX_VOLUME;
+  unsigned short barWidth = (m_maxSoundBarWidth * volume) / (double)CSettingWrapper::MAX_VOLUME;
   SetSoundBar(barWidth);
 }
 
@@ -444,7 +446,7 @@ unsigned short UeGui::CSoundMenuHook::GetVoume( unsigned short barWidth )
   {
     barWidth = m_maxSoundBarWidth;
   }
-  return barWidth * CSettingWrapper::MAX_VOLUME / m_maxSoundBarWidth;
+  return barWidth * CSettingWrapper::MAX_VOLUME / (double)m_maxSoundBarWidth;
 }
 
 void UeGui::CSoundMenuHook::RestarTimer()

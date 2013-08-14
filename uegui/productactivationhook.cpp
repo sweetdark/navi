@@ -42,6 +42,8 @@ void CProduceActivationHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(ProduceActivation_Background,	"Background"));
   m_ctrlNames.insert(GuiName::value_type(ProduceActivation_Title,	"Title"));
   m_ctrlNames.insert(GuiName::value_type(ProduceActivation_Cancel,	"Cancel"));
+  m_ctrlNames.insert(GuiName::value_type(ProduceActivation_Cancel_qu,	"Cancel_qu"));
+  m_ctrlNames.insert(GuiName::value_type(ProduceActivation_Cancel_xiao,	"Cancel_xiao"));
   m_ctrlNames.insert(GuiName::value_type(ProduceActivation_VersionLabel,	"VersionLabel"));
   m_ctrlNames.insert(GuiName::value_type(ProduceActivation_VersionCode,	"VersionCode"));
   m_ctrlNames.insert(GuiName::value_type(ProduceActivation_SeriesNumberLabel,	"SeriesNumberLabel"));
@@ -72,6 +74,8 @@ void CProduceActivationHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(ProduceActivation_InputCode16,	"InputCode16"));
   m_ctrlNames.insert(GuiName::value_type(ProduceActivation_DeleteChar,	"DeleteChar"));
   m_ctrlNames.insert(GuiName::value_type(ProduceActivation_Activation,	"Activation"));
+  m_ctrlNames.insert(GuiName::value_type(ProduceActivation_Activation_an,	"Activation_an"));
+  m_ctrlNames.insert(GuiName::value_type(ProduceActivation_Activation_zhuang,	"Activation_zhuang"));
 }
 
 void CProduceActivationHook::MakeControls()
@@ -102,8 +106,12 @@ void CProduceActivationHook::MakeControls()
   m_inputCode15Ctrl.SetCenterElement(GetGuiElement(ProduceActivation_InputCode15));
   m_inputCode16Ctrl.SetCenterElement(GetGuiElement(ProduceActivation_InputCode16));
   m_cancelCtrl.SetCenterElement(GetGuiElement(ProduceActivation_Cancel));
+  m_cancelCtrl.SetLeftElement(GetGuiElement(ProduceActivation_Cancel_qu));
+  m_cancelCtrl.SetRightElement(GetGuiElement(ProduceActivation_Cancel_xiao));
   m_deleteCharCtrl.SetCenterElement(GetGuiElement(ProduceActivation_DeleteChar));
   m_activationCtrl.SetCenterElement(GetGuiElement(ProduceActivation_Activation));
+  m_activationCtrl.SetLeftElement(GetGuiElement(ProduceActivation_Activation_an));
+  m_activationCtrl.SetRightElement(GetGuiElement(ProduceActivation_Activation_zhuang));
 }
 
 short CProduceActivationHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -112,99 +120,122 @@ short CProduceActivationHook::MouseDown(CGeoPoint<short> &scrPoint)
   switch(ctrlType)
   {
   case ProduceActivation_Cancel:
+  case ProduceActivation_Cancel_qu:
+  case ProduceActivation_Cancel_xiao:
     {
       m_cancelCtrl.MouseDown();
+      AddRenderUiControls(&m_cancelCtrl);
     }
     break;
   case ProduceActivation_DeleteChar:
     {
       m_deleteCharCtrl.MouseDown();
+      AddRenderUiControls(&m_deleteCharCtrl);
     }
     break;
   case ProduceActivation_Activation:
+  case ProduceActivation_Activation_an:
+  case ProduceActivation_Activation_zhuang:
     {
       m_activationCtrl.MouseDown();
+      AddRenderUiControls(&m_activationCtrl);
     }
     break;
   case ProduceActivation_InputCode1:
     {
       m_inputCode1Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode1Ctrl);
     }
     break;
   case ProduceActivation_InputCode2:
     {
       m_inputCode2Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode2Ctrl);
     }
     break;
   case ProduceActivation_InputCode3:
     {
       m_inputCode3Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode3Ctrl);
     }
     break;
   case ProduceActivation_InputCode4:
     {
       m_inputCode4Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode4Ctrl);
     }
     break;
   case ProduceActivation_InputCode5:
     {
       m_inputCode5Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode5Ctrl);
     }
     break;
   case ProduceActivation_InputCode6:
     {
       m_inputCode6Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode6Ctrl);
     }
     break;
   case ProduceActivation_InputCode7:
     {
       m_inputCode7Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode7Ctrl);
     }
     break;
   case ProduceActivation_InputCode8:
     {
       m_inputCode8Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode8Ctrl);
     }
     break;
   case ProduceActivation_InputCode9:
     {
       m_inputCode9Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode9Ctrl);
     }
     break;
 
   case ProduceActivation_InputCode10:
     {
       m_inputCode10Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode10Ctrl);
     }
     break;
   case ProduceActivation_InputCode11:
     {
       m_inputCode11Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode11Ctrl);
     }
     break;
   case ProduceActivation_InputCode12:
     {
       m_inputCode12Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode12Ctrl);
     }
     break;
   case ProduceActivation_InputCode13:
     {
       m_inputCode13Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode13Ctrl);
     }
     break;
   case ProduceActivation_InputCode14:
     {
       m_inputCode14Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode14Ctrl);
     }
     break;
   case ProduceActivation_InputCode15:
     {
       m_inputCode15Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode15Ctrl);
     }
     break;
   case ProduceActivation_InputCode16:
     {
       m_inputCode16Ctrl.MouseDown();
+      AddRenderUiControls(&m_inputCode16Ctrl);
     }
     break;
   default:
@@ -234,6 +265,8 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
   switch(m_downElementType)
   {
     case ProduceActivation_Cancel:
+    case ProduceActivation_Cancel_qu:
+    case ProduceActivation_Cancel_xiao:
       {
         m_cancelCtrl.MouseUp();
         if (needDo)
@@ -249,18 +282,17 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           DoDeleteChar();
         }
-        AddRenderUiControls(&m_deleteCharCtrl);
-
       }
       break;
     case ProduceActivation_Activation:
+    case ProduceActivation_Activation_an:
+    case ProduceActivation_Activation_zhuang:
       {
         m_activationCtrl.MouseUp();
         if (needDo)
         {
           DoActivation();
         }
-        AddRenderUiControls(&m_activationCtrl);
       }
       break;
     case ProduceActivation_InputCode1:
@@ -270,7 +302,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode1Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode1Ctrl);
       }
       break;
     case ProduceActivation_InputCode2:
@@ -280,7 +311,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode2Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode2Ctrl);
       }
       break;
     case ProduceActivation_InputCode3:
@@ -290,7 +320,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode3Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode3Ctrl);
       }
       break;
     case ProduceActivation_InputCode4:
@@ -300,7 +329,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode4Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode4Ctrl);
       }
       break;
     case ProduceActivation_InputCode5:
@@ -310,7 +338,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode5Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode5Ctrl);
       }
       break;
     case ProduceActivation_InputCode6:
@@ -320,7 +347,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode6Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode6Ctrl);
       }
       break;
     case ProduceActivation_InputCode7:
@@ -330,7 +356,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode7Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode7Ctrl);
       }
       break;
     case ProduceActivation_InputCode8:
@@ -340,7 +365,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode8Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode8Ctrl);
       }
       break;
     case ProduceActivation_InputCode9:
@@ -350,7 +374,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode9Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode9Ctrl);
       }
       break;
 
@@ -360,8 +383,7 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         if (needDo)
         {
           AddActivationCode(*m_inputCode10Ctrl.GetCaption());
-        } 
-        AddRenderUiControls(&m_inputCode10Ctrl);
+        }
       }
       break;
     case ProduceActivation_InputCode11:
@@ -371,7 +393,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode11Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode11Ctrl);
       }
       break;
     case ProduceActivation_InputCode12:
@@ -381,7 +402,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode12Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode12Ctrl);
       }
       break;
     case ProduceActivation_InputCode13:
@@ -391,7 +411,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode13Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode13Ctrl);
       }
       break;
     case ProduceActivation_InputCode14:
@@ -401,7 +420,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         { 
           AddActivationCode(*m_inputCode14Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode14Ctrl);
       }
       break;
     case ProduceActivation_InputCode15:
@@ -411,7 +429,6 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode15Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode15Ctrl);
       }
       break;
     case ProduceActivation_InputCode16:
@@ -421,23 +438,18 @@ short CProduceActivationHook::MouseUp(CGeoPoint<short> &scrPoint)
         {
           AddActivationCode(*m_inputCode16Ctrl.GetCaption());
         }
-        AddRenderUiControls(&m_inputCode16Ctrl);
       }
       break;
-  default:
-    {
+    default:
       m_isNeedRefesh = false;
       assert(false);
-    }
-    break;
+      break;
   }
-  DWORD start = ::GetTickCount();
+
   if (m_isNeedRefesh)
   {
-    this->Refresh();
+    Refresh();
   }
-  DWORD end = ::GetTickCount();
-  unsigned long cout = end - start;
   m_isNeedRefesh = true;
   return ctrlType;
 }
@@ -492,10 +504,6 @@ void UeGui::CProduceActivationHook::DoAddChar( char addChar )
     //Ìí¼Óµ½¼¤»îÂë
     AddActivationCode(addChar);
   }
-  AddRenderUiControls(&m_activationCodePart1Ctrl);
-  AddRenderUiControls(&m_activationCodePart2Ctrl);
-  AddRenderUiControls(&m_activationCodePart3Ctrl);
-  AddRenderUiControls(&m_activationCodePart4Ctrl);
 }
 
 void UeGui::CProduceActivationHook::DoDeleteChar()
@@ -504,10 +512,6 @@ void UeGui::CProduceActivationHook::DoDeleteChar()
   {
     //É¾³ý¼¤»îÂë
     DeleteActivationCode();
-    AddRenderUiControls(&m_activationCodePart1Ctrl);
-    AddRenderUiControls(&m_activationCodePart2Ctrl);
-    AddRenderUiControls(&m_activationCodePart3Ctrl);
-    AddRenderUiControls(&m_activationCodePart4Ctrl);
   }
   else
   {
@@ -669,10 +673,6 @@ void UeGui::CProduceActivationHook::AddActivationCode( char addChar )
   m_activationCode_Len++;
   m_activationCode[m_activationCode_Len - 1] = addChar;
   ShowActivationCode(m_activationCode, m_activationCode_Len);
-  AddRenderUiControls(&m_activationCodePart1Ctrl);
-  AddRenderUiControls(&m_activationCodePart2Ctrl);
-  AddRenderUiControls(&m_activationCodePart3Ctrl);
-  AddRenderUiControls(&m_activationCodePart4Ctrl);
 }
 
 void UeGui::CProduceActivationHook::DeleteActivationCode()
@@ -684,10 +684,6 @@ void UeGui::CProduceActivationHook::DeleteActivationCode()
   m_activationCode[m_activationCode_Len - 1] = '\0';
   m_activationCode_Len--;
   ShowActivationCode(m_activationCode, m_activationCode_Len);
-  AddRenderUiControls(&m_activationCodePart1Ctrl);
-  AddRenderUiControls(&m_activationCodePart2Ctrl);
-  AddRenderUiControls(&m_activationCodePart3Ctrl);
-  AddRenderUiControls(&m_activationCodePart4Ctrl);
 }
 
 void UeGui::CProduceActivationHook::DoClose()

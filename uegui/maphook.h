@@ -443,6 +443,10 @@ namespace UeGui
     */
     void SrcModalSelect(short selectIndex);
     /**
+    * \brief 快捷比例尺选择
+    */
+    void ShortcutScaleSelect(short selectIndex);
+    /**
     * \brief 设置双屏类型选择按钮状态
     */
     void RefreshSrcModalBtnStatus();
@@ -567,6 +571,10 @@ namespace UeGui
     * \brief 但双屏类型选择
     */
     static void OnSrcModalSelect(CAggHook* sender, short selectIndex);
+    /**
+    * \brief 快捷比例尺选择
+    */
+    static void OnShortcutScaleSelect(CAggHook* sender, short selectIndex);
   private:
     //主页：最小化
     CUiBitButton m_miniMizeBtn;    
@@ -676,6 +684,8 @@ namespace UeGui
     short m_lanWidth;
     //屏幕类型选择列表
     CItemSelectHook::ItemInfoList m_srcModalItemList;
+    //比例尺类型选择列表
+    CItemSelectHook::ItemInfoList m_scaleItemList;
     //当前系统时间
     short m_sysTime;
     //鼠标按下的时间计算

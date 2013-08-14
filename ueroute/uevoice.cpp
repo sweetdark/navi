@@ -2411,6 +2411,9 @@ inline void CUeVoice::MakeVoices()
   //m_vStrings.insert(VoiceMap::value_type(EVT_Red, _T(",有红绿灯拍照")));
   //m_vStrings.insert(VoiceMap::value_type(EVT_Limited, _T(",有限速拍照")));
   //m_vStrings.insert(VoiceMap::value_type(EVT_Exclusive, _T(",有专用道拍照")));
+
+  m_vStrings.insert(VoiceMap::value_type(IVT_RoutePlanSuccess, _T("路径规划成功")));
+  m_vStrings.insert(VoiceMap::value_type(IVT_RoutePlanFail, _T("路径规划失败")));
 }
 
 /**

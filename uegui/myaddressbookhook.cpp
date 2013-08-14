@@ -603,11 +603,19 @@ short CMyAddressBookHook::MouseUp(CGeoPoint<short> &scrPoint)
   case myaddressbookhook_ExportButton:
     {
       m_exportButtonCtrl.MouseUp();
+      if (m_exportButtonCtrl.IsEnable())
+      {
+        ExportAddrbook();
+      }
     }
     break;
   case myaddressbookhook_ImportButton:
     {
       m_importButtonCtrl.MouseUp();
+      if (m_importButtonCtrl.IsEnable())
+      {
+        ImportAddrbook();
+      }
     }
     break;
   case myaddressbookhook_NextPage:
@@ -871,14 +879,20 @@ void CMyAddressBookHook::SetAddressBookPageInfo()
   if (total <= 0)
   {
     m_cleanButtonCtrl.SetEnable(false);
-    m_importButtonCtrl.SetEnable(false);
     m_exportButtonCtrl.SetEnable(false);
   }
   else
   {
     m_cleanButtonCtrl.SetEnable(true);
-    /*m_importButtonCtrl.SetEnable(true);
-    m_exportButtonCtrl.SetEnable(true);*/
+    m_exportButtonCtrl.SetEnable(true);
+  }
+  if (m_userWrapper.IsIOAddrbookExist())
+  {
+    m_importButtonCtrl.SetEnable(true);
+  }
+  else
+  {
+    m_importButtonCtrl.SetEnable(false);
   }
   m_pageTurning.Clear();
   m_pageTurning.SetTotal(total);
@@ -1070,4 +1084,42 @@ int UeGui::CMyAddressBookHook::GetDataIndex( AddreessBookHookRecordType& row )
     return m_pageTurning.GetPageStartPosition() + row - 2;
   }
   return -1;
+}
+
+void UeGui::CMyAddressBookHook::ExportAddrbook()
+{
+  m_userWrapper.ConnectToAddrbookRecord();
+  if (m_userWrapper.ExportAddrbook() == 0/*SQL_SUCCESS*/)
+  {
+    m_importButtonCtrl.SetEnable(true);
+    CMessageDialogEvent dialogEvent(this, DHT_MyAddressBookHook, NULL);
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "已成功导出地址簿至 userdata\\addrbook", dialogEvent);
+    Sleep(1000);
+    CMessageDialogHook::CloseMessageDialog();
+  }
+  m_userWrapper.DisconnectAddrbookRecord();
+}
+
+void UeGui::CMyAddressBookHook::ImportAddrbook()
+{
+  if (m_userWrapper.IsIOAddrbookExist())
+  {
+    int index = 0;
+    const FavoriteEntry *fEntry;
+    m_userWrapper.ConnectToAddrbookRecord();
+    m_userWrapper.ConnectToFavorite();
+    while ((fEntry = m_userWrapper.GetAddrbookData(index++)) != NULL)
+    {
+      FavoriteEntry entry;
+      ::memcpy(&entry, fEntry, sizeof(FavoriteEntry));    
+      m_userWrapper.AddFavorite(entry); 
+    }
+    m_userWrapper.DisconnectFavorite();
+    m_userWrapper.DisconnectAddrbookRecord();
+    Load();
+    CMessageDialogEvent dialogEvent(this, DHT_MyAddressBookHook, NULL);
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "已成功导入地址簿", dialogEvent);
+    Sleep(1000);
+    CMessageDialogHook::CloseMessageDialog();
+  }
 }

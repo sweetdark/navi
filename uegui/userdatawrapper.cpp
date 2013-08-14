@@ -230,6 +230,11 @@ bool CUserDataWrapper::AddJourneyData(const char *journeyName, unsigned int rout
   return journeyWrapper.AddJourneyData(journeyName, routeType, poiList);
 }
 
+bool CUserDataWrapper::EditJourneyData(unsigned int dataIndex, const char *journeyName, unsigned int routeType, const POIDataList &poiList) const
+{
+  CMyJourneyWrapper journeyWrapper;
+  return journeyWrapper.EditJourneyData(dataIndex, journeyName, routeType, poiList);
+}
 
 void CUserDataWrapper::RemoveUsually(UsuallyRecordType n) const
 {
@@ -418,6 +423,24 @@ unsigned int CUserDataWrapper::AddFavorite(const FavoriteEntry &curFavor) const
 unsigned int CUserDataWrapper::UpdateFavorite(const FavoriteEntry &curFavor,int order) const
 {
   return m_query->UpdateFavorite(curFavor, order);
+}
+
+//导出备份地址簿
+unsigned int CUserDataWrapper::ExportAddrbook() const
+{
+  return m_query->ExportAddrbook();
+}
+
+//获取索引为order的备份地址簿记录
+const FavoriteEntry *CUserDataWrapper::GetAddrbookData(int order) const
+{
+  return m_query->GetAddrbookData(order);
+}
+
+//判断是否存在备份地址簿
+bool CUserDataWrapper::IsIOAddrbookExist() const
+{
+  return m_query->IsIOAddrbookExist();
 }
 
 //获取索引为order的历史线路信息
@@ -650,6 +673,15 @@ unsigned int CUserDataWrapper::ConnectToHistoryRecord(void) const
 unsigned int CUserDataWrapper::DisconnectHistoryRecord(void) const
 {
   return m_query->Disconnect(UeQuery::DT_HistoryRecords);
+}
+//
+unsigned int CUserDataWrapper::ConnectToAddrbookRecord(void) const
+{
+  return m_query->ConnectTo(UeQuery::DT_Addrbook, setting);
+}
+unsigned int CUserDataWrapper::DisconnectAddrbookRecord(void) const
+{
+  return m_query->Disconnect(UeQuery::DT_Addrbook);
 }
 
 tstring UeGui::CUserDataWrapper::GetLastRouteBackFilename() const

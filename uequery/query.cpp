@@ -346,3 +346,16 @@ unsigned IQuery::GetHistoryKeyword(std::vector<string> &vecHistoryKey,bool bIsAc
     return m_queryImpl->GetHistoryKeyword(vecHistoryKey,bIsAcro);
   return -1;
 }
+
+unsigned IQuery::ExportAddrbook()
+{
+  return m_queryImpl->ExportAddrbook();
+}
+const FavoriteEntry *IQuery::GetAddrbookData(int order)
+{
+  return m_queryImpl->GetAddrbookData(order);
+}
+bool IQuery::IsIOAddrbookExist()
+{
+  return m_queryImpl->IsIOAddrbookExist();
+}

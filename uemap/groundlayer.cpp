@@ -30,6 +30,7 @@
 #include "viewstate.h"
 #include "viewcanvas.h"
 #include "pancommand.h"
+#include "indexforpoi.h"
 #if __FOR_FPC__
 #include "fpclayer.h"
 #endif
@@ -380,6 +381,7 @@ void CGroundLayer::Draw(short type, const CViewDC *viewDC, CGeoRect<short> &scrE
   // Whether it really needs to be rendered
   // Here LT_Index is only as index layer not rendering layer
   // ...
+  //TIME_STAT;
   assert(m_gate && m_view /*&& viewDC*/);
   if(!(m_view->GetMapSchema() & LSH_BackGround) || m_type == LT_Index)
   {
@@ -446,7 +448,28 @@ void CGroundLayer::Draw(short type, const CViewDC *viewDC, CGeoRect<short> &scrE
                 break;
               case GT_Point:
                 {
-                  DrawPoint(curView, oneGrid, grdBase, cursor, viewDC, isRotated, is3d, isRough);
+                  bool isUsePoiIndex = false;
+                  if (isUsePoiIndex)
+                  {
+                    CIndexForPoi poiIndex;                               
+                    std::vector<unsigned long> poiIndexs;
+                    std::vector<unsigned long>::iterator poiIndexsIter;
+
+                    //²éÕÒpoiµÄÆ«ÒÆÁ¿
+                    poiIndex.GetPoiIndex(oneGrid,poiIndexs,mapExtent);
+                    poiIndexsIter = poiIndexs.begin();
+                    for (;poiIndexsIter!=poiIndexs.end();poiIndexsIter++)
+                    {
+                      cursor = *poiIndexsIter;
+                      DrawPoint(curView, oneGrid, grdBase, cursor, viewDC, isRotated, is3d, isRough); 
+                    }
+                    cursor = static_cast<long>(oneGrid->m_size);
+                  }
+                  else
+                  {
+                      DrawPoint(curView, oneGrid, grdBase, cursor, viewDC, isRotated, is3d, isRough); 
+                  }
+                                    
                 }
                 break;
               case GT_Line:
@@ -894,12 +917,12 @@ void CGroundLayer::DrawPoly(CViewState *curView, CGeoRect<int> &clipRect, CGroun
     if(coordCount > 2)
     {
       //
-      //curView->m_clipTool.Prepare(coords);
-      //bool rt = curView->m_clipTool.ClipPolygon(coords, clipRect);
+      curView->m_clipTool.Prepare(coords);
+      bool rt = curView->m_clipTool.ClipPolygon(coords, clipRect);
       coordCount = coords.GetCount();
 
       //
-      if(/*rt && */coordCount > 2)
+      if(rt && coordCount > 2)
       {
         // Note:
         // clrIndex = 1 means that background polygon and currently it no need to render them
@@ -1126,11 +1149,11 @@ void UeMap::CGroundLayer::LoadGridData(short type, CGeoRect<short> &scrExtent)
     return;
   }
 
-  m_view->GetScale(m_curLevel, m_curScale);
-
   //
   CGeoRect<long> renderingExtent;
   CViewState *curView = m_view->GetState(type);
+  curView->GetScale(m_curLevel, m_curScale);
+
   assert(curView);
 
   //

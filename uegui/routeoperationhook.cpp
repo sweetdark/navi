@@ -2,8 +2,8 @@
 #include "routewrapper.h"
 #include "maphook.h"
 #include "messagedialoghook.h"
-#include "myjourneyhook.h"
 #include "editswitchhook.h"
+#include "userdatawrapper.h"
 using namespace UeGui;
 
 CRouteOperationHook::CRouteOperationHook()
@@ -484,40 +484,13 @@ void UeGui::CRouteOperationHook::DoSaveJourneyData(const char* journeyName )
   }
 
   //调用我的行程管理hook接口
-  CMyJourneyHook* myJourneyHook = (CMyJourneyHook*)m_view->GetHook(DHT_MyJourneyHook);
-  if (myJourneyHook)
+  
+  if (CUserDataWrapper::Get().AddJourneyData(journeyName, m_routeType, m_POIList))
   {
-    myJourneyHook->AddJourneyData(journeyName, m_routeType, m_POIList);
     CMessageDialogHook::ShowMessageDialog(MB_NONE, "数据保存成功 !", dialogEvent);
     Sleep(1000);
     CMessageDialogHook::CloseMessageDialog();
   }
-  //switch (m_windowModel)
-  //{
-  //case WAppendModel :
-  //  {
-  //    //调用我的行程管理hook接口
-  //    CMyJourneyHook* myJourneyHook = (CMyJourneyHook*)m_view->GetHook(DHT_MyJourneyHook);
-  //    if (myJourneyHook)
-  //    {
-  //      myJourneyHook->AddJourneyData(journeyName, m_routeType, m_POIList);
-  //      CMessageDialogHook::ShowMessageDialog(MB_NONE, "数据保存成功 !", dialogEvent);
-  //      Sleep(1000);
-  //      CMessageDialogHook::CloseMessageDialog();
-  //    }
-  //    break;
-  //  }
-  //case WEditModel :
-  //  {
-  //    ::strcpy(m_JourneyName,journeyName);
-  //    break;
-  //  }
-  //default:
-  //  {
-  //    assert(false);
-  //    break;
-  //  }
-  //}
 }
 void UeGui::CRouteOperationHook::GetRouteData()
 {

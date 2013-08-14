@@ -155,6 +155,8 @@ namespace UeQuery
 			return ConnectToFavorite();
 		case DT_HistoryRecords:
 			return ConnectToHistoryRecord();
+    case DT_Addrbook:
+      return ConnectToAddrbookRecord();
 		default:
 			break;
 		}
@@ -177,6 +179,7 @@ namespace UeQuery
 			DisconnectRecent();
 			DisconnectFavorite();
 			DisconnectHistoryRecord();
+      DisconnectAddrbookRecord();
 			break;
 		case DT_Recents:
 			DisconnectRecent();
@@ -187,6 +190,8 @@ namespace UeQuery
 		case DT_HistoryRecords:
 			DisconnectHistoryRecord();
 			break;
+    case DT_Addrbook:
+      DisconnectAddrbookRecord();
 		default:
 			break;
 		}
@@ -656,6 +661,25 @@ namespace UeQuery
 		}
 		return (m_pFavoriteCtrl!=0);
 	}
+  bool CUeQueryImpl::InitIOAddrbookCtrl(void)
+  {
+    if (m_pIOAddrbookCtrl==0)
+    {
+      // Check whether it stay there
+      tstring favorFile(CPathConfig::GetCommonPath(CPathConfig::CPK_UserPath));
+      favorFile += _T("addrbook.db");
+      m_pIOAddrbookCtrl = new CCustomerFileReader(favorFile,sizeof(FavoriteEntry));
+      const CPathBasic &pathBasic(CPathBasic::Get());
+      if (!pathBasic.IsFileExist(favorFile))
+      {
+        //如果文件不存在则创建。
+        //注意： 这里因为可以用RemoveAllData()来达到此效果
+        //所以从简化代码的角度使用该函数，并不是在这里移除所有数据的意思。
+        m_pIOAddrbookCtrl->RemoveAllData();
+      }
+    }
+    return (m_pIOAddrbookCtrl!=0);
+  }
 
 	unsigned CUeQueryImpl::ConnectToRecent(void)
 	{
@@ -764,6 +788,24 @@ namespace UeQuery
 		}
 		return SQL_NotExistDB;
 	}
+
+  unsigned CUeQueryImpl::ConnectToAddrbookRecord(void)
+  {
+    if (!InitIOAddrbookCtrl())
+      return SQL_NotExistDB;
+    if (m_pIOAddrbookCtrl->ConnectFile())
+      return SQL_Success;
+    return SQL_ConnectFailure;
+  }
+
+  unsigned CUeQueryImpl::DisconnectAddrbookRecord(void)
+  {
+    if (m_pIOAddrbookCtrl!=0 && m_pIOAddrbookCtrl->DisconnectFile())
+    {
+      return SQL_Success;
+    }
+    return SQL_NotExistDB;
+  }
 
 	unsigned int CUeQueryImpl::AddHistoryRecord (const HistoryRecordEntry &curHisRecord)
 	{
@@ -924,4 +966,45 @@ namespace UeQuery
 		Disconnect(UeQuery::DT_HistoryRecords);
 		return SQL_Success;
 	}
+
+  unsigned int CUeQueryImpl::ExportAddrbook()
+  {
+    if (!InitIOAddrbookCtrl())
+    {
+      return SQL_ConnectFailure;
+    }
+    ConnectToFavorite();
+    while (GetAddrbookData(0) != NULL)
+    {
+      m_pIOAddrbookCtrl->RemoveBlockData(0);
+    }
+    for (int i=0; i<GetFavoriteCount(); i++)
+    {
+      m_pIOAddrbookCtrl->AddBlockData(reinterpret_cast<const char *>(GetFavorite(i)));
+    }
+    DisconnectFavorite();
+    return SQL_Success;
+  }
+
+  const FavoriteEntry *CUeQueryImpl::GetAddrbookData(int order)
+  {
+    if (m_pIOAddrbookCtrl!=0)
+    {
+      unsigned blockSize(0);
+      return reinterpret_cast<const FavoriteEntry *>(m_pIOAddrbookCtrl->GetBlockData(order,
+        blockSize));
+    }
+    return 0;
+  }
+
+  bool CUeQueryImpl::IsIOAddrbookExist()
+  {
+    tstring addrbookFile(CPathConfig::GetCommonPath(CPathConfig::CPK_UserPath));
+    addrbookFile += _T("addrbook.db");
+    const CPathBasic &pathBasic(CPathBasic::Get());
+    if (pathBasic.IsFileExist(addrbookFile))
+      return true;
+    else
+      return false;
+  }
 }

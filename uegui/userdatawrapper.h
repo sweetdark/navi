@@ -156,6 +156,8 @@ namespace UeGui
 
     //添加行程数据
     bool AddJourneyData(const char *journeyName, unsigned int routeType, const POIDataList &poiList) const;
+    //编辑我的行程数据
+    bool EditJourneyData(unsigned int dataIndex, const char *journeyName, unsigned int routeType, const POIDataList &poiList) const;
 
     //移除常用点
     void RemoveUsually(UsuallyRecordType n) const;
@@ -183,6 +185,15 @@ namespace UeGui
 
     //更新索引为order的地址信息
     unsigned int UpdateFavorite(const FavoriteEntry &curFavor,int order) const;
+
+    //导出备份地址簿
+    unsigned ExportAddrbook() const;
+
+    //获取索引为order的备份地址簿记录
+    const FavoriteEntry *GetAddrbookData(int order) const;
+
+    //判断是否存在备份地址簿
+    bool IsIOAddrbookExist() const;
 
     //获取索引为order的历史线路信息
     const RecentEntry *GetRecent(int order) const;
@@ -242,6 +253,9 @@ namespace UeGui
     //
     unsigned int ConnectToHistoryRecord(void) const;
     unsigned int DisconnectHistoryRecord(void) const;
+    //
+    unsigned int ConnectToAddrbookRecord(void) const;
+    unsigned int DisconnectAddrbookRecord(void) const;
 
     /*
     * \brief 保存最后最后一次未导航完成的路线

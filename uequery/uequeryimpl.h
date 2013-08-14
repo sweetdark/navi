@@ -61,7 +61,7 @@ namespace UeQuery
 	public:
 		CUeQueryImpl(void):m_records(0),m_pRoadEntryCtrl(0),
 			m_pRoadDistCodeCtrl(0),m_pRecentCtrl(0),m_pFavoriteCtrl(0),
-			m_pHistoryrecordCtrl(0),m_pHistKeywordHandle(0) {};
+			m_pHistoryrecordCtrl(0),m_pHistKeywordHandle(0),m_pIOAddrbookCtrl(0) {};
 		~CUeQueryImpl(void)
 		{
 			Release();
@@ -89,6 +89,12 @@ namespace UeQuery
 		unsigned AddFavorite(const FavoriteEntry &curFavor);
 		//更新索引为order的地址信息
 		unsigned UpdateFavorite(const FavoriteEntry &curFavor,int order);
+    //导出备份地址簿
+    unsigned ExportAddrbook();
+    //获取索引为order的备份地址簿记录
+    const FavoriteEntry *GetAddrbookData(int order);
+    //判断是否存在备份地址簿
+    bool IsIOAddrbookExist();
 
 		//获取历史线路的数目
 		int GetRecentCount(void);
@@ -164,6 +170,7 @@ namespace UeQuery
 		bool InitFavoriteCtrl(void);
 		bool InitHistoryrecordCtrl(void);
     bool InitHistoryKeywordCtrl(void);
+    bool InitIOAddrbookCtrl(void);
 		//
 		unsigned ConnectToRecent(void);
 		unsigned DisconnectRecent(void);
@@ -173,6 +180,9 @@ namespace UeQuery
 		//
 		unsigned ConnectToHistoryRecord(void);
 		unsigned DisconnectHistoryRecord(void);
+    //
+    unsigned ConnectToAddrbookRecord(void);
+    unsigned DisconnectAddrbookRecord(void);
 		//释放上一次的查询方式
 		void DisconnectIndexes(void);
 		//将m_bodyBegin与\\attrs\\pois.db数据进行映射，即初始化pois数据
@@ -205,6 +215,7 @@ namespace UeQuery
 		CCustomerFileReader *m_pRecentCtrl;
 		CCustomerFileReader *m_pFavoriteCtrl;
 		CCustomerFileReader *m_pHistoryrecordCtrl;
+    CCustomerFileReader *m_pIOAddrbookCtrl;
     //
     void *m_pHistKeywordHandle;
     //

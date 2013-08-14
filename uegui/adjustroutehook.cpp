@@ -7,6 +7,8 @@
 #include "routetypeswitchhook.h"
 #include "inputswitchhook.h"
 #include "selectpointcallbackctrl.h"
+#include "userdatawrapper.h"
+#include "editswitchhook.h"
 using namespace UeGui;
 
 #define ADDPOIMACRO(num) do                 \
@@ -26,7 +28,7 @@ using namespace UeGui;
   }                                         \
 } while (0)
 
-CAdjustRouteHook::CAdjustRouteHook() : m_selectRowTag(kROWBegin) , m_dataFrom(kFromRoute)
+CAdjustRouteHook::CAdjustRouteHook() : m_selectRowTag(kROWBegin), m_dataFrom(kFromRoute), m_dataIndex(-1)
 {
   m_strTitle = "编辑路线";
   m_vecHookFile.push_back(_T("adjustroutehook.bin"));
@@ -187,9 +189,14 @@ void CAdjustRouteHook::Load()
 {
   if (GetPrevHookType() != DHT_RouteTypeSwitchHook)
   {
-    if (m_dataFrom == kFromRoute)
+    if (GetPrevHookType() == DHT_MainMenuHook)
     {
       GetRouteData();
+      SetTitle("路线规划");
+    }
+    else
+    {
+      SetTitle("编辑路线");
     }
     InitButtonState();
     m_planMethod = CRouteWrapper::Get().GetMethod();
@@ -568,6 +575,12 @@ short CAdjustRouteHook::MouseUp(CGeoPoint<short> &scrPoint)
       if (IsNeedRefresh(m_saveLineBtnCtrl))
       {
         m_saveLineBtnCtrl.MouseUp();
+        CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(DHT_EditSwitchHook));
+        if (editSwitch)
+        {
+          editSwitch->SetEditCallBackFun(this, "编辑名称", "", &CAdjustRouteHook::OnSaveJourneyData);
+          TurnTo(editSwitch->GetCurEditHookType());
+        }
       }
     }
     break;
@@ -608,10 +621,11 @@ void CAdjustRouteHook::AddPOIData( const POIItem& poi )
   }
 }
 
-void CAdjustRouteHook::SetPOIDataList( const POIDataList& poiList )
+void CAdjustRouteHook::SetPOIDataList( const POIDataList& poiList, const int dataIndex)
 {
   m_POIList.clear();
   m_dataFrom = kFromOutside;
+  m_dataIndex = dataIndex;
   POIDataList::const_iterator iter = poiList.begin();
   for (; iter != poiList.end(); ++iter)
   {
@@ -621,7 +635,6 @@ void CAdjustRouteHook::SetPOIDataList( const POIDataList& poiList )
 
 void CAdjustRouteHook::InsertPOIData( int position, const UeQuery::SQLRecord* data )
 { 
-  m_dataFrom = kFromOutside;
   //在指定位置添加数据,超过最大数目后不允许再添加
   if (m_POIList.size() >= 6)
   {
@@ -793,6 +806,7 @@ void UeGui::CAdjustRouteHook::GetRouteData()
 {
   CRouteWrapper &routeWrapper = CRouteWrapper::Get();
   m_POIList.clear();
+  m_dataFrom = kFromRoute;
   //获取起点
   POIItem startPos;
   startPos.m_type = UeRoute::PT_Start;
@@ -1175,3 +1189,42 @@ void CAdjustRouteHook::InitButtonState()
     m_saveLineBtnCtrl.SetEnable(true);
   }
 }
+
+void CAdjustRouteHook::OnSaveJourneyData(void *pDoCallBackObj, const char* journeyName)
+{
+  CAdjustRouteHook* hook = static_cast<CAdjustRouteHook*>(pDoCallBackObj);
+  if (hook)
+  {
+    hook->DoSaveJourneyData(journeyName);
+  }
+}
+
+void CAdjustRouteHook::DoSaveJourneyData(const char *journeyName)
+{
+  if (m_dataFrom == kFromOutside)
+  {
+    CMessageDialogEvent dialogEvent(this, DHT_MyJourneyHook);
+    if (CUserDataWrapper::Get().EditJourneyData(m_dataIndex, journeyName, m_planMethod, m_POIList))
+    {
+      CMessageDialogHook::ShowMessageDialog(MB_NONE, "修改成功", dialogEvent);
+      ::Sleep(1000);
+    }
+    CMessageDialogHook::CloseMessageDialog(DHT_MyJourneyHook);
+  }
+  else
+  {
+    CMessageDialogEvent dialogEvent(this, DHT_AdjustRouteHook);
+    if (CUserDataWrapper::Get().AddJourneyData(journeyName, m_planMethod, m_POIList))
+    {
+      CMessageDialogHook::ShowMessageDialog(MB_NONE, "保存成功", dialogEvent);
+      ::Sleep(1000);
+    }    
+    else
+    {
+      CMessageDialogHook::ShowMessageDialog(MB_NONE, "保存失败，检查我的行程的容量", dialogEvent);
+      ::Sleep(1000);
+    }
+    CMessageDialogHook::CloseMessageDialog();
+  }
+}
+

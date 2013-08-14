@@ -68,6 +68,10 @@ short CViewImpl::CCrossAssist::m_lastSndOrder1 = -1;
 short CViewImpl::CCrossAssist::m_lastSndOrder2 = -1;
 short CViewImpl::CCrossAssist::m_lastSndOrder3 = -1;
 
+//Test
+static bool isFristTimeInCross = true;
+static double s_angle = 0.0;
+
 /**
 *
 */
@@ -2227,11 +2231,13 @@ void CViewImpl::Update(short type)
         else if (IsNeedShowEagle())
         {
           ShowEagle(curView, type);
+          isFristTimeInCross = true;
         }
         else
         {
           // 返回全屏模式
           curView = ZoomInFull(curView, dirInfo);
+          isFristTimeInCross = true;
           IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
           if (!curView)
           {
@@ -2242,11 +2248,13 @@ void CViewImpl::Update(short type)
       else if (IsNeedShowEagle())
       {
         m_needShowGuidanceView = true;
+        isFristTimeInCross = true;
         ShowEagle(curView, type);
       }
       else
       {
         m_needShowGuidanceView = true;
+        isFristTimeInCross = true;
         // 返回全屏模式
         curView = ZoomInFull(curView, dirInfo);
         IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
@@ -2414,8 +2422,16 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
           start.m_y = dirInfo.m_curPos.m_y;
           end.m_x = basePos.m_x;
           end.m_y = basePos.m_y;
-          double angle = CVectOP<double>::Angle(start, end);
-          mapLayout.m_angle = TWOPI + HALFPI - angle;
+          if (isFristTimeInCross)
+          {
+            double angle = CVectOP<double>::Angle(start, end);
+            mapLayout.m_angle = TWOPI + HALFPI - angle;
+            s_angle = mapLayout.m_angle; 
+          }
+          else
+          {
+            mapLayout.m_angle = s_angle;
+          }
           //mapLayout的比例尺，与取的路网等数据有关
           mapLayout.m_scale = curView->m_scales[1];  
           guidanceView->SetMapLayout(mapLayout);
@@ -2426,6 +2442,8 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
           CGuidanceView::m_curIndicator = dirInfo.m_curIndicator;
           guidanceView->m_curScaleLevel = 1; //路口放大图的比例尺
 
+          //Test
+          isFristTimeInCross = false;
         }
         //else
         //{

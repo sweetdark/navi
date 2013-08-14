@@ -13,6 +13,7 @@
 //#include "uicheckbutton.h"
 
 #define INPUTCODENUM 26
+#define MAXWORDNUM 20
 
 namespace UeGui
 {
@@ -104,6 +105,8 @@ namespace UeGui
     void ClearKeyWord(void);
     void SetCursorPosX(int curIndex);
 
+    void ShowKeyWord();
+
   private:
     static void DistSwitchCallBack(void *pDoCallBackObj, const SQLRecord *pResult);
 
@@ -141,8 +144,17 @@ namespace UeGui
     char m_poiKeyWord[128];
     //保存搜索区域用的关键字
     char m_distKeyWord[128];
+
     //关键字过长显示不全时, 标识从第几个字开始显示
     int m_wordPosOffset;
+    //用于保存截取后用于显示的字符串
+    tstring m_cutKeyWords;
+    //记录关键字输入框的原始位置
+    int m_orinBoxPos;
+    //光标可以移动到的最后位置
+    int m_limitPoxX;
+    //记录当前是否显示完整的关键字
+    bool m_isShowFullKeyWords;
   };
 }
 #endif

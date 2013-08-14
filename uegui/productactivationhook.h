@@ -22,6 +22,8 @@ namespace UeGui
       ProduceActivation_Background,
       ProduceActivation_Title,
       ProduceActivation_Cancel,
+      ProduceActivation_Cancel_qu,
+      ProduceActivation_Cancel_xiao,
       ProduceActivation_VersionLabel,
       ProduceActivation_VersionCode,
       ProduceActivation_SeriesNumberLabel,
@@ -52,6 +54,8 @@ namespace UeGui
       ProduceActivation_InputCode16,
       ProduceActivation_DeleteChar,
       ProduceActivation_Activation,
+      ProduceActivation_Activation_an,
+      ProduceActivation_Activation_zhuang,
       ProduceActivation_End
     };
 

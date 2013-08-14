@@ -49,6 +49,7 @@ void CInputHandHook::Init()
   ::memset(m_distKeyWord, 0x00, sizeof(m_distKeyWord));
   CQueryWrapper::Get().SetQueryMode(UeQuery::IndexType::IT_PoiName);
   m_iCurCursorIndex = 0;
+  m_wordPosOffset = 0;
   m_vecWordPosX.clear();
   m_vecWordPosX.push_back(m_keyWordBox.GetLabelElement()->m_startX-2);
 }
@@ -75,13 +76,15 @@ void CInputHandHook::UnLoad()
   {
     return;
   }
+  TCHAR uniText[512];
+  ::_tcscpy(uniText,m_tstrKeyWords.c_str());
   if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
   {
-    ::memcpy(m_distKeyWord, m_keyWordBox.GetCaption(), sizeof(m_distKeyWord));
+    m_stringBasic.Chs2Ascii(uniText,m_distKeyWord,MAXELEMENTNAME);
   }
   else
   {
-    ::memcpy(m_poiKeyWord, m_keyWordBox.GetCaption(), sizeof(m_poiKeyWord));
+    m_stringBasic.Chs2Ascii(uniText,m_poiKeyWord,MAXELEMENTNAME);
   }
 
   m_isNewChar = true;
@@ -145,6 +148,8 @@ void CInputHandHook::MakeControls()
   m_editSelectBtn.SetIconElement(GetGuiElement(InputHandHook_EditSelectBtnIcon));
 
   m_keyWordBox.SetLabelElement(GetGuiElement(InputHandHook_KeyWordBox));
+  m_orinBoxPos = m_keyWordBox.GetLabelElement()->m_startX;
+  m_limitPoxX = m_keyWordBox.GetLabelElement()->m_startX+m_keyWordBox.GetLabelElement()->m_width-5;
 
   m_otherSearchBtn.SetCenterElement(GetGuiElement(InputHandHook_OtherSearchBtn));
   m_otherSearchBtn.SetIconElement(GetGuiElement(InputHandHook_OtherSearchIcon));
@@ -394,16 +399,18 @@ short CInputHandHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_searchBtn.MouseUp();
       if (m_searchBtn.IsEnable())
       {
+        TCHAR uniText[512];
+        ::_tcscpy(uniText,m_tstrKeyWords.c_str());
         if (CQueryWrapper::Get().GetSQLSentence().m_indexType == UeQuery::IT_CityName)
         {
-          ::memcpy(m_distKeyWord, m_keyWordBox.GetCaption(), sizeof(m_distKeyWord));
+          m_stringBasic.Chs2Ascii(uniText,m_distKeyWord,MAXELEMENTNAME);
           CQueryWrapper::Get().SetQueryKeyword(m_distKeyWord);
           CQueryWrapper::Get().SaveCurKeyWord(m_distKeyWord, false);
           CAggHook::TurnTo(DHT_DistQueryListHook);
         }
         else
         {
-          ::memcpy(m_poiKeyWord, m_keyWordBox.GetCaption(), sizeof(m_poiKeyWord));
+          m_stringBasic.Chs2Ascii(uniText,m_poiKeyWord,MAXELEMENTNAME);
           CQueryWrapper::Get().SetQueryKeyword(m_poiKeyWord);
           CQueryWrapper::Get().SaveCurKeyWord(m_poiKeyWord, false);
           CAggHook::TurnTo(DHT_PoiQueryListHook);
@@ -467,8 +474,15 @@ short CInputHandHook::MouseUp(CGeoPoint<short> &scrPoint)
       }
       if (curIndex!=m_iCurCursorIndex)
       {
-        SetCursorPosX(curIndex);
-        m_isIdentify = false;
+        if (curIndex == 0 && !m_isShowFullKeyWords)
+        {
+          break;
+        }
+        else
+        {
+          SetCursorPosX(curIndex);
+          m_isIdentify = false;
+        }
       }
     }
     break;
@@ -486,8 +500,11 @@ short CInputHandHook::MouseUp(CGeoPoint<short> &scrPoint)
       }
       else
       {
-        AddOneKeyWord(m_inputCode[tempcode].GetCaption());
-        GetAssociateThing();
+        if (m_tstrKeyWords.length() < MAXWORDNUM)
+        {
+          AddOneKeyWord(m_inputCode[tempcode].GetCaption());
+          GetAssociateThing();
+        }
       }
       break;
     }
@@ -527,31 +544,8 @@ bool CInputHandHook::EraseOneKeyWord(void)
   if (m_iCurCursorIndex)
   {
     -- m_iCurCursorIndex;
-    m_vecWordPosX.clear();
-    //
     m_tstrKeyWords.erase(m_iCurCursorIndex,1);
-    //
-    m_vecWordPosX.push_back(m_keyWordBox.GetLabelElement()->m_startX-2);
-    //
-    UeMap::CViewCanvas *aggCanvas(UeMap::CViewCanvas::GetCanvas(UeMap::CT_AGG));
-    //
-    for (short i(0),cursorPosX(m_keyWordBox.GetLabelElement()->m_startX); i!=m_tstrKeyWords.size(); ++i)
-    {
-      aggCanvas->GetCurCursorPos(m_keyWordBox.GetLabelElement()->m_textStyle,m_tstrKeyWords[i],
-        cursorPosX);
-      m_vecWordPosX.push_back(cursorPosX-2);
-    }
-    //
-    SetCursorPosX(m_iCurCursorIndex);
-    //
-    TCHAR uniText[512];
-    ::_tcscpy(uniText,m_tstrKeyWords.c_str());
-    m_stringBasic.Chs2Ascii(uniText,m_keyWordBox.GetLabelElement()->m_label,MAXELEMENTNAME);
-    //
-    if (m_tstrKeyWords.size()<1)
-    {
-      m_searchBtn.SetEnable(false);
-    }
+    ShowKeyWord();
   }
   return m_tstrKeyWords.size();
 }
@@ -566,33 +560,8 @@ bool CInputHandHook::AddOneKeyWord(const char *pchLabelText)
 }
 bool CInputHandHook::doAddOneKeyWord(TCHAR oneWord)
 {
-  UeMap::CViewCanvas *aggCanvas(UeMap::CViewCanvas::GetCanvas(UeMap::CT_AGG));
-  {
-    short sCursorPosX(*(m_vecWordPosX.rbegin()));
-    //
-    aggCanvas->GetCurCursorPos(m_keyWordBox.GetLabelElement()->m_textStyle,oneWord,sCursorPosX);
-    //
-    if (sCursorPosX>(m_keyWordBox.GetLabelElement()->m_startX+m_keyWordBox.GetLabelElement()->m_width-5))
-    {
-      return false;
-    }
-  }
   m_tstrKeyWords.insert(m_iCurCursorIndex++,1,oneWord);
-  //
-  m_vecWordPosX.clear();
-  m_vecWordPosX.push_back(m_keyWordBox.GetLabelElement()->m_startX-2);
-  for (short i(0),cursorPosX(m_keyWordBox.GetLabelElement()->m_startX); i!=m_tstrKeyWords.size(); ++i)
-  {
-    aggCanvas->GetCurCursorPos(m_keyWordBox.GetLabelElement()->m_textStyle,m_tstrKeyWords[i],cursorPosX);
-    m_vecWordPosX.push_back(cursorPosX-2);
-  }
-  m_searchBtn.SetEnable(m_tstrKeyWords.size()>0);
-  //
-  SetCursorPosX(m_iCurCursorIndex);
-  //
-  TCHAR uniText[512];
-  ::_tcscpy(uniText,m_tstrKeyWords.c_str());
-  m_stringBasic.Chs2Ascii(uniText,m_keyWordBox.GetLabelElement()->m_label,MAXELEMENTNAME);
+  ShowKeyWord();
   return true;
 }
 
@@ -602,8 +571,10 @@ void CInputHandHook::ClearKeyWord(void)
   //
   m_searchBtn.SetEnable(false);
   //
+  m_iCurCursorIndex = 0;
+  m_wordPosOffset = 0;
   m_vecWordPosX.clear();
-  m_vecWordPosX.push_back(m_keyWordBox.GetLabelElement()->m_startX-2);
+  m_vecWordPosX.push_back(m_orinBoxPos);
   //
   SetCursorPosX(0);
   m_tstrKeyWords.clear();
@@ -627,9 +598,57 @@ void CInputHandHook::ResetKeyWord(const char *pchKeyWord)
 
 void CInputHandHook::SetCursorPosX(int curIndex)
 {
-  m_iCurCursorIndex = curIndex;
+  m_iCurCursorIndex = curIndex + m_wordPosOffset;
   m_deleteBtn.SetEnable(curIndex);
   m_pWordCursor->m_startX = m_vecWordPosX[curIndex];
+}
+
+void CInputHandHook::ShowKeyWord()
+{
+  UeMap::CViewCanvas *aggCanvas(UeMap::CViewCanvas::GetCanvas(UeMap::CT_AGG));
+  //先记录完整关键字的光标
+  m_wordPosOffset = 0;
+  m_keyWordBox.GetLabelElement()->m_startX = m_orinBoxPos;
+  m_vecWordPosX.clear();
+  m_vecWordPosX.push_back(m_orinBoxPos);
+  for (short i(0),cursorPosX(m_orinBoxPos); i!=m_tstrKeyWords.size(); ++i)
+  {
+    aggCanvas->GetCurCursorPos(m_keyWordBox.GetLabelElement()->m_textStyle,m_tstrKeyWords[i],cursorPosX);
+    m_vecWordPosX.push_back(cursorPosX);
+  }
+  //如果最后一个光标位置超出输入框则不显示完整关键字
+  int beyondPosX = *(m_vecWordPosX.rbegin()) - m_limitPoxX;
+  if (beyondPosX>0)
+  {
+    for (int i=0; i!=m_vecWordPosX.size(); i++)
+    {
+      m_vecWordPosX[i] -= beyondPosX;
+    }
+    while (*(m_vecWordPosX.begin()) < m_orinBoxPos)
+    {
+      m_wordPosOffset++;
+      m_vecWordPosX.erase(m_vecWordPosX.begin());
+    }
+    m_cutKeyWords = m_tstrKeyWords.substr(m_wordPosOffset, m_tstrKeyWords.length()-m_wordPosOffset);
+    m_keyWordBox.GetLabelElement()->m_startX = m_vecWordPosX[0] + 2;
+  }
+  //
+  SetCursorPosX(m_iCurCursorIndex-m_wordPosOffset);
+  //
+  m_searchBtn.SetEnable(m_tstrKeyWords.size()>0);
+  //
+  TCHAR uniText[512];
+  if (m_wordPosOffset == 0)
+  {
+    m_isShowFullKeyWords = true;
+    ::_tcscpy(uniText,m_tstrKeyWords.c_str());
+  }
+  else
+  {
+    m_isShowFullKeyWords = false;
+    ::_tcscpy(uniText,m_cutKeyWords.c_str());
+  }
+  m_stringBasic.Chs2Ascii(uniText,m_keyWordBox.GetLabelElement()->m_label,MAXELEMENTNAME);
 }
 
 bool CInputHandHook::GetAssociateThing()
@@ -740,8 +759,11 @@ void CInputHandHook::DoHandWriting(int curTime)
         SetAssociateBtnLabels();
         if (iWordNum!=0)
         {
-          AddOneKeyWord(m_inputCode[0].GetCaption());
-          m_isIdentify = true;
+          if (m_tstrKeyWords.length() < MAXWORDNUM)
+          {
+            AddOneKeyWord(m_inputCode[0].GetCaption());
+            m_isIdentify = true;
+          }
         }
         delete[] pusWordBuf;
       }

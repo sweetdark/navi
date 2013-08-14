@@ -814,7 +814,7 @@ void CAGGView::QuickDraw(bool isRaster, bool isTransforming)
     stackDC.RedrawBackGround(m_canvas.m_setting.m_bkColor);
     short scaleLevel = 0;
     int scaleValue = 0;
-    m_viewImpl->GetScale(scaleLevel, scaleValue);
+    GetScale(scaleLevel, scaleValue);
     m_canvas.RenderBasic(scaleLevel, isRaster, (m_pspVarious != 0.), true);
     m_canvas.RenderFlags(m_skyLimit, scaleLevel, isRaster, (m_pspVarious != 0.));
     
@@ -928,7 +928,7 @@ void CAGGView::OnDraw(short style)
         //
         short scaleLevel = 0;
         int scaleValue = 0;
-        m_viewImpl->GetScale(scaleLevel, scaleValue);
+        GetScale(scaleLevel, scaleValue);
 
         // In order to get the whole CHINA map
         double baseCoff = GetZoomCoff();
@@ -989,7 +989,7 @@ void CAGGView::OnDraw(short style)
               CGroundLayer::m_isSpecialArea = false;
               short scaleLevel = 0;
               int scaleValue = 0;
-              m_viewImpl->GetScale(scaleLevel, scaleValue);
+              GetScale(scaleLevel, scaleValue);
               m_viewImpl->MainState()->ZoomOut(8 - scaleLevel, 0); //·Å´óµ½5km
               m_viewImpl->Refresh();
               return;

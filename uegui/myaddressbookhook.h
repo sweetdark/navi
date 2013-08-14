@@ -145,6 +145,10 @@ namespace UeGui
 
     void GoToMapPosition(int n);
 
+    void ExportAddrbook();
+
+    void ImportAddrbook();
+
   private:
     //清空所有数据事件
     static void OnCleanAllRecord(CAggHook* sender, ModalResultType modalResult);

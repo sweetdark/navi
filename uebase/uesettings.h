@@ -410,7 +410,7 @@ namespace UeBase
     unsigned int m_fixedGpsBaud;
 
     //该参数移到VoiceSettings里面
-    unsigned int m_voice;//音量百分比
+    unsigned int m_voice;//音量值0-0xFFFFFFFF
     unsigned int m_fixedVoice;    
 
     //-------------------------
@@ -429,7 +429,7 @@ namespace UeBase
     * \brief 默认构造函数
     */
     SystemSettings() : m_gpsStartMode(SM_Cold), m_fixedStartMode(SM_Cold), m_gpsPort(0), m_fixedGpsPort(0), 
-      m_gpsBaud(0), m_fixedGpsBaud(0), m_voice(5), m_fixedVoice(5),
+      m_gpsBaud(0), m_fixedGpsBaud(0), m_voice(0x7FFFFFFF), m_fixedVoice(0x7FFFFFFF),
       m_language(0), m_carIcon(DefaultCarIcon), m_3DCarIcon(Default3DCarIcon), m_loudspeaker(1), m_voicePrompt(OS_ON), m_timeCalibration(OS_ON),
       m_startStatement(OS_ON)
     {
@@ -444,8 +444,8 @@ namespace UeBase
       m_gpsStartMode = 3;
       m_gpsPort = 0;
       m_gpsBaud = 0;
-      m_voice = 5;
-      m_fixedVoice = 5;
+      m_voice = 0x7FFFFFFF;
+      m_fixedVoice = 0x7FFFFFFF;
       m_loudspeaker = 1;
       m_voicePrompt = OS_ON;
       m_language = 0;

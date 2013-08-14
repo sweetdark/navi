@@ -685,6 +685,10 @@ namespace UeMap
     * \brief 设置鹰眼图是否打开
     */
     void SetEagleState(bool isEagleOn);
+    /**
+    * \brief 获取地图视图  
+    */
+    CViewState *GetMapView();
   private:
     // one view implementation against different OS(s)
     CViewImpl *m_viewImpl;

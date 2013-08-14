@@ -753,6 +753,8 @@ namespace UeMap
     unsigned int GetLayerSize(short scaleLevel);
 
     void SetEagleState(bool isEagleOn);
+
+    CViewState *GetMapView();
   protected:
     /**
     * 开始显示系统加载进度
@@ -856,7 +858,6 @@ namespace UeMap
 
     void SetFullViewPort(CViewState *curView);
 
-    CViewState *GetMapView();
     
     void InitGuiState();
   protected:

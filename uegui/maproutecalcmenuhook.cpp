@@ -242,7 +242,7 @@ short CMapRouteCalcMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
       needRefresh = true;
       m_button2.MouseUp();
       //切换到调整路线页面
-      //TurnTo(DHT_AdjustRouteHook);
+      TurnTo(DHT_AdjustRouteHook);
     }
     break;
   case MapRouteCalcMenuHook_Button3:

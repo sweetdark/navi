@@ -33,63 +33,43 @@ void UeGui::CRouteWrapper::GetPassedRouteList( RouteList& routeList )
   routeList.clear();
   if (m_route)
   {
-    GuidanceStatus dirInfo;
-    //获取当前车的位置的导航信息
-    m_route->GetCurrent(dirInfo);
-    int curPair = dirInfo.m_curPair;
-    //有多个经由点，就有多段
-    int totalPairs = m_route->GetPairs();
-    for (; curPair < totalPairs; curPair++)
+    int total = m_route->GetRoute()->GetIndicatorNum(0);
+    UeRoute::GuidanceIndicator *curIndicator = NULL;
+    for (int i = total - 1; i >= 0; --i)
     {
-      int total = (curPair == dirInfo.m_curPair) ? dirInfo.m_curIndicator : (m_route->GetIndicatorNum(curPair) - 1);
-      for (int i = total; i >= 0; i--)
+      curIndicator = m_route->GetRoute()->GetIndicator(0, i);
+      if (curIndicator)
       {
-        UeRoute::GuidanceIndicator *curIndicator = NULL;
-
-        curIndicator = m_route->GetRoute()->GetIndicator(curPair, i);
-        if (curIndicator)
+        RouteInfo routeInfo;
+        routeInfo.m_mileages = curIndicator->m_curDist;
+        routeInfo.m_direction = curIndicator->m_snd.m_dirCode;
+        routeInfo.m_parcelIdx = curIndicator->m_parcelIdx;
+        routeInfo.m_linkIdx = curIndicator->m_linkIdx;
+        routeInfo.m_begin = i;
+        routeInfo.m_end = i;
+        if (curIndicator->m_vtxs)
         {
-          RouteInfo routeInfo;
-          if (i == total)  //第一条取剩下的路程。
-          {
-            routeInfo.m_mileages = GetCurIndicatorLeftDist(dirInfo);
-          }
-          else
-          {
-            routeInfo.m_mileages = curIndicator->m_curDist;
-          }
-          routeInfo.m_direction = curIndicator->m_snd.m_dirCode;
-          routeInfo.m_parcelIdx = curIndicator->m_parcelIdx;
-          routeInfo.m_linkIdx = curIndicator->m_linkIdx;
-          routeInfo.m_begin = i;
-          routeInfo.m_end = i;
-          if (curIndicator->m_vtxs)
-          {
-            routeInfo.m_point.m_x = curIndicator->m_vtxs[0].m_x;
-            routeInfo.m_point.m_y = curIndicator->m_vtxs[0].m_y;
-          }
-          //读取道路名称
-          char* name = 0;
-          short length = 0;      
-          if(curIndicator->m_nameOffset > 0)
-          {
-            if (m_net)
-            {
-              m_net->GetNetwork()->GetNameTable(UeModel::UNT_Network)->GetContent(curIndicator->m_nameOffset, &name, length);
-            }
-            // 仅显示中文
-            unsigned char chLen = name[0];
-            name++;
-            name[chLen] = 0;   
-          }
-          else
-          {
-            //一般道路
-            name = "一般道路";
-          } 
-          ::strcpy(routeInfo.m_routeName, name);
-          routeList.push_back(routeInfo);
+          routeInfo.m_point.m_x = curIndicator->m_vtxs[0].m_x;
+          routeInfo.m_point.m_y = curIndicator->m_vtxs[0].m_y;
         }
+        //读取道路名称
+        char* name = 0;
+        short length = 0;      
+        if(curIndicator->m_nameOffset > 0)
+        {
+          m_net->GetNetwork()->GetNameTable(UeModel::UNT_Network)->GetContent(curIndicator->m_nameOffset, &name, length);
+          // 仅显示中文
+          unsigned char chLen = name[0];
+          name++;
+          name[chLen] = 0;   
+        }
+        else
+        {
+          //一般道路
+          name = "一般道路";
+        } 
+        ::strcpy(routeInfo.m_routeName, name);
+        routeList.push_back(routeInfo);
       }
     }
   }
@@ -565,6 +545,67 @@ bool UeGui::CRouteWrapper::GetRoadName( int offset, char *roadName )
       ::strcpy(roadName, "一般道路");
     }
     return true;
+  }
+  return false;
+}
+
+bool UeGui::CRouteWrapper::GetHighwayOutlets( HighwayOutletList &dataList )
+{
+  if (NULL == m_route)
+  {
+    return false;
+  }
+  dataList.clear();
+  // 默认读取3个出口信息  
+  int defaulCount = 3;
+  int blockSize = sizeof(unsigned int) + UeRoute::eSideEntry::MAXSIDEPROPLENGTH;
+  CMemVector outlets(blockSize, defaulCount);
+  if (m_route->GetHighwayOutlets(outlets))
+  {
+    HighwayOutlet outletData;
+    char *outlet = (char*)outlets.GetHead();
+    // 高速路出口类型
+    unsigned char type = -1;
+    unsigned short readSize = 0;
+    int  count = outlets.GetCount();
+    for(int i = 0; i < count; ++i)
+    {
+      //清空数据
+      ::memset(&outletData, 0, sizeof(HighwayOutlet));
+      // 获取提示信息
+      readSize = sizeof(unsigned int);
+      ::memcpy(&outletData.m_distance, outlet, readSize);
+      outlet += readSize;
+      readSize = sizeof(char);
+      ::memcpy(&type, outlet, readSize);
+      outlet += readSize;
+      readSize = UeRoute::eSideEntry::MAXSIDEPROPLENGTH - 1;
+      ::memcpy(outletData.m_name, outlet, readSize);
+      outlet += readSize;
+
+      if(type == 0x00)
+      {
+        // 高速出口提示
+        ::strcpy(outletData.m_typeName, "高速出口");
+      }
+      else if(type == 0x01)
+      {
+        // 服务区
+        ::strcpy(outletData.m_name, "服务区");
+        ::strcpy(outletData.m_typeName, "服务区");
+      }
+      else if(type == 0x02)
+      {
+        // 收费站
+        ::strcpy(outletData.m_name, "收费站");
+        ::strcpy(outletData.m_typeName, "收费站");
+      }
+      dataList.push_back(outletData);
+    }
+    if (dataList.size() > 0)
+    {
+      return true;
+    }
   }
   return false;
 }

@@ -557,15 +557,15 @@ void UeGui::CSettingWrapper::SetIsLoudSpeakerMute( bool value )
   else
   {
     m_systemSettings.m_loudspeaker = 1;
-    unsigned long ratioVol = MAX_SYS_VOLUME / MAX_VOLUME;
-    unsigned long volume = m_systemSettings.m_voice * ratioVol;
-    ::waveOutSetVolume(0, volume);
+    ::waveOutSetVolume(0, m_systemSettings.m_voice);
   }   
 }
 
 unsigned short UeGui::CSettingWrapper::GetVoice()
 {
-  return m_systemSettings.m_voice;
+  //将系统音量转成百分比
+  unsigned short volume = MAX_VOLUME * (m_systemSettings.m_voice / (double)MAX_SYS_VOLUME);
+  return volume;
 }
 
 void UeGui::CSettingWrapper::SetVoice( unsigned short value )
@@ -574,12 +574,12 @@ void UeGui::CSettingWrapper::SetVoice( unsigned short value )
   if (value > MAX_VOLUME)
   {
     ::waveOutSetVolume(0, MAX_SYS_VOLUME);
-    m_systemSettings.m_voice = MAX_VOLUME;
+    m_systemSettings.m_voice = MAX_SYS_VOLUME;
   } 
-  unsigned long ratioVol = MAX_SYS_VOLUME / MAX_VOLUME;
+  unsigned long ratioVol = MAX_SYS_VOLUME / (double)MAX_VOLUME;
   unsigned long volume = value * ratioVol;
   ::waveOutSetVolume(0, volume);
-  m_systemSettings.m_voice = value;
+  m_systemSettings.m_voice = volume;
 }
 
 unsigned char UeGui::CSettingWrapper::GetVoicePrompt()

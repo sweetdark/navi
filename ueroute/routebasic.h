@@ -1069,6 +1069,10 @@ namespace UeRoute
     /// 跨行政区
     IVT_CrossAdmin,
     IVT_SideInfo,
+    /// 路径规划成功
+    IVT_RoutePlanSuccess,
+    /// 路径规划失败
+    IVT_RoutePlanFail,
     IVT_Maximum
   };
 

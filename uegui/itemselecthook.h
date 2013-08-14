@@ -38,7 +38,23 @@ namespace UeGui
       ItemSelectHook_Line1,
       ItemSelectHook_Line2,
       ItemSelectHook_Line3,
+      ItemSelectHook_Position1,
+      ItemSelectHook_Position2,
       ItemSelectHook_End
+    };
+    
+    struct Coordinate 
+    {
+      short x;
+      short y;
+      Coordinate() : x(0), y(0) {}
+    };
+
+    //默认的窗口对话框坐标
+    enum DFTDlgCoordinateIndex
+    {
+      DFT_Coordinate1, //窗口在中间
+      DFT_Coordinate2  //窗口在左边
     };
 
     enum ItemType
@@ -71,9 +87,20 @@ namespace UeGui
     virtual bool operator ()();
 
     /*
+    * 设置对话框坐标为默认值
+    */
+    void SetDlgCoordinateDefault(DFTDlgCoordinateIndex index);
+
+    /*
+    * 设置对话框坐标
+    */
+    void SetDlgCoordinate(unsigned short x, unsigned short y);
+
+    /*
     * 设置选择事件
     */
     void SetSelectEvent(CAggHook* senderHook, ItemSelectEvent selectEvent, const ItemInfoList& itemInfoList);
+
   protected:
     virtual tstring GetBinaryFileName();
 
@@ -100,8 +127,15 @@ namespace UeGui
     CUiButton m_item4;
     CUiButton m_item4_Icon;
   private:
+    //调用hook
     CAggHook* m_senderHook;
+    //回调事件
     ItemSelectEvent m_itemSelectEvent;
+    //初始界面各元素坐标
+    Coordinate m_coordinates[ItemSelectHook_End];
+    //初始对话框默认坐标
+    Coordinate m_dlgDefaultCoordinate1;
+    Coordinate m_dlgDefaultCoordinate2;
   };
 }
 #endif

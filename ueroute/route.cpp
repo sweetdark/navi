@@ -1005,6 +1005,15 @@ unsigned int IRoute::RoutePlan(bool isPlayVoice)
 
     Prepare();
     Notify(ST_RenderPathes);
+
+    if (isPlayVoice && m_guider)
+    {
+      UeRoute::UeSound snd;
+      snd.m_count = 0;
+      snd.m_priority = 0;
+      snd.Add(IVT_RoutePlanFail);
+      m_guider->PlayVoice(snd);
+    }
     return rt;
   }
 
@@ -1016,6 +1025,14 @@ unsigned int IRoute::RoutePlan(bool isPlayVoice)
   {
     m_planState = PS_None;
     Notify(ST_RenderPathes);
+    if (isPlayVoice && m_guider)
+    {
+      UeRoute::UeSound snd;
+      snd.m_count = 0;
+      snd.m_priority = 0;
+      snd.Add(IVT_RoutePlanFail);
+      m_guider->PlayVoice(snd);
+    }
     return rt;
   }
 
@@ -1031,7 +1048,14 @@ unsigned int IRoute::RoutePlan(bool isPlayVoice)
   {
     m_planState = PS_Ready;
   }
-
+  if (isPlayVoice && m_guider)
+  {
+    UeRoute::UeSound snd;
+    snd.m_count = 0;
+    snd.m_priority = 0;
+    snd.Add(IVT_RoutePlanSuccess);
+    m_guider->PlayVoice(snd);
+  }
   SyncPositionTime();
   Notify(ST_RenderPathes);
   return PEC_Success;
