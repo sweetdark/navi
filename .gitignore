@@ -30,6 +30,7 @@
 *.tlh
 *.tmp
 *.vspscc
+tags
 .builds
 *.dotCover
 
