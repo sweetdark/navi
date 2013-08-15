@@ -154,6 +154,7 @@ short COperationHelpHook::MouseUp(CGeoPoint<short> &scrPoint)
   case OperationHelpHook_FastBack:
     {
       m_fastBackCtrl.MouseUp();
+      TurnTo(DHT_FastHandleHelpHook);
     }
     break;
   case OperationHelpHook_FunctionBtn:
@@ -161,6 +162,10 @@ short COperationHelpHook::MouseUp(CGeoPoint<short> &scrPoint)
   case  OperationHelpHook_FunctionBack:
     {
       m_functionBackCtrl.MouseUp();
+      if (ctrlType == m_downElementType)
+      {
+        TurnTo(DHT_BasicFunctionHook);
+      }
     }
     break;
   case OperationHelpHook_MapNavigationBtn:
@@ -168,6 +173,10 @@ short COperationHelpHook::MouseUp(CGeoPoint<short> &scrPoint)
   case OperationHelpHook_MapNavigationBack:
     {
       m_mapNavigationBackCtrl.MouseUp();
+      if (ctrlType = m_downElementType)
+      {
+        TurnTo(DHT_MapNavigationHook);
+      }
     }
     break;
   case OperationHelpHook_MapScanBtn:
@@ -175,6 +184,10 @@ short COperationHelpHook::MouseUp(CGeoPoint<short> &scrPoint)
   case OperationHelpHook_MapScanBack:
     {
       m_mapScanBackCtrl.MouseUp();
+      if (ctrlType == m_downElementType)
+      {
+        TurnTo(DHT_MapScanHook);
+      }
     }
     break;
   case OperationHelpHook_ServiceBtn:
@@ -182,13 +195,16 @@ short COperationHelpHook::MouseUp(CGeoPoint<short> &scrPoint)
   case OperationHelpHook_ServiceBack:
     {
       m_serviceBackCtrl.MouseUp();
+      if (ctrlType == m_downElementType)
+      {
+        TurnTo(DHT_DdtServiceHelpHook);
+      }
     }
     break;
   default:
     return CMenuBackgroundHook::MouseUp(scrPoint);
     break;
   }
-
     if (m_isNeedRefesh)
     {
       Refresh();

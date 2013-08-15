@@ -44,6 +44,11 @@ namespace UeGui
     void HideWindow();
 
     /**
+    * 根据屏幕点获取当前点属于那个视图范围内
+    **/
+    unsigned int GetSelectedViewType(const CGeoPoint<short> &scrPoint);
+
+    /**
     * \brief 获取主地图视图
     */
     CViewState* GetMainViewState();

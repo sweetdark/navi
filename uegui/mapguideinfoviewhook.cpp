@@ -315,26 +315,37 @@ void UeGui::CMapGuideInfoViewHook::Update( short type )
     m_routeInfoBtn.SetVisible(false);
     ShowCurGuidanceIcon(false);
     ShowNextGuidanceIcon(false);
+    //隐藏后续路口
+    ShowRouteGuideList(false);
+    //隐藏高速看板
+    HideHightSpeedBoard();
   }
   else if (m_isShowRouteGuideList)
   {
     //如果显示后续路口
+    UpdateRouteGuideInfo(dirInfo);
+    ShowRouteGuideList(true);
     m_routeInfoBtn.SetVisible(false);
     ShowCurGuidanceIcon(false);
     ShowNextGuidanceIcon(false);
-
-    UpdateRouteGuideInfo(dirInfo);
-    ShowRouteGuideList(true);
+    //隐藏高速看板
+    HideHightSpeedBoard();
   }
   else if (m_isShowHightSpeedBoard)
   {
     //如果显示高速看板
+    //更新高速看板
+    UpdateHighSpeedBoard();
     //更新下一道路信息
     UpdateNextRouteInfo(dirInfo);
     //更新方向看板
     UpdateDirectionBoardInfo(dirInfo);
-    ShowNextGuidanceIcon(false);
-    UpdateHighSpeedBoard();
+    //如果高速看板1没有显示则显示下一路口图标
+    if (m_highSpeedBoard1.IsVisible())
+    {
+      //隐藏后续路口
+      ShowNextGuidanceIcon(false);
+    }
   }
   else
   {
@@ -344,8 +355,7 @@ void UeGui::CMapGuideInfoViewHook::Update( short type )
     UpdateNextRouteInfo(dirInfo);
     //更新方向看板
     UpdateDirectionBoardInfo(dirInfo);
-
-    //隐藏方向看板
+    //隐藏后续路口
     ShowRouteGuideList(false);
     //隐藏高速看板
     HideHightSpeedBoard();
@@ -535,6 +545,7 @@ void UeGui::CMapGuideInfoViewHook::UpdateDirectionBoardInfo( const GuidanceStatu
     }
   }
   m_curDirectionBoard.SetCaption(buf);
+
   //显示下一路口方向看板
   if(dirInfo.m_nextOrderForSnd <= 0 || dirInfo.m_nextOrderForSnd >= m_routeWrapper.GetIndicatorNum(dirInfo.m_curPair))
   {
@@ -571,7 +582,9 @@ void UeGui::CMapGuideInfoViewHook::UpdateRouteGuideInfo( const GuidanceStatus& d
       m_routeGuideCurName.SetCaption(roadName);
     }
 
+    bool validData = false;
     int dataIndex = -1;
+    //unsigned char dirCode = 0;
     int curPair = dirInfo.m_curPair;
     int totalPairs = m_routeWrapper.GetPairs();
     float totalDist = dirInfo.m_curDistForSnd;
@@ -592,6 +605,15 @@ void UeGui::CMapGuideInfoViewHook::UpdateRouteGuideInfo( const GuidanceStatus& d
             totalDist += curIndicator->m_curDist;
           }
           else
+          {
+            validData = true;
+          }
+          if (0 == i)
+          {
+            validData = true;
+          }
+
+          if (validData)
           {
             ::memset(roadName, 0, MAX_NAME_LENGTH);
             bool rt = m_routeWrapper.GetRoadName(curIndicator->m_nameOffset, roadName);
@@ -983,20 +1005,8 @@ void UeGui::CMapGuideInfoViewHook::ClearRouteGuideRow( RowItem row )
 
 void UeGui::CMapGuideInfoViewHook::ShowRouteGuideData( RowItem row, int sndCode, const char* roadName, double dist )
 {
-  char buf[128] = {};  
-  if (dist > 1000)
-  {
-    //::sprintf(buf, "%.1f km", dist / 1000);
-    ::sprintf(buf, "%dkm", static_cast<int>(dist / 1000));
-  }
-  else
-  {
-    if (dist < 0)
-    {
-      dist = 0;
-    }
-    ::sprintf(buf, "%dm", static_cast<int>(dist));
-  }
+  char buf[128] = {};
+  m_routeWrapper.FormatDistance(buf, dist);
 
   switch (row)
   {
@@ -1132,11 +1142,14 @@ void UeGui::CMapGuideInfoViewHook::UpdateHighSpeedBoard()
   HighwayOutletList dataList;
   if (m_routeWrapper.GetHighwayOutlets(dataList))
   {
-    for (unsigned short i = HB_One; i < HB_End; ++i)
+    //从第三行开始显示
+    int dataIndex = -1;
+    for (short i = HB_Three; i >= HB_One; --i)
     {
-      if (i < dataList.size())
+      dataIndex++;
+      if (dataIndex < dataList.size())
       {
-        RefreshHighSpeedBoardData((HighSpeedBoardIndex)i, dataList[i]);
+        RefreshHighSpeedBoardData((HighSpeedBoardIndex)i, dataList[dataIndex]);
         ShowHightSpeedBoard((HighSpeedBoardIndex)i, true);
       }
       else
@@ -1154,19 +1167,7 @@ void UeGui::CMapGuideInfoViewHook::UpdateHighSpeedBoard()
 void UeGui::CMapGuideInfoViewHook::RefreshHighSpeedBoardData( HighSpeedBoardIndex boardIndex, const HighwayOutlet& data )
 {
   char buf[32] = {};
-  double distance = data.m_distance;
-  if (distance < 0)
-  {
-    distance = 0;
-  }
-  if(data.m_distance > 1000)
-  {
-    ::sprintf(buf, "%dkm", distance / 1000);
-  }
-  else
-  {       
-    ::sprintf(buf, "%dm", distance);
-  }
+  m_routeWrapper.FormatDistance(buf, data.m_distance);
 
   switch (boardIndex)
   {

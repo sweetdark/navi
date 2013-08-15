@@ -555,6 +555,10 @@ namespace UeGui
     */
     unsigned int DoRoutePlan(PlanType planType);
     /**
+    * \brief 停止导航要处理的事情，包括停止模拟和停止真实导航
+    */
+    void DoStopGuide();
+    /**
     * \brief 添加用户电子眼
     */
     void AddUserEEyeData();

@@ -113,6 +113,7 @@
 #include "roundradiusselecthook.h"
 #include "itemselecthook.h"
 #include "distselecthook.h"
+#include "startuphook.h"
 
 #if __FOR_FPC__
 #include "caphook.h"
@@ -401,17 +402,13 @@ void CGuiImpl::MakeHooks()
   // Initialize hooks
   CViewHook *viewHook = NULL;
 
+  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
+
 #if __FOR_PC__
   CViewHook::m_curHookType = CViewHook::DHT_MapHook;
 #else
   //默认开启启动声明
-  bool isShowLicenseHook = true;
-  CSettingWrapper &settingWrapper = CSettingWrapper::Get();
-  if (UeBase::OS_OFF == settingWrapper.GetIsOpenStartStatement())
-  {
-    isShowLicenseHook= false;
-  }
-  if (isShowLicenseHook)
+  if (UeBase::OS_ON == settingWrapper.GetIsOpenStartStatement())
   {
     CViewHook::m_curHookType = CViewHook::DHT_LicenseHook;
     //如果选择启动声明则加载，否则不加载
@@ -425,7 +422,15 @@ void CGuiImpl::MakeHooks()
     CViewHook::m_curHookType = CViewHook::DHT_MapHook;
   }
 #endif
-
+  //是否开启快捷面板
+  if (UeBase::OS_ON == settingWrapper.GetIsShowShortcutPanel())
+  {    
+    //如果选择启动声明则加载，否则不加载
+    viewHook = new CStartUpHook();
+    viewHook->SetHelpers(net, view, route, gps, query);
+    viewHook->LoadGUI();
+    view->AddHook(CViewHook::DHT_StartUpHook, viewHook);
+  }
   //地图界面
   viewHook = new CMapHook();
   viewHook->SetHelpers(net, view, route, gps, query);

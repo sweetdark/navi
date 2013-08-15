@@ -180,6 +180,7 @@ short CPromptSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
         if (m_highwayLeftCtrl.IsEnable())
         {
           SwitchHWSpeed(false);
+          SaveSetting();
         }
       }
     }
@@ -193,6 +194,7 @@ short CPromptSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
         if (m_highwayRightCtrl.IsEnable())
         {
           SwitchHWSpeed(true);
+          SaveSetting();
         }        
       }
     }
@@ -206,6 +208,7 @@ short CPromptSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
         if (m_nationalWayLeftCtrl.IsEnable())
         {
           SwitchMainSpeed(false);
+          SaveSetting();
         }        
       }
     }
@@ -219,6 +222,7 @@ short CPromptSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
         if (m_nationalWayRightCtrl.IsEnable())
         {
           SwitchMainSpeed(true);
+          SaveSetting();
         }        
       }
     }
@@ -232,6 +236,7 @@ short CPromptSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
         if (m_otherLeftCtrl.IsEnable())
         {
           SwitchOtherSpeed(false);
+          SaveSetting();
         }        
       }
     }
@@ -245,6 +250,7 @@ short CPromptSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
         if (m_otherRightCtrl.IsEnable())
         {
           SwitchOtherSpeed(true);
+          SaveSetting();
         }       
       }
     }
@@ -259,7 +265,6 @@ short CPromptSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
   if (m_isNeedRefesh)
   {
     this->Refresh();
-    SaveSetting();
   }
   m_isNeedRefesh = true;
   return ctrlType;

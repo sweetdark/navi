@@ -336,7 +336,7 @@ short CRouteOperationHook::MouseUp(CGeoPoint<short> &scrPoint)
       m_saveJurneyBtnCtrl.MouseUp();
       GetRouteData();
       CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(DHT_EditSwitchHook));
-      editSwitch->SetEditCallBackFun(this, m_strTitle.c_str(), "", SaveJourneyData);
+      editSwitch->SetEditCallBackFun(this, "±£´æÐÐ³Ì", "", SaveJourneyData);
       TurnTo(editSwitch->GetCurEditHookType());
     }
     break;

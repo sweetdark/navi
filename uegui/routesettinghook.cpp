@@ -161,6 +161,7 @@ short CRouteSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
         m_economyCtrl.SetCheck(false);
         m_shortestCtrl.SetCheck(false);
         m_avoidHighwayCtrl.SetEnable(true);
+        SaveSetting();
       }
     }
     break;
@@ -175,6 +176,7 @@ short CRouteSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
         m_shortestCtrl.SetCheck(false);
         m_avoidHighwayCtrl.SetCheck(false);
         m_avoidHighwayCtrl.SetEnable(false);
+        SaveSetting();
       }
     }
     break;
@@ -186,6 +188,7 @@ short CRouteSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
       m_highwayCtrl.SetCheck(false);
       m_shortestCtrl.SetCheck(false);
       m_avoidHighwayCtrl.SetEnable(true);
+      SaveSetting();
     }
     break;
   case RouteSettingHook_Shortest:
@@ -196,6 +199,7 @@ short CRouteSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
       m_highwayCtrl.SetCheck(false);
       m_economyCtrl.SetCheck(false);
       m_avoidHighwayCtrl.SetEnable(true);
+      SaveSetting();
     }
     break;
   case RouteSettingHook_AvoidHighway:
@@ -204,6 +208,7 @@ short CRouteSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
       if(ctrlType == m_downElementType && m_avoidHighwayCtrl.IsEnable())
       {
          m_avoidHighwayCtrl.MouseUp();
+         SaveSetting();
       }
     }
     break;
@@ -213,6 +218,7 @@ short CRouteSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
       if(ctrlType == m_downElementType)
       {
         m_avoidBoatCtrl.MouseUp();
+        SaveSetting();
       }
     }
     break;
@@ -226,7 +232,6 @@ short CRouteSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
   if (m_isNeedRefesh)
   {
     this->Refresh();
-    SaveSetting();
   }
   m_isNeedRefesh = true;
   return ctrlType;

@@ -5,38 +5,43 @@
 #include "uegui.h"
 #endif
 
-#ifndef _UEGUI_AGGHOOK_H
-#include "agghook.h"
-#endif
+#include "menubackgroundhook.h"
 
+//#include "uilabel.h"
 #include "uibutton.h"
 //#include "uiradiobutton.h"
 //#include "uicheckbutton.h"
 
 namespace UeGui
 {
-  class UEGUI_CLASS CDdtServiceHelpHook : public CAggHook
+  class UEGUI_CLASS CDdtServiceHelpHook : public CMenuBackgroundHook
   {
   public:
-    enum DdtServiceHelpHookCtrlType
+    enum ddtservicehelphookCtrlType
     {
-      DdtServiceHelpHook_Begin = 0,
-      DdtServiceHelpHook_BackGround,
-      DdtServiceHelpHook_BackGroundText,
-      DdtServiceHelpHook_GotoMapBtn,
-      DdtServiceHelpHook_BackButton,
-      DdtServiceHelpHook_TextLineOne,
-      DdtServiceHelpHook_TextLineTwo,
-      DdtServiceHelpHook_TextLineThree,
-      DdtServiceHelpHook_TextLineFour,
-      DdtServiceHelpHook_End
+      ddtservicehelphook_Begin = MenuBackgroundHook_End,
+      ddtservicehelphook_BackGround,
+      ddtservicehelphook_LeftPageBtn,
+      ddtservicehelphook_RightPageBtn,
+      ddtservicehelphook_HelpPicOne,
+      ddtservicehelphook_PicOneLabelOne,
+      ddtservicehelphook_PicOneLabelTwo,
+      ddtservicehelphook_PicOneLabelThree,
+      ddtservicehelphook_PicOneLabelFour,
+      ddtservicehelphook_PicOneBtnOne,
+      ddtservicehelphook_PicOneBtnTwo,
+      ddtservicehelphook_PicOneBtnThree,
+      ddtservicehelphook_PicOneBtnFour,
+      ddtservicehelphook_PicOneShowOne,
+      ddtservicehelphook_PicOneShowTwo,
+      ddtservicehelphook_PicOneShowThree,
+      ddtservicehelphook_PicOneShowFour,
+      ddtservicehelphook_End
     };
 
     CDdtServiceHelpHook();
 
     virtual ~CDdtServiceHelpHook();
-
-    virtual void MakeGUI();
 
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
@@ -44,18 +49,44 @@ namespace UeGui
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual bool operator ()();
+    void Load();
 
   protected:
-    virtual tstring GetBinaryFileName();
+
+    void ShowDetail(CUiButton, CUiButton, bool);
+
+    void SwitchPage();
+
+    void ShowPic(int, bool);
 
     virtual void MakeNames();
 
     void MakeControls();
 
   private:
-    CUiButton m_backButtonCtrl;
-    CUiButton m_gotoMapBtnCtrl;
+    //ºìÉ«¿ò
+    CUiButton m_recordBtn;
+    //ËµÃ÷¿ò
+    CUiButton m_recordDetail;
+
+    int m_showPic;
+
+    CUiButton m_backGroundCtrl;
+    CUiButton m_helpPicOneCtrl;
+    CUiButton m_leftPageBtnCtrl;
+    CUiButton m_picOneBtnFourCtrl;
+    CUiButton m_picOneBtnOneCtrl;
+    CUiButton m_picOneBtnThreeCtrl;
+    CUiButton m_picOneBtnTwoCtrl;
+    CUiButton m_picOneLabelFourCtrl;
+    CUiButton m_picOneLabelOneCtrl;
+    CUiButton m_picOneLabelThreeCtrl;
+    CUiButton m_picOneLabelTwoCtrl;
+    CUiButton m_picOneShowFourCtrl;
+    CUiButton m_picOneShowOneCtrl;
+    CUiButton m_picOneShowThreeCtrl;
+    CUiButton m_picOneShowTwoCtrl;
+    CUiButton m_rightPageBtnCtrl;
   };
 }
 #endif

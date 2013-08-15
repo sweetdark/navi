@@ -181,6 +181,7 @@ short CVoiceSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {        
         m_isDynamicVolumeCheck = m_isDynamicVolumeCheck?false:true;
         m_dynamicVoiceCtrl.SetCheck(m_isDynamicVolumeCheck);
+        SaveSetting();
       }
     }
     break;
@@ -193,6 +194,7 @@ short CVoiceSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
         --m_initDialectType;
         m_voiceCenterCtrl.SetCaption(m_dialectMap[m_initDialectType].c_str());
         SwitchVoicePageInfo();
+        SaveSetting();
       } 
     }
     break;
@@ -205,6 +207,7 @@ short CVoiceSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
         ++m_initDialectType;
         m_voiceCenterCtrl.SetCaption(m_dialectMap[m_initDialectType].c_str());
         SwitchVoicePageInfo();
+        SaveSetting();
       }      
     }
     break;
@@ -224,7 +227,6 @@ short CVoiceSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
   if (m_isNeedRefesh)
   {
     Refresh();
-    SaveSetting();
   }
   m_isNeedRefesh = true;
   return upElementType;

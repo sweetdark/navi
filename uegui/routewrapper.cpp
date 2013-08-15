@@ -609,3 +609,23 @@ bool UeGui::CRouteWrapper::GetHighwayOutlets( HighwayOutletList &dataList )
   }
   return false;
 }
+
+void UeGui::CRouteWrapper::FormatDistance( char* pBuffer, int distance )
+{
+  if (pBuffer)
+  {
+    if (distance > 1000)
+    {
+      ::sprintf(pBuffer, "%.1fkm", distance / 1000.0);
+      //::sprintf(pBuffer, "%dkm", static_cast<int>(distance / 1000.0));
+    }
+    else
+    {
+      if (distance < 0)
+      {
+        distance = 0;
+      }
+      ::sprintf(pBuffer, "%dm", distance);
+    }
+  }
+}

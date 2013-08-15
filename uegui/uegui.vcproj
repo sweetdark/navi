@@ -1059,6 +1059,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mapnavigationpic1hook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic1hook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\mapscanhook.cpp"
 				>
 			</File>

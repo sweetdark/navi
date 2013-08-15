@@ -187,6 +187,7 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       selected_CarIcon = GetCarIcon(m_rCarIcon8.GetCenterElement());
       m_3dCarIcon = m_rCarIcon8.GetCenterElement()->m_bkDisabled;
       m_rCarIcon8.SetCheck(true);      
+      SaveSetting();
     }
     break;
   case CarSettingHook_IconFive:
@@ -197,6 +198,7 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       selected_CarIcon = GetCarIcon(m_rCarIcon5.GetCenterElement());
       m_3dCarIcon = m_rCarIcon5.GetCenterElement()->m_bkDisabled;
       m_rCarIcon5.SetCheck(true);
+      SaveSetting();
     }
     break;
   case CarSettingHook_IconFour:
@@ -207,6 +209,7 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       selected_CarIcon = GetCarIcon(m_rCarIcon4.GetCenterElement());
       m_3dCarIcon = m_rCarIcon4.GetCenterElement()->m_bkDisabled;
       m_rCarIcon4.SetCheck(true);
+      SaveSetting();
     }
     break;
   case CarSettingHook_IconNine:
@@ -217,6 +220,7 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       selected_CarIcon = GetCarIcon(m_rCarIcon9.GetCenterElement());
       m_3dCarIcon = m_rCarIcon9.GetCenterElement()->m_bkDisabled;
       m_rCarIcon9.SetCheck(true);;
+      SaveSetting();
     }
     break;
   case CarSettingHook_IconOne:
@@ -227,6 +231,7 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       selected_CarIcon = GetCarIcon(m_rCarIcon1.GetCenterElement());
       m_3dCarIcon = m_rCarIcon1.GetCenterElement()->m_bkDisabled;
       m_rCarIcon1.SetCheck(true);
+      SaveSetting();
     }
     break;
   case CarSettingHook_IconSeven:
@@ -237,6 +242,7 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       selected_CarIcon = GetCarIcon(m_rCarIcon7.GetCenterElement());
       m_3dCarIcon = m_rCarIcon7.GetCenterElement()->m_bkDisabled;
       m_rCarIcon7.SetCheck(true);
+      SaveSetting();
     }
     break;
   case CarSettingHook_IconSix:
@@ -247,6 +253,7 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       selected_CarIcon = GetCarIcon(m_rCarIcon6.GetCenterElement());
       m_3dCarIcon = m_rCarIcon6.GetCenterElement()->m_bkDisabled;
       m_rCarIcon6.SetCheck(true);
+      SaveSetting();
     }
     break;
   case CarSettingHook_IconTen:
@@ -257,6 +264,7 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       selected_CarIcon = GetCarIcon(m_rCarIcon10.GetCenterElement());
       m_3dCarIcon = m_rCarIcon10.GetCenterElement()->m_bkDisabled;
       m_rCarIcon10.SetCheck(true);
+      SaveSetting();
     }
     break;
   case CarSettingHook_IconThree:
@@ -267,6 +275,7 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       selected_CarIcon = GetCarIcon(m_rCarIcon3.GetCenterElement());
       m_3dCarIcon = m_rCarIcon3.GetCenterElement()->m_bkDisabled;
       m_rCarIcon3.SetCheck(true);
+      SaveSetting();
     }
     break;
   case CarSettingHook_IconTwo:
@@ -277,6 +286,7 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       selected_CarIcon = GetCarIcon(m_rCarIcon2.GetCenterElement());
       m_3dCarIcon = m_rCarIcon2.GetCenterElement()->m_bkDisabled;
       m_rCarIcon2.SetCheck(true);
+      SaveSetting();
     }
     break;
   default:
@@ -287,7 +297,6 @@ short CCarSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
   if (m_isNeedRefesh)
   {
     Refresh();
-    SaveSetting();
   }
   m_isNeedRefesh = true;
   return ctrlType;

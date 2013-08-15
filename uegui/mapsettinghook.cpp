@@ -120,6 +120,7 @@ short CMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_dayModeBtnCtrl.SetCheck(false);
         m_nightModeBtnCtrl.SetCheck(false);
+        UpdateSettings();
       }
     }
     break;
@@ -132,6 +133,7 @@ short CMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_autoModeBtnCtrl.SetCheck(false);
         m_nightModeBtnCtrl.SetCheck(false);
+        UpdateSettings();
       }
     }
     break;
@@ -144,6 +146,7 @@ short CMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_autoModeBtnCtrl.SetCheck(false);
         m_dayModeBtnCtrl.SetCheck(false);
+        UpdateSettings();
       }
     }
     break;

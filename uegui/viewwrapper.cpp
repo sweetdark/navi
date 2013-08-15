@@ -27,6 +27,14 @@ void UeGui::CViewWrapper::HideWindow()
   }
 }
 
+unsigned int UeGui::CViewWrapper::GetSelectedViewType( const CGeoPoint<short> &scrPoint )
+{
+  if (m_view)
+  {
+    m_view->GetSelectedViewType(scrPoint);
+  }
+}
+
 CViewState* UeGui::CViewWrapper::GetMainViewState()
 {
   if (m_view)

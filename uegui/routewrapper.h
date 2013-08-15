@@ -72,7 +72,7 @@ namespace UeGui
   {
     char m_name[UeRoute::eSideEntry::MAXSIDEPROPLENGTH];     //高速路出口名称
     char m_typeName[UeRoute::eSideEntry::MAXSIDEPROPLENGTH]; //出口类型名称
-    double m_distance;                                       //距离路出口距离
+    unsigned int m_distance;                                 //距离路出口距离
   };
   typedef std::vector<HighwayOutlet> HighwayOutletList;
 
@@ -349,6 +349,11 @@ namespace UeGui
     * \brief 获取高速看板数据
     */
     bool GetHighwayOutlets(HighwayOutletList &dataList);
+
+    /**
+    * \brief 格式化距离
+    */
+    void FormatDistance(char* pBuffer, int distance);
   private:
     /*
     * 设置起点或者终点或者经过点

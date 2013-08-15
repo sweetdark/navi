@@ -662,14 +662,7 @@ void UeGui::CMapHook::MapTouch( CGeoPoint<short> &scrPoint )
     //展开菜单
     if (UpdateMenu(MUT_Expand))
     {
-      if (m_viewWrapper.IsGuidanceViewShown())
-      {
-        m_viewWrapper.Refresh();
-      }
-      else
-      {
-        m_viewWrapper.RefreshUI();
-      }
+      m_viewWrapper.RefreshUI();
     }
     return;
   }
@@ -695,9 +688,13 @@ void UeGui::CMapHook::MapTouch( CGeoPoint<short> &scrPoint )
     }
   }
   //地图选点
-  CMemVector objects(sizeof(CViewCanvas::RenderedPrimitive), 10);
-  m_viewWrapper.Pick(scrPoint, objects, true);
-  RefreshLocationInfo();
+  unsigned int viewType = m_view->GetSelectedViewType(scrPoint);
+  if ((VT_Heading == viewType) || (VT_North == viewType) || (VT_Perspective == viewType))
+  {
+    CMemVector objects(sizeof(CViewCanvas::RenderedPrimitive), 10);
+    m_viewWrapper.Pick(scrPoint, objects, true);
+    RefreshLocationInfo();
+  }
 }
 
 short UeGui::CMapHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -1375,6 +1372,25 @@ unsigned int UeGui::CMapHook::DoRoutePlan( PlanType planType )
   return rt;
 }
 
+void UeGui::CMapHook::DoStopGuide()
+{
+  m_elecEyeStatus = false;
+  m_viewWrapper.SetViewOpeMode(VM_Guidance);
+  //切换到浏览菜单
+  SwitchingGUI(GUI_MapBrowse);
+  UpdateMenu();
+  //更新底部状态栏
+  UpdateGuideInfo(NULL, 0, -1);
+  //刷新底部状态栏
+  RefreshLocationInfo();
+  //关闭鹰眼图
+  m_viewWrapper.ShowEagleView(false);
+  //关闭后续路口
+  m_mapGuideInfoView.SetIsShowRouteGuideList(false);
+  //关闭高速看板
+  m_mapGuideInfoView.SetIsShowHightSpeedBoard(false);
+}
+
 unsigned int UeGui::CMapHook::RoutePlan( PlanType planType /*= Plan_Single*/ )
 {
   unsigned int rt = DoRoutePlan(planType);
@@ -1475,15 +1491,8 @@ unsigned int UeGui::CMapHook::StartDemo( short speed /*= DEFAULT_DEMOSPEED*/ )
 unsigned int UeGui::CMapHook::StopDemo()
 {
   unsigned int rt = m_routeWrapper.StopDemo();
-  m_elecEyeStatus = false;
-  m_viewWrapper.SetViewOpeMode(VM_Guidance);
-  //切换到浏览菜单
-  SwitchingGUI(GUI_MapBrowse);
-  UpdateMenu();
-  //更新底部状态栏
-  UpdateGuideInfo(NULL, 0, -1);
-  //刷新底部状态栏
-  RefreshLocationInfo();
+  //处理停止导航后的事情
+  DoStopGuide();
   return rt;
 }
 
@@ -1509,14 +1518,8 @@ unsigned int UeGui::CMapHook::StartGuidance()
 unsigned int UeGui::CMapHook::StopGuidance()
 {
   unsigned int rt = m_routeWrapper.StopGuidance();
-  m_elecEyeStatus = false;
-  //切换到浏览状态状态菜单
-  SwitchingGUI(GUI_MapBrowse);
-  UpdateMenu();
-  //更新底部状态栏
-  UpdateGuideInfo(NULL, 0, -1);
-  //刷新底部状态栏
-  RefreshLocationInfo();
+  //处理停止导航后的事情
+  DoStopGuide();
   return rt;
 }
 
@@ -2305,7 +2308,7 @@ void UeGui::CMapHook::SetScreenMode(ScreenMode screenMode)
     case SM_EagelView:
       {
         //打开鹰眼图
-        m_viewWrapper.ShowEagleView();        
+        m_viewWrapper.ShowEagleView();
         break;
       }
     case SM_RouteGuidance:
@@ -2337,7 +2340,7 @@ void UeGui::CMapHook::SetScreenMode(ScreenMode screenMode)
     case SM_EagelView:
       {
         //关闭鹰眼图
-        m_viewWrapper.ShowEagleView(false);        
+        m_viewWrapper.ShowEagleView(false);   
         break;
       }
     case SM_RouteGuidance:
@@ -2350,7 +2353,6 @@ void UeGui::CMapHook::SetScreenMode(ScreenMode screenMode)
     case SM_HighWayBoard:
       {
         //关闭高速看板
-        //打开高速看板
         m_mapGuideInfoView.SetIsShowHightSpeedBoard(false);
         m_mapGuideInfoView.Update(MUT_Normal);
         break;

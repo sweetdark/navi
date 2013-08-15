@@ -3,6 +3,9 @@ using namespace UeGui;
 
 CFastHandleHelpHook::CFastHandleHelpHook()
 {
+  m_strTitle = "快速上手";
+  m_vecHookFile.push_back(_T("fasthandlehelphook.bin"));
+  HelpPicMark=1;
 }
 
 CFastHandleHelpHook::~CFastHandleHelpHook()
@@ -12,35 +15,11 @@ CFastHandleHelpHook::~CFastHandleHelpHook()
   m_imageNames.clear();
 }
 
-void CFastHandleHelpHook::MakeGUI()
-{
-  FetchWithBinary();
-  MakeNames();
-  MakeControls();
-  ConfigInit();
-  HelpPicMark=1;
-}
-
-tstring CFastHandleHelpHook::GetBinaryFileName()
-{
-  return _T("fasthandlehelphook.bin");
-}
-
 void CFastHandleHelpHook::MakeNames()
 {
-  m_ctrlNames.erase(m_ctrlNames.begin(), m_ctrlNames.end());
-  m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_BackGround,	"BackGround"));
-  m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_BackGroundText,	"BackGroundText"));
-  m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_GotoMapBtn,	"GotoMapBtn"));
-  m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_BackButton,	"BackButton"));
+  CMenuBackgroundHook::MakeNames();
   m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_LeftBtnCenter,	"LeftBtnCenter"));
-  m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_LeftBtnLeft,	"LeftBtnLeft"));
-  m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_LeftBtnRight,	"LeftBtnRight"));
-  m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_LeftBtnIcon,	"LeftBtnIcon"));
   m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_RightBtnCenter,	"RightBtnCenter"));
-  m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_RightBtnLeft,	"RightBtnLeft"));
-  m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_RightBtnRight,	"RightBtnRight"));
-  m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_RightBtnIcon,	"RightBtnIcon"));
   m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_HelpPicOne,	"HelpPicOne"));
   m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_HelpPicTwo,	"HelpPicTwo"));
   m_ctrlNames.insert(GuiName::value_type(FastHandleHelpHook_HelpPicThree,	"HelpPicThree"));
@@ -50,9 +29,7 @@ void CFastHandleHelpHook::MakeNames()
 
 void CFastHandleHelpHook::MakeControls()
 {
-  m_backButtonCtrl.SetCenterElement(GetGuiElement(FastHandleHelpHook_BackButton));
-  m_gotoMapBtnCtrl.SetCenterElement(GetGuiElement(FastHandleHelpHook_GotoMapBtn));
-
+  CMenuBackgroundHook::MakeControls();
   m_helpPicFiveCtrl.SetCenterElement(GetGuiElement(FastHandleHelpHook_HelpPicFive));
   m_helpPicFourCtrl.SetCenterElement(GetGuiElement(FastHandleHelpHook_HelpPicFour));
   m_helpPicOneCtrl.SetCenterElement(GetGuiElement(FastHandleHelpHook_HelpPicOne));
@@ -60,13 +37,7 @@ void CFastHandleHelpHook::MakeControls()
   m_helpPicTwoCtrl.SetCenterElement(GetGuiElement(FastHandleHelpHook_HelpPicTwo));
 
   m_leftBtnCenterCtrl.SetCenterElement(GetGuiElement(FastHandleHelpHook_LeftBtnCenter));
-  m_leftBtnCenterCtrl.SetIconElement(GetGuiElement(FastHandleHelpHook_LeftBtnIcon));
-  m_leftBtnCenterCtrl.SetLeftElement(GetGuiElement(FastHandleHelpHook_LeftBtnLeft));
-  m_leftBtnCenterCtrl.SetRightElement(GetGuiElement(FastHandleHelpHook_LeftBtnRight));
   m_rightBtnCenterCtrl.SetCenterElement(GetGuiElement(FastHandleHelpHook_RightBtnCenter));
-  m_rightBtnCenterCtrl.SetIconElement(GetGuiElement(FastHandleHelpHook_RightBtnIcon));
-  m_rightBtnCenterCtrl.SetLeftElement(GetGuiElement(FastHandleHelpHook_RightBtnLeft));
-  m_rightBtnCenterCtrl.SetRightElement(GetGuiElement(FastHandleHelpHook_RightBtnRight));
 }
 
 short CFastHandleHelpHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -74,44 +45,26 @@ short CFastHandleHelpHook::MouseDown(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
-  case FastHandleHelpHook_BackButton:
-    {
-      m_backButtonCtrl.MouseDown();
-    }
-    break;
-  case FastHandleHelpHook_BackGround:
-  case FastHandleHelpHook_BackGroundText:
-    break;
-  case FastHandleHelpHook_GotoMapBtn:
-    {
-      m_gotoMapBtnCtrl.MouseDown();
-    }
-    break;
   case FastHandleHelpHook_LeftBtnCenter:
-  case FastHandleHelpHook_LeftBtnIcon:
-  case FastHandleHelpHook_LeftBtnLeft:
-  case FastHandleHelpHook_LeftBtnRight:
     {
       m_leftBtnCenterCtrl.MouseDown();
+      AddRenderUiControls(&m_leftBtnCenterCtrl);
     }
     break;
   case FastHandleHelpHook_RightBtnCenter:
-  case FastHandleHelpHook_RightBtnIcon:
-  case FastHandleHelpHook_RightBtnLeft:
-  case FastHandleHelpHook_RightBtnRight:
     {
       m_rightBtnCenterCtrl.MouseDown();
+      AddRenderUiControls(&m_leftBtnCenterCtrl);
     }
     break;
   default:
-    m_isNeedRefesh = false;
-    assert(false);
+    return CMenuBackgroundHook::MouseDown(scrPoint);
     break;
   }
- /* if (m_isNeedRefesh)
+  if (m_isNeedRefesh)
   {
     this->Refresh();
-  }*/
+  }
   m_isNeedRefesh = true;
   return ctrlType;
 }
@@ -126,32 +79,7 @@ short CFastHandleHelpHook::MouseUp(CGeoPoint<short> &scrPoint)
   short ctrlType = CAggHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
-  case FastHandleHelpHook_BackButton:
-    {
-      if(ctrlType == m_downElementType)
-      {
-        /*CViewHook::m_prevHookType = CViewHook::DHT_FastHandleHelpHook;
-        CViewHook::m_curHookType = CViewHook::DHT_OperationHelpHook;*/
-        CAggHook::Return();
-      }
-      m_backButtonCtrl.MouseUp();
-    }
-    break;
-  case FastHandleHelpHook_GotoMapBtn:
-    {
-      if(ctrlType == m_downElementType)
-      {
-        /*CViewHook::m_prevHookType=CViewHook::m_curHookType;
-        CViewHook::m_curHookType=CViewHook::DHT_MapHook;*/
-        CAggHook::GoToMapHook();
-      }
-      m_gotoMapBtnCtrl.MouseUp();
-    }
-    break;
   case FastHandleHelpHook_LeftBtnCenter:
-  case FastHandleHelpHook_LeftBtnIcon:
-  case FastHandleHelpHook_LeftBtnLeft:
-  case FastHandleHelpHook_LeftBtnRight:
     {
       if(HelpPicMark<1&&HelpPicMark>5)
         break;
@@ -164,9 +92,6 @@ short CFastHandleHelpHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   case FastHandleHelpHook_RightBtnCenter:
-  case FastHandleHelpHook_RightBtnIcon:
-  case FastHandleHelpHook_RightBtnLeft:
-  case FastHandleHelpHook_RightBtnRight:
     {
       if(HelpPicMark<1||HelpPicMark>5)
         break;
@@ -179,8 +104,7 @@ short CFastHandleHelpHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    m_isNeedRefesh = false;
-    assert(false);
+    return CMenuBackgroundHook::MouseUp(scrPoint);
     break;
   }
   if (m_isNeedRefesh)
@@ -189,11 +113,6 @@ short CFastHandleHelpHook::MouseUp(CGeoPoint<short> &scrPoint)
   }
   m_isNeedRefesh = true;
   return ctrlType;
-}
-
-bool CFastHandleHelpHook::operator ()()
-{
-  return false;
 }
 
 void CFastHandleHelpHook::ConfigInit()
@@ -290,7 +209,7 @@ void CFastHandleHelpHook::ShowPicture(int value)
   }
 }
 
-void CFastHandleHelpHook::Init()
+void CFastHandleHelpHook::Load()
 {
   ShowPicture(1);
   HelpPicMark=1;

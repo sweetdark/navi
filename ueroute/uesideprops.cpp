@@ -248,6 +248,7 @@ bool CUeSideProps::GetHighwayOutlet(int parcelID, int linkID, int nextLinkID, ch
               prop[0] = curEntry->m_type;
               unsigned char *info = m_data + curEntry->m_offset;
               ::memcpy(prop + 1, info + 1, info[0]);
+              prop[info[0] + 1] = '\0';
               //::memcpy(prop, curEntry->m_content, eSideEntry::MAXSIDEPROPLENGTH); 
               return true;
             }

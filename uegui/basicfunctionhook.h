@@ -5,106 +5,98 @@
 #include "uegui.h"
 #endif
 
-#ifndef _UEGUI_AGGHOOK_H
-#include "agghook.h"
-#endif
+#include "menubackgroundhook.h"
 
+//#include "uilabel.h"
 #include "uibutton.h"
 //#include "uiradiobutton.h"
 //#include "uicheckbutton.h"
 
 namespace UeGui
 {
-  class UEGUI_CLASS CBasicFunctionHook : public CAggHook
+  class UEGUI_CLASS CBasicFunctionHook : public CMenuBackgroundHook
   {
   public:
-    enum BasicFunctionHookCtrlType
+    enum basicfunctionhookCtrlType
     {
-      BasicFunctionHook_Begin = 0,
-      BasicFunctionHook_BackGround,
-      BasicFunctionHook_BackGroundText,
-      BasicFunctionHook_GotoMapBtn,
-      BasicFunctionHook_BackButton,
-      BasicFunctionHook_LeftBtnCenter,
-      BasicFunctionHook_LeftBtnLeft,
-      BasicFunctionHook_LeftBtnRight,
-      BasicFunctionHook_LeftBtnIcon,
-      BasicFunctionHook_RightBtnCenter,
-      BasicFunctionHook_RightBtnLeft,
-      BasicFunctionHook_RightBtnRight,
-      BasicFunctionHook_RightBtnIcon,
-      BasicFunctionHook_HelpPicOne,
-      BasicFunctionHook_HelpPicGoMap,
-      BasicFunctionHook_HelpPicGoBack,
-      BasicFunctionHook_PicOneBtnThree,
-      BasicFunctionHook_PicOneBtnFour,
-      BasicFunctionHook_PicOneBtnFive,
-      BasicFunctionHook_PicOneBtnSix,
-      BasicFunctionHook_PicOneBtnSeven,
-      BasicFunctionHook_PicOneBtnEight,
-      BasicFunctionHook_HelpPicTwo,
-      BasicFunctionHook_PicTwoBtnThree,
-      BasicFunctionHook_PicTwoBtnFour,
-      BasicFunctionHook_PicTwoBtnFive,
-      BasicFunctionHook_PicTwoBtnSix,
-      BasicFunctionHook_PicTwoBtnSeven,
-      BasicFunctionHook_PicTwoBtnEight,
-      BasicFunctionHook_PicTwoBtnNine,
-      BasicFunctionHook_PicTwoBtnTen,
-      BasicFunctionHook_PicTwoBtnEleven,
-      BasicFunctionHook_PicTwoBtnTwelve,
-      BasicFunctionHook_PicTwoBtnThirteen,
-      BasicFunctionHook_PicTwoBtnFourteen,
-      BasicFunctionHook_PicTwoBtnFifTeen,
-      BasicFunctionHook_HelpPicThree,
-      BasicFunctionHook_PicThreeBtnThree,
-      BasicFunctionHook_PicThreeBtnFour,
-      BasicFunctionHook_PicThreeBtnFive,
-      BasicFunctionHook_PicThreeBtnSix,
-      BasicFunctionHook_PicThreeBtnSeven,
-      BasicFunctionHook_HelpPicFour,
-      BasicFunctionHook_PicFourBtnThree,
-      BasicFunctionHook_PicFourBtnFour,
-      BasicFunctionHook_PicFourBtnFive,
-      BasicFunctionHook_PicFourBtnSix,
-      BasicFunctionHook_PicFourBtnSeven,
-      BasicFunctionHook_PicFourBtnEight,
-      BasicFunctionHook_PicFourBtnNine,
-      BasicFunctionHook_PicFourBtnTen,
-      BasicFunctionHook_HelpPicFive,
-      BasicFunctionHook_PicFiveBtnThree,
-      BasicFunctionHook_PicFiveBtnFour,
-      BasicFunctionHook_PicFiveBtnFive,
-      BasicFunctionHook_PicFiveBtnSix,
-      BasicFunctionHook_PicFiveBtnSeven,
-      BasicFunctionHook_PicFiveBtnEight,
-      BasicFunctionHook_HelpPicSix,
-      BasicFunctionHook_PicSixBtnThree,
-      BasicFunctionHook_PicSixBtnFour,
-      BasicFunctionHook_PicSixBtnFive,
-      BasicFunctionHook_PicSixBtnSix,
-      BasicFunctionHook_PicSixBtnSeven,
-      BasicFunctionHook_PicSixBtnEight,
-      BasicFunctionHook_PicSixBtnNine,
-      BasicFunctionHook_PicSixBtnTen,
-      BasicFunctionHook_HelpPicSeven,
-      BasicFunctionHook_PicSevenBtnThree,
-      BasicFunctionHook_PicSevenBtnFour,
-      BasicFunctionHook_PicSevenBtnFive,
-      BasicFunctionHook_PicSevenBtnSix,
-      BasicFunctionHook_helpMessageBoxBtn,
-      BasicFunctionHook_IconTip,
-      BasicFunctionHook_HelpMessageUpLabel,
-      BasicFunctionHook_HelpMessageCenterLabel,
-      BasicFunctionHook_HelpMessageDownLabel,
-      BasicFunctionHook_End
+      basicfunctionhook_Begin = MenuBackgroundHook_End,
+      basicfunctionhook_HelpPicOne,
+      basicfunctionhook_RightBtnCenter,
+      basicfunctionhook_LeftBtnCenter,
+      basicfunctionhook_PicOneBtnOne,
+      basicfunctionhook_PicOneBtnTwo,
+      basicfunctionhook_PicOneBtnThree,
+      basicfunctionhook_PicOneBtnFour,
+      basicfunctionhook_PicOneBtnFive,
+      basicfunctionhook_PicOneBtnSix,
+      basicfunctionhook_PicOneBtnSeven,
+      basicfunctionhook_PicOneBtnEight,
+      basicfunctionhook_HelpPicTwo,
+      basicfunctionhook_PicTwoBtnOne,
+      basicfunctionhook_PicTwoBtnTwo,
+      basicfunctionhook_PicTwoBtnThree,
+      basicfunctionhook_PicTwoBtnFour,
+      basicfunctionhook_PicTwoBtnFive,
+      basicfunctionhook_PicTwoBtnSix,
+      basicfunctionhook_HelpPicThree,
+      basicfunctionhook_PicThreeBtnOne,
+      basicfunctionhook_PicThreeBtnTwo,
+      basicfunctionhook_PicThreeBtnThree,
+      basicfunctionhook_PicThreeBtnFour,
+      basicfunctionhook_PicThreeBtnFive,
+      basicfunctionhook_PicThreeBtnSix,
+      basicfunctionhook_PicThreeBtnSeven,
+      basicfunctionhook_PicThreeBtnEight,
+      basicfunctionhook_PicOneShowOne,
+      basicfunctionhook_PicOneShowTwo,
+      basicfunctionhook_PicOneShowThree,
+      basicfunctionhook_PicOneShowFour,
+      basicfunctionhook_PicOneShoowFive,
+      basicfunctionhook_PicOneShowSix,
+      basicfunctionhook_PicOneShowSeven,
+      basicfunctionhook_PicOneShowEight,
+      basicfunctionhook_PicOneLabelOne,
+      basicfunctionhook_PicOneLabelTwo,
+      basicfunctionhook_PicOneLabelThree,
+      basicfunctionhook_PicOneLabelFour,
+      basicfunctionhook_PicOneLabelFive,
+      basicfunctionhook_PicOneLabelSix,
+      basicfunctionhook_PicOneLabelSeven,
+      basicfunctionhook_PicOneLabelEight,
+      basicfunctionhook_PicTwoShowOne,
+      basicfunctionhook_PicTwoShowTwo,
+      basicfunctionhook_PicTwoShowThree,
+      basicfunctionhook_PicTwoShowFour,
+      basicfunctionhook_PicTwoShowFive,
+      basicfunctionhook_PicTwoShowSix,
+      basicfunctionhook_PicTwoLabelOne,
+      basicfunctionhook_PicTwoLabelTwo,
+      basicfunctionhook_PicTwoLabelThree,
+      basicfunctionhook_PicTwoLableFour,
+      basicfunctionhook_PicTwoLabelFive,
+      basicfunctionhook_PicTwoLabelSix,
+      basicfunctionhook_PicThreeShowOne,
+      basicfunctionhook_PicThreeShowTwo,
+      basicfunctionhook_PicThreeShowThree,
+      basicfunctionhook_PicThreeShowFour,
+      basicfunctionhook_PicThreeShowFive,
+      basicfunctionhook_PicThreeShowSix,
+      basicfunctionhook_PicThreeShowSeven,
+      basicfunctionhook_PicThreeShowEight,
+      basicfunctionhook_PicThreeLabelOne,
+      basicfunctionhook_PicThreeLabelTwo,
+      basicfunctionhook_PicThreeLabelThree,
+      basicfunctionhook_PicThreeLabelFour,
+      basicfunctionhook_PicThreeLabelFive,
+      basicfunctionhook_PicThreeLabelSix,
+      basicfunctionhook_PicThreeLabelSeven,
+      basicfunctionhook_PicThreeLabelEight,
+      basicfunctionhook_End
     };
 
     CBasicFunctionHook();
 
     virtual ~CBasicFunctionHook();
-
-    virtual void MakeGUI();
 
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
@@ -112,179 +104,99 @@ namespace UeGui
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual bool operator ()();
-
-    void Init();
+    void Load();
 
   protected:
-    virtual tstring GetBinaryFileName();
+
+    void ShowDetail(CUiButton , CUiButton);
+
+    void SwitchPage();
+
+    void ShowPic(int ,bool);
 
     virtual void MakeNames();
 
     void MakeControls();
 
-    void PicOneVisble(bool value);
-
-    void PicTwoVisble(bool value);
-
-    void PicThreeVisble(bool value);
-
-    void PicFourVisble(bool value);
-
-    void PicFiveVisble(bool value);
-
-    void PicSixVisble(bool value);
-
-    void PicSevenVisble(bool value);
-
-    void ShowPicture(int value);
-
-    void ConfigInit();
-
-    void Message(bool value);
-
-
   private:
-    CUiButton m_backButtonCtrl;
-    CUiButton m_gotoMapBtnCtrl;
-    //上一个
-    CUiBitButton m_leftBtnCtrl;
-    //下一个
-    CUiBitButton m_rightBtnCtrl;
-    //帮助图片中返回地图界面
-    CUiButton m_helpPicGoMapCtrl;
-    //帮助图片中返回上一操作界面
-    CUiButton m_helpPicGoBackCtrl;
+    //红色框
+    CUiButton m_recordBtn;
+    //说明框
+    CUiButton m_recordDetail;
 
-    //帮助图片1--菜单
+    int m_showPic;
+
     CUiButton m_helpPicOneCtrl;
-    //菜单--找地方
-    CUiButton m_findPlce;
-    //菜单--路线操作
-    CUiButton m_routeOperation;
-    //菜单--道道通服务
-    CUiButton m_DDTService;
-    //菜单--我的信息
-    CUiButton m_myInformation;
-    //菜单--导航设置
-    CUiButton m_naviSetting;
-    //菜单--系统设置
-    CUiButton m_sysSetting;
-
-    //帮助图片2--找地方
-    CUiButton m_helpPicTwoCtrl;
-    //找地方--查地名
-    CUiButton m_searchPlce;
-    //找地方--查道路
-    CUiButton m_searchRoute;
-    //找地方--分类查找
-    CUiButton m_sortting;
-    //找地方--查历史
-    CUiButton m_searchHistory;
-    //找地方--查地址簿
-    CUiButton m_searchAdd;
-    //找地方--查周边
-    CUiButton m_searchAround;
-    //找地方--查Q码
-    CUiButton m_searchQCode;
-    //找地方--查区域
-    CUiButton m_searchArea;
-    //找地方--回家
-    CUiButton m_goHome;
-    //找地方--回单位
-    CUiButton m_goCompany;
-    //找地方--常用点1
-    CUiButton m_commonPoint1;
-    //找地方--常用点2
-    CUiButton m_commonPoint2;
-    //找地方--常用点3
-    CUiButton m_commonPoint3;
-
-    //帮助图片3--我的信息
     CUiButton m_helpPicThreeCtrl;
-    //我的信息--历史信息
-    CUiButton m_historyInfo;
-    //我的信息--地址簿
-    CUiButton m_AddInfo;
-    //我的信息--我的行程
-    CUiButton m_myJourney;
-    //我的信息--常用点
-    CUiButton m_commonPoint;
-    //我的信息--容量信息
-    CUiButton m_capacityInfo;
-
-    //帮助图片4--导航设置
-    CUiButton m_helpPicFourCtrl;
-    //导航设置--地图显示
-    CUiButton m_mapDisplay;
-    //导航设置--路口放大图
-    CUiButton m_intersectionZoomIn;
-    //导航设置--电子眼
-    CUiButton m_electronicEye;
-    //导航设置--提示设置
-    CUiButton m_promptSetting;
-    //导航设置--路线设置
-    CUiButton m_routeSetting;
-    //导航设置--轨迹设置
-    CUiButton m_trajectorySetting;
-    //导航设置--安全设置
-    CUiButton m_safetySetting;
-    //导航设置--初始化
-    CUiButton m_init;
-
-    //帮助图片5--系统设置
-    CUiButton m_helpPicFiveCtrl;
-    //系统设置--语音设置
-    CUiButton m_voiceSetting;
-    //系统设置--自车图标
-    CUiButton m_carIcon;
-    //系统设置--时间校准
-    CUiButton m_timeCalibration;
-    //系统设置--启动声明
-    CUiButton m_startStatement;
-    //系统设置--版本信息
-    CUiButton m_editonInfo;
-    //系统设置--退出系统
-    CUiButton m_exitSys;
-
-    //帮助图片6--请选择对路线的操作
-    CUiButton m_helpPicSixCtrl;
-    //路线操作--停止导航
-    CUiButton m_stopNavi;
-    //路线操作--经过道路
-    CUiButton m_passRoute;
-    //路线操作--调整路线
-    CUiButton m_adjustRoute;
-    //路线操作--绕路规划
-    CUiButton m_detourPlan;
-    //路线操作--下一目的地
-    CUiButton m_nextDestination;
-    //路线操作--概览路线
-    CUiButton m_generalizationRoute;
-    //路线操作--模拟导航
-    CUiButton m_demoNavi;
-    //路线操作--删除路线
-    CUiButton m_delRoute;
-
-    //帮助图片7--道道通服务
-    CUiButton m_helpPicSevenCtrl;
-    //道道通服务--4S店
-    CUiButton m_4S;
-    //道道通服务--景点查询
-    CUiButton m_viewSearch;
-    //道道通服务--操作帮助
-    CUiButton m_operationHelp;
-    //道道通服务--升级服务
-    CUiButton m_updateService;
-
-    //帮助信息提示框
-    CUiBitButton m_helpMessageBoxBtnCtrl;
-    CUiLabel m_helpMessageUpLabel;
-    CUiLabel m_helpMessageCenterLabel;
-    CUiLabel m_helpMessageDownLabel;
-
-    int HelpPicMark;
-    bool MSGBoxMark;
+    CUiButton m_helpPicTwoCtrl;
+    CUiButton m_leftBtnCenterCtrl;
+    CUiButton m_picOneBtnEightCtrl;
+    CUiButton m_picOneBtnFiveCtrl;
+    CUiButton m_picOneBtnFourCtrl;
+    CUiButton m_picOneBtnOneCtrl;
+    CUiButton m_picOneBtnSevenCtrl;
+    CUiButton m_picOneBtnSixCtrl;
+    CUiButton m_picOneBtnThreeCtrl;
+    CUiButton m_picOneBtnTwoCtrl;
+    CUiButton m_picOneLabelEightCtrl;
+    CUiButton m_picOneLabelFiveCtrl;
+    CUiButton m_picOneLabelFourCtrl;
+    CUiButton m_picOneLabelOneCtrl;
+    CUiButton m_picOneLabelSevenCtrl;
+    CUiButton m_picOneLabelSixCtrl;
+    CUiButton m_picOneLabelThreeCtrl;
+    CUiButton m_picOneLabelTwoCtrl;
+    CUiButton m_picOneShoowFiveCtrl;
+    CUiButton m_picOneShowEightCtrl;
+    CUiButton m_picOneShowFourCtrl;
+    CUiButton m_picOneShowOneCtrl;
+    CUiButton m_picOneShowSevenCtrl;
+    CUiButton m_picOneShowSixCtrl;
+    CUiButton m_picOneShowThreeCtrl;
+    CUiButton m_picOneShowTwoCtrl;
+    CUiButton m_picThreeBtnEightCtrl;
+    CUiButton m_picThreeBtnFiveCtrl;
+    CUiButton m_picThreeBtnFourCtrl;
+    CUiButton m_picThreeBtnOneCtrl;
+    CUiButton m_picThreeBtnSevenCtrl;
+    CUiButton m_picThreeBtnSixCtrl;
+    CUiButton m_picThreeBtnThreeCtrl;
+    CUiButton m_picThreeBtnTwoCtrl;
+    CUiButton m_picThreeLabelEightCtrl;
+    CUiButton m_picThreeLabelFiveCtrl;
+    CUiButton m_picThreeLabelFourCtrl;
+    CUiButton m_picThreeLabelOneCtrl;
+    CUiButton m_picThreeLabelSevenCtrl;
+    CUiButton m_picThreeLabelSixCtrl;
+    CUiButton m_picThreeLabelThreeCtrl;
+    CUiButton m_picThreeLabelTwoCtrl;
+    CUiButton m_picThreeShowEightCtrl;
+    CUiButton m_picThreeShowFiveCtrl;
+    CUiButton m_picThreeShowFourCtrl;
+    CUiButton m_picThreeShowOneCtrl;
+    CUiButton m_picThreeShowSevenCtrl;
+    CUiButton m_picThreeShowSixCtrl;
+    CUiButton m_picThreeShowThreeCtrl;
+    CUiButton m_picThreeShowTwoCtrl;
+    CUiButton m_picTwoBtnFiveCtrl;
+    CUiButton m_picTwoBtnFourCtrl;
+    CUiButton m_picTwoBtnOneCtrl;
+    CUiButton m_picTwoBtnSixCtrl;
+    CUiButton m_picTwoBtnThreeCtrl;
+    CUiButton m_picTwoBtnTwoCtrl;
+    CUiButton m_picTwoLabelFiveCtrl;
+    CUiButton m_picTwoLabelOneCtrl;
+    CUiButton m_picTwoLabelSixCtrl;
+    CUiButton m_picTwoLabelThreeCtrl;
+    CUiButton m_picTwoLabelTwoCtrl;
+    CUiButton m_picTwoLableFourCtrl;
+    CUiButton m_picTwoShowFiveCtrl;
+    CUiButton m_picTwoShowFourCtrl;
+    CUiButton m_picTwoShowOneCtrl;
+    CUiButton m_picTwoShowSixCtrl;
+    CUiButton m_picTwoShowThreeCtrl;
+    CUiButton m_picTwoShowTwoCtrl;
+    CUiButton m_rightBtnCenterCtrl;
   };
 }
 #endif

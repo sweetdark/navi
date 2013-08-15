@@ -12,27 +12,20 @@
 #include "uibutton.h"
 //#include "uiradiobutton.h"
 //#include "uicheckbutton.h"
+#include "menubackgroundhook.h"
 
 namespace UeGui
 {
-  class UEGUI_CLASS CFastHandleHelpHook : public CAggHook
+  class UEGUI_CLASS CFastHandleHelpHook : public CMenuBackgroundHook
   {
   public:
     enum FastHandleHelpHookCtrlType
     {
-      FastHandleHelpHook_Begin = 0,
-      FastHandleHelpHook_BackGround,
-      FastHandleHelpHook_BackGroundText,
-      FastHandleHelpHook_GotoMapBtn,
-      FastHandleHelpHook_BackButton,
+      FastHandleHelpHook_Begin = MenuBackgroundHook_End,
+
       FastHandleHelpHook_LeftBtnCenter,
-      FastHandleHelpHook_LeftBtnLeft,
-      FastHandleHelpHook_LeftBtnRight,
-      FastHandleHelpHook_LeftBtnIcon,
       FastHandleHelpHook_RightBtnCenter,
-      FastHandleHelpHook_RightBtnLeft,
-      FastHandleHelpHook_RightBtnRight,
-      FastHandleHelpHook_RightBtnIcon,
+
       FastHandleHelpHook_HelpPicOne,
       FastHandleHelpHook_HelpPicTwo,
       FastHandleHelpHook_HelpPicThree,
@@ -45,20 +38,15 @@ namespace UeGui
 
     virtual ~CFastHandleHelpHook();
 
-    virtual void MakeGUI();
-
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
     virtual short MouseMove(CGeoPoint<short> &scrPoint);
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual bool operator ()();
-
-    void Init();
+    void Load();
 
   protected:
-    virtual tstring GetBinaryFileName();
 
     virtual void MakeNames();
 
@@ -79,14 +67,11 @@ namespace UeGui
     void PicFiveVisble(bool value);
 
   private:
-    CUiButton m_backButtonCtrl;
-    CUiButton m_gotoMapBtnCtrl;
-
-    CUiButton m_helpPicFiveCtrl;
-    CUiButton m_helpPicFourCtrl;
-    CUiButton m_helpPicOneCtrl;
-    CUiButton m_helpPicThreeCtrl;
-    CUiButton m_helpPicTwoCtrl;
+    CUiBitButton m_helpPicFiveCtrl;
+    CUiBitButton m_helpPicFourCtrl;
+    CUiBitButton m_helpPicOneCtrl;
+    CUiBitButton m_helpPicThreeCtrl;
+    CUiBitButton m_helpPicTwoCtrl;
 
     CUiBitButton m_leftBtnCenterCtrl;
     CUiBitButton m_rightBtnCenterCtrl;

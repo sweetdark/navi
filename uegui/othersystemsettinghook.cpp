@@ -109,6 +109,7 @@ short COtherSystemSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_changePanel = m_changePanel?false:true;
         m_fastOperatPanelCtrl.SetCheck(m_changePanel);
+        SaveSetting();
       }
     }
     break;
@@ -122,6 +123,7 @@ short COtherSystemSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_changeDeclaration = m_changeDeclaration?false:true;
         m_spDeclarationCtrl.SetCheck(m_changeDeclaration);
+        SaveSetting();
       }
     }
     break;
@@ -133,7 +135,6 @@ short COtherSystemSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
   if (m_isNeedRefesh)
   {
     Refresh();
-    SaveSetting();
   }
   m_isNeedRefesh = true;
   return ctrlType;

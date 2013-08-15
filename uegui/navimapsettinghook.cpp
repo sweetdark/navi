@@ -118,7 +118,8 @@ short CNaviMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
         m_changeAuto = m_changeAuto?false:true;
         m_autoZoomCtrl.SetCheck(m_changeAuto);
       }*/
-      }
+      SaveSetting();
+    }
     break;
   case navimapsettinghook_DirectCompassBtn:
   case navimapsettinghook_DirectCompassIcon:
@@ -130,6 +131,7 @@ short CNaviMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_changeCompass = m_changeCompass?false:true;
         m_directCompassCtrl.SetCheck(m_changeCompass);
+        SaveSetting();
       }
     }
     break;
@@ -143,6 +145,7 @@ short CNaviMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_changeIntersection = m_changeIntersection?false:true;
         m_intersectionPicCtrl.SetCheck(m_changeIntersection);
+        SaveSetting();
       }
     }
     break;
@@ -154,7 +157,6 @@ short CNaviMapSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
   if (m_isNeedRefesh)
   {
     Refresh();
-    SaveSetting();
   }
   m_isNeedRefesh = true;
   return ctrlType;

@@ -2566,9 +2566,11 @@ bool CUeVoice::GetHighwayOutlets(CMemVector &outlets)
   int order = curOrder;
   unsigned int dist = indicators[order]->m_curDist - m_parent->m_carInfo.m_curDist;
   int count = 0;
-  char prop[sizeof(unsigned int) + eSideEntry::MAXSIDEPROPLENGTH] = {0, };
+  char prop[sizeof(unsigned int) + eSideEntry::MAXSIDEPROPLENGTH] = {0,};
   while(order > 0 && indicators[order]->m_roadClass == RC_MotorWay && count < 3)
   {
+    //清空数据
+    ::memset(prop, 0, sizeof(unsigned int) + eSideEntry::MAXSIDEPROPLENGTH);
     // 高速出口
     if(m_sides->GetHighwayOutlet(indicators[order]->m_parcelIdx, 
       indicators[order]->m_linkIdx, indicators[order-1]->m_linkIdx, prop + sizeof(unsigned int)))

@@ -5,90 +5,127 @@
 #include "uegui.h"
 #endif
 
-#ifndef _UEGUI_AGGHOOK_H
-#include "agghook.h"
-#endif
+#include "menubackgroundhook.h"
 
+//#include "uilabel.h"
 #include "uibutton.h"
 //#include "uiradiobutton.h"
 //#include "uicheckbutton.h"
 
 namespace UeGui
 {
-  class UEGUI_CLASS CMapScanHook : public CAggHook
+  class UEGUI_CLASS CMapScanHook : public CMenuBackgroundHook
   {
   public:
-    enum MapScanHookCtrlType
+    enum mapscanhookCtrlType
     {
-      MapScanHook_Begin = 0,
-      MapScanHook_BackGround,
-      MapScanHook_BackGroundText,
-      MapScanHook_GotoMapBtn,
-      MapScanHook_BackButton,
-      MapScanHook_LeftBtnCenter,
-      MapScanHook_LeftBtnLeft,
-      MapScanHook_LeftBtnRight,
-      MapScanHook_LeftBtnIcon,
-      MapScanHook_RightBtnCenter,
-      MapScanHook_RightBtnLeft,
-      MapScanHook_RightBtnRight,
-      MapScanHook_RightBtnIcon,
-      MapScanHook_HelpPicOne,
-      MapScanHook_PicOneBtnOne,
-      MapScanHook_PicOneBtnTwo,
-      MapScanHook_PicOneBtnThree,
-      MapScanHook_PicOneBtnFour,
-      MapScanHook_PicOneBtnFive,
-      MapScanHook_PicOneBtnSix,
-      MapScanHook_PicOneBtnSeven,
-      MapScanHook_PicOneBtnEight,
-      MapScanHook_PicOneBtnNine,
-      MapScanHook_PicOneBtnTen,
-      MapScanHook_PicOneBtnEleven,
-
-      MapScanHook_PicOneBtnThirteen,
-      MapScanHook_PicOneBtnFourteen,
-      MapScanHook_PicOneBtnFifTeen,
-      MapScanHook_HelpPicTwo,
-      MapScanHook_PicTwoBtnOne,
-      MapScanHook_PicTwoBtnTwo,
-      MapScanHook_PicTwoBtnThree,
-      MapScanHook_PicTwoBtnFour,
-      MapScanHook_PicTwoBtnFive,
-      MapScanHook_PicTwoBtnSix,
-      MapScanHook_PicTwoBtnSeven,
-      MapScanHook_PicTwoBtnEight,
-      MapScanHook_PicTwoBtnNine,
-      MapScanHook_PicTwoBtnTen,
-      MapScanHook_PicTwoBtnEleven,
-      MapScanHook_PicTwoBtnTwelve,
-      MapScanHook_PicTwoBtnThirteen,
-      MapScanHook_PicTwoBtnFourteen,
-      MapScanHook_PicTwoBtnFifTeen,
-      MapScanHook_HelpPicThree,
-      MapScanHook_PicThreeBtnOne,
-      MapScanHook_PicThreeBtnTwo,
-      MapScanHook_PicThreeBtnThree,
-      MapScanHook_PicThreeBtnFour,
-      MapScanHook_PicThreeBtnFive,
-      MapScanHook_PicThreeBtnSix,
-      MapScanHook_PicThreeBtnSeven,
-
-      MapScanHook_PicThreeBtnNine,
-      MapScanHook_PicThreeBtnTen,
-      MapScanHook_helpMessageBoxBtn,
-      MapScanHook_IconTip,
-      MapScanHook_HelpMessageUpLabel,
-      MapScanHook_HelpMessageCenterLabel,
-      MapScanHook_HelpMessageDownLabel,
-      MapScanHook_End
+      mapscanhook_Begin = MenuBackgroundHook_End,
+      mapscanhook_LeftBtnCenter,
+      mapscanhook_RightBtnCenter,
+      mapscanhook_HelpPicOne,
+      mapscanhook_PicOneBtnOne,
+      mapscanhook_PicOneBtnTwo,
+      mapscanhook_PicOneBtnThree,
+      mapscanhook_PicOneBtnTwelve,
+      mapscanhook_PicOneBtnFour,
+      mapscanhook_PicOneBtnThirteen,
+      mapscanhook_PicOneBtnFive,
+      mapscanhook_PicOneBtnFourteen,
+      mapscanhook_PicOneBtnSix,
+      mapscanhook_PicOneBtnFifteen,
+      mapscanhook_PicOneBtnSeven,
+      mapscanhook_PicOneBtnSixteen,
+      mapscanhook_PicOneBtnEight,
+      mapscanhook_PicOneBtnSeventeen,
+      mapscanhook_PicOneBtnNine,
+      mapscanhook_PicOneBtnEighteen,
+      mapscanhook_PicOneBtnTen,
+      mapscanhook_PicOneBtnNineteen,
+      mapscanhook_PicOneBtnEleven,
+      mapscanhook_PicOneBtnTwenty,
+      mapscanhook_HelpPicTwo,
+      mapscanhook_PicTwoBtnOne,
+      mapscanhook_PicTwoBtnTwo,
+      mapscanhook_PicTwoBtnThree,
+      mapscanhook_PicTwoBtnFour,
+      mapscanhook_PicTwoBtnFive,
+      mapscanhook_PicTwoBtnSix,
+      mapscanhook_PicTwoBtnSeven,
+      mapscanhook_PicTwoBtnEight,
+      mapscanhook_PicTwoBtnNine,
+      mapscanhook_PicTwoBtnTen,
+      mapscanhook_PicTwoBtnEleven,
+      mapscanhook_PicTwoBtnTwelve,
+      mapscanhook_PicOneLabelOne,
+      mapscanhook_PicOneLabelTwo,
+      mapscanhook_PicOneLabelThree,
+      mapscanhook_PicOneLabelTwelve,
+      mapscanhook_PicOneLabelFour,
+      mapscanhook_PicOneLabelThirteen,
+      mapscanhook_PicOneLabeFive,
+      mapscanhook_PicOneLabelFourteen,
+      mapscanhook_PicOneLabelSix,
+      mapscanhook_PicOneLabelFifteen,
+      mapscanhook_PicOneLabelSeven,
+      mapscanhook_PicOneLabelSixteen,
+      mapscanhook_PicOneLabelEight,
+      mapscanhook_PicOneLabelSeventeen,
+      mapscanhook_PicOneLabelNine,
+      mapscanhook_PicOneLabelEighteen,
+      mapscanhook_PicOneLabelTen,
+      mapscanhook_PicOneLabelNineteen,
+      mapscanhook_PicOneLabelEleven,
+      mapscanhook_PicOneLabelTwenty,
+      mapscanhook_PicTwoLabelOne,
+      mapscanhook_PicTwoLabelTwo,
+      mapscanhook_PicTwoLabelThree,
+      mapscanhook_PicTwoLabelFour,
+      mapscanhook_PicTwoLabelFive,
+      mapscanhook_PicTwoLabelSix,
+      mapscanhook_PicTwoLabelSeven,
+      mapscanhook_PicTwoLabelEight,
+      mapscanhook_PicTwoLabelNine,
+      mapscanhook_PicTwoLabelTen,
+      mapscanhook_PicTwoLabelEleven,
+      mapscanhook_PicTwoLabelTwelve,
+      mapscanhook_PicOneShowOne,
+      mapscanhook_PicOneShowTwo,
+      mapscanhook_PicOneShowThree,
+      mapscanhook_PicOneShowTwelve,
+      mapscanhook_PicOneShowFour,
+      mapscanhook_PicOneShowThirteen,
+      mapscanhook_PicOneShowFive,
+      mapscanhook_PicOneShowFourteen,
+      mapscanhook_PicOneShowSix,
+      mapscanhook_PicOneShowFifteen,
+      mapscanhook_PicOneShowSeven,
+      mapscanhook_PicOneShowSixteen,
+      mapscanhook_PicOneShowEight,
+      mapscanhook_PicOneShowSeventeen,
+      mapscanhook_PicOneShowNine,
+      mapscanhook_PicOneShowEighteen,
+      mapscanhook_PicOneShowTen,
+      mapscanhook_PicOneShowNineteen,
+      mapscanhook_PicOneShowEleven,
+      mapscanhook_PicOneShowTwenty,
+      mapscanhook_PicTwoShowOne,
+      mapscanhook_PicTwoShowTwo,
+      mapscanhook_PicTwoShowThree,
+      mapscanhook_PicTwoShowFour,
+      mapscanhook_PicTwoShowFive,
+      mapscanhook_PicTwoShowSix,
+      mapscanhook_PicTwoShowSeven,
+      mapscanhook_PicTwoShowEight,
+      mapscanhook_PicTwoShowNine,
+      mapscanhook_PicTwoShowTen,
+      mapscanhook_PicTwoShowEleven,
+      mapscanhook_PicTwoShowTwelve,
+      mapscanhook_End
     };
 
     CMapScanHook();
 
     virtual ~CMapScanHook();
-
-    virtual void MakeGUI();
 
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
@@ -96,86 +133,128 @@ namespace UeGui
 
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    virtual bool operator ()();
-
-    void Init();
+    void Load();
 
   protected:
-    virtual tstring GetBinaryFileName();
+
+    void ShowButton(CUiButton button, CUiButton detail);
+
+    void SwitchPage();
+
+    void ShowPic(int, bool);
 
     virtual void MakeNames();
 
     void MakeControls();
 
-    void PicOneVisble(bool value);
-
-    void PicTwoVisble(bool value);
-
-    void PicThreeVisble(bool value);
-
-    void ShowPicture(int value);
-
-    void ConfigInit();
-
-    void Message(bool value);
-
   private:
-    CUiButton m_backButtonCtrl;
-    CUiButton m_gotoMapBtnCtrl;
+    //ºìÉ«¿ò
+    CUiButton m_recordBtn;
+    //ËµÃ÷¿ò
+    CUiButton m_recordDetail;
 
-    CUiBitButton m_leftBtnCenterCtrl;
-    CUiBitButton m_rightBtnCenterCtrl;
-    CUiBitButton m_helpMessageBoxBtnCtrl;
-    CUiLabel m_helpMessageUpLabel;
-    CUiLabel m_helpMessageCenterLabel;
-    CUiLabel m_helpMessageDownLabel;
+    int m_showPic;
 
     CUiButton m_helpPicOneCtrl;
-    CUiButton m_picOneBtnOneCtrl;
-    CUiButton m_picOneBtnTwoCtrl;
-    CUiButton m_picOneBtnThreeCtrl;
-    CUiButton m_picOneBtnFourCtrl;
-    CUiButton m_picOneBtnFiveCtrl;
-    CUiButton m_picOneBtnSixCtrl;
-    CUiButton m_picOneBtnSevenCtrl;
-    CUiButton m_picOneBtnEightCtrl;
-    CUiButton m_picOneBtnNineCtrl;
-    CUiButton m_picOneBtnTenCtrl;
-    CUiButton m_picOneBtnElevenCtrl;
-    CUiButton m_picOneBtnThirteenCtrl;
-    CUiButton m_picOneBtnFourteenCtrl;
-    CUiButton m_picOneBtnFifTeenCtrl;
-
     CUiButton m_helpPicTwoCtrl;
-    CUiButton m_picTwoBtnOneCtrl;
-    CUiButton m_picTwoBtnTwoCtrl;
-    CUiButton m_picTwoBtnThreeCtrl;   
-    CUiButton m_picTwoBtnFourCtrl;
-    CUiButton m_picTwoBtnFiveCtrl;
-    CUiButton m_picTwoBtnSixCtrl; 
-    CUiButton m_picTwoBtnSevenCtrl;
+    CUiButton m_leftBtnCenterCtrl;
+    CUiButton m_picOneBtnEightCtrl;
+    CUiButton m_picOneBtnEighteenCtrl;
+    CUiButton m_picOneBtnElevenCtrl;
+    CUiButton m_picOneBtnFifteenCtrl;
+    CUiButton m_picOneBtnFiveCtrl;
+    CUiButton m_picOneBtnFourCtrl;
+    CUiButton m_picOneBtnFourteenCtrl;
+    CUiButton m_picOneBtnNineCtrl;
+    CUiButton m_picOneBtnNineteenCtrl;
+    CUiButton m_picOneBtnOneCtrl;
+    CUiButton m_picOneBtnSevenCtrl;
+    CUiButton m_picOneBtnSeventeenCtrl;
+    CUiButton m_picOneBtnSixCtrl;
+    CUiButton m_picOneBtnSixteenCtrl;
+    CUiButton m_picOneBtnTenCtrl;
+    CUiButton m_picOneBtnThirteenCtrl;
+    CUiButton m_picOneBtnThreeCtrl;
+    CUiButton m_picOneBtnTwelveCtrl;
+    CUiButton m_picOneBtnTwentyCtrl;
+    CUiButton m_picOneBtnTwoCtrl;
+    CUiButton m_picOneLabeFiveCtrl;
+    CUiButton m_picOneLabelEightCtrl;
+    CUiButton m_picOneLabelEighteenCtrl;
+    CUiButton m_picOneLabelElevenCtrl;
+    CUiButton m_picOneLabelFifteenCtrl;
+    CUiButton m_picOneLabelFourCtrl;
+    CUiButton m_picOneLabelFourteenCtrl;
+    CUiButton m_picOneLabelNineCtrl;
+    CUiButton m_picOneLabelNineteenCtrl;
+    CUiButton m_picOneLabelOneCtrl;
+    CUiButton m_picOneLabelSevenCtrl;
+    CUiButton m_picOneLabelSeventeenCtrl;
+    CUiButton m_picOneLabelSixCtrl;
+    CUiButton m_picOneLabelSixteenCtrl;
+    CUiButton m_picOneLabelTenCtrl;
+    CUiButton m_picOneLabelThirteenCtrl;
+    CUiButton m_picOneLabelThreeCtrl;
+    CUiButton m_picOneLabelTwelveCtrl;
+    CUiButton m_picOneLabelTwentyCtrl;
+    CUiButton m_picOneLabelTwoCtrl;
+    CUiButton m_picOneShowEightCtrl;
+    CUiButton m_picOneShowEighteenCtrl;
+    CUiButton m_picOneShowElevenCtrl;
+    CUiButton m_picOneShowFifteenCtrl;
+    CUiButton m_picOneShowFiveCtrl;
+    CUiButton m_picOneShowFourCtrl;
+    CUiButton m_picOneShowFourteenCtrl;
+    CUiButton m_picOneShowNineCtrl;
+    CUiButton m_picOneShowNineteenCtrl;
+    CUiButton m_picOneShowOneCtrl;
+    CUiButton m_picOneShowSevenCtrl;
+    CUiButton m_picOneShowSeventeenCtrl;
+    CUiButton m_picOneShowSixCtrl;
+    CUiButton m_picOneShowSixteenCtrl;
+    CUiButton m_picOneShowTenCtrl;
+    CUiButton m_picOneShowThirteenCtrl;
+    CUiButton m_picOneShowThreeCtrl;
+    CUiButton m_picOneShowTwelveCtrl;
+    CUiButton m_picOneShowTwentyCtrl;
+    CUiButton m_picOneShowTwoCtrl;
     CUiButton m_picTwoBtnEightCtrl;
-    CUiButton m_picTwoBtnNineCtrl;
-    CUiButton m_picTwoBtnTenCtrl;
     CUiButton m_picTwoBtnElevenCtrl;
+    CUiButton m_picTwoBtnFiveCtrl;
+    CUiButton m_picTwoBtnFourCtrl;
+    CUiButton m_picTwoBtnNineCtrl;
+    CUiButton m_picTwoBtnOneCtrl;
+    CUiButton m_picTwoBtnSevenCtrl;
+    CUiButton m_picTwoBtnSixCtrl;
+    CUiButton m_picTwoBtnTenCtrl;
+    CUiButton m_picTwoBtnThreeCtrl;
     CUiButton m_picTwoBtnTwelveCtrl;
-    CUiButton m_picTwoBtnThirteenCtrl;
-    CUiButton m_picTwoBtnFourteenCtrl;
-    CUiButton m_picTwoBtnFifTeenCtrl;
-
-    CUiButton m_helpPicThreeCtrl;
-    CUiButton m_picThreeBtnOneCtrl;
-    CUiButton m_picThreeBtnTwoCtrl;
-    CUiButton m_picThreeBtnThreeCtrl;
-    CUiButton m_picThreeBtnFourCtrl;
-    CUiButton m_picThreeBtnFiveCtrl;
-    CUiButton m_picThreeBtnSixCtrl;
-    CUiButton m_picThreeBtnSevenCtrl;
-    CUiButton m_picThreeBtnNineCtrl;
-    CUiButton m_picThreeBtnTenCtrl;
-
-    int HelpPicMark;
-    bool MSGBoxMark;
+    CUiButton m_picTwoBtnTwoCtrl;
+    CUiButton m_picTwoLabelEightCtrl;
+    CUiButton m_picTwoLabelElevenCtrl;
+    CUiButton m_picTwoLabelFiveCtrl;
+    CUiButton m_picTwoLabelFourCtrl;
+    CUiButton m_picTwoLabelNineCtrl;
+    CUiButton m_picTwoLabelOneCtrl;
+    CUiButton m_picTwoLabelSevenCtrl;
+    CUiButton m_picTwoLabelSixCtrl;
+    CUiButton m_picTwoLabelTenCtrl;
+    CUiButton m_picTwoLabelThreeCtrl;
+    CUiButton m_picTwoLabelTwelveCtrl;
+    CUiButton m_picTwoLabelTwoCtrl;
+    CUiButton m_picTwoShowEightCtrl;
+    CUiButton m_picTwoShowElevenCtrl;
+    CUiButton m_picTwoShowFiveCtrl;
+    CUiButton m_picTwoShowFourCtrl;
+    CUiButton m_picTwoShowNineCtrl;
+    CUiButton m_picTwoShowOneCtrl;
+    CUiButton m_picTwoShowSevenCtrl;
+    CUiButton m_picTwoShowSixCtrl;
+    CUiButton m_picTwoShowTenCtrl;
+    CUiButton m_picTwoShowThreeCtrl;
+    CUiButton m_picTwoShowTwelveCtrl;
+    CUiButton m_picTwoShowTwoCtrl;
+    CUiButton m_rightBtnCenterCtrl;
   };
 }
 #endif
