@@ -1265,6 +1265,9 @@ namespace UeMap
 
     void RenderMainViewFlag(PlanPosition& onePos, const int picNum, const double skyLimit, const short scaleLevel);
  
+    void LoadTextFont(short textStyle);
+
+    void SetGrayFontAttr(unsigned char width, unsigned char height);
   protected:
     //
     INameTable *m_roadNameTable;

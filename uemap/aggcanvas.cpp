@@ -2289,8 +2289,7 @@ void CAGGCanvas::RenderNormalRoadName(short scaleLevel, bool is3d)
 
     // 加载字体
     LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
-    m_grayFont.width(textProp.m_width-1);
-    m_grayFont.height(textProp.m_height-1);
+    SetGrayFontAttr(textProp.m_width-1, textProp.m_height-1);
 
     // 对部分等级的道路，采用文字框体标注路名
     if(oneLine->m_class < UeModel::RC_ImportantLocal)
@@ -2695,8 +2694,7 @@ void CAGGCanvas::TextOut(const AGGPoint &oneText)
   if(scaleLevel < 14)
   {
     LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
-    m_grayFont.width(textProp.m_width);
-    m_grayFont.height(textProp.m_height);
+    SetGrayFontAttr(textProp.m_width, textProp.m_height);
 
     //MakeBufferText(uniText, RGB(255, 255, 255), pos);
     
@@ -5065,12 +5063,7 @@ inline void CAGGCanvas::RenderSidePicture(short indexCode, short type, short arr
 
 void CAGGCanvas::GetCurCursorPos(short sTextStyle,TCHAR tchWord,short &sCurPosX,bool bIsDelOp)
 {
-  // Text property
-  const MapsText &textProp(m_setting.GetTextProp(sTextStyle));
-  assert(textProp.m_height && textProp.m_width);
-  // 获取字体信息
-  const MapsFont &fontProp(m_setting.GetFontProp(textProp.m_font));
-  LoadFont(fontProp,1,agg::glyph_ren_agg_gray8);
+  LoadTextFont(sTextStyle);
   //
   const agg::glyph_cache* glyph = m_grayFace.glyph(tchWord);
   if (bIsDelOp)
@@ -5465,8 +5458,7 @@ inline void CAGGCanvas::RenderHighwayOutlets(short scaleLevel)
 
     int ftWidth = textProp.m_width;
     int ftHeight = textProp.m_height;
-    m_grayFont.width(ftWidth-1);
-    m_grayFont.height(ftHeight-1);
+    SetGrayFontAttr(ftWidth - 1, ftHeight - 1);
 
     // 距离、类型
     unsigned int dist = 0;
@@ -6688,8 +6680,7 @@ void CAGGCanvas::RenderSenstiveIndicator(void *dc, int style, CGeoPoint<long> &p
 
     //
     LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8/*textProp.m_style*/);
-    m_grayFont.width(ftWidth);
-    m_grayFont.height(ftHeight);
+    SetGrayFontAttr(ftWidth, ftHeight);
     RenderMultiTextContent(name, leftTopX, leftTopY + 5, ftHeight);
   }
 }
@@ -6812,8 +6803,7 @@ void CAGGCanvas::RenderRoutePosition(void *dc, CGeoPoint<long> &pos, char *name)
 
     //
     LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8/*textProp.m_style*/);
-    m_grayFont.width(ftWidth);
-    m_grayFont.height(ftHeight);
+    SetGrayFontAttr(ftWidth, ftHeight);
     {
       //绘制字体
       int tRows = 1;
@@ -7221,8 +7211,7 @@ inline void CAGGCanvas::DoRenderHookTexts(const CGeoRect<short> &scrExtent, cons
       //
       const MapsFont &fontProp(m_setting.GetFontProp(textProp.m_font));
       LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
-      m_grayFont.width(textProp.m_width);
-      m_grayFont.height(textProp.m_height);
+      SetGrayFontAttr(textProp.m_width, textProp.m_height);
       
       if (!isMulti)
       {
@@ -7348,12 +7337,7 @@ inline void CAGGCanvas::DoRenderHookMultiTexts(const CGeoRect<short> &scrExtent,
     // Text property
     const MapsText &textProp(m_setting.GetTextProp(oneElement.m_textStyle));
     assert(textProp.m_height && textProp.m_width);
-    //获取字体信息
-    const MapsFont &fontProp(m_setting.GetFontProp(textProp.m_font));
-    LoadFont(fontProp,1,agg::glyph_ren_agg_gray8);
-    //获取文本显示一半尺寸信息
-    m_grayFont.width(textProp.m_width);
-    m_grayFont.height(textProp.m_height);
+    LoadTextFont(oneElement.m_textStyle);
     int iTempX((tCols+1)/2*textProp.m_width/2);
     int iTempY((vecLineStr.size()*textProp.m_height+6)/2);
     //获取屏幕中心点
@@ -8267,4 +8251,20 @@ void CAGGCanvas::RenderMainViewFlag(PlanPosition& onePos, const int picNum, cons
       }
     }
   }
+}
+
+void CAGGCanvas::LoadTextFont(short textStyle)
+{
+  const MapsText &textProp(m_setting.GetTextProp(textStyle));
+  assert(textProp.m_height && textProp.m_width);
+  // 获取字体信息
+  const MapsFont &fontProp(m_setting.GetFontProp(textProp.m_font));
+  LoadFont(fontProp,1,agg::glyph_ren_agg_gray8);
+  SetGrayFontAttr(textProp.m_width, textProp.m_height);
+}
+
+void CAGGCanvas::SetGrayFontAttr(unsigned char width, unsigned char height)
+{
+  m_grayFont.width(width);
+  m_grayFont.height(height);
 }
