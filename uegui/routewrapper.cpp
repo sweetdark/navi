@@ -33,43 +33,47 @@ void UeGui::CRouteWrapper::GetPassedRouteList( RouteList& routeList )
   routeList.clear();
   if (m_route)
   {
-    int total = m_route->GetRoute()->GetIndicatorNum(0);
-    UeRoute::GuidanceIndicator *curIndicator = NULL;
-    for (int i = total - 1; i >= 0; --i)
+    int totalPairs = m_route->GetPairs();
+    for (unsigned int pairs = 0; pairs < totalPairs; pairs++)
     {
-      curIndicator = m_route->GetRoute()->GetIndicator(0, i);
-      if (curIndicator)
+      int total = m_route->GetRoute()->GetIndicatorNum(pairs);
+      UeRoute::GuidanceIndicator *curIndicator = NULL;
+      for (int i = total - 1; i >= 0; --i)
       {
-        RouteInfo routeInfo;
-        routeInfo.m_mileages = curIndicator->m_curDist;
-        routeInfo.m_direction = curIndicator->m_snd.m_dirCode;
-        routeInfo.m_parcelIdx = curIndicator->m_parcelIdx;
-        routeInfo.m_linkIdx = curIndicator->m_linkIdx;
-        routeInfo.m_begin = i;
-        routeInfo.m_end = i;
-        if (curIndicator->m_vtxs)
+        curIndicator = m_route->GetRoute()->GetIndicator(pairs, i);
+        if (curIndicator)
         {
-          routeInfo.m_point.m_x = curIndicator->m_vtxs[0].m_x;
-          routeInfo.m_point.m_y = curIndicator->m_vtxs[0].m_y;
+          RouteInfo routeInfo;
+          routeInfo.m_mileages = curIndicator->m_curDist;
+          routeInfo.m_direction = curIndicator->m_snd.m_dirCode;
+          routeInfo.m_parcelIdx = curIndicator->m_parcelIdx;
+          routeInfo.m_linkIdx = curIndicator->m_linkIdx;
+          routeInfo.m_begin = i;
+          routeInfo.m_end = i;
+          if (curIndicator->m_vtxs)
+          {
+            routeInfo.m_point.m_x = curIndicator->m_vtxs[0].m_x;
+            routeInfo.m_point.m_y = curIndicator->m_vtxs[0].m_y;
+          }
+          //读取道路名称
+          char* name = 0;
+          short length = 0;      
+          if(curIndicator->m_nameOffset > 0)
+          {
+            m_net->GetNetwork()->GetNameTable(UeModel::UNT_Network)->GetContent(curIndicator->m_nameOffset, &name, length);
+            // 仅显示中文
+            unsigned char chLen = name[0];
+            name++;
+            name[chLen] = 0;   
+          }
+          else
+          {
+            //一般道路
+            name = "一般道路";
+          } 
+          ::strcpy(routeInfo.m_routeName, name);
+          routeList.push_back(routeInfo);
         }
-        //读取道路名称
-        char* name = 0;
-        short length = 0;      
-        if(curIndicator->m_nameOffset > 0)
-        {
-          m_net->GetNetwork()->GetNameTable(UeModel::UNT_Network)->GetContent(curIndicator->m_nameOffset, &name, length);
-          // 仅显示中文
-          unsigned char chLen = name[0];
-          name++;
-          name[chLen] = 0;   
-        }
-        else
-        {
-          //一般道路
-          name = "一般道路";
-        } 
-        ::strcpy(routeInfo.m_routeName, name);
-        routeList.push_back(routeInfo);
       }
     }
   }

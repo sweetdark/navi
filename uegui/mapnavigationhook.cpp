@@ -7,6 +7,7 @@ CMapNavigationHook::CMapNavigationHook()
   m_strTitle = "µØÍ¼µ¼º½";
   m_vecHookFile.push_back(_T("mapnavigationhook.bin"));  
   m_showPic = 1;
+  m_picOne = NULL;
 }
 
 CMapNavigationHook::~CMapNavigationHook()

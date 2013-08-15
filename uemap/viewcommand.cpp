@@ -106,3 +106,12 @@ bool CViewCommand::MoveTo(const GpsCar &curPos,bool isRefresh)
   return true;
 }
 
+void CViewCommand::CommondLock()
+{
+  m_synObject.Lock();
+}
+
+void CViewCommand::CommondUnLock()
+{
+  m_synObject.UnLock();
+}

@@ -114,6 +114,11 @@ namespace UeMap
     */
     static CViewCommand *GetCommand(short type, CViewImpl *navView);
 
+    //commond common
+    static void CommondLock();
+
+    static void CommondUnLock();
+
   protected:
     // Belonged nav view
     CViewImpl *m_view;
@@ -124,6 +129,7 @@ namespace UeMap
 
     // View command as a singleton
     static CViewCommand *m_viewCommand;
+  private:
     // Synchronized object
     static CSynGuard m_synObject;
   };

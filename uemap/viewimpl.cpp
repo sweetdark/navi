@@ -996,7 +996,7 @@ inline void CViewImpl::RenderSidePicture(bool isDraw, short picCode /* = -1 */, 
 */
 void CViewImpl::ZoomIn()
 {
-  //CTimerCommand::m_synObject.Lock();
+  //CTimerCommand::CommondLock();
 
   //
   if(!m_views.empty())
@@ -1013,7 +1013,7 @@ void CViewImpl::ZoomIn()
     OnPaint();
   }
 
-  //CTimerCommand::m_synObject.UnLock();
+  //CTimerCommand::CommondUnLock();
 }
 
 /**
@@ -1021,7 +1021,7 @@ void CViewImpl::ZoomIn()
 */
 void CViewImpl::ZoomOut()
 {
-  //CTimerCommand::m_synObject.Lock();
+  //CTimerCommand::CommondLock();
 
   //
   if(!m_views.empty())
@@ -1038,7 +1038,7 @@ void CViewImpl::ZoomOut()
     OnPaint();
   }
 
-  //CTimerCommand::m_synObject.UnLock();
+  //CTimerCommand::CommondUnLock();
 }
 
 /**
@@ -1078,14 +1078,14 @@ void CViewImpl::Rotating(double step, double from, double to)
 **/
 void CViewImpl::Zooming(bool isZoomIn)
 {
-  //CTimerCommand::m_synObject.Lock();
+  //CTimerCommand::CommondLock();
 
   if(!m_views.empty())
   {
     m_views[0]->Zooming(isZoomIn);
   }
 
-  //CTimerCommand::m_synObject.UnLock();
+  //CTimerCommand::CommondUnLock();
 }
 
 /**
@@ -1093,7 +1093,7 @@ void CViewImpl::Zooming(bool isZoomIn)
 **/
 void CViewImpl::Zooming(short start, short end, short step)
 {
-  //CTimerCommand::m_synObject.Lock();
+  //CTimerCommand::CommondLock();
 
   // Note:
   // Since we directly use idle mechansim to do this zooming process, here it no need to
@@ -1103,7 +1103,7 @@ void CViewImpl::Zooming(short start, short end, short step)
     m_views[0]->Zooming(start, end, step);
   }
 
-  //CTimerCommand::m_synObject.UnLock();
+  //CTimerCommand::CommondUnLock();
 }
 
 /**
@@ -1111,7 +1111,7 @@ void CViewImpl::Zooming(short start, short end, short step)
 **/
 inline void CViewImpl::Transforming(double diff, bool isOnce)
 {
-  //CTimerCommand::m_synObject.Lock();
+  //CTimerCommand::CommondLock();
 
   if(!m_views.empty() /*&& m_views[0]->Is3D()*/)
   {
@@ -1119,7 +1119,7 @@ inline void CViewImpl::Transforming(double diff, bool isOnce)
     m_views[0]->SwitchTo(m_views[0]->m_curScaleLevel, m_carInfo.m_headingDegree);
   }
 
-  //CTimerCommand::m_synObject.UnLock();
+  //CTimerCommand::CommondUnLock();
 }
 
 /**
@@ -1127,7 +1127,7 @@ inline void CViewImpl::Transforming(double diff, bool isOnce)
 **/
 inline void CViewImpl::Transforming(double diff, double to)
 {
-  //CTimerCommand::m_synObject.Lock();
+  //CTimerCommand::CommondLock();
 
   if(!m_views.empty() && m_views[0]->Is3D())
   {
@@ -1135,7 +1135,7 @@ inline void CViewImpl::Transforming(double diff, double to)
     m_views[0]->SwitchTo(m_views[0]->m_curScaleLevel, m_carInfo.m_headingDegree);
   }
 
-  //CTimerCommand::m_synObject.UnLock();
+  //CTimerCommand::CommondUnLock();
 }
 
 /**
@@ -1339,13 +1339,13 @@ inline void CViewImpl::Refresh()
     m_views[i]->GetDC()->m_isRefresh = true;
   }
 
-  //CTimerCommand::m_synObject.Lock();
+  //CTimerCommand::CommondLock();
 
   //
   //m_views[0]->GetDC()->m_isRefresh = true;
   OnPaint();
 
-  //CTimerCommand::m_synObject.UnLock();
+  //CTimerCommand::CommondUnLock();
 }
 
 inline void CViewImpl::RefreshUI(short type)

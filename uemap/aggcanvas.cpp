@@ -6373,7 +6373,7 @@ void UeMap::CAGGCanvas::RenderRouteThroughtPoint( double skyLimit, short scaleLe
   for(int wayPointCount = 0; wayPointCount < IRoute::GetRoute()->GetPosCount() - 2; wayPointCount++)
   {
     onePos.m_type = PT_Middle;
-    rt = IRoute::GetRoute()->GetPosition(onePos, wayPointCount + 2);
+    rt = IRoute::GetRoute()->GetPosition(onePos, wayPointCount + 1);
     if(rt == PEC_Success && onePos.m_pos.IsValid())
     {
       RenderMainViewFlag(onePos, ITWayFLagBeginOffset + wayPointCount, skyLimit, scaleLevel);
@@ -7430,7 +7430,7 @@ void CAGGCanvas::RenderCursor(double skyLimit)
 void CAGGCanvas::RenderFlags(double skyLimit, short scaleLevel, bool isRaster /*= false*/, bool is3d /*= false*/ )
 {
   // 地址标识
-  RenderMarkPic(scaleLevel, is3d);
+  //RenderMarkPic(scaleLevel, is3d);
   // 天空图片
   RenderSky(skyLimit, isRaster);
   // 经由点标识

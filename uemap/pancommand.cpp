@@ -45,16 +45,17 @@ int CPanCommand::m_prevTime = 0;
 */
 bool CPanCommand::MouseDown(const CGeoPoint<short> &scrPoint, short mouseFlag)
 {
+  //TODO:暂时去掉鼠标抓取拖动地图的功能
   // Waiting until the termination of timer command
-  //m_synObject.Lock();
+  //CommondLock();
 
-  //
-  CViewState *curView = m_view->m_views[0];
-  assert(curView);
-  m_mapBase = curView->GetMapLayout().m_base;    
+  ////
+  //CViewState *curView = m_view->m_views[0];
+  //assert(curView);
+  //m_mapBase = curView->GetMapLayout().m_base;    
 
-  //
-  m_start = m_end = scrPoint;
+  ////
+  //m_start = m_end = scrPoint;
   return m_isActive = true;
 }
 
@@ -85,31 +86,32 @@ bool CPanCommand::MouseMove(const CGeoPoint<short> &scrPoint, short mouseFlag)
 bool CPanCommand::MouseUp(const CGeoPoint<short> &scrPoint, short mouseFlag) 
 {
   //
-  bool rt = false;
-  m_end = scrPoint;
-  if(m_isActive && 
-    ((::abs(m_end.m_x - m_start.m_x) > m_panLimitation) || (::abs(m_end.m_y - m_start.m_y) > m_panLimitation)))
-  {
-    // Ending time
-    CViewState *curView = m_view->m_views[0];
-    m_mapBase = curView->GetMapLayout().m_base;
-    m_view->UpFlash(m_start, m_end);
+  //TODO:暂时去掉鼠标抓取拖动地图的功能
+    bool rt = false;
+//  m_end = scrPoint;
+//  if(m_isActive && 
+//    ((::abs(m_end.m_x - m_start.m_x) > m_panLimitation) || (::abs(m_end.m_y - m_start.m_y) > m_panLimitation)))
+//  {
+//    // Ending time
+//    CViewState *curView = m_view->m_views[0];
+//    m_mapBase = curView->GetMapLayout().m_base;
+//    m_view->UpFlash(m_start, m_end);
+//
+//    //
+//#ifdef _UNIX
+//    m_paningTime = CPanCommand::m_paningTime = ::clock();
+//#else
+//    m_paningTime = CPanCommand::m_paningTime = ::GetTickCount();
+//#endif
+//
+//    rt = true;
+//  }
+//
+//  m_start = m_end;
+//  m_isActive = false;
+//  m_isMoving = false;
 
-    //
-#ifdef _UNIX
-    m_paningTime = CPanCommand::m_paningTime = ::clock();
-#else
-    m_paningTime = CPanCommand::m_paningTime = ::GetTickCount();
-#endif
-
-    rt = true;
-  }
-
-  m_start = m_end;
-  m_isActive = false;
-  m_isMoving = false;
-
-  //m_synObject.UnLock();
+  //CommondUnLock();
   return rt;
 }
 

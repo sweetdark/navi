@@ -61,7 +61,7 @@ bool CTimerCommand::MoveTo(const GpsCar &curPos, bool isRefresh)
   // Note:
   // Currently remove this protection mechansim for higher performance
   // ...
-  m_synObject.Lock();
+  CommondLock();
 
   //
   bool rt = false;
@@ -120,6 +120,6 @@ bool CTimerCommand::MoveTo(const GpsCar &curPos, bool isRefresh)
   // Currently remove this protection mechansim for higher performance
   // ...
   // Release synchronized object
-  m_synObject.UnLock();
+  CommondUnLock();
   return rt;
 }

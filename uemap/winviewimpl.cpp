@@ -250,7 +250,7 @@ void CWinViewImpl::OnPaint()
     }
   }
 
-  // CTimerCommand::m_synObject.Lock();
+  // CTimerCommand::CommondLock();
   // Whether need to redraw
   if(!IsValid())
   {
@@ -289,7 +289,7 @@ void CWinViewImpl::OnPaint()
     (*(*hookFirst).second)();
   }
   CViewImpl::DrawGui();
-  //CTimerCommand::m_synObject.UnLock();
+  //CTimerCommand::CommondUnLock();
 }
 
 /**

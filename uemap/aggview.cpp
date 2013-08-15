@@ -34,8 +34,9 @@
 #include "networklayer.h"
 #include "groundlayer.h"
 #include "pancommand.h"
-#include "planlayer.h"
 #include "timercommand.h"
+#include "planlayer.h"
+
 using namespace UeMap;
 
 // Refer to logger
@@ -784,7 +785,7 @@ void CAGGView::QuickDraw(bool isRaster, bool isTransforming)
 {
   //MEMORY_STAT
   //TIME_STAT;
-  CTimerCommand::m_synObject.Lock();
+  CTimerCommand::CommondLock();
 
   //
   CViewDC *curDC = GetDC();
@@ -836,7 +837,7 @@ void CAGGView::QuickDraw(bool isRaster, bool isTransforming)
   //
   ::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
 
-  CTimerCommand::m_synObject.UnLock();
+  CTimerCommand::CommondUnLock();
 }
 
 /**
@@ -844,7 +845,7 @@ void CAGGView::QuickDraw(bool isRaster, bool isTransforming)
 **/
 void CAGGView::OnDraw(short style)
 {
-  CTimerCommand::m_synObject.Lock();
+  CTimerCommand::CommondLock();
   //MEMORY_STAT
   //TIME_STAT;
   CViewDC *curDC = GetDC();
@@ -882,7 +883,7 @@ void CAGGView::OnDraw(short style)
       //::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
 
       ////
-      //CTimerCommand::m_synObject.UnLock();
+      CTimerCommand::CommondUnLock();
       return;
     }
 
@@ -1041,6 +1042,7 @@ void CAGGView::OnDraw(short style)
     if(bitsPerPixel >= SYSTEM_BPP)
     {
       ::BitBlt(mapDC, minX, minY, maxX - minX, maxY - minY, (HDC)(stackDC.GetDC()), curDC->m_bufBase.m_x, curDC->m_bufBase.m_y, SRCCOPY);
+      
     }
     else
     {
@@ -1063,11 +1065,17 @@ void CAGGView::OnDraw(short style)
     curDC->m_clipBox = CGeoRect<short>(0,0,0,0);
     curDC->m_offset = CGeoPoint<short>(0,0);
     curDC->m_isRefresh = false;
+    if (m_isScrolling)
+    {
+      HDC dc = ::GetDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd));
+      ::BitBlt(dc, minX, minY, maxX - minX, maxY - minY, mapDC, 0, 0, SRCCOPY);
+      ::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
+    }
     //::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
   }
   
   
-  CTimerCommand::m_synObject.UnLock();
+  CTimerCommand::CommondUnLock();
 }
 
 void CAGGView::DrawProgress(short step)

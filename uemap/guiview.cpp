@@ -3,6 +3,7 @@
 #include "viewimpl.h"
 #include "viewdc.h"
 #include "viewcanvas.h"
+#include "timercommand.h"
 using namespace UeMap;
 
 CGuiView::CGuiView(bool isLand, CViewImpl *navView) : CViewState(VT_Gui, isLand, navView)
@@ -14,6 +15,7 @@ CGuiView::~CGuiView() {}
 
 void CGuiView::OnDraw(short style)
 {
+  CTimerCommand::CommondLock();
   CViewDC *curDC = GetDC();
   HDC dc = ::GetDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd));
   CAggStackDC& stackDC = CAggStackDC::GetAggDC(GetDCType(), curDC);
@@ -88,6 +90,7 @@ void CGuiView::OnDraw(short style)
   curDC->m_offset = CGeoPoint<short>(0,0);
   curDC->m_isRefresh = false;
   ::ReleaseDC(reinterpret_cast<HWND>(m_viewImpl->m_wnd), dc);
+  CTimerCommand::CommondUnLock();
 }
 
 void CGuiView::DrawProgress(short step)

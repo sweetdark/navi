@@ -113,7 +113,7 @@
 #include "roundradiusselecthook.h"
 #include "itemselecthook.h"
 #include "distselecthook.h"
-#include "startuphook.h"
+//#include "startuphook.h"
 
 #if __FOR_FPC__
 #include "caphook.h"
@@ -423,13 +423,13 @@ void CGuiImpl::MakeHooks()
   }
 #endif
   //是否开启快捷面板
-  if (UeBase::OS_ON == settingWrapper.GetIsShowShortcutPanel())
+  //if (UeBase::OS_ON == settingWrapper.GetIsShowShortcutPanel())
   {    
     //如果选择启动声明则加载，否则不加载
-    viewHook = new CStartUpHook();
-    viewHook->SetHelpers(net, view, route, gps, query);
-    viewHook->LoadGUI();
-    view->AddHook(CViewHook::DHT_StartUpHook, viewHook);
+    //viewHook = new CStartUpHook();
+    //viewHook->SetHelpers(net, view, route, gps, query);
+    //viewHook->LoadGUI();
+    //view->AddHook(CViewHook::DHT_StartUpHook, viewHook);
   }
   //地图界面
   viewHook = new CMapHook();
