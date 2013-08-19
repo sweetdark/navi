@@ -51,6 +51,9 @@ using namespace UeRoute;
 
 //
 #include "uemodel\network.h"
+#include "uemodel\netlink.h"
+#include "uemodel\netparcel.h"
+#include "uemodel\netnode.h"
 using namespace UeModel;
 
 //
@@ -69,6 +72,86 @@ short CGuidanceView::m_curOrderType = UeQuery::OT_Dist;
 CGeoPoint<short> CGuidanceView::m_sndCoord(0,0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Test
+static std::vector<CGeoPoint<long> > roundVec;
+
+static std::set<long> linkSet;
+
+static std::set<long> nodeIDSet;
+
+static void GetRoundAboutNodePoints(INetParcel *oneParcel, INetLink *oneLink)
+{
+  assert(oneParcel, oneLink);
+  //if (oneLink->GetForm() == UeModel::RF_Roundabout)
+  {
+    CGeoPoint<long> pos = oneLink->GetStartPos(oneParcel);
+
+    CGeoRect<double> parcelMbr;
+    //获取网格的矩形区域
+    oneParcel->GetMBR(parcelMbr);
+    pos.m_x += parcelMbr.m_minX;
+    pos.m_y += parcelMbr.m_minY;
+    if (std::find(roundVec.begin(), roundVec.end(), pos) == roundVec.end())
+    {
+      roundVec.push_back(pos);
+    }
+  }
+}
+
+static void RecursionLink(const long linkId, INetParcel* const parcel)
+{
+  assert(parcel);
+  if (linkSet.insert(linkId).second == false)
+  {
+    return;
+  }
+  INetLink *link = parcel->GetLink(linkId);
+
+  if (link)
+  {
+    long nodeId = link->GetEndNode(parcel);
+    INetNode *curNode = parcel->GetNode(nodeId);
+    int linkCount = curNode->GetCLinkCount(nodeId, parcel);
+    if (linkCount > 1)
+    {
+      long curLinkIdx = -1;
+      for (int i = 0; i < linkCount; ++i)
+      {
+        long curNodeId = 0;
+        assert(curNode);
+        INetLink *curLink = curNode->GetCLink(i, curLinkIdx, curNodeId, parcel);
+        if (curLinkIdx == linkId /*|| nodeId == curLink->GetStartNode(parcel)*/) 
+        {
+          continue;
+        }
+
+        assert(curLink);
+        if (curLink->GetForm() != RF_Roundabout)
+        {
+          GetRoundAboutNodePoints(parcel, curLink);
+          continue;
+        }
+//        GetRoundAboutNodePoints(parcel, curLink);
+        RecursionLink(curLinkIdx, parcel);
+      }
+    }
+  }
+}
+
+static void GetRoundAboutPos(const GuidanceIndicator& indicator)
+{
+  long parcelId = indicator.m_parcelIdx;
+  long linkId = indicator.m_linkIdx;
+  IRoadNetwork *network = IRoadNetwork::GetNetwork();
+  if (network)
+  {
+    INetParcel  *parcel = network->GetParcel(PT_Real, parcelId);
+    if (parcel)
+    {
+      RecursionLink(linkId, parcel);
+    }
+  }
+}
 
 bool CGuidanceView::MouseDown(const CGeoPoint<short> &scrPoint)
 {
@@ -232,6 +315,7 @@ void UeMap::CGuidanceView::DoDrawCross()
           Map2Scr(oneIndicator->m_vtxs[oneIndicator->m_vtxNum - 1], CGuidanceView::m_sndCoord);
         }
       }
+      DealPlanRoundAbout();
     }
 
     //
@@ -261,5 +345,46 @@ void UeMap::CGuidanceView::DoDrawCross()
     curDC->m_clipBox = CGeoRect<short>(0,0,0,0);
     curDC->m_offset = CGeoPoint<short>(0,0);
     curDC->m_isRefresh = false;
+  }
+}
+
+void CGuidanceView::DealPlanRoundAbout()
+{
+  CGeoRect<short> scrExtent = CGeoRect<short>(0, 0, 0, 0);
+  CGeoRect<long> mapExtent;
+  GetMapExtent(scrExtent, mapExtent);
+
+  GuidanceStatus dirInfo;
+  IRoute *route = IRoute::GetRoute();
+  if (!route)
+  {
+    return;
+  }
+  unsigned int rt = route->GetCurrent(dirInfo);
+  int curPair = dirInfo.m_curPair;
+  int totalPairs = dirInfo.m_curPair + 1;
+  for (; curPair < totalPairs; curPair++)
+  {
+
+    int total = route->GetIndicatorNum(curPair) - 1;
+    for (int i = total; i >= 0; i--)
+    {
+      GuidanceIndicator *oneIndicator = route->GetIndicator(curPair, i);
+      assert(oneIndicator);
+      if (!oneIndicator || oneIndicator->m_roadForm != RF_Roundabout)
+      {
+        continue;
+      }
+  
+      GetRoundAboutPos(*oneIndicator);
+    }
+  }
+
+  m_canvas.m_roundAboutPoints.clear();
+  for (unsigned int i = 0; i < roundVec.size(); ++i)
+  {
+    CGeoPoint<short> scrPos;
+    Map2Scr(roundVec[i], scrPos);
+    m_canvas.m_roundAboutPoints.push_back(scrPos);
   }
 }

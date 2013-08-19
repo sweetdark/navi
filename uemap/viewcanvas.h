@@ -627,6 +627,7 @@ namespace UeMap
     static CMemVector m_points;
     static CMemVector m_lines;
     static CMemVector m_polygons;
+    static std::vector<CGeoPoint<short> > m_roundAboutPoints;
 #if __FOR_FPC__
     static CMemVector m_namePoints;
     static CMemVector m_trafficPoints;

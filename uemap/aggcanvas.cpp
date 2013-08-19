@@ -30,6 +30,8 @@
 #include "guidanceview.h"
 #include "aggstackdc.h"
 #include "viewcommand.h"
+#include "fontmanager.h"
+
 using namespace UeMap;
 
 /// Refer to AGG package
@@ -104,12 +106,6 @@ short CAGGCanvas::m_textTypes = 0;
 
 // Note:
 // The order of below variables' initialization
-// TODO: Extract font manage class.
-//CAGGCanvas::font_engine_type CAGGCanvas::m_lineFont;
-//CAGGCanvas::font_manager_type CAGGCanvas::m_lineFace(m_lineFont);
-//CAGGCanvas::font_engine_type CAGGCanvas::m_grayFont;
-//CAGGCanvas::font_manager_type CAGGCanvas::m_grayFace(m_grayFont);
-
 // For dynamically rendering
 short CAGGCanvas::m_dynRadius = 3;
 short CAGGCanvas::m_dynOrder = 0;
@@ -121,7 +117,7 @@ short CAGGCanvas::m_timePhase = 0;
 //
 GuidanceCar CAGGCanvas::m_gpsCar;
 
-// TODO: 将以下的宏定义对应图片资源移到Rending Icons
+// TODO: 将以下的宏定义对应图片e移到Rending Icons
 #define ITScreenCenterIconOffset 382
 #define ITCurPosNorthIconOffset 118
 #define ITCurPosHeadingIconOffset 119
@@ -143,7 +139,7 @@ GuidanceCar CAGGCanvas::m_gpsCar;
 /**
 *
 **/
-CAGGCanvas::CAGGCanvas() : m_lineFont(), m_lineFace(m_lineFont), m_grayFont(), m_grayFace(m_grayFont)
+CAGGCanvas::CAGGCanvas() : m_fontManager(new CFontManager()), m_lineFace(m_fontManager->GetLineFont()), m_grayFace(m_fontManager->GetGrayFont())
 {
   m_roadNameTable = IRoadNetwork::GetNetwork()->GetNameTable(UeModel::UNT_Network);
   m_poiNameTable = IRoadNetwork::GetNetwork()->GetNameTable(UeModel::UNT_POI);
@@ -157,6 +153,11 @@ CAGGCanvas::CAGGCanvas() : m_lineFont(), m_lineFace(m_lineFont), m_grayFont(), m
 CAGGCanvas::~CAGGCanvas()
 {
   ReleaseCanvas();
+  if (m_fontManager)
+  {
+    delete m_fontManager;
+    m_fontManager = NULL;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1625,6 +1626,7 @@ void CAGGCanvas::RenderGuidance(const CViewDC *viewDC, const CGeoRect<short> &sc
       RenderAfnLines(0, false, true);
       RenderBubbleForGuidance();
       RenderRightScreenCarIcon();
+      RenderRoundAboutNumber();
     }
     if (rt == PEC_Success)
     {
@@ -1727,11 +1729,6 @@ inline void CAGGCanvas::SetPickPosition(const CGeoPoint<long> &mapPoint, CGeoPoi
   }
   //
   m_view->Map2Scr(m_selPosition, scrPoint);
-  //double x = scrPoint.m_x;
-  //double y = scrPoint.m_y;
-  //CAGGView::m_mtxPsp.transform(&x, &y);
-  //scrPoint.m_x = static_cast<int>(x);
-  //scrPoint.m_y = static_cast<int>(y);
 }
 
 /**
@@ -2288,8 +2285,8 @@ void CAGGCanvas::RenderNormalRoadName(short scaleLevel, bool is3d)
     pos.m_y = static_cast<int>(y);
 
     // 加载字体
-    LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
-    SetGrayFontAttr(textProp.m_width-1, textProp.m_height-1);
+    m_fontManager->LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
+    m_fontManager->SetGrayFontWidthAndHeight(textProp.m_width-1, textProp.m_height-1);
 
     // 对部分等级的道路，采用文字框体标注路名
     if(oneLine->m_class < UeModel::RC_ImportantLocal)
@@ -2467,9 +2464,8 @@ void CAGGCanvas::RenderAlignedRoadName(short scaleLevel, bool is3d)
     assert(textProp.m_height && textProp.m_width);
 
     // Aligned name should be only in outline font style
-    LoadFont(fontProp, 0, agg::glyph_ren_outline);
-    m_lineFont.height(textProp.m_width);
-    m_lineFont.width(textProp.m_height);
+    m_fontManager->LoadFont(fontProp, 0, agg::glyph_ren_outline);
+    m_fontManager->SetLineFontWidthAndHeight(textProp.m_width, textProp.m_height);
 
     // Specify 
     conv_font_curve_type fCurves(m_lineFace.path_adaptor());
@@ -2590,9 +2586,8 @@ void CAGGCanvas::RenderAlignedRoadName(short scaleLevel, bool is3d)
     assert(textProp.m_height && textProp.m_width);
 
     // Aligned name should be only in outline font style
-    LoadFont(fontProp, 0, agg::glyph_ren_outline);
-    m_lineFont.height(textProp.m_width);
-    m_lineFont.width(textProp.m_height);
+    m_fontManager->LoadFont(fontProp, 0, agg::glyph_ren_outline);
+    m_fontManager->SetLineFontWidthAndHeight(textProp.m_width, textProp.m_height);
 
     // Specify 
     conv_font_curve_type fCurves(m_lineFace.path_adaptor());
@@ -2693,8 +2688,8 @@ void CAGGCanvas::TextOut(const AGGPoint &oneText)
   m_view->GetScale(scaleLevel, scaleValue);
   if(scaleLevel < 14)
   {
-    LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
-    SetGrayFontAttr(textProp.m_width, textProp.m_height);
+    m_fontManager->LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
+    m_fontManager->SetGrayFontWidthAndHeight(textProp.m_width, textProp.m_height);
 
     //MakeBufferText(uniText, RGB(255, 255, 255), pos);
     
@@ -3489,11 +3484,7 @@ inline void CAGGCanvas::RenderPspPoints(short scaleLevel, bool isRaster)
           AGGPoint &onePoi = (*first).second[i];
           CGeoPoint<short> pos = onePoi.m_pos;
 
-          double x = pos.m_x;
-          double y = pos.m_y;
-          CAGGView::m_mtxPsp.transform(&x, &y);
-          pos.m_x = static_cast<short>(x);
-          pos.m_y = static_cast<short>(y);
+          TransformScreenPoint(pos);
 
           m_scanRas.reset();
           agg::ellipse inner(pos.m_x, pos.m_y, 5, 5, 10);
@@ -3516,11 +3507,10 @@ inline void CAGGCanvas::RenderPspPoints(short scaleLevel, bool isRaster)
 
           // 
           CGeoPoint<short> pos = onePoi.m_pos;
-          double x = pos.m_x - poiPicture->GetRenderingSpec().m_cx/2;
-          double y = pos.m_y - poiPicture->GetRenderingSpec().m_cy/2;
-          CAGGView::m_mtxPsp.transform(&x, &y);
-          pos.m_x = static_cast<short>(x);
-          pos.m_y = static_cast<short>(y);
+
+          pos.m_x -= poiPicture->GetRenderingSpec().m_cx/2;
+          pos.m_y -= poiPicture->GetRenderingSpec().m_cy/2;
+          TransformScreenPoint(pos);
 
           //
           CGeoRect<int> rect;
@@ -3623,15 +3613,9 @@ inline void CAGGCanvas::RenderPspTexts(short scaleLevel, bool isRaster)
       if(oneText.m_clrIdx >= TC_Place_Begin && oneText.m_clrIdx < TC_Place_Begin + 70)
       {
         //
-        CGeoPoint<short> pos = oneText.m_pos;
-        double x = pos.m_x;
-        double y = pos.m_y;
-        //CAGGView::m_mtxPsp.transform(&x, &y);
-        pos.m_x = static_cast<short>(x);
-        pos.m_y = static_cast<short>(y);
 
         m_scanRas.reset();
-        agg::ellipse inner(pos.m_x, pos.m_y, 3, 3, 10);
+        agg::ellipse inner(oneText.m_pos.m_x, oneText.m_pos.m_y, 3, 3, 10);
         m_scanRas.add_path(inner);
         m_renderSolid->color(agg::rgba(1, 0.2, 0));
         agg::render_scanlines(m_scanRas, m_packedSL, *m_renderSolid);
@@ -3677,12 +3661,10 @@ inline void CAGGCanvas::RenderPspLandmark(short scaleLevel, bool isRaster /* = f
 
           // 
           CGeoPoint<short> pos = onePoi.m_pos;
-          double x = pos.m_x - crossPic->GetRenderingSpec().m_cx/2;
-          double y = pos.m_y - crossPic->GetRenderingSpec().m_cy/2;
-          CAGGView::m_mtxPsp.transform(&x, &y);
-          pos.m_x = static_cast<short>(x);
-          pos.m_y = static_cast<short>(y);
 
+          pos.m_x -= crossPic->GetRenderingSpec().m_cx/2;
+          pos.m_y -= crossPic->GetRenderingSpec().m_cy/2;
+          TransformScreenPoint(pos);
           //
           CGeoRect<int> rect;
           rect.m_minX = pos.m_x - crossPic->GetRenderingSpec().m_cx/2;
@@ -5454,11 +5436,11 @@ inline void CAGGCanvas::RenderHighwayOutlets(short scaleLevel)
     const MapsText &textProp = m_setting.GetTextProp(UeMap::TC_Note_Begin + 1);
     const MapsFont &fontProp = m_setting.GetFontProp(textProp.m_font);
     assert(textProp.m_height && textProp.m_width);
-    LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
+    m_fontManager->LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
 
     int ftWidth = textProp.m_width;
     int ftHeight = textProp.m_height;
-    SetGrayFontAttr(ftWidth - 1, ftHeight - 1);
+    m_fontManager->SetGrayFontWidthAndHeight(ftWidth - 1, ftHeight - 1);
 
     // 距离、类型
     unsigned int dist = 0;
@@ -6577,12 +6559,9 @@ inline void CAGGCanvas::RenderGpsCar(short scaleLevel)
     CUePicture *centerPicture = const_cast<CUePicture *>(m_view->GetUePicture(CViewHook::IT_GuiBegin + ITScreenCenterIconOffset));
     centerPicture->GetPicture(ITScreenCenterIconOffset - 1);
 
-    double x = centerPos.m_x;
-    double y = centerPos.m_y;
-
-    CAGGView::m_mtxPsp.transform(&x, &y);
-    centerPos.m_x = static_cast<short>(x) - centerPicture->GetRenderingSpec().m_cx/2;
-    centerPos.m_y = static_cast<short>(y) - centerPicture->GetRenderingSpec().m_cy/2;
+    TransformScreenPoint(centerPos);
+    centerPos.m_x -= centerPicture->GetRenderingSpec().m_cx/2;
+    centerPos.m_y -= centerPicture->GetRenderingSpec().m_cy/2;
 
     CGeoRect<int> rect;
     rect.m_minX = centerPos.m_x - centerPicture->GetRenderingSpec().m_cx/2;
@@ -6679,8 +6658,8 @@ void CAGGCanvas::RenderSenstiveIndicator(void *dc, int style, CGeoPoint<long> &p
     }
 
     //
-    LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8/*textProp.m_style*/);
-    SetGrayFontAttr(ftWidth, ftHeight);
+    m_fontManager->LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8/*textProp.m_style*/);
+    m_fontManager->SetGrayFontWidthAndHeight(ftWidth, ftHeight);
     RenderMultiTextContent(name, leftTopX, leftTopY + 5, ftHeight);
   }
 }
@@ -6802,8 +6781,8 @@ void CAGGCanvas::RenderRoutePosition(void *dc, CGeoPoint<long> &pos, char *name)
     }
 
     //
-    LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8/*textProp.m_style*/);
-    SetGrayFontAttr(ftWidth, ftHeight);
+    m_fontManager->LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8/*textProp.m_style*/);
+    m_fontManager->SetGrayFontWidthAndHeight(ftWidth, ftHeight);
     {
       //绘制字体
       int tRows = 1;
@@ -7210,8 +7189,8 @@ inline void CAGGCanvas::DoRenderHookTexts(const CGeoRect<short> &scrExtent, cons
       const MapsText &ftextProp(m_setting.GetTextProp(oneElement.m_focusTextStyle));
       //
       const MapsFont &fontProp(m_setting.GetFontProp(textProp.m_font));
-      LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
-      SetGrayFontAttr(textProp.m_width, textProp.m_height);
+      m_fontManager->LoadFont(fontProp, 1, agg::glyph_ren_agg_gray8);
+      m_fontManager->SetGrayFontWidthAndHeight(textProp.m_width, textProp.m_height);
       
       if (!isMulti)
       {
@@ -7261,7 +7240,7 @@ inline void CAGGCanvas::DoRenderHookTexts(const CGeoRect<short> &scrExtent, cons
         TCHAR uniText[256] = {};      
         m_stringBasic.Ascii2Chs(oneElement.m_label, uniText, 256);
         const agg::glyph_cache *glyph(m_grayFace.glyph(*uniText));
-        int iWordHeight = m_grayFont.height();
+        int iWordHeight = m_fontManager->GetGrayFontWidth(); 
         const int TOP_SPACE = 3;
 
         unsigned int posY = oneElement.m_extent.m_minY -scrExtent.m_minY + iWordHeight/2 + TOP_SPACE;
@@ -7380,12 +7359,8 @@ void CAGGCanvas::RenderCursor(double skyLimit)
     //
     CGeoPoint<short> scrPoint;
     m_view->Map2Scr(m_selPosition, scrPoint);
-    double x = scrPoint.m_x;
-    double y = scrPoint.m_y;
-    CAGGView::m_mtxPsp.transform(&x, &y);
-    scrPoint.m_x = static_cast<int>(x);
-    scrPoint.m_y = static_cast<int>(y);
 
+    TransformScreenPoint(scrPoint);
     //
     CGeoRect<int> rect;
     rect.m_minX = scrPoint.m_x;
@@ -7451,66 +7426,7 @@ void CAGGCanvas::RenderFlags(double skyLimit, short scaleLevel, bool isRaster /*
     // 高速出口图文提示
     //RenderHighwayOutlets(scaleLevel);
   }
-}
 
-/**
-*
-*/
-inline void CAGGCanvas::LoadFont(const MapsFont &fontProp, int faceIdx, int renType)
-{
-  /*TCHAR dataPath[CPathBasic::MAXPATHLENGTH] = {0, };
-  m_pathBasic.GetModulePath(dataPath, CPathBasic::MAXPATHLENGTH);*/
-  tstring fontFile = CPathConfig::GetCommonPath(CPathConfig::CPK_FontsPath);
-  /*m_pathBasic.GetPathSeperator(fontFile);
-  fontFile += _T("fonts");
-  m_pathBasic.GetPathSeperator(fontFile);*/
-  wchar_t uniFamily[512];
-  int len = m_stringBasic.Ascii2Wcs(const_cast<char *>(fontProp.m_family), uniFamily, 512);
-  fontFile += uniFamily;
-
-  if (m_preFontFile == fontFile)
-  {
-    if (m_preFont == renType)
-    {
-      return;
-    }
-    char name[512];
-    int len = m_stringBasic.Wcs2Ascii(const_cast<wchar_t *>(fontFile.c_str()), name, 512);
-    if(renType == agg::glyph_ren_agg_gray8)
-    {
-      m_grayFont.load_font(name, 0, static_cast<agg::glyph_rendering>(renType));
-      m_grayFont.flip_y(true);
-    }
-    else if(renType == agg::glyph_ren_outline)
-    {
-      m_lineFont.load_font(name, 0, static_cast<agg::glyph_rendering>(renType));
-      m_lineFont.flip_y(true);
-    }
-    return;
-  }
-
-  if (m_pathBasic.IsFileExist(fontFile))
-  {
-    m_preFontFile = fontFile;
-    m_preFont = renType;
-    char name[512];
-    int len = m_stringBasic.Wcs2Ascii(const_cast<wchar_t *>(fontFile.c_str()), name, 512);
-    if(renType == agg::glyph_ren_agg_gray8)
-    {
-      m_grayFont.load_font(name, 0, static_cast<agg::glyph_rendering>(renType));
-      m_grayFont.flip_y(true);
-    }
-    else if(renType == agg::glyph_ren_outline)
-    {
-      m_lineFont.load_font(name, 0, static_cast<agg::glyph_rendering>(renType));
-      m_lineFont.flip_y(true);
-    }
-  }
-  else
-  {
-    assert(false);
-  }
-  
 }
 
 /**
@@ -7890,11 +7806,7 @@ void CAGGCanvas::RenderElecEye(bool is3D)
     m_view->GetMapView()->Map2Scr(mapPoint, scrPoint);
     if (is3D)
     {
-      double x = scrPoint.m_x;
-      double y = scrPoint.m_y;
-      CAGGView::m_mtxPsp.transform(&x, &y);
-      scrPoint.m_x = static_cast<short>(x);
-      scrPoint.m_y = static_cast<short>(y);
+      TransformScreenPoint(scrPoint);
     }
 
     short elecIcon = m_view->GetViewIcon(VI_ELECTRONIC_ICON);
@@ -7992,7 +7904,7 @@ void CAGGCanvas::RenderMarkPic(short scaleLevel, bool is3d)
         mapPos.m_x =curFavor->m_x;
         mapPos.m_y =curFavor->m_y;
 
-        CGeoPoint<long> scrPos;
+        CGeoPoint<short> scrPos;
         curView->Map2Scr(mapPos, scrPos);
         CGeoPoint<short> temPos(scrPos.m_x, scrPos.m_y);
         if (curView->GetScrLayout().m_extent.IsContain(temPos))
@@ -8006,11 +7918,7 @@ void CAGGCanvas::RenderMarkPic(short scaleLevel, bool is3d)
           temPos.m_y = temPos.m_y - picInfo.m_height / 2;
           if(is3d)
           {
-            double x = temPos.m_x;
-            double y = temPos.m_y;
-            CAGGView::m_mtxPsp.transform(&x, &y);
-            temPos.m_x = x;
-            temPos.m_y = y;
+            TransformScreenPoint(temPos);
           }
           CPictureBasic::RenderingSpec spec;
           spec.m_cx = 0;
@@ -8211,11 +8119,8 @@ void CAGGCanvas::RenderMainViewFlag(PlanPosition& onePos, const int picNum, cons
     {
       CGeoPoint<short> scrPoint;
       m_view->GetMapView()->Map2Scr(onePos.m_pos, scrPoint);
-      double x = scrPoint.m_x;
-      double y = scrPoint.m_y;
-      CAGGView::m_mtxPsp.transform(&x, &y);
-      scrPoint.m_x = static_cast<int>(x);
-      scrPoint.m_y = static_cast<int>(y);
+
+      TransformScreenPoint(scrPoint);
 
       onePicture->GetPicture(picNum - 1);
 
@@ -8259,12 +8164,27 @@ void CAGGCanvas::LoadTextFont(short textStyle)
   assert(textProp.m_height && textProp.m_width);
   // 获取字体信息
   const MapsFont &fontProp(m_setting.GetFontProp(textProp.m_font));
-  LoadFont(fontProp,1,agg::glyph_ren_agg_gray8);
-  SetGrayFontAttr(textProp.m_width, textProp.m_height);
+  m_fontManager->LoadFont(fontProp,1,agg::glyph_ren_agg_gray8);
+  m_fontManager->SetGrayFontWidthAndHeight(textProp.m_width, textProp.m_height);
 }
 
-void CAGGCanvas::SetGrayFontAttr(unsigned char width, unsigned char height)
+void CAGGCanvas::TransformScreenPoint(CGeoPoint<short> &scrPoint)
 {
-  m_grayFont.width(width);
-  m_grayFont.height(height);
+  double x = scrPoint.m_x;
+  double y = scrPoint.m_y;
+  CAGGView::m_mtxPsp.transform(&x, &y);
+  scrPoint.m_x = static_cast<int>(x);
+  scrPoint.m_y = static_cast<int>(y);
+}
+
+void CAGGCanvas::RenderRoundAboutNumber()
+{
+  for (unsigned int i = 0; i < m_roundAboutPoints.size(); ++i)
+  {
+    CGeoPoint<int> temPos(m_roundAboutPoints[i].m_x, m_roundAboutPoints[i].m_y);
+    TCHAR num[8] = {0,};
+
+    ::_stprintf(num, _T("%d"), i);
+    TextOut(num, temPos, NULL, NULL, RGB(255, 0, 0), 0, true);
+  }
 }

@@ -141,6 +141,9 @@ namespace UeMap
     *
     */
     void DoDrawCross();
+  private:
+
+    void DealPlanRoundAbout();
   protected:
     //
     short m_distForSnd;

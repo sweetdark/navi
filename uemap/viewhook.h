@@ -354,6 +354,18 @@ namespace UeMap
       DHT_StartUpHook                 = 0x1316,
       //µº∫Ω∞Ô÷˙Õº∆¨1
       DHT_MapNavigationPic1Hook       = 0x1317,
+      //µº∫Ω∞Ô÷˙Õº∆¨2
+      DHT_MapNavigationPic2Hook       = 0x1318,
+      //µº∫Ω∞Ô÷˙Õº∆¨3
+      DHT_MapNavigationPic3Hook       = 0x1319,
+      //µº∫Ω∞Ô÷˙Õº∆¨4
+      DHT_MapNavigationPic4Hook       = 0x131A,
+      //µº∫Ω∞Ô÷˙Õº∆¨5
+      DHT_MapNavigationPic5Hook       = 0x131B,
+      //µº∫Ω∞Ô÷˙Õº∆¨6
+      DHT_MapNavigationPic6Hook       = 0x131C,
+      //µÁ◊”—€±‡º≠¡–±Ì
+      DHT_EEyeListHook                = 0x131D,
 
       DHT_Outside                     = 0x2010
     };

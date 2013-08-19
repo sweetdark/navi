@@ -191,6 +191,7 @@ namespace UeMap
   // Forward classes
   class CAggStackDC;
 
+  class CFontManager;
   /**
   * brief agg画布类
   */
@@ -203,7 +204,7 @@ namespace UeMap
     friend class CKeyboardHook;
     friend class CInputHook;
 
-    // Note:
+    // Note: 跨模块的破坏封装
     friend class CAggHook;
 
     /**
@@ -1078,14 +1079,6 @@ namespace UeMap
     **/
     void RenderCursor(double skyLimit);
 
-    /**
-    * \brief 加载字体数据
-    * \param fontProp 字体属性
-    * \param faceIdx 索引
-    * \param renType 渲染类型(glyph_rendering)
-    */
-    void LoadFont(const MapsFont &fontProp, int faceIdx, int renType);
-
     //
     // GUI Hooks
     //
@@ -1267,7 +1260,9 @@ namespace UeMap
  
     void LoadTextFont(short textStyle);
 
-    void SetGrayFontAttr(unsigned char width, unsigned char height);
+    void TransformScreenPoint(CGeoPoint<short> &scrPoint);
+
+    void RenderRoundAboutNumber();
   protected:
     //
     INameTable *m_roadNameTable;
@@ -1307,11 +1302,15 @@ namespace UeMap
     static agg::scanline_p8 m_packedSL;
     static agg::scanline_bin m_binSL;
 
+    // agghook引入了aggcanvas.h的头文件，
+    //所以如果在此添加新的类非指针成员，则必须把此类的头文件包含
+    //同时要把此头文件公开，使得agghook也能引入该头文件。否则编译错误
+    //然而此类我只想在uemap中使用，不公开出去。
+    CFontManager *m_fontManager;
+
     // True type fonts
     // TODO: Extract class.
-    /*static */font_engine_type m_lineFont;
     /*static */font_manager_type m_lineFace;
-    /*static */font_engine_type m_grayFont;
     /*static */font_manager_type m_grayFace;
 
     // Different path storages
