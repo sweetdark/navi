@@ -115,6 +115,11 @@ namespace UeRoute
     virtual unsigned int DoPlan() = 0;
 
     /**
+    * \brief 偏航重规划
+    */
+    virtual unsigned int RePlan() = 0;
+
+    /**
     * \brief 用于PC端检验工具的日志接口
     */
     virtual void SetPlanLogFile(void *logFile) = 0;

@@ -403,120 +403,160 @@ short CMapScanHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_picOneShowEightCtrl.MouseDown();
       m_picOneShowEightCtrl.SetVisible(false);
+      m_picOneBtnEightCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowEightCtrl);
     }
     break;
   case mapscanhook_PicOneShowEighteen:
     {
       m_picOneShowEighteenCtrl.MouseDown();
       m_picOneShowEighteenCtrl.SetVisible(false);
+      m_picOneBtnEighteenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowEighteenCtrl);
     }
     break;
   case mapscanhook_PicOneShowEleven:
     {
       m_picOneShowElevenCtrl.MouseDown();
       m_picOneShowElevenCtrl.SetVisible(false);
+      m_picOneBtnElevenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowElevenCtrl);
     }
     break;
   case mapscanhook_PicOneShowFifteen:
     {
       m_picOneShowFifteenCtrl.MouseDown();
       m_picOneShowFifteenCtrl.SetVisible(false);
+      m_picOneBtnFifteenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowFifteenCtrl);
     }
     break;
   case mapscanhook_PicOneShowFive:
     {
       m_picOneShowFiveCtrl.MouseDown();
       m_picOneShowFiveCtrl.SetVisible(false);
+      m_picOneBtnFiveCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowFiveCtrl);
     }
     break;
   case mapscanhook_PicOneShowFour:
     {
       m_picOneShowFourCtrl.MouseDown();
       m_picOneShowFourCtrl.SetVisible(false);
+      m_picOneBtnFourCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowFourCtrl);
     }
     break;
   case mapscanhook_PicOneShowFourteen:
     {
       m_picOneShowFourteenCtrl.MouseDown();
       m_picOneShowFourteenCtrl.SetVisible(false);
+      m_picOneBtnFourteenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowFourteenCtrl);
     }
     break;
   case mapscanhook_PicOneShowNine:
     {
       m_picOneShowNineCtrl.MouseDown();
       m_picOneShowNineCtrl.SetVisible(false);
+      m_picOneBtnNineCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowNineCtrl);
     }
     break;
   case mapscanhook_PicOneShowNineteen:
     {
       m_picOneShowNineteenCtrl.MouseDown();
       m_picOneShowNineteenCtrl.SetVisible(false);
+      m_picOneBtnNineteenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowNineteenCtrl);
     }
     break;
   case mapscanhook_PicOneShowOne:
     {
       m_picOneShowOneCtrl.MouseDown();
       m_picOneShowOneCtrl.SetVisible(false);
+      m_picOneBtnOneCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowOneCtrl);
     }
     break;
   case mapscanhook_PicOneShowSeven:
     {
       m_picOneShowSevenCtrl.MouseDown();
       m_picOneShowSevenCtrl.SetVisible(false);
+      m_picOneBtnSevenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowSevenCtrl);
     }
     break;
   case mapscanhook_PicOneShowSeventeen:
     {
       m_picOneShowSeventeenCtrl.MouseDown();
       m_picOneShowSeventeenCtrl.SetVisible(false);
+      m_picOneBtnSeventeenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowSeventeenCtrl);
     }
     break;
   case mapscanhook_PicOneShowSix:
     {
       m_picOneShowSixCtrl.MouseDown();
       m_picOneShowSixCtrl.SetVisible(false);
+      m_picOneBtnSixCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowSixCtrl);
     }
     break;
   case mapscanhook_PicOneShowSixteen:
     {
       m_picOneShowSixteenCtrl.MouseDown();
       m_picOneShowSixteenCtrl.SetVisible(false);
+      m_picOneBtnSixteenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowSixteenCtrl);
     }
     break;
   case mapscanhook_PicOneShowTen:
     {
       m_picOneShowTenCtrl.MouseDown();
       m_picOneShowTenCtrl.SetVisible(false);
+      m_picOneBtnTenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowTenCtrl);
     }
     break;
   case mapscanhook_PicOneShowThirteen:
     {
       m_picOneShowThirteenCtrl.MouseDown();
       m_picOneShowThirteenCtrl.SetVisible(false);
+      m_picOneBtnThirteenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowThirteenCtrl);
     }
     break;
   case mapscanhook_PicOneShowThree:
     {
       m_picOneShowThreeCtrl.MouseDown();
       m_picOneShowThreeCtrl.SetVisible(false);
+      m_picOneBtnThreeCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowThreeCtrl);
     }
     break;
   case mapscanhook_PicOneShowTwelve:
     {
       m_picOneShowTwelveCtrl.MouseDown();
       m_picOneShowTwelveCtrl.SetVisible(false);
+      m_picOneBtnTwelveCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowTwelveCtrl);
     }
     break;
   case mapscanhook_PicOneShowTwenty:
     {
       m_picOneShowTwentyCtrl.MouseDown();
       m_picOneShowTwentyCtrl.SetVisible(false);
+      m_picOneBtnTwentyCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowTwentyCtrl);
     }
     break;
   case mapscanhook_PicOneShowTwo:
     {
       m_picOneShowTwoCtrl.MouseDown();
       m_picOneShowTwoCtrl.SetVisible(false);
+      m_picOneBtnTwoCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowTwoCtrl);
     }
     break;
   case mapscanhook_PicTwoBtnEight:
@@ -619,72 +659,96 @@ short CMapScanHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_picTwoShowEightCtrl.MouseDown();
       m_picTwoShowEightCtrl.SetVisible(false);
+      m_picTwoBtnEightCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowEightCtrl);
     }
     break;
   case mapscanhook_PicTwoShowEleven:
     {
       m_picTwoShowElevenCtrl.MouseDown();
       m_picTwoShowElevenCtrl.SetVisible(false);
+      m_picTwoBtnElevenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowElevenCtrl);
     }
     break;
   case mapscanhook_PicTwoShowFive:
     {
       m_picTwoShowFiveCtrl.MouseDown();
       m_picTwoShowFiveCtrl.SetVisible(false);
+      m_picTwoBtnFiveCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowFiveCtrl);
     }
     break;
   case mapscanhook_PicTwoShowFour:
     {
       m_picTwoShowFourCtrl.MouseDown();
       m_picTwoShowFourCtrl.SetVisible(false);
+      m_picTwoBtnFourCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowFourCtrl);
     }
     break;
   case mapscanhook_PicTwoShowNine:
     {
       m_picTwoShowNineCtrl.MouseDown();
       m_picTwoShowNineCtrl.SetVisible(false);
+      m_picTwoBtnNineCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowNineCtrl);
     }
     break;
   case mapscanhook_PicTwoShowOne:
     {
       m_picTwoShowOneCtrl.MouseDown();
       m_picTwoShowOneCtrl.SetVisible(false);
+      m_picTwoBtnOneCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowOneCtrl);
     }
     break;
   case mapscanhook_PicTwoShowSeven:
     {
       m_picTwoShowSevenCtrl.MouseDown();
       m_picTwoShowSevenCtrl.SetVisible(false);
+      m_picTwoBtnSevenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowEightCtrl);
     }
     break;
   case mapscanhook_PicTwoShowSix:
     {
       m_picTwoShowSixCtrl.MouseDown();
       m_picTwoShowSixCtrl.SetVisible(false);
+      m_picTwoBtnSixCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowSixCtrl);
     }
     break;
   case mapscanhook_PicTwoShowTen:
     {
       m_picTwoShowTenCtrl.MouseDown();
       m_picTwoShowTenCtrl.SetVisible(false);
+      m_picTwoBtnTenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowTenCtrl);
     }
     break;
   case mapscanhook_PicTwoShowThree:
     {
       m_picTwoShowThreeCtrl.MouseDown();
       m_picTwoShowThreeCtrl.SetVisible(false);
+      m_picTwoBtnThreeCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowThreeCtrl);
     }
     break;
   case mapscanhook_PicTwoShowTwelve:
     {
       m_picTwoShowTwelveCtrl.MouseDown();
       m_picTwoShowTwelveCtrl.SetVisible(false);
+      m_picTwoBtnTwelveCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowTwelveCtrl);
     }
     break;
   case mapscanhook_PicTwoShowTwo:
     {
       m_picTwoShowTwoCtrl.MouseDown();
       m_picTwoShowTwoCtrl.SetVisible(false);
+      m_picTwoBtnTwoCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowTwoCtrl);
     }
     break;
   case mapscanhook_RightBtnCenter:
@@ -1026,6 +1090,13 @@ short CMapScanHook::MouseUp(CGeoPoint<short> &scrPoint)
         ShowPic(m_showPic, true);
         SwitchPage();
       }
+    }
+    break;
+  case mapscanhook_HelpPicOne:
+  case mapscanhook_HelpPicTwo:
+    {
+      m_recordBtn.SetVisible(false);
+      m_recordDetail.SetVisible(false);
     }
     break;
   default:

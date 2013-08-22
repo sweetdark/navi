@@ -242,6 +242,11 @@ namespace UeQuery
 			delete m_pHistoryrecordCtrl;
 			m_pHistoryrecordCtrl=0;
 		}
+    if (m_pIOAddrbookCtrl!=0)
+    {
+      delete m_pIOAddrbookCtrl;
+      m_pIOAddrbookCtrl=0;
+    }
 		return SQL_Success;
 	}
 	unsigned CUeQueryImpl::ConnectToPoiDB(void)

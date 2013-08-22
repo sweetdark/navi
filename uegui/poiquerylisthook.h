@@ -33,21 +33,33 @@ namespace UeGui
       PoiQueryListHook_List1PoiNameBox,
       PoiQueryListHook_List1CursorBox,
       PoiQueryListHook_List1PoiDistBox,
+      PoiQueryListHook_List1PoiTelBox,
+      PoiQueryListHook_List1PoiFarBox,
+      PoiQueryListHook_List1PoiCursorBox,
 
       PoiQueryListHook_List2Btn,
       PoiQueryListHook_List2PoiNameBox,
       PoiQueryListHook_List2CursorBox,
       PoiQueryListHook_List2PoiDistBox,
+      PoiQueryListHook_List2PoiTelBox,
+      PoiQueryListHook_List2PoiFarBox,
+      PoiQueryListHook_List2PoiCursorBox,
 
       PoiQueryListHook_List3Btn,
       PoiQueryListHook_List3PoiNameBox,
       PoiQueryListHook_List3CursorBox,
       PoiQueryListHook_List3PoiDistBox,
+      PoiQueryListHook_List3PoiTelBox,
+      PoiQueryListHook_List3PoiFarBox,
+      PoiQueryListHook_List3PoiCursorBox,
 
       PoiQueryListHook_List4Btn,
       PoiQueryListHook_List4PoiNameBox,
       PoiQueryListHook_List4CursorBox,
       PoiQueryListHook_List4PoiDistBox,
+      PoiQueryListHook_List4PoiTelBox,
+      PoiQueryListHook_List4PoiFarBox,
+      PoiQueryListHook_List4PoiCursorBox,
 
       PoiQueryListHook_PageUpBtn,
       PoiQueryListHook_PageUpBtnIcon,
@@ -59,6 +71,16 @@ namespace UeGui
       PoiQueryListHook_PageInfoInterval,
       PoiQueryListHook_BtnIntervalLine1,
       PoiQueryListHook_BtnIntervalLine2,
+
+      PoiQueryListHook_Cursor1,
+      PoiQueryListHook_Cursor2,
+      PoiQueryListHook_Cursor3,
+      PoiQueryListHook_Cursor4,
+      PoiQueryListHook_Cursor5,
+      PoiQueryListHook_Cursor6,
+      PoiQueryListHook_Cursor7,
+      PoiQueryListHook_Cursor8,
+
       PoiQueryListHook_End
     };
 
@@ -84,6 +106,10 @@ namespace UeGui
 
     void ResetResultList();
 
+    void SetDirection(const SQLRecord &oneRecord, int index);
+
+    void GetDistances();
+
   private:
     static void DistSwitchCallBack(void *pDoCallBackObj, const SQLRecord *pResult);
 
@@ -98,6 +124,9 @@ namespace UeGui
     CUiBitButton m_infoBtn[4];
     CUiLabel m_poiLabel[4];
     CUiLabel m_addrLabel[4];
+    CUiLabel m_farLabel[4];
+    CUiLabel m_telLabel[4];
+    CUiButton m_cursorIcon[4];
 
     CUiBitButton m_returnBtn;
     

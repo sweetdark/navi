@@ -92,7 +92,6 @@ namespace UeGui
 
     bool EraseOneKeyWord();
     bool AddOneKeyWord(const char *pchLabelText);
-    bool doAddOneKeyWord(TCHAR oneWord);
     void ClearKeyWord(void);
     void SetCursorPosX(int curIndex);
 

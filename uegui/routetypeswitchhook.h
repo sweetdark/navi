@@ -50,6 +50,7 @@ namespace UeGui
 
     virtual bool operator ()() { return true; }
 
+    virtual void Load();
     static void SetRouteTypeCallBackFun(CAggHook *sender, RouteTypeCallBack callBack);
 
   protected:
@@ -67,6 +68,7 @@ namespace UeGui
 
     void DoCallBack();
 
+    void InitIconStatus();
   private:
     unsigned int m_planMethod;
 
@@ -75,11 +77,15 @@ namespace UeGui
   private:
     CUiButton m_grayBackCtrl;
     CUiBitButton m_highWayBtnCtrl;
+    CUiButton m_highWayIconCtrl;
     CUiBitButton m_shortestBtnCtrl;
+    CUiButton m_shortestIconCtr;
     CUiButton m_popupListBottomCtrl;
     CUiButton m_popupListTopCtrl;
     CUiBitButton m_recommondBtnCtrl;
+    CUiButton m_recommondIconCtrl;
     CUiBitButton m_economicWayBtnCtrl;
+    CUiButton m_economicWayIconCtrl;
   };
 }
 #endif

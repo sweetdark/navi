@@ -189,7 +189,7 @@ void CAdjustRouteHook::Load()
 {
   if (GetPrevHookType() != DHT_RouteTypeSwitchHook)
   {
-    if (GetPrevHookType() == DHT_MainMenuHook)
+    if (GetPrevHookType() == DHT_MainMenuHook || GetPrevHookType() == DHT_MapHook)
     {
       GetRouteData();
       SetTitle("路线规划");

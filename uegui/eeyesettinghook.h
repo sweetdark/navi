@@ -1,138 +1,115 @@
-#ifndef _UEGUI_EEYE_SETTING_HOOK_H
-#define _UEGUI_EEYE_SETTING_HOOK_H
+#ifndef _UEGUI_EEYESETTINGHOOK_H
+#define _UEGUI_EEYESETTINGHOOK_H
 
-// Refer to EXPORT & IMPORT macro definitions
 #ifndef _UEGUI_BASE_H
 #include "uegui.h"
 #endif
 
-// Refer to its parent
-#ifndef _UEGUI_AGGHOOK_H
-#include "agghook.h"
-#endif
+#include "userdatawrapper.h"
 
+#include "menubackgroundhook.h"
+
+//#include "uilabel.h"
 #include "uibutton.h"
-#include "uicheckbutton.h"
-
-using namespace UeBase;
+#include "uiradiobutton.h"
+//#include "uicheckbutton.h"
 
 namespace UeGui
 {
-  /**
-  * \brief 电子眼设置界面
-  */
-  class UEGUI_CLASS CEEyeSettingHook : public CAggHook
+  class UEGUI_CLASS CEEyeSettingHook : public CMenuBackgroundHook
   {
   public:
-    enum EEyeSettingCtrlType
+    enum EEyeSettingHookCtrlType
     {
-      EEyeSettingHook_Begin,
-
-      EEyeSettingHook_Back,
-
-      EEyeSettingHook_Map,
-      EEyeSettingHook_Previous,
-
-      EEyeSettingHook_TopText,
-
-      EEyeSettingHook_EnableLeft,
-      EEyeSettingHook_Enable,
-      EEyeSettingHook_EnableRight,
-      EEyeSettingHook_EnableIcon,
-
-      EEyeSettingHook_RedLightLeft,
-      EEyeSettingHook_RedLight,
-      EEyeSettingHook_RedLightRight,
-      EEyeSettingHook_RedLightIcon,
-
-      EEyeSettingHook_OverSpeedLeft,
-      EEyeSettingHook_OverSpeed,
-      EEyeSettingHook_OverSpeedRight,
-      EEyeSettingHook_OverSpeedIcon,
-
-      EEyeSettingHook_BreakRuleLeft,
-      EEyeSettingHook_BreakRule,
-      EEyeSettingHook_BreakRuleRight,
-      EEyeSettingHook_BreakRuleIcon,
-
-      EEyeSettingHook_RailLeft,
-      EEyeSettingHook_Rail,
-      EEyeSettingHook_RailRight,
-      EEyeSettingHook_RailIcon,
-      
+      EEyeSettingHook_Begin = MenuBackgroundHook_End,
+      EEyeSettingHook_DistLabel,
+      EEyeSettingHook_AddrText,
+      EEyeSettingHook_AddrLabel,
+      EEyeSettingHook_QCodeText,
+      EEyeSettingHook_QCodeLabel,
+      EEyeSettingHook_FixPosBtn,
+      EEyeSettingHook_EeyeTypeText,
+      EEyeSettingHook_EeyeBtnOne,
+      EEyeSettingHook_EeyeBtnOneIcon,
+      EEyeSettingHook_EeyeBtnOneLabel,
+      EEyeSettingHook_EeyeBtnTwo,
+      EEyeSettingHook_EeyeBtnTwoIcon,
+      EEyeSettingHook_EeyeBtnTwoLabel,
+      EEyeSettingHook_EeyeBtnThree,
+      EEyeSettingHook_EeyeBtnThreeIcon,
+      EEyeSettingHook_EeyeBtnThreeLabel,
+      EEyeSettingHook_EeyeBtnFour,
+      EEyeSettingHook_EeyeBtnFourIcon,
+      EEyeSettingHook_EeyeBtnFourLabel,
+      EEyeSettingHook_LimitSpeedText,
+      EEyeSettingHook_AddSpeedBtn,
+      EEyeSettingHook_AddSpeedBtnIcon,
+      EEyeSettingHook_SpeedLabelLeft,
+      EEyeSettingHook_SpeedLabelCenter,
+      EEyeSettingHook_SpeedLabelRight,
+      EEyeSettingHook_MinusSpeedBtn,
+      EEyeSettingHook_MinusSpeedBtnIcon,
+      EEyeSettingHook_SaveBtn,
+      EEyeSettingHook_ButtomBack,
       EEyeSettingHook_End
     };
 
-  public:
-    /**
-    * \brief 默认构造函数
-    */
     CEEyeSettingHook();
 
-    /**
-    * \brief 析构函数
-    */
     virtual ~CEEyeSettingHook();
 
-  public:
-    /**
-    *
-    */
-    virtual void MakeGUI();
-    /**
-    *
-    */
-    virtual void Load();
-    /**
-    *
-    */
-    virtual void Init();
-    /**
-    *
-    */
     virtual short MouseDown(CGeoPoint<short> &scrPoint);
 
-    /**
-    *
-    */
     virtual short MouseMove(CGeoPoint<short> &scrPoint);
 
-    /**
-    *
-    */
     virtual short MouseUp(CGeoPoint<short> &scrPoint);
 
-    /**
-    *
-    */
-    virtual bool operator ()();
+    void SetEditEEyeData(int index, UserEEyeEntryData *pEEyeData);
 
   protected:
-    /**
-    *
-    */
-    virtual tstring GetBinaryFileName();
 
-    /**
-    *
-    */
+    virtual void Load();
+
     virtual void MakeNames();
 
-  private:   
-    //生成控件
     void MakeControls();
-    //保存设置
-    void SaveSettings();
-  private:
-    CUiButton m_mapCtrl;
-    CUiButton m_previousCtrl;
 
-    CUiCheckButton m_enableCtrl;
-    CUiCheckButton m_redLightCtrl;
-    CUiCheckButton m_overSpeedCtrl;
-    CUiCheckButton m_breakRuleCtrl;
-    CUiCheckButton m_railCtrl;
+    void ShowSettings();
+
+    void ShowInfo();
+
+    void FixSpeed(bool isAddSpeed);
+
+    void SetSpeedBtnEnable();
+
+    void FixEEyeDataPos();
+
+    static void OnFixEEyeDataPos(void *callBackObj, const UeQuery::SQLRecord* data);
+
+    void DoFixEEyeDataPos(const UeQuery::SQLRecord* data);
+
+  private:
+    CUiLabel m_nameLabel;
+    CUiLabel m_addrLabel;
+    CUiLabel m_qCodeLabel;
+
+    CUiButton m_fixPosBtn;
+    CUiRadioButton m_redLightBtn;
+    CUiRadioButton m_speedBtn;
+    CUiRadioButton m_ruleBtn;
+    CUiRadioButton m_channelBtn;
+
+    CUiBitButton m_addSpeedBtn;
+    CUiBitButton m_minusSpeedBtn;
+    CUiLabel m_speedLabel;
+
+    CUiButton m_saveBtn;
+    //正在编辑的电子眼
+    UserEEyeEntryData m_eEyeData;
+    //正在编辑的电子眼的下标
+    int m_index;
+    //Q码
+    unsigned short m_QCode[9];
   };
 }
-
 #endif

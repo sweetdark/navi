@@ -15,6 +15,11 @@
 namespace UeGui
 {
   class CMapNavigationPic1Hook;
+  class CMapNavigationPic2Hook;
+  class CMapNavigationPic3Hook;
+  class CMapNavigationPic4Hook;
+  class CMapNavigationPic5Hook;
+  class CMapNavigationPic6Hook;
 
   class UEGUI_CLASS CMapNavigationHook : public CMenuBackgroundHook
   {
@@ -43,6 +48,8 @@ namespace UeGui
 
   protected:
 
+    void ShowPic(int,bool);
+
     void SwitchPage();
 
     virtual void MakeNames();
@@ -51,6 +58,11 @@ namespace UeGui
 
   private:
     CMapNavigationPic1Hook* m_picOne;
+    CMapNavigationPic2Hook* m_picTwo;
+    CMapNavigationPic3Hook* m_picThree;
+    CMapNavigationPic4Hook* m_picFour;
+    CMapNavigationPic5Hook* m_picFive;
+    CMapNavigationPic6Hook* m_picSix;
 
     int m_showPic;
     CUiButton m_leftBtnCenterCtrl;

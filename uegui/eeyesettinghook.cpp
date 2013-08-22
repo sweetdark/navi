@@ -1,11 +1,20 @@
 #include "eeyesettinghook.h"
-#include "guisetting.h"
 
-using namespace UeBase;
+#include "ueroute\routebasic.h"
+
+#include "maphook.h"
+
+#ifndef __Q_CODE_H__
+#include "QCode.h"
+#pragma comment(lib, "QCode.lib")
+#endif
+
 using namespace UeGui;
 
 CEEyeSettingHook::CEEyeSettingHook()
 {
+  m_strTitle = "编辑电子眼";
+  m_vecHookFile.push_back(_T("eeyesettinghook.bin"));
 }
 
 CEEyeSettingHook::~CEEyeSettingHook()
@@ -15,336 +24,250 @@ CEEyeSettingHook::~CEEyeSettingHook()
   m_imageNames.clear();
 }
 
-void CEEyeSettingHook::MakeGUI()
+void CEEyeSettingHook::Load()
 {
-#if __FOR_DEVICE__
-  FetchWithBinary();
-  MakeNames();
-  MakeControls();
-  Init();
-#endif
-}
-
-tstring CEEyeSettingHook::GetBinaryFileName()
-{
-  return _T("eeyesettinghook.bin");
+  ShowInfo();
+  ShowSettings();
 }
 
 void CEEyeSettingHook::MakeNames()
 {
-  m_ctrlNames.erase(m_ctrlNames.begin(), m_ctrlNames.end());
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_Map,	"Map"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_Previous,	"Previous"));
-
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EnableLeft,	"EnableLeft"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_Enable,	"Enable"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EnableRight,	"EnableRight"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EnableIcon,	"EnableIcon"));
-
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_RedLightLeft,	"RedLightLeft"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_RedLight,	"RedLight"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_RedLightRight,	"RedLightRight"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_RedLightIcon,	"RedLightIcon"));
-  
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_OverSpeedLeft,	"OverSpeedLeft"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_OverSpeed,	"OverSpeed"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_OverSpeedRight,	"OverSpeedRight"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_OverSpeedIcon,	"OverSpeedIcon"));
-
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_BreakRuleLeft,	"BreakRuleLeft"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_BreakRule,	"BreakRule"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_BreakRuleRight,	"BreakRuleRight"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_BreakRuleIcon,	"BreakRuleIcon"));
-
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_RailLeft,	"RailLeft"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_Rail,	"Rail"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_RailRight,	"RailRight"));
-  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_RailIcon,	"RailIcon"));
+  CMenuBackgroundHook::MakeNames();
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_DistLabel,	"DistLabel"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_AddrText,	"AddrText"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_AddrLabel,	"AddrLabel"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_QCodeText,	"QCodeText"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_QCodeLabel,	"QCodeLabel"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_FixPosBtn,	"FixPosBtn"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeTypeText,	"EeyeTypeText"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnOne,	"EeyeBtnOne"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnOneIcon,	"EeyeBtnOneIcon"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnOneLabel,	"EeyeBtnOneLabel"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnTwo,	"EeyeBtnTwo"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnTwoIcon,	"EeyeBtnTwoIcon"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnTwoLabel,	"EeyeBtnTwoLabel"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnThree,	"EeyeBtnThree"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnThreeIcon,	"EeyeBtnThreeIcon"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnThreeLabel,	"EeyeBtnThreeLabel"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnFour,	"EeyeBtnFour"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnFourIcon,	"EeyeBtnFourIcon"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_EeyeBtnFourLabel,	"EeyeBtnFourLabel"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_LimitSpeedText,	"LimitSpeedText"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_AddSpeedBtn,	"AddSpeedBtn"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_AddSpeedBtnIcon,	"AddSpeedBtnIcon"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_SpeedLabelLeft,	"SpeedLabelLeft"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_SpeedLabelCenter,	"SpeedLabelCenter"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_SpeedLabelRight,	"SpeedLabelRight"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_MinusSpeedBtn,	"MinusSpeedBtn"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_MinusSpeedBtnIcon,	"MinusSpeedBtnIcon"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_SaveBtn,	"SaveBtn"));
+  m_ctrlNames.insert(GuiName::value_type(EEyeSettingHook_ButtomBack,	"ButtomBack"));
 }
 
 void CEEyeSettingHook::MakeControls()
 {
-  m_mapCtrl.SetCenterElement(GetGuiElement(EEyeSettingHook_Map));
-  m_previousCtrl.SetCenterElement(GetGuiElement(EEyeSettingHook_Previous));
+  CMenuBackgroundHook::MakeControls();
+  m_nameLabel.SetLabelElement(GetGuiElement(EEyeSettingHook_DistLabel));
+  m_addrLabel.SetLabelElement(GetGuiElement(EEyeSettingHook_AddrLabel));
+  m_qCodeLabel.SetLabelElement(GetGuiElement(EEyeSettingHook_QCodeLabel));
 
-  m_enableCtrl.SetLeftElement(GetGuiElement(EEyeSettingHook_EnableLeft));
-  m_enableCtrl.SetCenterElement(GetGuiElement(EEyeSettingHook_Enable));
-  m_enableCtrl.SetRightElement(GetGuiElement(EEyeSettingHook_EnableRight));
-  m_enableCtrl.SetIconElement(GetGuiElement(EEyeSettingHook_EnableIcon));
+  m_fixPosBtn.SetCenterElement(GetGuiElement(EEyeSettingHook_FixPosBtn));
 
-  m_redLightCtrl.SetLeftElement(GetGuiElement(EEyeSettingHook_RedLightLeft));
-  m_redLightCtrl.SetCenterElement(GetGuiElement(EEyeSettingHook_RedLight));
-  m_redLightCtrl.SetRightElement(GetGuiElement(EEyeSettingHook_RedLightRight));
-  m_redLightCtrl.SetIconElement(GetGuiElement(EEyeSettingHook_RedLightIcon));
+  m_redLightBtn.SetCenterElement(GetGuiElement(EEyeSettingHook_EeyeBtnOne));
+  m_redLightBtn.SetIconElement(GetGuiElement(EEyeSettingHook_EeyeBtnOneIcon));
+  m_redLightBtn.SetLabelElement(GetGuiElement(EEyeSettingHook_EeyeBtnOneLabel));
 
-  m_overSpeedCtrl.SetLeftElement(GetGuiElement(EEyeSettingHook_OverSpeedLeft));
-  m_overSpeedCtrl.SetCenterElement(GetGuiElement(EEyeSettingHook_OverSpeed));
-  m_overSpeedCtrl.SetRightElement(GetGuiElement(EEyeSettingHook_OverSpeedRight));
-  m_overSpeedCtrl.SetIconElement(GetGuiElement(EEyeSettingHook_OverSpeedIcon));
+  m_speedBtn.SetCenterElement(GetGuiElement(EEyeSettingHook_EeyeBtnTwo));
+  m_speedBtn.SetIconElement(GetGuiElement(EEyeSettingHook_EeyeBtnTwoIcon));
+  m_speedBtn.SetLabelElement(GetGuiElement(EEyeSettingHook_EeyeBtnTwoLabel));
 
-  m_breakRuleCtrl.SetLeftElement(GetGuiElement(EEyeSettingHook_BreakRuleLeft));
-  m_breakRuleCtrl.SetCenterElement(GetGuiElement(EEyeSettingHook_BreakRule));
-  m_breakRuleCtrl.SetRightElement(GetGuiElement(EEyeSettingHook_BreakRuleRight));
-  m_breakRuleCtrl.SetIconElement(GetGuiElement(EEyeSettingHook_BreakRuleIcon));
+  m_ruleBtn.SetCenterElement(GetGuiElement(EEyeSettingHook_EeyeBtnThree));
+  m_ruleBtn.SetIconElement(GetGuiElement(EEyeSettingHook_EeyeBtnThreeIcon));
+  m_ruleBtn.SetLabelElement(GetGuiElement(EEyeSettingHook_EeyeBtnThreeLabel));
 
-  m_railCtrl.SetLeftElement(GetGuiElement(EEyeSettingHook_RailLeft));
-  m_railCtrl.SetCenterElement(GetGuiElement(EEyeSettingHook_Rail));
-  m_railCtrl.SetRightElement(GetGuiElement(EEyeSettingHook_RailRight));
-  m_railCtrl.SetIconElement(GetGuiElement(EEyeSettingHook_RailIcon));
-}
+  m_channelBtn.SetCenterElement(GetGuiElement(EEyeSettingHook_EeyeBtnFour));
+  m_channelBtn.SetIconElement(GetGuiElement(EEyeSettingHook_EeyeBtnFourIcon));
+  m_channelBtn.SetLabelElement(GetGuiElement(EEyeSettingHook_EeyeBtnFourLabel));
 
-void CEEyeSettingHook::Init()
-{
-  CGuiSettings* guiSettings = CGuiSettings::GetGuiSettings();
-  if (guiSettings)
-  {
-    if (OS_ON == guiSettings->GetIsEEyeOpen())
-    {
-      m_enableCtrl.SetCheck(true);
+  m_addSpeedBtn.SetCenterElement(GetGuiElement(EEyeSettingHook_AddSpeedBtn));
+  m_addSpeedBtn.SetIconElement(GetGuiElement(EEyeSettingHook_AddSpeedBtnIcon));
+  m_minusSpeedBtn.SetCenterElement(GetGuiElement(EEyeSettingHook_MinusSpeedBtn));
+  m_minusSpeedBtn.SetIconElement(GetGuiElement(EEyeSettingHook_MinusSpeedBtnIcon));
+  m_speedLabel.SetLabelElement(GetGuiElement(EEyeSettingHook_SpeedLabelCenter));
 
-      m_redLightCtrl.SetEnable(true);
-      m_overSpeedCtrl.SetEnable(true);
-      m_breakRuleCtrl.SetEnable(true);
-      m_railCtrl.SetEnable(true);
-    }
-    else
-    {
-      m_enableCtrl.SetCheck(false);
-
-      m_redLightCtrl.SetEnable(false);
-      m_overSpeedCtrl.SetEnable(false);
-      m_breakRuleCtrl.SetEnable(false);
-      m_railCtrl.SetEnable(false);
-    }
-    unsigned char eyeType = guiSettings->GetEEyeType();
-    if (eyeType & VoiceSettings::EYE_TrafficLight)
-    {
-      m_redLightCtrl.SetCheck(true);
-    }
-    else
-    {
-      m_redLightCtrl.SetCheck(false);
-    }
-    if (eyeType & VoiceSettings::EYE_Speedding)
-    {
-      m_overSpeedCtrl.SetCheck(true);
-    }
-    else
-    {
-      m_overSpeedCtrl.SetCheck(false);
-    }
-    if (eyeType & VoiceSettings::EYE_IllegalMonitoring)
-    {
-      m_breakRuleCtrl.SetCheck(true);
-    }
-    else
-    {
-      m_breakRuleCtrl.SetCheck(false);
-    }
-    if (eyeType & VoiceSettings::EYE_RailwayCrossing)
-    {
-      m_railCtrl.SetCheck(true);
-    }
-    else
-    {
-      m_railCtrl.SetCheck(false);
-    }
-  }
+  m_saveBtn.SetCenterElement(GetGuiElement(EEyeSettingHook_SaveBtn));
 }
 
 short CEEyeSettingHook::MouseDown(CGeoPoint<short> &scrPoint)
 {
-  short ctrlType = CAggHook::MouseDown(scrPoint);
-
+  short ctrlType = CMenuBackgroundHook::MouseDown(scrPoint);
   switch(ctrlType)
   {
-  case EEyeSettingHook_Map:
+  case EEyeSettingHook_AddSpeedBtn:
+  case EEyeSettingHook_AddSpeedBtnIcon:
     {
-      m_mapCtrl.MouseDown();
+      m_addSpeedBtn.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_addSpeedBtn);
     }
     break;
-  case EEyeSettingHook_Previous:
+  case EEyeSettingHook_MinusSpeedBtn:
+  case EEyeSettingHook_MinusSpeedBtnIcon:
     {
-      m_previousCtrl.MouseDown();
+      m_minusSpeedBtn.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_minusSpeedBtn);
     }
     break;
-  case EEyeSettingHook_EnableLeft:
-  case EEyeSettingHook_Enable:
-  case EEyeSettingHook_EnableRight:
-  case EEyeSettingHook_EnableIcon:
+  case EEyeSettingHook_FixPosBtn:
     {
-      m_enableCtrl.MouseDown();
-      AddRenderUiControls(&m_enableCtrl);
+      m_fixPosBtn.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_fixPosBtn);
     }
     break;
-  case EEyeSettingHook_RedLightLeft:
-  case EEyeSettingHook_RedLight:
-  case EEyeSettingHook_RedLightRight:
-  case EEyeSettingHook_RedLightIcon:
+  case EEyeSettingHook_SaveBtn:
     {
-      if(m_enableCtrl.Checked())
-      {
-        m_redLightCtrl.MouseDown();
-        AddRenderUiControls(&m_redLightCtrl);
-      }
+      m_saveBtn.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_saveBtn);
     }
     break;
-  case EEyeSettingHook_OverSpeedLeft:
-  case EEyeSettingHook_OverSpeed:
-  case EEyeSettingHook_OverSpeedRight:
-  case EEyeSettingHook_OverSpeedIcon:
+  case EEyeSettingHook_EeyeBtnOne:
+  case EEyeSettingHook_EeyeBtnOneIcon:
+  case EEyeSettingHook_EeyeBtnOneLabel:
     {
-      if(m_enableCtrl.Checked())
-      {
-        m_overSpeedCtrl.MouseDown();
-        AddRenderUiControls(&m_overSpeedCtrl);
-      }
+      m_redLightBtn.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_redLightBtn);
     }
     break;
-  case EEyeSettingHook_BreakRuleLeft:
-  case EEyeSettingHook_BreakRule:
-  case EEyeSettingHook_BreakRuleRight:
-  case EEyeSettingHook_BreakRuleIcon:
+  case EEyeSettingHook_EeyeBtnTwo:
+  case EEyeSettingHook_EeyeBtnTwoIcon:
+  case EEyeSettingHook_EeyeBtnTwoLabel:
     {
-      if(m_enableCtrl.Checked())
-      {
-        m_breakRuleCtrl.MouseDown();
-        AddRenderUiControls(&m_breakRuleCtrl);
-      }
+      m_speedBtn.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_speedBtn);
     }
     break;
-  case EEyeSettingHook_RailLeft:
-  case EEyeSettingHook_Rail:
-  case EEyeSettingHook_RailRight:
-  case EEyeSettingHook_RailIcon:
+  case EEyeSettingHook_EeyeBtnThree:
+  case EEyeSettingHook_EeyeBtnThreeIcon:
+  case EEyeSettingHook_EeyeBtnThreeLabel:
     {
-      if(m_enableCtrl.Checked())
-      {
-        m_railCtrl.MouseDown();
-        AddRenderUiControls(&m_railCtrl);
-      }
+      m_ruleBtn.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_ruleBtn);
+    }
+    break;
+  case EEyeSettingHook_EeyeBtnFour:
+  case EEyeSettingHook_EeyeBtnFourIcon:
+  case EEyeSettingHook_EeyeBtnFourLabel:
+    {
+      m_channelBtn.MouseDown();
+      MOUSEDOWN_1RENDERCTRL(m_channelBtn);
     }
     break;
   default:
-    m_isNeedRefesh = false;
-    assert(false);
+    return CMenuBackgroundHook::MouseDown(scrPoint);
     break;
   }
+
   if (m_isNeedRefesh)
   {
-    this->Refresh();
+    Refresh();
   }
   m_isNeedRefesh = true;
   return ctrlType;
 }
 
-short CEEyeSettingHook::MouseMove(UeBase::CGeoPoint<short> &scrPoint)
+short CEEyeSettingHook::MouseMove(CGeoPoint<short> &scrPoint)
 {
   return -1;
 }
 
-short CEEyeSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
+short CEEyeSettingHook::MouseUp(CGeoPoint<short> &scrPoint)
 {
-  short ctrlType = CAggHook::MouseUp(scrPoint);
-
+  short ctrlType = CMenuBackgroundHook::MouseUp(scrPoint);
   switch(m_downElementType)
   {
-  case EEyeSettingHook_Map:
+  case EEyeSettingHook_AddSpeedBtn:
+  case EEyeSettingHook_AddSpeedBtnIcon:
     {
-      m_mapCtrl.MouseUp();
-
-      if(ctrlType == m_downElementType)
+      m_addSpeedBtn.MouseUp();
+      if (m_addSpeedBtn.IsEnable())
       {
-        SaveSettings();
-        //CViewHook::m_prevHookType = CViewHook::m_curHookType;
-       /* CViewHook::m_curHookType = CViewHook::DHT_MapHook;*/
-        CAggHook::GoToMapHook();
+        FixSpeed(true);
       }
     }
     break;
-  case EEyeSettingHook_Previous:
+  case EEyeSettingHook_MinusSpeedBtn:
+  case EEyeSettingHook_MinusSpeedBtnIcon:
     {
-      m_previousCtrl.MouseUp();
-
-      if(ctrlType == m_downElementType)
+      m_minusSpeedBtn.MouseUp();
+      if (m_minusSpeedBtn.IsEnable())
       {
-        // TODO: Extract Methods.
-        SaveSettings();
-        /*short prevHookType = CViewHook::m_prevHookType;
-        CViewHook::m_prevHookType = CViewHook::m_curHookType;
-        CViewHook::m_curHookType = prevHookType;*/
-        CAggHook::Return();
+        FixSpeed(false);
       }
     }
     break;
-  case EEyeSettingHook_EnableLeft:
-  case EEyeSettingHook_Enable:
-  case EEyeSettingHook_EnableRight:
-  case EEyeSettingHook_EnableIcon:
-    { 
-      m_enableCtrl.MouseUp(); // 已改变m_enableCtrl.Checked()返回值
-      if(ctrlType == m_downElementType)
-      {
-       
-        if(m_enableCtrl.Checked())
-        {
-          m_redLightCtrl.SetEnable(true);
-          m_overSpeedCtrl.SetEnable(true);
-          m_breakRuleCtrl.SetEnable(true);
-          m_railCtrl.SetEnable(true);
-        }
-        else
-        {
-          m_redLightCtrl.SetEnable(false);
-          m_overSpeedCtrl.SetEnable(false);
-          m_breakRuleCtrl.SetEnable(false);
-          m_railCtrl.SetEnable(false);
-        }
-      }
-      else  m_enableCtrl.MouseUp(); // 回到m_enableCtrl.Checked()的原来状态
-    }
-    break;
-  case EEyeSettingHook_RedLightLeft:
-  case EEyeSettingHook_RedLight:
-  case EEyeSettingHook_RedLightRight:
-  case EEyeSettingHook_RedLightIcon:
+  case EEyeSettingHook_FixPosBtn:
     {
-      if(m_enableCtrl.Checked())
+      m_fixPosBtn.MouseUp();
+      if (m_fixPosBtn.IsEnable())
       {
-        m_redLightCtrl.MouseUp();
+        FixEEyeDataPos();
       }
     }
     break;
-  case EEyeSettingHook_OverSpeedLeft:
-  case EEyeSettingHook_OverSpeed:
-  case EEyeSettingHook_OverSpeedRight:
-  case EEyeSettingHook_OverSpeedIcon:
+  case EEyeSettingHook_SaveBtn:
     {
-      if(m_enableCtrl.Checked())
+      m_saveBtn.MouseUp();
+      if (m_saveBtn.IsEnable())
       {
-        m_overSpeedCtrl.MouseUp();
+        CUserDataWrapper::Get().EditUserEEyeData(m_index, m_eEyeData);
+        Return();
       }
     }
     break;
-  case EEyeSettingHook_BreakRuleLeft:
-  case EEyeSettingHook_BreakRule:
-  case EEyeSettingHook_BreakRuleRight:
-  case EEyeSettingHook_BreakRuleIcon:
+  case EEyeSettingHook_EeyeBtnOne:
+  case EEyeSettingHook_EeyeBtnOneIcon:
+  case EEyeSettingHook_EeyeBtnOneLabel:
     {
-      if(m_enableCtrl.Checked())
+      m_redLightBtn.MouseUp();
+      if (m_redLightBtn.IsEnable())
       {
-        m_breakRuleCtrl.MouseUp();
+        m_eEyeData.m_type = TVT_TrafficLights;
+        ShowSettings();
       }
     }
     break;
-  case EEyeSettingHook_RailLeft:
-  case EEyeSettingHook_Rail:
-  case EEyeSettingHook_RailRight:
-  case EEyeSettingHook_RailIcon:
+  case EEyeSettingHook_EeyeBtnTwo:
+  case EEyeSettingHook_EeyeBtnTwoIcon:
+  case EEyeSettingHook_EeyeBtnTwoLabel:
     {
-      if(m_enableCtrl.Checked())
+      m_speedBtn.MouseUp();
+      if (m_speedBtn.IsEnable())
       {
-        m_railCtrl.MouseUp();
+        m_eEyeData.m_type = TVT_SpeedLimit;
+        ShowSettings();
+      }
+    }
+    break;
+  case EEyeSettingHook_EeyeBtnThree:
+  case EEyeSettingHook_EeyeBtnThreeIcon:
+  case EEyeSettingHook_EeyeBtnThreeLabel:
+    {
+      m_ruleBtn.MouseUp();
+      if (m_ruleBtn.IsEnable())
+      {
+        m_eEyeData.m_type = TVT_NormalCamera;
+        ShowSettings();
+      }
+    }
+    break;
+  case EEyeSettingHook_EeyeBtnFour:
+  case EEyeSettingHook_EeyeBtnFourIcon:
+  case EEyeSettingHook_EeyeBtnFourLabel:
+    {
+      m_channelBtn.MouseUp();
+      if (m_channelBtn.IsEnable())
+      {
+        m_eEyeData.m_type = TVT_TunnelPort;
+        ShowSettings();
       }
     }
     break;
@@ -353,55 +276,132 @@ short CEEyeSettingHook::MouseUp(UeBase::CGeoPoint<short> &scrPoint)
     assert(false);
     break;
   }
+
   if (m_isNeedRefesh)
   {
-    this->Refresh();
+    Refresh();
   }
   m_isNeedRefesh = true;
   return ctrlType;
 }
 
-bool CEEyeSettingHook::operator ()()
+void CEEyeSettingHook::ShowSettings()
 {
-  return false;
-}
+  m_redLightBtn.SetCheck(false);
+  m_speedBtn.SetCheck(false);
+  m_ruleBtn.SetCheck(false);
+  m_channelBtn.SetCheck(false);
 
-void UeGui::CEEyeSettingHook::Load()
-{
-  Init();
-}
+  m_addSpeedBtn.SetEnable(false);
+  m_minusSpeedBtn.SetEnable(false);
 
-void UeGui::CEEyeSettingHook::SaveSettings()
-{
-  CGuiSettings* guiSettings = CGuiSettings::GetGuiSettings();
-  if (guiSettings)
+  if (m_eEyeData.m_type == TVT_TrafficLights)
   {
-    if (m_enableCtrl.Checked())
-    {
-      guiSettings->SetIsEEyeOpen(OS_ON);
-    }
-    else
-    {
-      guiSettings->SetIsEEyeOpen(OS_OFF);
-    }
-    unsigned char eyeType = 0;
-    if (m_redLightCtrl.Checked())
-    {
-      eyeType |= VoiceSettings::EYE_TrafficLight;
-    }
-    if (m_overSpeedCtrl.Checked())
-    {
-      eyeType |= VoiceSettings::EYE_Speedding;
-    }
-    if (m_breakRuleCtrl.Checked())
-    {
-      eyeType |= VoiceSettings::EYE_IllegalMonitoring;
-    }
-    if (m_railCtrl.Checked())
-    {
-      eyeType |= VoiceSettings::EYE_RailwayCrossing;
-    }
-    guiSettings->SetEEyeType(eyeType);
-    guiSettings->SaveNaviationSettings();
+    m_redLightBtn.SetCheck(true);
+  }
+  else if (m_eEyeData.m_type == TVT_SpeedLimit)
+  {
+    m_speedBtn.SetCheck(true);
+    m_addSpeedBtn.SetEnable(true);
+    m_minusSpeedBtn.SetEnable(true);
+    SetSpeedBtnEnable();
+  }
+  else if (m_eEyeData.m_type == TVT_NormalCamera)
+  {
+    m_ruleBtn.SetCheck(true);
+  }
+  else if (m_eEyeData.m_type == TVT_TunnelPort)
+  {
+    m_channelBtn.SetCheck(true);
+  }
+}
+
+void CEEyeSettingHook::ShowInfo()
+{
+  //读取Q码
+  float median = 100000.0;
+  double dX = m_eEyeData.m_x / median;
+  double dY = m_eEyeData.m_y / median;
+  QCode_MapToCode(dX, dY, m_QCode, 9);
+  //显示基本信息
+  char name[128];
+  ::memcpy(name, m_eEyeData.m_name, sizeof(name));
+  m_nameLabel.SetCaption(name);
+  ::memcpy(name, m_eEyeData.m_address, sizeof(name));
+  m_addrLabel.SetCaption(name);
+  char buf[12] = {};
+  ::sprintf(buf, "%c%c%c-%c%c%c-%c%c%c",m_QCode[0], m_QCode[1], m_QCode[2], m_QCode[3], m_QCode[4], m_QCode[5], m_QCode[6], m_QCode[7], m_QCode[8]);
+  m_qCodeLabel.SetCaption(buf);
+  //显示设置信息
+  ::sprintf(m_speedLabel.GetCaption(), "%dkm/h", m_eEyeData.m_speed);
+  SetSpeedBtnEnable();
+}
+
+void CEEyeSettingHook::FixSpeed(bool isAddSpeed)
+{
+  int speed = m_eEyeData.m_speed;
+  isAddSpeed ? speed+=10 : speed-=10;
+  if (speed < 40)
+  {
+    speed = 40;
+  }
+  if (speed > 120)
+  {
+    speed = 120;
+  }
+  m_eEyeData.m_speed = speed;
+  ::sprintf(m_speedLabel.GetCaption(), "%dkm/h", m_eEyeData.m_speed);
+  SetSpeedBtnEnable();
+}
+
+void CEEyeSettingHook::SetSpeedBtnEnable()
+{
+  m_addSpeedBtn.SetEnable(true);
+  m_minusSpeedBtn.SetEnable(true);
+  if (m_eEyeData.m_speed <= 40)
+  {
+    m_minusSpeedBtn.SetEnable(false);
+  }
+  else if (m_eEyeData.m_speed >= 120)
+  {
+    m_addSpeedBtn.SetEnable(false);
+  }
+}
+
+void CEEyeSettingHook::FixEEyeDataPos()
+{
+  PointInfo pointInfo;
+  pointInfo.m_point.m_x = m_eEyeData.m_x;
+  pointInfo.m_point.m_y = m_eEyeData.m_y;
+  ::memcpy(&pointInfo.m_name, m_eEyeData.m_name, sizeof(pointInfo.m_name));
+  TurnTo(DHT_MapHook);
+  CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
+  pMapHook->SelectPoint(pointInfo.m_point, pointInfo.m_name, this, OnFixEEyeDataPos);
+}
+
+void CEEyeSettingHook::OnFixEEyeDataPos(void *callBackObj, const UeQuery::SQLRecord* data)
+{
+  CEEyeSettingHook *pEEyeSettingHook = static_cast<CEEyeSettingHook*>(callBackObj);
+  if (pEEyeSettingHook)
+  {
+    pEEyeSettingHook->DoFixEEyeDataPos(data);
+    pEEyeSettingHook->Load();
+  }
+}
+
+void CEEyeSettingHook::DoFixEEyeDataPos(const UeQuery::SQLRecord* data)
+{
+  m_eEyeData.m_x = data->m_x;
+  m_eEyeData.m_y = data->m_y;
+  ::memcpy(m_eEyeData.m_name, data->m_uniName, sizeof(m_eEyeData.m_name));
+}
+
+void CEEyeSettingHook::SetEditEEyeData(int index, UserEEyeEntryData *pEEyeData)
+{
+  m_index = index;
+  ::memcpy(&m_eEyeData, pEEyeData, sizeof(UserEEyeEntryData));
+  if (m_eEyeData.m_speed == 0)
+  {
+    m_eEyeData.m_speed = 40;
   }
 }

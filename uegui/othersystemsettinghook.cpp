@@ -20,8 +20,6 @@ void COtherSystemSettingHook::MakeGUI()
   FetchWithBinary();
   MakeNames();
   MakeControls();
-  m_fastOperatPanelCtrl.SetVisible(false);
-  m_fastOperatPanelLabelCtrl.SetVisible(false);
 }
 tstring COtherSystemSettingHook::GetBinaryFileName()
 {
@@ -157,6 +155,14 @@ void COtherSystemSettingHook::SaveSetting()
   }
   settingWrapper.SaveAllSettings();
   /*快捷操作面板的设置*/
+  if (m_fastOperatPanelCtrl.Checked())
+  {
+    settingWrapper.SetIsShowShortcutPanel(UeBase::OS_ON);
+  }
+  else
+  {
+    settingWrapper.SetIsShowShortcutPanel(UeBase::OS_OFF);
+  }
 }
 void COtherSystemSettingHook::ReadSetting()
 {
@@ -175,5 +181,15 @@ void COtherSystemSettingHook::ReadSetting()
   {
     m_spDeclarationCtrl.SetCheck(false);
     m_changeDeclaration = false;
+  }
+  if (UeBase::OS_OFF == settingWrapper.GetIsShowShortcutPanel())
+  {
+    m_fastOperatPanelCtrl.SetCheck(false);
+    m_changePanel = false;
+  }
+  else
+  {
+    m_fastOperatPanelCtrl.SetCheck(true);
+    m_changePanel = true;
   }
 }

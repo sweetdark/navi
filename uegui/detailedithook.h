@@ -137,8 +137,6 @@ namespace UeGui
 
     void SetEditData();
 
-    bool EditData2FavoriteEntry(EditData* edata, FavoriteEntry* fEntry);
-
     //±£´æÊý¾Ý
     bool SaveFavoriteEntryData(const FavoriteEntry& data);
   private:

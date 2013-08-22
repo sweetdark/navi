@@ -66,8 +66,6 @@ namespace UeGui
 
     void SetKeyWord(const char* keyword);
 
-    void SetTitle(const char* title);
-
     void SetQueryMode();
 
     //实时判断当前的手写输入
@@ -87,7 +85,6 @@ namespace UeGui
 
     bool EraseOneKeyWord();
     bool AddOneKeyWord(const char *pchLabelText);
-    bool doAddOneKeyWord(TCHAR oneWord);
     void ClearKeyWord(void);
     void SetCursorPosX(int curIndex);
 

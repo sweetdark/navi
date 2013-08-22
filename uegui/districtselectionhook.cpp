@@ -579,7 +579,7 @@ void CDistrictSelectionHook::GetItemList()
   if (m_isCommonUse)
   {
     m_pCurItemCtrl->GetComItem(m_vecListItem);
-    m_vecListItem.erase(m_vecListItem.begin());
+    //m_vecListItem.erase(m_vecListItem.begin());
   }
   else
   {

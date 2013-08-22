@@ -637,6 +637,16 @@ void UeGui::CSettingWrapper::SetIsOpenStartStatement( unsigned char value )
   m_systemSettings.m_startStatement = value;
 }
 
+unsigned char UeGui::CSettingWrapper::GetIsShowShortcutPanel()
+{
+  return m_systemSettings.m_showShortcutPanel;
+}
+
+void UeGui::CSettingWrapper::SetIsShowShortcutPanel( unsigned char value )
+{
+  m_systemSettings.m_showShortcutPanel = value;
+}
+
 unsigned char UeGui::CSettingWrapper::GetGPSPort()
 {
   return m_systemSettings.m_gpsPort;

@@ -92,7 +92,7 @@ void CGpsHook::MakeControls()
     m_sNRCtrl[i].SetCenterElement(GetGuiElement(j++));
   }
   //卫星图标
-  for (int i=0, j=GpsHook_SNROne; i<12; i++)
+  for (int i=0, j=GpsHook_Point1; i<12; i++)
   {
     m_point[i].SetCenterElement(GetGuiElement(j++));
   }
@@ -126,17 +126,17 @@ short CGpsHook::MouseUp(CGeoPoint<short> &scrPoint)
   return CMenuBackgroundHook::MouseUp(scrPoint);
 }
 
-void CGpsHook::Update()
+void CGpsHook::Timer()
 {
-  if (CViewHook::m_curHookType != DHT_GPSHook && CViewHook::m_curHookType != DHT_MapHook)
-  {
-    return;
-  }
-
   //如果停留在地图界面则只更新卫星个数
   if (DHT_MapHook == CViewHook::m_curHookType)
   {
     UpdateLocationSatelliteNum();
+    return;
+  }
+
+  if (CViewHook::m_curHookType != DHT_GPSHook && CViewHook::m_curHookType != DHT_MapHook)
+  {
     return;
   }
 
@@ -415,7 +415,7 @@ GuiElement* CGpsHook::GetSatlliteElement( int id )
   }
   else
   {
-    return m_point[id].GetCenterElement();
+    return m_point[index].GetCenterElement();
   }
 }
 

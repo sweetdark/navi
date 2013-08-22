@@ -125,7 +125,6 @@ namespace UeMap
       UHT_ForBlockCmd,
       UHT_UpdateGPSHook,
       UHT_UpdateMapHook,
-      UHT_SplitMapHook,
       UHT_UpdateCountDown,
       UHT_UpdateKeyboardHook,
       UHT_UpdateLocationMapHook,

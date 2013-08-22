@@ -94,6 +94,27 @@ void CPoiQueryListHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_PageInfoInterval,	"PageInfoInterval"));
   m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_BtnIntervalLine1,	"BtnIntervalLine1"));
   m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_BtnIntervalLine2,	"BtnIntervalLine2"));
+
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List1PoiTelBox,	"List1PoiTelBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List2PoiTelBox,	"List2PoiTelBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List3PoiTelBox,	"List3PoiTelBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List4PoiTelBox,	"List4PoiTelBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List1PoiFarBox,	"List1PoiFarBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List2PoiFarBox,	"List2PoiFarBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List3PoiFarBox,	"List3PoiFarBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List4PoiFarBox,	"List4PoiFarBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_Cursor1,	"Cursor1"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_Cursor2,	"Cursor2"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_Cursor3,	"Cursor3"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_Cursor4,	"Cursor4"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_Cursor5,	"Cursor5"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_Cursor6,	"Cursor6"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_Cursor7,	"Cursor7"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_Cursor8,	"Cursor8"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List1PoiCursorBox,	"List1PoiCursorBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List2PoiCursorBox,	"List2PoiCursorBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List3PoiCursorBox,	"List3PoiCursorBox"));
+  m_ctrlNames.insert(GuiName::value_type(PoiQueryListHook_List4PoiCursorBox,	"List4PoiCursorBox"));
 }
 
 void CPoiQueryListHook::MakeControls()
@@ -123,6 +144,9 @@ void CPoiQueryListHook::MakeControls()
     m_poiLabel[i].SetParent(this);
 
     m_addrLabel[i].SetLabelElement(GetGuiElement(j++));
+    m_telLabel[i].SetLabelElement(GetGuiElement(j++));
+    m_farLabel[i].SetLabelElement(GetGuiElement(j++));
+    m_cursorIcon[i].SetCenterElement(GetGuiElement(j++));
   }
 
   m_returnBtn.SetCenterElement(GetGuiElement(MenuBackgroundHook_ReturnBtn));
@@ -181,13 +205,12 @@ short CPoiQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    if (ctrlType >= PoiQueryListHook_List1Btn && ctrlType <= PoiQueryListHook_List4PoiDistBox)
+    if (ctrlType >= PoiQueryListHook_List1Btn && ctrlType <= PoiQueryListHook_List4PoiCursorBox)
     {
-      int index = (ctrlType-PoiQueryListHook_List1Btn)/4;
+      int index = (ctrlType-PoiQueryListHook_List1Btn)/7;
       m_infoBtn[index].MouseDown();
-      m_addrLabel[index].MouseDown();
-      m_poiLabel[index].MouseDown();
       MOUSEDOWN_3RENDERCTRL(m_infoBtn[index], m_poiLabel[index], m_addrLabel[index]);
+      MOUSEDOWN_3RENDERCTRL(m_telLabel[index], m_farLabel[index], m_cursorIcon[index]);
     } 
     else
     {
@@ -276,12 +299,10 @@ short CPoiQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    if (ctrlType >= PoiQueryListHook_List1Btn && ctrlType <= PoiQueryListHook_List4PoiDistBox)
+    if (ctrlType >= PoiQueryListHook_List1Btn && ctrlType <= PoiQueryListHook_List4PoiCursorBox)
     {
-      int index = (ctrlType-PoiQueryListHook_List1Btn)/4;
+      int index = (ctrlType-PoiQueryListHook_List1Btn)/7;
       m_infoBtn[index].MouseUp();
-      m_addrLabel[index].MouseUp();
-      m_poiLabel[index].MouseUp();
       if(m_infoBtn[index].IsEnable())
       {
         CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
@@ -327,6 +348,7 @@ void CPoiQueryListHook::SearchForResult()
     pRecordVec->Clear(false);
   }
 
+  GetDistances();
   m_records.SetDistplayNum(((PoiQueryListHook_List4PoiDistBox-PoiQueryListHook_List1Btn+1)/4));
 
   ResetResultList();
@@ -347,16 +369,43 @@ void CPoiQueryListHook::ResetResultList()
       m_infoBtn[i].SetEnable(false);
       m_poiLabel[i].SetCaption("");
       m_addrLabel[i].SetCaption("");
+      m_telLabel[i].SetCaption("");
+      m_farLabel[i].SetCaption("");
+      m_cursorIcon[i].SetVisible(false);
       continue;
     }
+    //poi名称
     m_infoBtn[i].SetEnable(true);
     m_poiLabel[i].SetCaption(oneRecord->m_uniName);
     SQLSentence sql = CQueryWrapper::Get().GetSQLSentence();
     UeQuery::CTermIndexCtrl::GetKeyWordPosInRecord(oneRecord->m_uniName, sql, posBuffer);
     m_poiLabel[i].SetFocusKey(posBuffer);
-
+    //地址
     CCodeIndexCtrl::GetDistCodeCtrl().GetItemNameByCode(oneRecord->m_addrCode,
       m_addrLabel[i].GetCaption());
+    if (oneRecord->m_pchAddrStr)
+    {
+      ::strcat(m_addrLabel[i].GetCaption(), oneRecord->m_pchAddrStr);
+    }
+    //电话
+    m_telLabel[i].SetCaption(oneRecord->m_pchTelStr);
+    if (oneRecord->m_pchTelStr == NULL)
+    {
+      m_telLabel[i].SetCaption("暂无电话");
+    }
+    //距离
+    int distance = ::sqrt(oneRecord->m_dist2th);
+    if (distance > 1000)
+    {
+      ::sprintf(m_farLabel[i].GetCaption(),"%.2f km",distance/1000.);
+    }
+    else
+    {
+      ::sprintf(m_farLabel[i].GetCaption(),"%d m",distance);
+    }
+    //方向
+    m_cursorIcon[i].SetVisible(true);
+    SetDirection(*oneRecord, i);
 
     PointInfo pointInfo;
     pointInfo.m_point.m_x = oneRecord->m_x;
@@ -382,6 +431,100 @@ void CPoiQueryListHook::ResetResultList()
     m_curPageInfo.SetCaption(curPage);
     m_totalPageInfo.SetCaption(totalPage);
   }
+}
+
+void CPoiQueryListHook::GetDistances()
+{
+  const GpsCar &carInfo(m_view->GetGpsCar());
+  CGeoPoint<long> onePoint;
+  onePoint.m_x = carInfo.m_curPos.m_x;
+  onePoint.m_y = carInfo.m_curPos.m_y;
+  m_records.InitPoiToPoiDist(onePoint);
+}
+
+void CPoiQueryListHook::SetDirection(const SQLRecord &oneRecord, int index)
+{
+  const static int dirOffset(1000);
+  const GpsCar &carInfo(m_view->GetGpsCar());
+  int iDir = PoiQueryListHook_Cursor5;
+  if (!oneRecord.m_azimuth)
+  {
+    int iDistX(oneRecord.m_x-carInfo.m_curPos.m_x),
+      iDistY(oneRecord.m_y-carInfo.m_curPos.m_y);
+    //
+    if (iDistY>=0)
+    {
+      //北方
+      if (iDistX>=dirOffset)
+      {
+        if (iDistY>=dirOffset)
+        {
+          //东北
+          iDir = PoiQueryListHook_Cursor2;
+        }
+        else
+        {
+          //正东
+          iDir = PoiQueryListHook_Cursor3;
+        }
+      }
+      else if (iDistX<=-dirOffset)
+      {
+        if (iDistY>=dirOffset)
+        {
+          //西北
+          iDir = PoiQueryListHook_Cursor8;
+        }
+        else
+        {
+          //正西
+          iDir = PoiQueryListHook_Cursor7;
+        }
+      }
+      else
+      {
+        //正北
+        iDir = PoiQueryListHook_Cursor1;
+      }
+    }
+    else
+    {
+      //南方
+      if (iDistX>=dirOffset)
+      {
+        if (iDistY<=-dirOffset)
+        {
+          //东南
+          iDir = PoiQueryListHook_Cursor4;
+        }
+        else
+        {
+          //正东
+          iDir = PoiQueryListHook_Cursor3;
+        }
+      }
+      else if (iDistX<=-dirOffset)
+      {
+        if (iDistY<=-dirOffset)
+        {
+          //西南
+          iDir = PoiQueryListHook_Cursor6;
+        }
+        else
+        {
+          //正西
+          iDir = PoiQueryListHook_Cursor7;
+        }
+      }
+      else
+      {
+        //正南
+        iDir = PoiQueryListHook_Cursor5;
+      }
+    }
+  }
+  //
+  m_cursorIcon[index].GetCenterElement()->m_backStyle = GetGuiElement(iDir)->m_bkNormal;
 }
 
 void CPoiQueryListHook::DistSwitchCallBack(void *pDoCallBackObj,const SQLRecord *pResult)

@@ -44,6 +44,16 @@
 //#include "viewhook.h"
 //#endif
 
+namespace UeModel
+{
+  class INetParcel;
+}
+
+namespace UeRoute
+{
+  class GuidanceIndicator;
+}
+
 // Declare namespace
 namespace UeMap
 {
@@ -97,6 +107,9 @@ namespace UeMap
     **/
     virtual ~CGuidanceView()
     {
+      m_roundAboutPoints.clear();
+      m_linkSet.clear();
+      m_nodeIDs.clear();
     }
 
   public:
@@ -143,7 +156,15 @@ namespace UeMap
     void DoDrawCross();
   private:
 
-    void DealPlanRoundAbout();
+    void DealRoundAboutPoints();
+
+    void GetAllRoundAboutNodeInParcel(const long startLinkId, UeModel::INetParcel* const parcel);
+
+    void GetRoundAboutNode(const UeRoute::GuidanceIndicator& indicator);
+
+    void FilterRoundAboutNode(UeModel::INetParcel *parcel);
+
+    void FillRoundAboutPoints(UeModel::INetParcel *parcel);
   protected:
     //
     short m_distForSnd;
@@ -162,6 +183,12 @@ namespace UeMap
     static int m_curIndicator;
     // For render query results
     static int m_curRecord;
+  private:
+    std::vector<CGeoPoint<short> > m_roundAboutPoints;
+
+    std::set<long> m_linkSet;
+
+    std::vector<long> m_nodeIDs;
   };
 }
 

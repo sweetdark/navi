@@ -8,7 +8,11 @@ CSystemSettingHook::CSystemSettingHook()
 {
   m_strTitle = "œµÕ≥…Ë÷√";
   m_vecHookFile.push_back(_T("systemsettinghook.bin"));
-  
+  m_active = kSystemSetting;
+ 
+  m_systemLeftSide =NULL;
+  m_navigationLeftSide = NULL;
+  m_versionInfo = NULL;
 }
 
 CSystemSettingHook::~CSystemSettingHook()
@@ -250,12 +254,12 @@ void CSystemSettingHook::SetTabStatus(TabPageType page, bool status)
   }
 }
 void CSystemSettingHook::Load()
-{
-  SetTabStatus(kSystemSetting, true);
-  m_active = kSystemSetting;
-  SetTabStatus(kNavigationSetting, false);
-  SetTabStatus(kVersionInfo, false);
-  SwitchTabPage(kSystemSetting);
+ {
+    SetTabStatus(kSystemSetting, true);
+    m_active = kSystemSetting;
+    SetTabStatus(kNavigationSetting, false);
+    SetTabStatus(kVersionInfo, false);
+    SwitchTabPage(kSystemSetting);  
 }
 void CSystemSettingHook::DoReturn()
 {

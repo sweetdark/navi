@@ -215,6 +215,11 @@ namespace UeRoute
     unsigned int RoutePlan(bool isPlayVoice);
 
     /**
+    * \brief 偏航重规划
+    */
+    unsigned int ReRoutePlan();
+
+    /**
     * \brief 多路径规划
     */
     unsigned int MultiRoutePlan();

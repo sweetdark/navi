@@ -1071,7 +1071,7 @@ void UeGui::CHistoryInformationHook::DoEditRecord( RowTag row )
       unsigned int dataIndex = GetDataIndex(m_selectRow);
       m_userWrapper.GetRecentName(dataIndex, recentName);
       CEditSwitchHook* editSwitch = ((CEditSwitchHook*)m_view->GetHook(CAggHook::DHT_EditSwitchHook));
-      editSwitch->SetEditCallBackFun(this, m_strTitle.c_str(), recentName, EditHookCallBack);
+      editSwitch->SetEditCallBackFun(this, "编辑名称", recentName, EditHookCallBack);
       TurnTo(editSwitch->GetCurEditHookType());
       break;
     }
@@ -1122,7 +1122,7 @@ void UeGui::CHistoryInformationHook::DeleteAllRecord()
     }
   }
   //检查历史信息页是否有数据，没有数据则退回我的信息窗口
-  CheckHistoryInfoData();
+  //CheckHistoryInfoData();
 }
 
 void UeGui::CHistoryInformationHook::ActivatePage( PageTag page )
@@ -1450,7 +1450,7 @@ void UeGui::CHistoryInformationHook::DeleteData( PageTag page, RowTag row )
     }
   }
   //检查历史信息页是否有数据，没有数据则退回我的信息窗口
-  CheckHistoryInfoData();
+  //CheckHistoryInfoData();
 }
 
 //根据页来显示数据
@@ -1738,4 +1738,5 @@ void CHistoryInformationHook::DoEditHookCallBack(const char *pResult)
   int index = GetDataIndex(m_selectRow);
   m_userWrapper.EditHistoryRouteData(index , pResult);
   m_editRoutReturn = true;
+  Return();
 }

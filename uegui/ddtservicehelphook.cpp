@@ -220,9 +220,14 @@ short CDdtServiceHelpHook::MouseUp(CGeoPoint<short> &scrPoint)
       }
     }
     break;
+  case ddtservicehelphook_HelpPicOne:
+    {
+      m_recordBtn.SetVisible(false);
+      m_recordDetail.SetVisible(false);
+    }
+    break;
   default:
     return CMenuBackgroundHook::MouseUp(scrPoint);
-    Refresh();
     break;
   }
 

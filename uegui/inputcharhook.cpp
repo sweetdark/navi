@@ -566,24 +566,17 @@ bool CInputCharHook::EraseOneKeyWord(void)
 {
   if (m_iCurCursorIndex)
   {
-    -- m_iCurCursorIndex;
-    m_tstrKeyWords.erase(m_iCurCursorIndex,1);
+    m_tstrKeyWords.erase(--m_iCurCursorIndex,1);
     ShowKeyWord();
   }
   return m_tstrKeyWords.size();
 }
 
-//添加一个字
 bool CInputCharHook::AddOneKeyWord(const char *pchLabelText)
 {
   TCHAR uniChar[3] = {0, };
   m_stringBasic.Ascii2Chs(pchLabelText,uniChar,2);
-  doAddOneKeyWord(uniChar[0]);
-  return false;
-}
-bool CInputCharHook::doAddOneKeyWord(TCHAR oneWord)
-{
-  m_tstrKeyWords.insert(m_iCurCursorIndex++,1,oneWord);
+  m_tstrKeyWords.insert(m_iCurCursorIndex++,1,uniChar[0]);
   ShowKeyWord();
   return true;
 }
@@ -614,8 +607,9 @@ void CInputCharHook::ResetKeyWord(const char *pchKeyWord)
     //
     for (int i(0); i<uWordNum; ++i)
     {
-      doAddOneKeyWord(uniWords[i]);
+      m_tstrKeyWords.insert(m_iCurCursorIndex++,1,uniWords[i]);
     }
+    ShowKeyWord();
   }
 }
 
@@ -799,7 +793,7 @@ void CInputCharHook::SetQueryMode()
 
   //根据搜索类型切换界面
   int indexType = CQueryWrapper::Get().GetSQLSentence().m_indexType;
-  if (indexType == UeQuery::IT_PoiName || indexType == UeQuery::IT_RoadName)
+  if (indexType != UeQuery::IT_CityName)
   {
     ResetKeyWord(m_poiKeyWord);
     m_distSwitchBtn.SetCaption(CQueryWrapper::Get().GetQueryAdmName());

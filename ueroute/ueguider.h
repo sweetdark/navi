@@ -152,6 +152,16 @@ namespace UeRoute
     unsigned int MakePrompts(PlannedLink *curES, PlannedLink *curSE, PlannedLink *esLinks, PlannedLink *seLinks, const NetPosition &startPos, const NetPosition &endPos, int pair);
 
     /**
+    * \brief 预存引导信息（偏航重规划）
+    */
+    unsigned int ReservePrompts(int pair, GuidanceIndicator **indicators);
+
+    /**
+    * \brief 合并引导信息（偏航重规划）
+    */
+    unsigned int MergePrompts(GuidanceIndicator **indicators, int indicatorNum, int startOrder);
+
+    /**
     * \brief 第一条引导指令
     */
     unsigned int FirstIndicator();

@@ -51,6 +51,7 @@ short CUpdateServiceHook::MouseDown(CGeoPoint<short> &scrPoint)
   case updateservicehook_ServicePointBtn:
     {
       m_servicePointBtnCtrl.MouseDown();
+      AddRenderUiControls(&m_servicePointBtnCtrl);
     }
     break;
   default:
@@ -103,5 +104,6 @@ void CUpdateServiceHook::Load()
   m_text2Ctrl.SetCaption("正版用户每年可享受2次升级服务,具体的升级时间请拨打客服电话");
   m_text3Ctrl.SetCaption("咨询:400-8898-123。");
   m_text4Ctrl.SetCaption("如果需要了解更多升级服务信息,可拨打客服电话咨询");
+  m_servicePointBtnCtrl.SetEnable(false);
 }
 

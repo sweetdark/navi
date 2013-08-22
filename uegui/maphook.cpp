@@ -16,6 +16,7 @@
 #include "detailmessagehook.h"
 #include "usuallyfile.h"
 #include "itemselecthook.h"
+#include "startuphook.h"
 
 using namespace UeGui;
 //
@@ -29,7 +30,7 @@ m_settingWrapper(CSettingWrapper::Get()), m_userDataWrapper(CUserDataWrapper::Ge
 m_selectPointObj(NULL), m_selectPointEvent(NULL), m_curGuiType(GUI_None), m_preGuiType(GUI_None), m_queryPointIndex(-1), 
 m_planType(Plan_Single),m_guiTimerInterval(0), m_curPlanmethodType(UeRoute::MT_Max), m_elecEyeStatus(false), m_bIsCompassShown(false),
 m_elecProgressBarWidth(0), m_elecMaxPromptDist(0), m_screenMode(SM_None), m_needRestoreRoute(false), m_lanHight(50), m_lanWidth(0), 
-m_firstDrawMap(true), m_sysTime(0), m_downTimeCount(0)
+m_firstDrawMap(true), m_sysTime(0), m_downTimeCount(0), m_bIsShowShortcutPanel(false)
 {
   m_restorePoiList.clear();
   m_queryPointList.clear();
@@ -96,9 +97,17 @@ void UeGui::CMapHook::DoDraw( const CGeoRect<short> &scrExtent )
   {
     //只有渲染过一次地图之后，才能读取到地图上的点、线、面数据
     m_firstDrawMap = false;
-
-    //判断是否要恢复路线
-    if (m_needRestoreRoute)
+    if (m_bIsShowShortcutPanel)
+    {
+      CStartUpHook* startUpHook = (CStartUpHook*)m_viewWrapper.GetHook(CViewHook::DHT_StartUpHook);
+      if (startUpHook)
+      {
+        startUpHook->SetRestoreRouteState(m_needRestoreRoute);
+        TurnTo(DHT_StartUpHook);
+        Refresh();
+      }      
+    }
+    else if (m_needRestoreRoute)
     {
       //打开提示回复路线对话框
       CMessageDialogEvent dialogEvent(this, DHT_MapHook, &CMapHook::OnRestoreRote);
@@ -109,6 +118,11 @@ void UeGui::CMapHook::DoDraw( const CGeoRect<short> &scrExtent )
 
 void UeGui::CMapHook::Init()
 {
+  //读取是否显示快捷面板
+  m_bIsShowShortcutPanel = m_settingWrapper.GetIsShowShortcutPanel();
+  //读取是否需要回复上次未导航完成路线
+  m_needRestoreRoute = m_userDataWrapper.GetLastRoute(m_restoreRouteType, m_restorePoiList);
+  
   RefreshSetPointStatus();
   RefreshZoomingInfo();
   //读取开机位置
@@ -143,10 +157,8 @@ void UeGui::CMapHook::Init()
       RefreshLocationInfo();
     }   
   }
-    //如果当前地图模式为引导状态则切换成浏览状态
+  //如果当前地图模式为引导状态则切换成浏览状态
   m_viewWrapper.SetViewOpeMode(VM_Guidance);
-  //读取是否需要回复上次未导航完成路线
-  m_needRestoreRoute = m_userDataWrapper.GetLastRoute(m_restoreRouteType, m_restorePoiList);
 }
 
 void UeGui::CMapHook::Update( short type )
@@ -166,12 +178,19 @@ void UeGui::CMapHook::Update( short type )
     }
   case CViewHook::UHT_UpdateMapHook:
     {
-      UpdateMenu();
-      break;
-    }
-  case CViewHook::UHT_SplitMapHook:
-    {
-      UpdateMenu();
+      //读取当前规划状态
+      short planState = m_routeWrapper.GetPlanState();
+      if ((UeRoute::PS_None == planState) || (UeRoute::PS_Ready == planState))
+      {
+        //如果是无路线状态则证明当前导航结束
+        DoStopGuide();
+        m_viewWrapper.Refresh();
+      }
+      else
+      {
+        //否则更新菜单
+        UpdateMenu();
+      }
       break;
     }
   }
@@ -468,6 +487,12 @@ void UeGui::CMapHook::Timer()
         Refresh();
       }      
     }
+  }
+
+  //路径规划自动开始导航倒计时
+  if (m_mapRouteCalcMenu.IsShown())
+  {
+    m_mapRouteCalcMenu.Timer();
   }
 
   //刷新系统时间
@@ -1202,7 +1227,7 @@ void UeGui::CMapHook::OpenAroundSearchMenu()
   if (viewHook)
   {
     viewHook->Init();
-  }  
+  }
   TurnTo(CViewHook::DHT_RoundSelectionHook);
 }
 
@@ -1260,11 +1285,13 @@ void UeGui::CMapHook::OpenDetailHook()
   }
 
   //如果没有具体地址，则显示省、市、区
-  if(detailInfo.m_address[0]==0)
+  if(detailInfo.m_address[0] == 0)
   {
-    //获取区域code
-    unsigned distcode(CCodeIndexCtrl::GetDistCode(pickPos.m_x, pickPos.m_y));
-    queryWrapper.GetComAdmNameByCode(distcode,(char*)detailInfo.m_address);
+    IGui* gui = IGui::GetGui();
+    if (!gui->GetDistrictName(pickPos, detailInfo.m_address))
+    {
+      ::memset(detailInfo.m_name, 0, 256);
+    }
   }
 
   CDetailMessageHook* detailMessageHook = (CDetailMessageHook*)m_viewWrapper.GetHook(CViewHook::DHT_DetailMessageHook);
@@ -1364,8 +1391,16 @@ unsigned int UeGui::CMapHook::DoRoutePlan( PlanType planType )
   }
   if (UeRoute::PEC_Success != rt)
   {
+    //删除所有经由点
     m_routeWrapper.RemovePosition();
-    CMessageDialogHook::ShowMessageDialog(MB_NONE, "路径规划失败", dialogEvent);
+    if (UeRoute::PEC_TooShortest == rt)
+    {
+      CMessageDialogHook::ShowMessageDialog(MB_NONE, "起点和目的地距离太近，请检查.", dialogEvent);
+    }
+    else
+    {
+      CMessageDialogHook::ShowMessageDialog(MB_NONE, "路径规划失败.", dialogEvent);
+    }        
     Sleep(500);
   }
   CMessageDialogHook::CloseMessageDialog();
@@ -1374,10 +1409,13 @@ unsigned int UeGui::CMapHook::DoRoutePlan( PlanType planType )
 
 void UeGui::CMapHook::DoStopGuide()
 {
+  //初始化电子眼状态
   m_elecEyeStatus = false;
+  //设置视图模式
   m_viewWrapper.SetViewOpeMode(VM_Guidance);
   //切换到浏览菜单
   SwitchingGUI(GUI_MapBrowse);
+  //更新菜单
   UpdateMenu();
   //更新底部状态栏
   UpdateGuideInfo(NULL, 0, -1);
@@ -1399,7 +1437,6 @@ unsigned int UeGui::CMapHook::RoutePlan( PlanType planType /*= Plan_Single*/ )
     m_viewWrapper.AutoScallingMap();
     //刷新比例尺
     RefreshZoomingInfo();
-    CMessageDialogHook::CloseMessageDialog();
     //切换到路径规划菜单
     SwitchingGUI(GUI_RouteCalculate);
     //保存历史出发地
@@ -1428,6 +1465,32 @@ unsigned int UeGui::CMapHook::RoutePlan_StartDemo( PlanType planType /*= Plan_Si
   if (UeRoute::PEC_Success == rt)
   {
     rt = StartDemo();
+  }
+  return rt;
+}
+
+unsigned int UeGui::CMapHook::BackTrackingPlan()
+{
+  CMessageDialogEvent dialogEvent(this, m_curHookType, NULL);
+  CMessageDialogHook::ShowMessageDialog(MB_NONE, "规划中，请稍候...", dialogEvent);
+  unsigned int rt = m_routeWrapper.BackTrackingPlan();
+  if (UeRoute::PEC_Success == rt)
+  {
+    m_viewWrapper.AutoScallingMap();
+    //刷新比例尺
+    RefreshZoomingInfo();
+    //切换到路径规划菜单
+    SwitchingGUI(GUI_RouteCalculate);
+    //规划成功自动跳转到地图界面，并开始导航
+    CMessageDialogHook::CloseMessageDialog(DHT_MapHook);
+    m_viewWrapper.Refresh();
+  }
+  else
+  {
+    m_routeWrapper.RemovePosition();
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "路径规划失败", dialogEvent);
+    Sleep(500);
+    CMessageDialogHook::CloseMessageDialog();
   }
   return rt;
 }
@@ -1485,14 +1548,19 @@ unsigned int UeGui::CMapHook::StartDemo( short speed /*= DEFAULT_DEMOSPEED*/ )
     //刷新界面
     m_viewWrapper.Refresh();
   }
+  else
+  {
+    CMessageDialogEvent dialogEvent(this, DHT_MapHook, NULL);
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "模拟导航失败", dialogEvent);
+    Sleep(500);
+    CMessageDialogHook::CloseMessageDialog();
+  }
   return rt;
 }
 
 unsigned int UeGui::CMapHook::StopDemo()
 {
   unsigned int rt = m_routeWrapper.StopDemo();
-  //处理停止导航后的事情
-  DoStopGuide();
   return rt;
 }
 
@@ -1512,26 +1580,27 @@ unsigned int UeGui::CMapHook::StartGuidance()
     //刷新界面
     m_viewWrapper.Refresh();
   }
+  else
+  {
+    CMessageDialogEvent dialogEvent(this, DHT_MapHook, NULL);
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "开始导航失败", dialogEvent);
+    Sleep(500);
+    CMessageDialogHook::CloseMessageDialog();
+  }
   return rt;
 }
 
 unsigned int UeGui::CMapHook::StopGuidance()
 {
   unsigned int rt = m_routeWrapper.StopGuidance();
-  //处理停止导航后的事情
-  DoStopGuide();
   return rt;
 }
 
 unsigned int UeGui::CMapHook::EraseRoute()
 {
-  //判断当前是否已经规划了路线
-  UeRoute::PlanResultDesc desc;
-  if ((m_routeWrapper.GetPlanState() != UeRoute::PS_None) && (m_routeWrapper.GetPlanResultDesc(desc)))
-  {
-    m_routeWrapper.SetBlock(true);
-    m_routeWrapper.Prepare();
-  }
+  //删除路线
+  m_routeWrapper.EraseRoute();
+  //设置视图模式
   m_viewWrapper.SetViewOpeMode(VM_Guidance);
   //切换到浏览状态状态菜单
   SwitchingGUI(GUI_MapBrowse);
@@ -1541,6 +1610,7 @@ unsigned int UeGui::CMapHook::EraseRoute()
 
 void UeGui::CMapHook::Cancel()
 {
+  //设置视图模式
   m_viewWrapper.SetViewOpeMode(VM_Guidance);
   //切换到浏览状态状态菜单
   SwitchingGUI(GUI_MapBrowse);
@@ -2193,10 +2263,10 @@ void UeGui::CMapHook::UpdateElecEyeInfo()
 
 void UeGui::CMapHook::UpdateElecProgress( double distance /*= 0*/ )
 {
-  int promptDist = distance;
+  int promptDist = m_elecMaxPromptDist - distance;
   if (promptDist < 0)
   {
-    promptDist = 0;
+    promptDist = m_elecMaxPromptDist;
   }
   GuiElement* guiElement = m_elecEye.GetLabelElement();
   if (guiElement)
@@ -2228,7 +2298,7 @@ bool UeGui::CMapHook::UpdateElecIcon( UeRoute::EEyeProp& eyeProp )
   case UeRoute::TVT_SpeedLimit:
     {
       //限速
-      if (eyeProp.m_speed <= 25)
+      if ((eyeProp.m_speed >= 20) && (eyeProp.m_speed <= 25))
       {
         promptElementType = MapHook_ElecEyeIconType_1;
       }
@@ -2268,9 +2338,13 @@ bool UeGui::CMapHook::UpdateElecIcon( UeRoute::EEyeProp& eyeProp )
       {
         promptElementType = MapHook_ElecEyeIconType_10;
       }
-      else
+      else if ((eyeProp.m_speed > 105) && (eyeProp.m_speed <= 115))
       {
         promptElementType = MapHook_ElecEyeIconType_11;
+      }
+      else
+      {
+        promptElementType = MapHook_ElecEyeIconType_12;
       }
       break;
     }
@@ -2285,7 +2359,6 @@ bool UeGui::CMapHook::UpdateElecIcon( UeRoute::EEyeProp& eyeProp )
   }
   if (MapHook_Begin != promptElementType)
   {
-    //先只显示电子眼
     ChangeElementIcon(m_elecEye.GetIconElement(), GetGuiElement(promptElementType));
     return true;
   }
@@ -2414,7 +2487,12 @@ void UeGui::CMapHook::OnRestoreRote( CAggHook* sender, ModalResultType modalResu
 
 void UeGui::CMapHook::RestoreRote()
 {
+  //恢复路线
+  CMessageDialogEvent dialogEvent(this, DHT_MapHook, NULL);
+  CMessageDialogHook::ShowMessageDialog(MB_NONE, "上次导航恢复中，请稍候...", dialogEvent);
+
   m_needRestoreRoute = false;
+  bool restoreState = true;
   if (m_restorePoiList.size() >= 2)
   {
     m_routeWrapper.SetMethod(m_restoreRouteType);
@@ -2425,12 +2503,37 @@ void UeGui::CMapHook::RestoreRote()
       rt = m_routeWrapper.SetPosition(planPosition);
       if (UeRoute::PEC_Success != rt)
       {
-        return;
+        restoreState = false;
       }
     }
-    RoutePlan(Plan_Multiple);    
+    if (restoreState)
+    {
+      unsigned int rt = UeRoute::PEC_Success;
+      m_planType = Plan_Multiple;
+      rt = m_routeWrapper.RoutePlan();
+      if (UeRoute::PEC_Success == rt)
+      {
+        rt = m_routeWrapper.MultiRoutePlan();
+      }
+      if (UeRoute::PEC_Success != rt)
+      {
+        restoreState = false;
+      }
+    }
   }
-  m_viewWrapper.Refresh();
+
+  if (restoreState)
+  {
+    CMessageDialogHook::CloseMessageDialog();
+    StartGuidance();
+  }
+  else
+  {
+    m_routeWrapper.RemovePosition();
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "路径恢复失败", dialogEvent);
+    Sleep(500);
+    CMessageDialogHook::CloseMessageDialog();
+  }
 }
 
 void UeGui::CMapHook::CancelRestoreRote()
@@ -2524,53 +2627,77 @@ void UeGui::CMapHook::OnShortcutScaleSelect( CAggHook* sender, short selectIndex
 
 void UeGui::CMapHook::AddUserEEyeData()
 {
-  CMessageDialogEvent dialogEvent(this, DHT_MapHook, NULL);
-  CGeoPoint<long> pickPos; 
-  ViewOpeMode viewMode = m_viewWrapper.GetViewOpeMode();
-  if (VM_Browse == viewMode)
+  bool addStatus = false;
+  if (m_net)
   {
-    m_viewWrapper.GetPickPos(pickPos);
-  }
-  else
-  {
-    const UeMap::GpsCar gpsCar = m_viewWrapper.GetGpsCar();
-    pickPos.m_x = gpsCar.m_curPos.m_x;
-    pickPos.m_y = gpsCar.m_curPos.m_y;    
-  }      
-  const SQLRecord *record = m_queryWrapper.GetNearestPoi(pickPos);
-  if (record)
-  {
+    CGeoPoint<long> pickPos; 
+    ViewOpeMode viewMode = m_viewWrapper.GetViewOpeMode();
+    if (VM_Browse == viewMode)
+    {
+      m_viewWrapper.GetPickPos(pickPos);
+    }
+    else
+    {
+      const UeMap::GpsCar gpsCar = m_viewWrapper.GetGpsCar();
+      pickPos.m_x = gpsCar.m_curPos.m_x;
+      pickPos.m_y = gpsCar.m_curPos.m_y;    
+    }
+
     //用户电子眼数据结构
     UserEEyeEntryData eEyeEntryData;
-    if (record->m_uniName)
+    //读取区域名作为地址
+    IGui* gui = IGui::GetGui();
+    if (!gui->GetDistrictName(pickPos, (char*)eEyeEntryData.m_address))
     {
-      ::strcpy((char*)eEyeEntryData.m_name, record->m_uniName);
+      eEyeEntryData.m_address[0] = '\0';
     }
-    if (record->m_pchAddrStr)
+    // 读取名称
+    m_viewWrapper.GetPickName((char*)eEyeEntryData.m_name);
+    if(::strlen((char*)eEyeEntryData.m_name) > 0)
     {
-      ::strcpy((char*)eEyeEntryData.m_address, record->m_pchAddrStr);
+      eEyeEntryData.m_name[::strlen((char*)eEyeEntryData.m_name) - 1] = '\0';
     }
-    //如果没有具体地址，则显示省、市、区
-    if(eEyeEntryData.m_address[0] == 0)
+    else
     {
-      //获取区域code
-      unsigned distcode(CCodeIndexCtrl::GetDistCode(pickPos.m_x, pickPos.m_y));
-      m_queryWrapper.GetComAdmNameByCode(distcode,(char*)eEyeEntryData.m_address);
+      ::strcpy((char*)eEyeEntryData.m_name, (char*)eEyeEntryData.m_address);
     }
 
     eEyeEntryData.m_x = pickPos.m_x;
     eEyeEntryData.m_y = pickPos.m_y;
     eEyeEntryData.m_type = TVT_NormalCamera;
-    eEyeEntryData.m_linkId = record->m_linkIdx;
-    m_userDataWrapper.AddUserEEyeData(record->m_parcelIdx, eEyeEntryData);
 
-    CMessageDialogHook::ShowMessageDialog(MB_NONE, "保存成功！", dialogEvent);
+
+    //读取网格ID和路网ID
+    long parcelIdx = m_net->GetParcelID(PT_Real, pickPos);
+    if (parcelIdx >= 0)
+    {
+      INetParcel *netParcel = m_net->GetParcel(PT_Real, parcelIdx);
+      if (netParcel)
+      {
+        NetPosition netPosition;
+        netPosition.m_parcelIdx = parcelIdx;
+        netPosition.m_realPosition.m_x = pickPos.m_x;
+        netPosition.m_realPosition.m_y = pickPos.m_y;
+        INetLink *netLink = netParcel->GetNearest(netPosition, 1000);
+        if (netLink)
+        {
+          eEyeEntryData.m_linkId = netPosition.m_linkIdx;
+          addStatus = m_userDataWrapper.AddUserEEyeData(parcelIdx, eEyeEntryData);          
+        }
+      }
+    }
+  }
+
+  CMessageDialogEvent dialogEvent(this, DHT_MapHook, NULL);
+  if (addStatus)
+  {
+    CMessageDialogHook::ShowMessageDialog(MB_NONE, "保存成功！", dialogEvent);    
   }
   else
-  {
+  {    
     CMessageDialogHook::ShowMessageDialog(MB_NONE, "保存失败！", dialogEvent);
-    Sleep(500);
-  }  
+  }
+  Sleep(500);
   CMessageDialogHook::CloseMessageDialog();
 }
 

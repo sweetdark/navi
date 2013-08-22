@@ -1,4 +1,5 @@
 #include "guidanceviewhook.h"
+#include "routewrapper.h"
 using namespace UeGui;
 #include "uemodel\network.h"
 #include "uemodel\netnametable.h"
@@ -119,20 +120,6 @@ void UeGui::CGuidanceViewHook::RefreshProgressBar()
   unsigned int rt = m_route->GetCurrent(dirInfo);
   if (UeRoute::PEC_Success == rt)
   {
-    //if (m_lastDistForSnd != dirInfo.m_curDistForSnd)
-    //{
-    //  m_lastDistForSnd = dirInfo.m_curDistForSnd;
-    //}
-    //else
-    //{
-    //  //避免路口放大图，车已经过了拐点(但ueroute没有notiy通知view去update)导致还停留在路口放大图的情况。
-    //  if (m_view)
-    //  {
-    //    m_view->Update(UeRoute::ST_RenderFull);
-    //    m_view->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
-    //    return;
-    //  }
-    //}
     GuidanceIndicator *oneIndicator = IRoute::GetRoute()->GetIndicator(dirInfo.m_curPair, dirInfo.m_curOrderForSnd);
     if (oneIndicator->m_roadClass == RC_MotorWay)
     {
@@ -143,11 +130,13 @@ void UeGui::CGuidanceViewHook::RefreshProgressBar()
       m_maxProgressDist = UeRoute::CDT_Normal;
     }
 
-    if (dirInfo.m_curDistForSnd < 0)
+    int curDist = CRouteWrapper::Get().GetCurRoundAboutDist(dirInfo);
+    if (curDist < 0)
     {
-      dirInfo.m_curDistForSnd = 0;
+      curDist = dirInfo.m_curDistForSnd < 0 ? 0 : dirInfo.m_curDistForSnd;
     }
-    unsigned int progressHight = m_maxProgressHight * dirInfo.m_curDistForSnd / (double)m_maxProgressDist;
+
+    unsigned int progressHight = m_maxProgressHight * curDist / (double)m_maxProgressDist;
     if (0 >= progressHight)
     {
       progressHight = 1;
@@ -164,7 +153,7 @@ void UeGui::CGuidanceViewHook::RefreshProgressBar()
     }
     //显示距离
     char buf[10] = {}; 
-    ::sprintf(buf, "%dm", dirInfo.m_curDistForSnd);
+    ::sprintf(buf, "%dm", curDist);
     m_distLabel.SetCaption(buf);
 
 
@@ -187,7 +176,10 @@ void UeGui::CGuidanceViewHook::RefreshProgressBar()
           short length = 0;
           if (nextRoad->m_nameOffset)
           {
-            m_net->GetNameTable(UeModel::UNT_Network)->GetContent(nextRoad->m_nameOffset, &roadName, length);
+            if (m_net)
+            {
+              m_net->GetNameTable(UeModel::UNT_Network)->GetContent(nextRoad->m_nameOffset, &roadName, length);
+            }
             if (roadName)
             {
               unsigned char chLen = roadName[0];

@@ -4,6 +4,7 @@
 #include "messagedialoghook.h"
 #include "editswitchhook.h"
 #include "userdatawrapper.h"
+#include "routetypeswitchhook.h"
 using namespace UeGui;
 
 CRouteOperationHook::CRouteOperationHook()
@@ -242,9 +243,13 @@ short CRouteOperationHook::MouseUp(CGeoPoint<short> &scrPoint)
   case RouteOperationHook_RouteTypeLable:
   case RouteOperationHook_ThirdBtnBackground:
     {
-      m_thirdBtnBackgroundCtrl.MouseUp();
-      m_routeTypeBtnCtrl.MouseUp();
-      TurnTo(DHT_RouteTypeSwitchHook);
+			if (IsNeedRefresh(m_routeTypeBtnCtrl))
+			{
+				m_thirdBtnBackgroundCtrl.MouseUp();
+				m_routeTypeBtnCtrl.MouseUp();
+        DoRouteTypeSelect();
+				TurnTo(DHT_RouteTypeSwitchHook);
+			}
     }
     break;
   case RouteOperationHook_NexDestinationLable:
@@ -531,4 +536,32 @@ void UeGui::CRouteOperationHook::GetRouteData()
 void UeGui::CRouteOperationHook::SetRouteType( unsigned int routeType )
 {  
   m_routeType = routeType;
+}
+
+void UeGui::CRouteOperationHook::DoRouteTypeSelect()
+{
+  CRouteTypeSwitchHook::SetRouteTypeCallBackFun( this, OnSelectRouteType);
+}
+
+void UeGui::CRouteOperationHook::OnSelectRouteType(CAggHook* senderHook, unsigned int routeType)
+{
+	CRouteWrapper::Get().SetMethod(routeType);
+  CRouteOperationHook *hook = dynamic_cast<CRouteOperationHook*>(senderHook);
+  if (hook)
+  {
+    hook->SetRouteType(routeType);
+  }
+  CMapHook *mapHook = dynamic_cast<CMapHook*>(CViewWrapper::Get().GetHook(DHT_MapHook));
+  if (mapHook)
+  {
+    mapHook->GoToMapHook();
+    if (CRouteWrapper::Get().GetPlanState() == PS_RealGuidance)
+    {
+      mapHook->RoutePlan_StartGuidance();
+    }
+    else
+    {
+      mapHook->RoutePlan();
+    }
+  }
 }

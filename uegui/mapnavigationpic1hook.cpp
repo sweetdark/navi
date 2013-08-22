@@ -168,6 +168,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelEight:
     {
       m_picOneBtnEightCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnEightCtrl);
     }
     break;
@@ -175,6 +176,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelEighteen:
     {
       m_picOneBtnEighteenCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnEighteenCtrl);
     }
     break;
@@ -182,6 +184,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelEleven:
     {
       m_picOneBtnElevenCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnElevenCtrl);
     }
     break;
@@ -189,6 +192,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelFifteen:
     {
       m_picOneBtnFifteenCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnFifteenCtrl);
     }
     break;
@@ -196,6 +200,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelFive:
     {
       m_picOneBtnFiveCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnFiveCtrl);
     }
     break;
@@ -203,6 +208,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelFour:
     {
       m_picOneBtnFourCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnFourCtrl);
     }
     break;
@@ -210,6 +216,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelFourteen:
     {
       m_picOneBtnFourteenCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnFourteenCtrl);
     }
     break;
@@ -217,6 +224,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelNine:
     {
       m_picOneBtnNineCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnNineCtrl);
     }
     break;
@@ -224,6 +232,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelNineteen:
     {
       m_picOneBtnNineteenCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnNineteenCtrl);
     }
     break;
@@ -231,6 +240,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelOne:
     {
       m_picOneBtnOneCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnOneCtrl);
     }
     break;
@@ -238,6 +248,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelSeven:
     {
       m_picOneBtnSevenCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnSevenCtrl);
     }
     break;
@@ -245,6 +256,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelSeventeen:
     {
       m_picOneBtnSeventeenCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnSeventeenCtrl);
     }
     break;
@@ -252,6 +264,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelSix:
     {
       m_picOneBtnSixCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnSixCtrl);
     }
     break;
@@ -259,6 +272,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelSixteen:
     {
       m_picOneBtnSixteenCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnSixteenCtrl);
     }
     break;
@@ -266,6 +280,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelTen:
     {
       m_picOneBtnTenCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnTenCtrl);
     }
     break;
@@ -273,6 +288,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelThirteen:
     {
       m_picOneBtnThirteenCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnThirteenCtrl);
     }
     break;
@@ -280,6 +296,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelThree:
     {
       m_picOneBtnThreeCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnThreeCtrl);
     }
     break;
@@ -287,6 +304,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelTwelve:
     {
       m_picOneBtnTwelveCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnTwelveCtrl);
     }
     break;
@@ -294,6 +312,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelTwenty:
     {
       m_picOneBtnTwentyCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnTwentyCtrl);
     }
     break;
@@ -301,6 +320,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   case mapnavigationpic1hook_PicOneLabelTwo:
     {
       m_picOneBtnTwoCtrl.MouseDown();
+      m_recordDetail.SetVisible(false);
       AddRenderUiControls(&m_picOneBtnTwoCtrl);
     }
     break;
@@ -308,120 +328,140 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_picOneShowEightCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowEightCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowEighteen:
     {
       m_picOneShowEighteenCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowEighteenCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowEleven:
     {
       m_picOneShowElevenCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowElevenCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowFifteen:
     {
       m_picOneShowFifteenCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowFifteenCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowFive:
     {
       m_picOneShowFiveCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowFiveCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowFour:
     {
       m_picOneShowFourCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowFourCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowFourteen:
     {
       m_picOneShowFourteenCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowFourteenCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowNine:
     {
       m_picOneShowNineCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowNineCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowNineteen:
     {
       m_picOneShowNineteenCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowNineteenCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowOne:
     {
       m_picOneShowOneCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowOneCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowSeven:
     {
       m_picOneShowSevenCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowSevenCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowSeventeen:
     {
       m_picOneShowSeventeenCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowSeventeenCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowSix:
     {
       m_picOneShowSixCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowSixCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowSixteen:
     {
       m_picOneShowSixteenCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowSixteenCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowTen:
     {
       m_picOneShowTenCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowTenCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowThirteen:
     {
       m_picOneShowThirteenCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowThirteenCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowThree:
     {
       m_picOneShowThreeCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowThreeCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowTwelve:
     {
       m_picOneShowTwelveCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowTwelveCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowTwenty:
     {
       m_picOneShowTwentyCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowTwentyCtrl);
     }
     break;
   case mapnavigationpic1hook_PicOneShowTwo:
     {
       m_picOneShowTwoCtrl.MouseDown();
       m_recordDetail.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowTwoCtrl);
     }
     break;
   default:
@@ -433,6 +473,7 @@ short CMapNavigationPic1Hook::MouseDown(CGeoPoint<short> &scrPoint)
   if (m_isNeedRefesh)
   {
     Refresh();
+
   }
   m_isNeedRefesh = true;
   return ctrlType;
@@ -446,146 +487,172 @@ short CMapNavigationPic1Hook::MouseMove(CGeoPoint<short> &scrPoint)
 short CMapNavigationPic1Hook::MouseUp(CGeoPoint<short> &scrPoint)
 {
   short ctrlType = CAggHook::MouseUp(scrPoint);
-  switch(m_downElementType)
+  switch(ctrlType)
   {
   case mapnavigationpic1hook_PicOneLabelEight:
   case mapnavigationpic1hook_PicOneBtnEight:
     {
       m_picOneBtnEightCtrl.MouseUp();
-      ShowDetail(m_picOneBtnEightCtrl, m_picOneLabelEightCtrl);
+      ShowDetail(m_picOneBtnEightCtrl, m_picOneShowEightCtrl);
+      m_picOneShowEightCtrl.SetCaption("控制底部操作栏的显\n示和隐藏");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelEighteen:
   case mapnavigationpic1hook_PicOneBtnEighteen:
     {
       m_picOneBtnEighteenCtrl.MouseUp();
-      ShowDetail(m_picOneBtnEighteenCtrl, m_picOneLabelEighteenCtrl);
+      ShowDetail(m_picOneBtnEighteenCtrl, m_picOneShowEighteenCtrl);
+      m_picOneShowEighteenCtrl.SetCaption("提示将要驶入的\n道路名称");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelEleven:
   case mapnavigationpic1hook_PicOneBtnEleven:
     {
       m_picOneBtnElevenCtrl.MouseUp();
-      ShowDetail(m_picOneBtnElevenCtrl, m_picOneLabelElevenCtrl);
+      ShowDetail(m_picOneBtnElevenCtrl, m_picOneShowElevenCtrl);
+      m_picOneShowElevenCtrl.SetCaption("点击后可查询当前地\n图中心位置周边的信\n息点");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelFifteen:
   case mapnavigationpic1hook_PicOneBtnFifteen:
     {
       m_picOneBtnFifteenCtrl.MouseUp();
-      ShowDetail(m_picOneBtnFifteenCtrl, m_picOneLabelFifteenCtrl);
+      ShowDetail(m_picOneBtnFifteenCtrl, m_picOneShowFifteenCtrl);
+      m_picOneShowFifteenCtrl.SetCaption("提示当前语音提示状\n态，点击后可打开语\n音调节面板");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelFive:
   case mapnavigationpic1hook_PicOneBtnFive:
     {
       m_picOneBtnFiveCtrl.MouseUp();
-      ShowDetail(m_picOneBtnFiveCtrl, m_picOneLabelFiveCtrl);
+      ShowDetail(m_picOneBtnFiveCtrl, m_picOneShowFiveCtrl);
+      m_picOneShowFiveCtrl.SetCaption("提示当前地图显示比例尺");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelFour:
   case mapnavigationpic1hook_PicOneBtnFour:
     {
       m_picOneBtnFourCtrl.MouseUp();
-      ShowDetail(m_picOneBtnFourCtrl, m_picOneLabelFourCtrl);
+      ShowDetail(m_picOneBtnFourCtrl, m_picOneShowFourCtrl);
+      m_picOneShowFourCtrl.SetCaption("点击后可控制放大地图");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelFourteen:
   case mapnavigationpic1hook_PicOneBtnFourteen:
     {
       m_picOneBtnFourteenCtrl.MouseUp();
-      ShowDetail(m_picOneBtnFourteenCtrl, m_picOneLabelFourteenCtrl);
+      ShowDetail(m_picOneBtnFourteenCtrl, m_picOneShowFourteenCtrl);
+      m_picOneShowFourteenCtrl.SetCaption("提示当前行驶的\n道路名称");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelNine:
   case mapnavigationpic1hook_PicOneBtnNine:
     {
       m_picOneBtnNineCtrl.MouseUp();
-      ShowDetail(m_picOneBtnNineCtrl, m_picOneLabelNineCtrl);
+      ShowDetail(m_picOneBtnNineCtrl, m_picOneShowNineCtrl);
+      m_picOneShowNineCtrl.SetCaption("点击后打开功能菜单");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelNineteen:
   case mapnavigationpic1hook_PicOneBtnNineteen:
     {
       m_picOneBtnNineteenCtrl.MouseUp();
-      ShowDetail(m_picOneBtnNineteenCtrl, m_picOneLabelNineteenCtrl);
+      ShowDetail(m_picOneBtnNineteenCtrl, m_picOneShowNineteenCtrl);
+      m_picOneShowNineteenCtrl.SetCaption("提示将要发生的路口\n转向和到该转向的距\n离，点击后可触发转\n向提示的播报");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelOne:
   case mapnavigationpic1hook_PicOneBtnOne:
     {
       m_picOneBtnOneCtrl.MouseUp();
-      ShowDetail(m_picOneBtnOneCtrl, m_picOneLabelOneCtrl);
+      ShowDetail(m_picOneBtnOneCtrl, m_picOneShowOneCtrl);
+      m_picOneShowOneCtrl.SetCaption("点击后打开设备系统\n界面，导航软件进入\n后台运行");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelSeven:
   case mapnavigationpic1hook_PicOneBtnSeven:
     {
       m_picOneBtnSevenCtrl.MouseUp();
-      ShowDetail(m_picOneBtnSevenCtrl, m_picOneLabelSevenCtrl);
+      ShowDetail(m_picOneBtnSevenCtrl, m_picOneShowSevenCtrl);
+      m_picOneShowSevenCtrl.SetCaption("点击后打开对当前路\n线的操作菜单");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelSeventeen:
   case mapnavigationpic1hook_PicOneBtnSeventeen:
     {
       m_picOneBtnSeventeenCtrl.MouseUp();
-      ShowDetail(m_picOneBtnSeventeenCtrl, m_picOneLabelSeventeenCtrl);
+      ShowDetail(m_picOneBtnSeventeenCtrl, m_picOneShowSeventeenCtrl);
+      m_picOneShowSeventeenCtrl.SetCaption("可控制地图模式，\n包括一般双屏，鹰\n眼图，后续路口，\n高速看板");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelSix:
   case mapnavigationpic1hook_PicOneBtnSix:
     {
       m_picOneBtnSixCtrl.MouseUp();
-      ShowDetail(m_picOneBtnSixCtrl, m_picOneLabelSixCtrl);
+      ShowDetail(m_picOneBtnSixCtrl, m_picOneShowSixCtrl);
+      m_picOneShowSixCtrl.SetCaption("点击后可控制缩小地图");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelSixteen:
   case mapnavigationpic1hook_PicOneBtnSixteen:
     {
       m_picOneBtnSixteenCtrl.MouseUp();
-      ShowDetail(m_picOneBtnSixteenCtrl, m_picOneLabelSixteenCtrl);
+      ShowDetail(m_picOneBtnSixteenCtrl, m_picOneShowSixteenCtrl);
+      m_picOneShowSixteenCtrl.SetCaption("提示卫星信号状态，\n点击后可打开信号详\n情界面");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelTen:
   case mapnavigationpic1hook_PicOneBtnTen:
     {
       m_picOneBtnTenCtrl.MouseUp();
-      ShowDetail(m_picOneBtnTenCtrl, m_picOneLabelTenCtrl);
+      ShowDetail(m_picOneBtnTenCtrl, m_picOneShowTenCtrl);
+      m_picOneShowTenCtrl.SetCaption("点击后打开快捷操作菜单");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelThirteen:
   case mapnavigationpic1hook_PicOneBtnThirteen:
     {
       m_picOneBtnThirteenCtrl.MouseUp();
-      ShowDetail(m_picOneBtnThirteenCtrl, m_picOneLabelThirteenCtrl);
+      ShowDetail(m_picOneBtnThirteenCtrl, m_picOneShowThirteenCtrl);
+      m_picOneShowThirteenCtrl.SetCaption("提示当前时间信息");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelThree:
   case mapnavigationpic1hook_PicOneBtnThree:
     {
       m_picOneBtnThreeCtrl.MouseUp();
-      ShowDetail(m_picOneBtnThreeCtrl, m_picOneLabelThreeCtrl);
+      ShowDetail(m_picOneBtnThreeCtrl, m_picOneShowThreeCtrl);
+      m_picOneShowThreeCtrl.SetCaption("提示当前地图显示状\n态，点击后可切换地\n图显示状态");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelTwelve:
   case mapnavigationpic1hook_PicOneBtnTwelve:
     {
       m_picOneBtnTwelveCtrl.MouseUp();
-      ShowDetail(m_picOneBtnTwelveCtrl, m_picOneLabelTwelveCtrl);
+      ShowDetail(m_picOneBtnTwelveCtrl, m_picOneShowTwelveCtrl);
+      m_picOneShowTwelveCtrl.SetCaption("点击后可通过多\n种方式查询地图\n数据库");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelTwenty:
   case mapnavigationpic1hook_PicOneBtnTwenty:
     {
       m_picOneBtnTwentyCtrl.MouseUp();
-      ShowDetail(m_picOneBtnTwentyCtrl, m_picOneLabelTwentyCtrl);
+      ShowDetail(m_picOneBtnTwentyCtrl, m_picOneShowTwentyCtrl);
+      m_picOneShowTwentyCtrl.SetCaption("提示将要发生的第二\n个路口转向");
     }
     break;
   case mapnavigationpic1hook_PicOneLabelTwo:
   case mapnavigationpic1hook_PicOneBtnTwo:
     {
       m_picOneBtnTwoCtrl.MouseUp();
-      ShowDetail(m_picOneBtnTwoCtrl, m_picOneLabelTwoCtrl);
+      ShowDetail(m_picOneBtnTwoCtrl, m_picOneShowTwoCtrl);
+      m_picOneShowTwoCtrl.SetCaption("点击后停止当前\n路线导航");
+    }
+    break;
+  case mapnavigationpic1hook_HelpPicOne:
+    {
+      m_recordBtn.SetVisible(false);
+      m_recordDetail.SetVisible(false);
     }
     break;
   default:
@@ -609,6 +676,9 @@ bool CMapNavigationPic1Hook::operator ()()
 
 void CMapNavigationPic1Hook::ShowPicOne(bool show)
 {
+  m_recordBtn.SetVisible(false);
+  m_recordDetail.SetVisible(false);
+
   m_helpPicOneCtrl.SetVisible(show);
   m_picOneLabelEightCtrl.SetVisible(show);
   m_picOneLabelEighteenCtrl.SetVisible(show);

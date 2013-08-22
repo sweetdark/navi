@@ -44,7 +44,6 @@ using namespace UeModel;
 CMemVector CViewCanvas::m_points = CMemVector(sizeof(RenderedPoint), 500, false);
 CMemVector CViewCanvas::m_lines = CMemVector(sizeof(RenderedLine), 2000, false);
 CMemVector CViewCanvas::m_polygons = CMemVector(sizeof(RenderedPolygon), 500, false);
-std::vector<CGeoPoint<short> > CViewCanvas::m_roundAboutPoints;
 
 #if __FOR_PC__
 CViewCanvas::RenderedLine CViewCanvas::m_curSelLink;
@@ -124,6 +123,7 @@ CViewCanvas::~CViewCanvas()
 {
   //
   PrepareForSelection(true);
+  m_roundAboutPoints.clear();
 }
 
 /**
@@ -1131,4 +1131,10 @@ inline void CViewCanvas::SetPickPosition_NoRefresh(const CGeoPoint<long> &mapPoi
 inline void CViewCanvas::RenderSidePicture(short indexCode, short type, short arrowCode)
 {
   ((CAGGCanvas *)CViewCanvas::GetCanvas(UeMap::CT_AGG))->RenderSidePicture(indexCode, type, arrowCode);
+}
+
+inline void CViewCanvas::SetRoundAboutPoints(std::vector<CGeoPoint<short> > roundAboutPoints)
+{
+  m_roundAboutPoints.clear();
+  m_roundAboutPoints = roundAboutPoints;
 }

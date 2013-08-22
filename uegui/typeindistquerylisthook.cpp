@@ -48,26 +48,31 @@ void CTypeInDistQueryListHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List1PoiNameBox,	"List1PoiNameBox"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List1CursorBox,	"List1CursorBox"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List1PoiDistBox,	"List1PoiDistBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List1PoiTelBox,	"List1PoiTelBox"));
 
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List2Btn,	"List2Btn"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List2PoiNameBox,	"List2PoiNameBox"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List2CursorBox,	"List2CursorBox"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List2PoiDistBox,	"List2PoiDistBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List2PoiTelBox,	"List2PoiTelBox"));
 
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List3Btn,	"List3Btn"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List3PoiNameBox,	"List3PoiNameBox"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List3CursorBox,	"List3CursorBox"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List3PoiDistBox,	"List3PoiDistBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List3PoiTelBox,	"List3PoiTelBox"));
 
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List4Btn,	"List4Btn"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List4PoiNameBox,	"List4PoiNameBox"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List4CursorBox,	"List4CursorBox"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List4PoiDistBox,	"List4PoiDistBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List4PoiTelBox,	"List4PoiTelBox"));
 
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List5Btn,	"List5Btn"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List5PoiNameBox,	"List5PoiNameBox"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List5CursorBox,	"List5CursorBox"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List5PoiDistBox,	"List5PoiDistBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_List5PoiTelBox,	"List5PoiTelBox"));
 
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_PageUpBtn,	"PageUpBtn"));
   m_ctrlNames.insert(GuiName::value_type(TypeInDistQueryListHook_PageUpBtnIcon,	"PageUpBtnIcon"));
@@ -113,6 +118,7 @@ void CTypeInDistQueryListHook::MakeControls()
     m_InfoBtn[i].SetIconElement(GetGuiElement(j++));
 
     m_AddrLabel[i].SetLabelElement(GetGuiElement(j++));
+    m_telLabel[i].SetLabelElement(GetGuiElement(j++));
   }
 }
 
@@ -157,12 +163,11 @@ short CTypeInDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    if (ctrlType >= TypeInDistQueryListHook_List1Btn && ctrlType <= TypeInDistQueryListHook_List5PoiDistBox)
+    if (ctrlType >= TypeInDistQueryListHook_List1Btn && ctrlType <= TypeInDistQueryListHook_List5PoiTelBox)
     {
-      int index = (ctrlType-TypeInDistQueryListHook_List1Btn)/4;
+      int index = (ctrlType-TypeInDistQueryListHook_List1Btn)/5;
       m_InfoBtn[index].MouseDown();
-      m_AddrLabel[index].MouseDown();
-      MOUSEDOWN_2RENDERCTRL(m_InfoBtn[index], m_AddrLabel[index]);
+      MOUSEDOWN_3RENDERCTRL(m_InfoBtn[index], m_AddrLabel[index], m_telLabel[index]);
     } 
     else
     {
@@ -243,11 +248,10 @@ short CTypeInDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    if (ctrlType >= TypeInDistQueryListHook_List1Btn && ctrlType <= TypeInDistQueryListHook_List5PoiDistBox)
+    if (ctrlType >= TypeInDistQueryListHook_List1Btn && ctrlType <= TypeInDistQueryListHook_List5PoiTelBox)
     {
-      int index = (ctrlType-TypeInDistQueryListHook_List1Btn)/4;
+      int index = (ctrlType-TypeInDistQueryListHook_List1Btn)/5;
       m_InfoBtn[index].MouseUp();
-      m_AddrLabel[index].MouseUp();
       if(m_InfoBtn[index].IsEnable())
       {
         CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
@@ -304,6 +308,7 @@ void CTypeInDistQueryListHook::ResetResultList()
       m_InfoBtn[i].SetEnable(false);
       m_InfoBtn[i].SetCaption("");
       m_AddrLabel[i].SetCaption("");
+      m_telLabel[i].SetCaption("");
     }
     m_pageUpBtn.SetEnable(false);
     m_pageDownBtn.SetEnable(false);
@@ -320,13 +325,25 @@ void CTypeInDistQueryListHook::ResetResultList()
       m_InfoBtn[i].SetEnable(false);
       m_InfoBtn[i].SetCaption("");
       m_AddrLabel[i].SetCaption("");
+      m_telLabel[i].SetCaption("");
       continue;
     }
+    //poi名称
     m_InfoBtn[i].SetEnable(true);
     m_InfoBtn[i].SetCaption(oneRecord->m_uniName);
-
+    //地址
     CCodeIndexCtrl::GetDistCodeCtrl().GetItemNameByCode(oneRecord->m_addrCode,
       m_AddrLabel[i].GetCaption());
+    if (oneRecord->m_pchAddrStr)
+    {
+      ::strcat(m_AddrLabel[i].GetCaption(), oneRecord->m_pchAddrStr);
+    }
+    //电话
+    m_telLabel[i].SetCaption(oneRecord->m_pchTelStr);
+    if (oneRecord->m_pchTelStr == NULL)
+    {
+      m_telLabel[i].SetCaption("暂无电话");
+    }
 
     PointInfo pointInfo;
     pointInfo.m_point.m_x = oneRecord->m_x;

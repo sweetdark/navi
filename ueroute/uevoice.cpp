@@ -1705,9 +1705,9 @@ inline bool CUeVoice::IsContinue(int order, GuidanceIndicator **indicators, bool
   int turnDist = (nextOrder >= 0) ? indicators[nextOrder]->m_curDist : 0;
   while(nextOrder >=0 && turnDist < MAXUTURNDIST && (nextOrder -1) >= 0)
   {
-    if(indicators[nextOrder]->m_roadForm == RF_UTurn ||
+    if(indicators[nextOrder]->m_roadForm == RF_UTurn  //||
       //IsUTurn(indicators[order]->m_snd.m_dirCode, indicators[nextOrder]->m_snd.m_dirCode) ||
-      IsUTurn(indicators, order, nextOrder))
+      /*IsUTurn(indicators, order, nextOrder) 此处判断不够严谨导致错误*/)
     {
       isUTurn = true;
       break;
@@ -2333,11 +2333,11 @@ inline void CUeVoice::MakeVoices()
 
   // Direction commands
   m_vStrings.insert(VoiceMap::value_type(DVT_DirectGo, _T("直行")));
-  m_vStrings.insert(VoiceMap::value_type(DVT_RightDirect, _T("靠右"))); // 靠右直行 请走右线
+  m_vStrings.insert(VoiceMap::value_type(DVT_RightDirect, _T("走右线"))); // 靠右直行 请走右线
   m_vStrings.insert(VoiceMap::value_type(DVT_Right, _T("沿右前方行驶")));
   m_vStrings.insert(VoiceMap::value_type(DVT_ForkRight, _T("走右线")));
   m_vStrings.insert(VoiceMap::value_type(DVT_RTurn, _T("右转")));
-  m_vStrings.insert(VoiceMap::value_type(DVT_LeftDirect, _T("靠左"))); // 靠左直行 请走左线
+  m_vStrings.insert(VoiceMap::value_type(DVT_LeftDirect, _T("走左线"))); // 靠左直行 请走左线
   m_vStrings.insert(VoiceMap::value_type(DVT_Left, _T("沿左前方行驶"))); 
   m_vStrings.insert(VoiceMap::value_type(DVT_ForkLeft, _T("走左线")));
   m_vStrings.insert(VoiceMap::value_type(DVT_LTurn, _T("左转")));

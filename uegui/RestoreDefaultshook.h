@@ -88,6 +88,11 @@ namespace UeGui
     CUiCheckButton m_addressBookCtrl;
     CUiCheckButton m_elecEyeCtrl;
 
+    CUiLabel m_historyLabel;
+    CUiLabel m_myJourneyLabel;
+    CUiLabel m_addressBookLabel;
+    CUiLabel m_elecEyeLabel;
+
     CUiLabel m_textOne;
     CUiLabel m_textTwo;
     

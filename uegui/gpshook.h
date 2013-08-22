@@ -87,7 +87,7 @@ namespace UeGui
 
     virtual void Load();
 
-    void Update();
+    virtual void Timer();
 
     void Gps2Scr(short elevation, short azimuth, CGeoPoint<int> &scrPt);
 

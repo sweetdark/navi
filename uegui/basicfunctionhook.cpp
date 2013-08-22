@@ -243,48 +243,56 @@ short CBasicFunctionHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_picOneShoowFiveCtrl.MouseDown();
       m_picOneShoowFiveCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShoowFiveCtrl);
     }
     break;
   case basicfunctionhook_PicOneShowEight:
     {
       m_picOneShowEightCtrl.MouseDown();
       m_picOneShowEightCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowEightCtrl);
     }
     break;
   case basicfunctionhook_PicOneShowFour:
     {
       m_picOneShowFourCtrl.MouseDown();
       m_picOneShowFourCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowFourCtrl);
     }
     break;
   case basicfunctionhook_PicOneShowOne:
     {
       m_picOneShowOneCtrl.MouseDown();
       m_picOneShowOneCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowOneCtrl);
     }
     break;
   case basicfunctionhook_PicOneShowSeven:
     {
       m_picOneShowSevenCtrl.MouseDown();
       m_picOneShowSevenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowSevenCtrl);
     }
     break;
   case basicfunctionhook_PicOneShowSix:
     {
       m_picOneShowSixCtrl.MouseDown();
       m_picOneShowSixCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowSixCtrl);
     }
     break;
   case basicfunctionhook_PicOneShowThree:
     {
       m_picOneShowThreeCtrl.MouseDown();
       m_picOneShowThreeCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowThreeCtrl);
     }
     break;
   case basicfunctionhook_PicOneShowTwo:
     {
       m_picOneShowTwoCtrl.MouseDown();
       m_picOneShowTwoCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picOneShowTwoCtrl);
     }
     break;
 
@@ -356,48 +364,56 @@ short CBasicFunctionHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_picThreeShowFiveCtrl.MouseDown();
       m_picThreeShowFiveCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picThreeShowFiveCtrl);
     }
     break;
   case basicfunctionhook_PicThreeShowEight:
     {
       m_picThreeShowEightCtrl.MouseDown();
       m_picThreeShowEightCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picThreeShowEightCtrl);
     }
     break;
   case basicfunctionhook_PicThreeShowFour:
     {
       m_picThreeShowFourCtrl.MouseDown();
       m_picThreeShowFourCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picThreeShowFourCtrl);
     }
     break;
   case basicfunctionhook_PicThreeShowThree:
     {
       m_picThreeShowThreeCtrl.MouseDown();
       m_picThreeShowThreeCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picThreeShowThreeCtrl);
     }
     break;
   case basicfunctionhook_PicThreeShowSeven:
     {
       m_picThreeShowSevenCtrl.MouseDown();
       m_picThreeShowSevenCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picThreeShowSevenCtrl);
     }
     break;
   case basicfunctionhook_PicThreeShowSix:
     {
       m_picThreeShowSixCtrl.MouseDown();
       m_picThreeShowSixCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picThreeShowSixCtrl);
     }
     break;
   case basicfunctionhook_PicThreeShowOne:
     {
       m_picThreeShowOneCtrl.MouseDown();
       m_picThreeShowOneCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picThreeShowOneCtrl);
     }
     break;
   case basicfunctionhook_PicThreeShowTwo:
     {
       m_picThreeShowTwoCtrl.MouseDown();
       m_picThreeShowTwoCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picThreeShowTwoCtrl);
     }
     break;
 
@@ -453,36 +469,42 @@ short CBasicFunctionHook::MouseDown(CGeoPoint<short> &scrPoint)
     {
       m_picTwoShowFiveCtrl.MouseDown();
       m_picTwoShowFiveCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowFiveCtrl);
     }
     break;
   case basicfunctionhook_PicTwoShowFour:
     {
       m_picTwoShowFourCtrl.MouseDown();
       m_picTwoShowFourCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowFourCtrl);
     }
     break;
   case basicfunctionhook_PicTwoShowTwo:
     {
       m_picTwoShowTwoCtrl.MouseDown();
       m_picTwoShowTwoCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowTwoCtrl);
     }
     break;
   case basicfunctionhook_PicTwoShowSix:
     {
       m_picTwoShowSixCtrl.MouseDown();
       m_picTwoShowSixCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowSixCtrl);
     }
     break;
   case basicfunctionhook_PicTwoShowOne:
     {
       m_picTwoShowOneCtrl.MouseDown();
       m_picTwoShowOneCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowOneCtrl);
     }
     break;
   case basicfunctionhook_PicTwoShowThree:
     {
       m_picTwoShowThreeCtrl.MouseDown();
       m_picTwoShowThreeCtrl.SetVisible(false);
+      AddRenderUiControls(&m_picTwoShowThreeCtrl);
     }
     break;
 
@@ -722,6 +744,14 @@ short CBasicFunctionHook::MouseUp(CGeoPoint<short> &scrPoint)
       }
     }
     break;
+  case basicfunctionhook_HelpPicOne:
+  case basicfunctionhook_HelpPicThree:
+  case basicfunctionhook_HelpPicTwo:
+    {
+      m_recordBtn.SetVisible(false);
+      m_recordDetail.SetVisible(false);
+    }
+    break;
   default:
     return CMenuBackgroundHook::MouseUp(scrPoint);
     break;
@@ -789,6 +819,8 @@ void CBasicFunctionHook::ShowPic(int pic, bool show)
     assert(false);
     break;
   }
+  m_recordDetail.SetVisible(false);
+  m_recordBtn.SetVisible(false);
 }
 
 void CBasicFunctionHook::SwitchPage()

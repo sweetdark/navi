@@ -42,21 +42,33 @@ namespace UeGui
       TypeNoDistQueryListHook_List1PoiNameBox,
       TypeNoDistQueryListHook_List1CursorBox,
       TypeNoDistQueryListHook_List1PoiDistBox,
+      TypeNoDistQueryListHook_List1PoiTelBox,
+      TypeNoDistQueryListHook_List1PoiFarBox,
+      TypeNoDistQueryListHook_List1PoiCursorBox,
 
       TypeNoDistQueryListHook_List2Btn,
       TypeNoDistQueryListHook_List2PoiNameBox,
       TypeNoDistQueryListHook_List2CursorBox,
       TypeNoDistQueryListHook_List2PoiDistBox,
+      TypeNoDistQueryListHook_List2PoiTelBox,
+      TypeNoDistQueryListHook_List2PoiFarBox,
+      TypeNoDistQueryListHook_List2PoiCursorBox,
 
       TypeNoDistQueryListHook_List3Btn,
       TypeNoDistQueryListHook_List3PoiNameBox,
       TypeNoDistQueryListHook_List3CursorBox,
       TypeNoDistQueryListHook_List3PoiDistBox,
+      TypeNoDistQueryListHook_List3PoiTelBox,
+      TypeNoDistQueryListHook_List3PoiFarBox,
+      TypeNoDistQueryListHook_List3PoiCursorBox,
 
       TypeNoDistQueryListHook_List4Btn,
       TypeNoDistQueryListHook_List4PoiNameBox,
       TypeNoDistQueryListHook_List4CursorBox,
       TypeNoDistQueryListHook_List4PoiDistBox,
+      TypeNoDistQueryListHook_List4PoiTelBox,
+      TypeNoDistQueryListHook_List4PoiFarBox,
+      TypeNoDistQueryListHook_List4PoiCursorBox,
 
       TypeNoDistQueryListHook_PageUpBtn,
       TypeNoDistQueryListHook_PageUpBtnIcon,
@@ -74,6 +86,15 @@ namespace UeGui
       TypeNoDistQueryListHook_RadiusSelectBtn,
       TypeNoDistQueryListHook_RadiusSelectBtnIcon,
       TypeNoDistQueryListHook_RadiusSelectBtnLabel,
+
+      TypeNoDistQueryListHook_Cursor1,
+      TypeNoDistQueryListHook_Cursor2,
+      TypeNoDistQueryListHook_Cursor3,
+      TypeNoDistQueryListHook_Cursor4,
+      TypeNoDistQueryListHook_Cursor5,
+      TypeNoDistQueryListHook_Cursor6,
+      TypeNoDistQueryListHook_Cursor7,
+      TypeNoDistQueryListHook_Cursor8,
 
       TypeNoDistQueryListHook_End
     };
@@ -112,6 +133,10 @@ namespace UeGui
 
     void SetRadiusLabel();
 
+    void SetDirection(const SQLRecord &oneRecord, int index);
+
+    void GetDistances();
+
   private:
     CUiButton m_mapCenterBtn;
     CUiButton m_curPosBtn;
@@ -128,6 +153,9 @@ namespace UeGui
 
     CUiBitButton m_infoBtn[4];
     CUiLabel m_addrLabel[4];
+    CUiLabel m_telLabel[4];
+    CUiLabel m_farLabel[4];
+    CUiButton m_cursorIcon[4];
 
     CUiBitButton m_pageUpBtn;
     CUiBitButton m_pageDownBtn;
@@ -146,6 +174,8 @@ namespace UeGui
     CGeoPoint<long> m_mapCenterPos;
     //当前选择的搜索半径
     int m_curRadius;
+    //记录当前搜索的点
+    CGeoPoint<long> m_curSelectedPos;
   };
 }
 #endif

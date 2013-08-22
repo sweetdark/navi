@@ -1061,6 +1061,46 @@ unsigned int IRoute::RoutePlan(bool isPlayVoice)
   return PEC_Success;
 }
 
+unsigned int IRoute::ReRoutePlan()
+{
+  TIME_STAT;
+  MEMORY_STAT;
+#if VARIANTLOGGER
+  m_log.Log(_T("\nBegin once re-route plan - The %i time\n"), ++m_runTimes);
+#endif
+
+  // Check method specifications
+  m_planState = PS_Plan;
+  unsigned int rt = IsReadyForPlanning();
+  if(rt != PEC_Success)
+  {
+#if VARIANTLOGGER
+    m_log.Log(_T("Not ready for re-route plan - Invalid parameters or positions setting\n"));
+#endif
+
+    Prepare();
+    Notify(ST_RenderPathes);
+    return rt;
+  }
+
+  // Do plan
+  rt = m_impl->RePlan();
+  if(rt != PEC_Success)
+  {
+    m_planState = PS_None;
+    Notify(ST_RenderPathes);
+    return rt;
+  }
+#if VARIANTLOGGER
+  m_log.Log(_T("End once re-route plan\n\n"));
+#endif
+
+  m_planState = PS_RealGuidance;
+  SyncPositionTime();
+  Notify(ST_RenderPathes);
+  return PEC_Success;
+}
+
 unsigned int IRoute::MultiRoutePlan()
 {
   int prevPlan = m_curPlan;

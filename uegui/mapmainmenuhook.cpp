@@ -251,7 +251,7 @@ short CMapMainMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   case MapMainMenuHook_StopGuideBtn:
   case MapMainMenuHook_StopGuideLabel:
     {
-      needRefresh = true;
+      needRefresh = false;
       m_stopGuide.MouseUp();
       if (m_parentHook)
       {
@@ -305,11 +305,14 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
   //执行展开或者收缩
   if (bExpand)
   {
+    //显示菜单栏
+    ShowMenuBar(true, bExpand);
     //重新开启界面切换定时器
     mapHook->RestarGuiTimer();    
     mapHook->ShowMinimizeBtn();      
     mapHook->ShowMapAzimuthBtn();
-    mapHook->ShowMapScalingBtn(); 
+    mapHook->ShowMapScalingBtn();
+    mapHook->ShowDetailBtn1();
     mapHook->ShowDetailBtn2(false);
     mapHook->ShowGuideInfoBtn(false);
     mapHook->ShowCompass(false);
@@ -349,6 +352,8 @@ void UeGui::CMapMainMenuHook::ExpandMenu( bool bExpand /*= true*/ )
   }
   else
   {
+    //显示菜单栏
+    ShowMenuBar(true, bExpand);
     //关闭界面切换定时器
     mapHook->CloseGuiTimer();
     mapHook->ShowMinimizeBtn(false);
@@ -409,19 +414,6 @@ void UeGui::CMapMainMenuHook::DynamicUpdate( bool bExpand, short planState, UeMa
   //执行展开或者收缩
   if (bExpand)
   {
-    //如果显示路口放大图
-    if (m_viewWrapper.IsGuidanceViewShown())
-    {
-      //隐藏菜单栏
-      ShowMenuBar(false, bExpand);
-      mapHook->ShowDetailBtn1(false);
-    }
-    else
-    {
-      //显示菜单栏
-      ShowMenuBar(true, bExpand);
-      mapHook->ShowDetailBtn1();      
-    }
     //更新切换屏幕模式按钮状态
     mapHook->RefreshSrcModalBtnStatus();
   }

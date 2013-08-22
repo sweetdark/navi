@@ -560,6 +560,9 @@ namespace UeMap
     { 
       return m_detailedInfo; 
     }
+
+    //设置矢量放大图环岛出口点
+    void SetRoundAboutPoints(std::vector<CGeoPoint<short> > roundAboutPoints);
   protected:
     //
     //
@@ -619,6 +622,7 @@ namespace UeMap
     */
     SIZE GetTextSize(HDC dc, LPCTSTR text, int count);
 
+
   protected:
     // Properties of this canvas
     CCanvasSetting m_setting;
@@ -627,7 +631,6 @@ namespace UeMap
     static CMemVector m_points;
     static CMemVector m_lines;
     static CMemVector m_polygons;
-    static std::vector<CGeoPoint<short> > m_roundAboutPoints;
 #if __FOR_FPC__
     static CMemVector m_namePoints;
     static CMemVector m_trafficPoints;
@@ -642,6 +645,7 @@ namespace UeMap
     static CMemVector m_poiRects;
     static CMemVector m_nameRects;
     static CMemVector m_drawnNames;
+    std::vector<CGeoPoint<short> > m_roundAboutPoints;
 
     //
     static CWinCanvas *m_gdiCanvas;

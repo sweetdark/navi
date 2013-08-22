@@ -216,11 +216,6 @@ namespace UeGui
     int GetDataIndex(unsigned int row);
 
     PointList GetCurrentPagePointList();
-    /**
-    * \brief 根据控件是否可用来判断是否刷新
-    * \param button 按钮
-    **/
-    bool IsNeedRefresh(CUiButton &button);
 
     void ClickRowByMouseUp(CUiButton &button, unsigned int row);
 

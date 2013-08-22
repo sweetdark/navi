@@ -600,6 +600,7 @@
 				AdditionalIncludeDirectories="..\..\..\include;..\..\..\include\freetype\include"
 				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;NDEBUG;_WINDOWS;_USRDLL;UEGUI_EXPORTS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
 				RuntimeLibrary="2"
+				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -963,6 +964,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\eeyelisthook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\eeyelisthook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\eeyesettinghook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\eeyesettinghook.h"
+				>
+			</File>
+			<File
 				RelativePath=".\fasthandlehelphook.cpp"
 				>
 			</File>
@@ -1064,6 +1081,46 @@
 			</File>
 			<File
 				RelativePath=".\mapnavigationpic1hook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic2hook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic2hook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic3hook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic3hook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic4hook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic4hook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic5hook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic5hook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic6hook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mapnavigationpic6hook.h"
 				>
 			</File>
 			<File
@@ -1208,6 +1265,14 @@
 			</File>
 			<File
 				RelativePath=".\soundmenuhook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\startuphook.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\startuphook.h"
 				>
 			</File>
 			<File

@@ -51,7 +51,6 @@ void CEditSpellingHook::Load()
     TurnTo(editHook->GetCurEditHookType());
     return;
   }
-
   ResetKeyWord(m_keyWord);
   m_curSpellingCursor = 0;
   m_posBuffer[0] = 0xff;
@@ -397,24 +396,17 @@ bool CEditSpellingHook::EraseOneKeyWord(void)
 {
   if (m_iCurCursorIndex)
   {
-    -- m_iCurCursorIndex;
-    m_tstrKeyWords.erase(m_iCurCursorIndex,1);
+    m_tstrKeyWords.erase(--m_iCurCursorIndex,1);
     ShowKeyWord();
   }
   return m_tstrKeyWords.size();
 }
 
-//Ìí¼ÓÒ»¸ö×Ö
 bool CEditSpellingHook::AddOneKeyWord(const char *pchLabelText)
 {
   TCHAR uniChar[3] = {0, };
   m_stringBasic.Ascii2Chs(pchLabelText,uniChar,2);
-  doAddOneKeyWord(uniChar[0]);
-  return false;
-}
-bool CEditSpellingHook::doAddOneKeyWord(TCHAR oneWord)
-{
-  m_tstrKeyWords.insert(m_iCurCursorIndex++,1,oneWord);
+  m_tstrKeyWords.insert(m_iCurCursorIndex++,1,uniChar[0]);
   ShowKeyWord();
   return true;
 }
@@ -445,8 +437,9 @@ void CEditSpellingHook::ResetKeyWord(const char *pchKeyWord)
     //
     for (int i(0); i<uWordNum; ++i)
     {
-      doAddOneKeyWord(uniWords[i]);
+      m_tstrKeyWords.insert(m_iCurCursorIndex++,1,uniWords[i]);
     }
+    ShowKeyWord();
   }
 }
 
@@ -653,10 +646,4 @@ char* CEditSpellingHook::GetKeyWord()
 void CEditSpellingHook::SetKeyWord(const char* keyword)
 {
   ::memcpy(m_keyWord, keyword, sizeof(m_keyWord));
-}
-
-void CEditSpellingHook::SetTitle(const char* title)
-{
-  m_strTitle = title;
-  ::strcpy(GetGuiElement(MenuBackgroundHook_TitleLable)->m_label, m_strTitle.c_str());
 }

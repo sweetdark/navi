@@ -1093,6 +1093,7 @@ void UeGui::CAggHook::TurnTo( int hookType, bool bUnLoadCurHook /*= true*/ )
   CAggHook* hook = static_cast<CAggHook*>(m_view->GetHook(m_curHookType));
   if (bUnLoadCurHook && hook)
   {
+    hook->ClearRenderElements();
     hook->UnLoad();
   }
 
@@ -1103,6 +1104,7 @@ void UeGui::CAggHook::TurnTo( int hookType, bool bUnLoadCurHook /*= true*/ )
   hook = static_cast<CAggHook*>(m_view->GetHook(m_curHookType));
   if (hook)
   {
+    hook->ClearRenderElements();
     hook->Load();
   }
 }

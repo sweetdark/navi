@@ -204,6 +204,11 @@ namespace UeGui
     //设置是否开启启动声明 0:不开启(OS_OFF) 1：开启(OS_ON)
     void SetIsOpenStartStatement(unsigned char value);
     //////////////////////////////////////////////////////////////////////////
+    //是否开启快捷面板 0:不开启(OS_OFF) 1：开启(OS_ON)
+    unsigned char GetIsShowShortcutPanel();
+    //设置是否开启快捷面板 0:不开启(OS_OFF) 1：开启(OS_ON)
+    void SetIsShowShortcutPanel(unsigned char value);
+    //////////////////////////////////////////////////////////////////////////
     /*
     * 读取端口
     * return value 1(COM1) 2(COM2) ......

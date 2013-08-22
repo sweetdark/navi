@@ -81,6 +81,10 @@ namespace UeGui
 
     virtual bool operator ()();
     /**
+    * 计时器
+    **/
+    virtual void Timer();
+    /**
     * \设置当前hook是否显示
     */
     virtual void Show( bool show = true );
@@ -130,13 +134,15 @@ namespace UeGui
     * \brief 显示距离信息到标签上
     */
     void ShowDistLabel(double dist, CUiLabel& label);
+    /**
+    * \brief 开始导航
+    */
+    void StartGuidance();
+    /**
+    * \brief 倒计时刷新
+    */
+    void TimerRefresh();
   private:
-    // 父hook
-    CAggHook* m_parentHook;
-    //路线操作接口
-    CRouteWrapper& m_routeWrapper;
-    //地图操作接口
-    CViewWrapper& m_viewWrapper;
     //菜单按钮
     CUiBitButton m_button1;
     CUiBitButton m_button2;
@@ -157,13 +163,23 @@ namespace UeGui
     CUiLabel m_routeDistLabel4;
     //开始导航
     CUiButton m_startGuidanceBtn;
-
     CUiButton m_multiRouteBack;
     CUiButton m_delimiter1;
     CUiButton m_delimiter2;
     CUiButton m_delimiter3;
+  private:
+    // 父hook
+    CAggHook* m_parentHook;
+    //路线操作接口
+    CRouteWrapper& m_routeWrapper;
+    //地图操作接口
+    CViewWrapper& m_viewWrapper;
     //多路径规划结果
     UeRoute::PlanResultDesc m_planResult[UeRoute::MT_Max];
+    //自动开始导航倒计时
+    short m_autoGuidanceTimerInterval;
+    //开始导航按钮文字
+    char m_guidanceCaption[MAX_NAME_LENGTH];
   };
 }
 #endif

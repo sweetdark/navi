@@ -244,6 +244,11 @@ namespace UeGui
     unsigned int MultiRoutePlan();
 
     /**
+    * \brief 返程规划
+    */
+    unsigned int BackTrackingPlan();
+
+    /**
     * \brief 设置规划方式
     */
     unsigned int SetMethod(unsigned int method);
@@ -253,7 +258,12 @@ namespace UeGui
     */
     unsigned int GetMethod();
 
-        /**
+    /**
+    * 读取当前路线规划方式
+    **/
+    UeRoute::MethodType GetPlanMethodType();
+
+    /**
     * \brief 取得规划结果基本信息
     */
     bool GetPlanResultDesc(PlanResultDesc &desc);
@@ -299,6 +309,11 @@ namespace UeGui
     * \brief 停止导航
     */
     unsigned int StopGuidance();
+
+    /**
+    * \brief 删除路线
+    */
+    unsigned int EraseRoute();
 
     /**
     * \brief 取得规划结果的分段数（根据经由点划分）
@@ -351,14 +366,36 @@ namespace UeGui
     bool GetHighwayOutlets(HighwayOutletList &dataList);
 
     /**
+    * \brief 取得路段关联信息
+    */
+    unsigned char GetSideProp(unsigned char type, int code, int xCoord, int yCoord, char *prop);
+
+    /**
+    * \brief Get current prop
+    */
+    const char *GetSideProp(unsigned char type);
+
+    /**
     * \brief 格式化距离
     */
     void FormatDistance(char* pBuffer, int distance);
+    /**
+    * \brief 判断车是将进入环岛或者已经在环岛中
+    */
+    bool IsRoundAbout(const GuidanceStatus &dirInfo);
+    /**
+    * \brief 获取当前车的位置到环岛出口的距离
+    */
+    float GetCurRoundAboutDist(const GuidanceStatus &dirInfo);
   private:
     /*
     * 设置起点或者终点或者经过点
     */
     unsigned int SetPosition(PositionType posType);
+    /*
+    * 备份当前路线到内存中
+    */
+    void BackupCurrentRoute();
   private:
     //函数对象：用于算法，判断是否为不同的路。只在直行的路上做判断
     class DifferentRoad 
@@ -430,6 +467,8 @@ namespace UeGui
     IRoute *m_route;
     IMapMatch *m_gps;
     IQuery *m_query;
+    //保存经由点给返程时使用
+    POIDataList m_planPositionList;
   };
 }
 #endif

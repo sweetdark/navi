@@ -49,7 +49,6 @@ void CEditHandHook::Load()
     TurnTo(editHook->GetCurEditHookType());
     return;
   }
-
   ResetKeyWord(m_keyWord);
   m_vecWordsBuf.clear();
   SetAssociateBtnLabels();
@@ -347,17 +346,20 @@ short CEditHandHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       short tempcode = ctrlType-EditHandHook_InputCode1;
       m_inputCode[tempcode].MouseUp();
-      if (m_isIdentify)
+      if (m_inputCode[tempcode].IsEnable())
       {
-        EraseOneKeyWord();
-        AddOneKeyWord(m_inputCode[tempcode].GetCaption());
-        m_isIdentify = false;
-      }
-      else
-      {
-        if (m_tstrKeyWords.length() < MAXWORDNUM)
+        if (m_isIdentify)
         {
+          EraseOneKeyWord();
           AddOneKeyWord(m_inputCode[tempcode].GetCaption());
+          m_isIdentify = false;
+        }
+        else
+        {
+          if (m_tstrKeyWords.length() < MAXWORDNUM)
+          {
+            AddOneKeyWord(m_inputCode[tempcode].GetCaption());
+          }
         }
       }
       break;
@@ -397,24 +399,17 @@ bool CEditHandHook::EraseOneKeyWord(void)
 {
   if (m_iCurCursorIndex)
   {
-    -- m_iCurCursorIndex;
-    m_tstrKeyWords.erase(m_iCurCursorIndex,1);
+    m_tstrKeyWords.erase(--m_iCurCursorIndex,1);
     ShowKeyWord();
   }
   return m_tstrKeyWords.size();
 }
 
-//Ìí¼ÓÒ»¸ö×Ö
 bool CEditHandHook::AddOneKeyWord(const char *pchLabelText)
 {
   TCHAR uniChar[3] = {0, };
   m_stringBasic.Ascii2Chs(pchLabelText,uniChar,2);
-  doAddOneKeyWord(uniChar[0]);
-  return false;
-}
-bool CEditHandHook::doAddOneKeyWord(TCHAR oneWord)
-{
-  m_tstrKeyWords.insert(m_iCurCursorIndex++,1,oneWord);
+  m_tstrKeyWords.insert(m_iCurCursorIndex++,1,uniChar[0]);
   ShowKeyWord();
   return true;
 }
@@ -445,8 +440,9 @@ void CEditHandHook::ResetKeyWord(const char *pchKeyWord)
     //
     for (int i(0); i<uWordNum; ++i)
     {
-      doAddOneKeyWord(uniWords[i]);
+      m_tstrKeyWords.insert(m_iCurCursorIndex++,1,uniWords[i]);
     }
+    ShowKeyWord();
   }
 }
 
@@ -657,10 +653,4 @@ char* CEditHandHook::GetKeyWord()
 void CEditHandHook::SetKeyWord(const char* keyword)
 {
   ::memcpy(m_keyWord, keyword, sizeof(m_keyWord));
-}
-
-void CEditHandHook::SetTitle(const char* title)
-{
-  m_strTitle = title;
-  ::strcpy(GetGuiElement(MenuBackgroundHook_TitleLable)->m_label, m_strTitle.c_str());
 }

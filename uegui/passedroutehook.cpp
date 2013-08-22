@@ -55,7 +55,7 @@ void CPassedRouteHook::Load()
   UeRoute::PlanResultDesc desc;
   //路线类型
   unsigned char planType = GetPlanType();
-  if (m_route->GetPlanState() != UeRoute::PS_None && GetResultDesc(planType,desc))
+  if (CRouteWrapper::Get().GetPlanState() != UeRoute::PS_None && GetResultDesc(planType,desc))
   {
     SetPlanInfo(desc);
     LaodRouteList();
@@ -444,7 +444,7 @@ float CPassedRouteHook::GetCurIndicatorLeftDist(const GuidanceStatus& dirInfo) c
   float returnValue;
   if (dirInfo.m_curOrderForSnd == dirInfo.m_curIndicator)
   {
-    UeRoute::GuidanceIndicator *curIndicator = m_route->GetIndicator(dirInfo.m_curPair, dirInfo.m_curIndicator);
+    UeRoute::GuidanceIndicator *curIndicator = CRouteWrapper::Get().GetIndicator(dirInfo.m_curPair, dirInfo.m_curIndicator);
     returnValue = curIndicator->m_curDist;
   }
   else
@@ -452,7 +452,7 @@ float CPassedRouteHook::GetCurIndicatorLeftDist(const GuidanceStatus& dirInfo) c
     returnValue = dirInfo.m_curDistForSnd;
     for (int i = dirInfo.m_curIndicator - 1; i >= dirInfo.m_curOrderForSnd; --i)
     {
-      UeRoute::GuidanceIndicator *curIndicator = m_route->GetIndicator(dirInfo.m_curPair, i);
+      UeRoute::GuidanceIndicator *curIndicator = CRouteWrapper::Get().GetIndicator(dirInfo.m_curPair, i);
       returnValue -= curIndicator->m_curDist;
     }
   }
@@ -464,17 +464,17 @@ bool CPassedRouteHook::GetResultDesc(const unsigned char curPlan, PlanResultDesc
 {
   GuidanceStatus dirInfo;
   //获取当前车的位置的导航信息
-  m_route->GetCurrent(dirInfo);
+  CRouteWrapper::Get().GetCurrent(dirInfo);
   int curPair = dirInfo.m_curPair;
   //有多个经由点，就有多段
-  int totalPairs = m_route->GetPairs();
+  int totalPairs = CRouteWrapper::Get().GetPairs();
   for (; curPair < totalPairs; curPair++)
   {
-    int total = (curPair == dirInfo.m_curPair) ? dirInfo.m_curIndicator : (m_route->GetIndicatorNum(curPair) - 1);
+    int total = (curPair == dirInfo.m_curPair) ? dirInfo.m_curIndicator : (CRouteWrapper::Get().GetIndicatorNum(curPair) - 1);
     for (int i = total; i >= 0; i--)
     {
       UeRoute::GuidanceIndicator *curIndicator = NULL;
-      curIndicator = m_route->GetIndicator(curPair, i);
+      curIndicator = CRouteWrapper::Get().GetIndicator(curPair, i);
       if (curPair == dirInfo.m_curPair && i == total)
       {
         desc.totalLength += GetCurIndicatorLeftDist(dirInfo);
@@ -517,7 +517,7 @@ bool CPassedRouteHook::GetResultDesc(const unsigned char curPlan, PlanResultDesc
 
 unsigned char CPassedRouteHook::GetPlanType() const
 {
-  unsigned int routeType = m_route->GetMethod();
+  unsigned int routeType = CRouteWrapper::Get().GetMethod();
   unsigned char planType = -1;
   if (routeType & RW_Fast) 
   {
@@ -557,7 +557,7 @@ void CPassedRouteHook::SetPlanInfo( UeRoute::PlanResultDesc& planResult)
   m_totalTimeLableCtrl.SetCaption(cValue);
 
   //路线类型
-  unsigned int routeType = m_route->GetMethod();
+  unsigned int routeType = CRouteWrapper::Get().GetMethod();
   if (routeType & RW_Fast) 
   {
     /// 高速优先
@@ -606,6 +606,14 @@ void CPassedRouteHook::LaodRouteList()
   routeWrapper.GetPassedRouteList(m_routeList);
   //合并相同道路
   routeWrapper.MergeRoad(m_routeList);
+  //增加终点的显示
+  PlanPosition endPos;
+  endPos.m_type = PT_End;
+  routeWrapper.GetPosition(endPos);
+  RouteInfo endRoute;
+  endRoute.m_point = endPos.m_pos;
+  ::strcpy(endRoute.m_routeName, endPos.m_name);
+  m_routeList.push_back(endRoute);
 }
 
 void CPassedRouteHook::LoadPageTuring()
@@ -757,20 +765,6 @@ PointList CPassedRouteHook::GetCurrentPagePointList()
 }
 
 
-bool CPassedRouteHook::IsNeedRefresh(CUiButton &button)
-{
-  if (button.IsEnable())
-  {
-    m_isNeedRefesh = true;
-    return true;
-  }
-  else
-  {
-    m_isNeedRefesh = false;
-    return false;
-  }
-}
-
 void CPassedRouteHook::ClickRowByMouseUp(CUiButton &button, unsigned int row)
 {
   if (IsNeedRefresh(button))
@@ -792,6 +786,7 @@ void CPassedRouteHook::AvoidRoute(unsigned int row)
 {
   if (row > kROWBegin && row < kROWEnd)
   {
+    CRouteWrapper& routeWrapper = CRouteWrapper::Get();
     int index = GetDataIndex(row);
     if (index >= 0)
     {
@@ -799,7 +794,7 @@ void CPassedRouteHook::AvoidRoute(unsigned int row)
       UeRoute::GuidanceIndicator *curIndicator = NULL;
       for (int j = m_routeList[index].m_begin; j >= m_routeList[index].m_end; --j)
       {
-        curIndicator = m_route->GetRoute()->GetIndicator(0, j);
+        curIndicator = routeWrapper.GetIndicator(0, j);
         if (curIndicator)
         {
           BlockElement oneBlock;
@@ -811,23 +806,22 @@ void CPassedRouteHook::AvoidRoute(unsigned int row)
 
       if (blocks.GetCount() > 0)
       {
-        m_route->SetBlock(blocks);
+        routeWrapper.SetBlock(blocks);
       }       
-      m_route->SetPlanState(PS_None);
+      routeWrapper.SetPlanState(PS_None);
       GoToMapHook();
-      CMessageDialogEvent dialogEvent(this, DHT_MapHook, NULL);
-      CMessageDialogHook::ShowMessageDialog(MB_NONE, "规划中，请稍候...", dialogEvent);
-      if (m_route->RoutePlan() == PEC_Success)
+      //CMessageDialogEvent dialogEvent(this, DHT_MapHook, NULL);
+      //CMessageDialogHook::ShowMessageDialog(MB_NONE, "规划中，请稍候...", dialogEvent);
+      CMapHook *mapHook = dynamic_cast<CMapHook*>(CViewWrapper::Get().GetHook(DHT_MapHook));
+      if (mapHook)
       {
-        ::Sleep(10000);
-        CMessageDialogHook::CloseMessageDialog();
+        if (mapHook->RoutePlan_StartGuidance() != PEC_Success)
+        {
+          CMessageDialogEvent dialogEvent(this, DHT_MapHook, NULL);
+          CMessageDialogHook::ShowMessageDialog(MB_NONE, "回避规划失败！", dialogEvent);
+          CMessageDialogHook::CloseMessageDialog();
+        }
       }
-	    else
-	    {
-        CMessageDialogEvent dialogEvent(this, DHT_MapHook, NULL);
-        CMessageDialogHook::ShowMessageDialog(MB_NONE, "回避规划失败！", dialogEvent);
-        CMessageDialogHook::CloseMessageDialog();
-	    }
     } 
   }
 }
@@ -857,14 +851,16 @@ void CPassedRouteHook::CRouteRow::Show(const char* routeName, const char* mileag
     m_rowFlagBtn->SetVisible(true);
     m_rowAvoidBtn->SetVisible(true);
     m_rowAvoidBtn->SetEnable(false);
+    m_rowDistBtn->SetVisible(true);
   }
   else if (m_pageController->IsLastPage() && m_pageController->GetLastPageEndRow() == m_rowNum)
   {
-    //最后一页最后一行显示目的地
+    //最后一页最后一行显示目的地, 不显示距离，不可以规避
     m_rowFlagBtn->GetCenterElement()->m_backStyle = m_endFlag;
     m_rowFlagBtn->SetVisible(true);
     m_rowAvoidBtn->SetVisible(true);
     m_rowAvoidBtn->SetEnable(false);
+    m_rowDistBtn->SetVisible(false);
   }
   else
   {
@@ -878,6 +874,7 @@ void CPassedRouteHook::CRouteRow::Show(const char* routeName, const char* mileag
     {
       m_rowAvoidBtn->SetEnable(false);
     }
+    m_rowDistBtn->SetVisible(true);
   }
   m_rowNameBtn->SetCaption(routeName);
   m_rowDistBtn->SetCaption(mileages);

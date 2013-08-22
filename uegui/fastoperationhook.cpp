@@ -1,4 +1,7 @@
 #include "fastoperationhook.h"
+#include "viewwrapper.h"
+#include "maphook.h"
+
 using namespace UeGui;
 
 CFastOperationHook::CFastOperationHook()
@@ -146,6 +149,7 @@ short CFastOperationHook::MouseUp(CGeoPoint<short> &scrPoint)
   case fastoperationhook_ElecEyeLable:
     {
       m_elecEyeBtnCtrl.MouseUp();
+      TurnTo(DHT_EEyeListHook);
     }
     break;
   case fastoperationhook_BackTrackBtn:
@@ -153,6 +157,14 @@ short CFastOperationHook::MouseUp(CGeoPoint<short> &scrPoint)
   case fastoperationhook_BackTrackLable:
     {
       m_backTrackBtnCtrl.MouseUp();
+      //·µ³Ì¹æ»®
+      CViewWrapper &viewWrapper = CViewWrapper::Get();
+      CMapHook* mapHook = (CMapHook*)viewWrapper.GetHook(DHT_MapHook);
+      if (mapHook)
+      {
+        m_isNeedRefesh = false;
+        mapHook->BackTrackingPlan();
+      }
     }
     break;
   default:
@@ -167,5 +179,3 @@ short CFastOperationHook::MouseUp(CGeoPoint<short> &scrPoint)
   m_isNeedRefesh = true;
   return ctrlType;
 }
-
-

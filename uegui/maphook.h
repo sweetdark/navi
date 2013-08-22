@@ -241,6 +241,10 @@ namespace UeGui
     */
     unsigned int RoutePlan_StartDemo(PlanType planType = Plan_Single);
     /**
+    * \brief 返程规划
+    */
+    unsigned int BackTrackingPlan();
+    /**
     * \brief 获取多路径规划方式
     */
     unsigned char GetMultiMethodType();
@@ -265,7 +269,7 @@ namespace UeGui
     /**
     * \brief 删除路线
     */
-    unsigned int  EraseRoute();
+    unsigned int EraseRoute();
     /**
     * \brief 设置当前选择的点为图上点,由外部查询POI或者道路名称进入
     */
@@ -677,6 +681,8 @@ namespace UeGui
     ScreenMode m_screenMode;
     //是否是第一次渲染地图，因为之后渲染过一次地图之后，才能读取到地图上的点和线数据
     bool m_firstDrawMap;
+    //是否显示快捷面板
+    bool m_bIsShowShortcutPanel;
     //是否需要回复上次未导航完成路线
     bool m_needRestoreRoute;
     //回复路线类型

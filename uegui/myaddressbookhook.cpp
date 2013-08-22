@@ -8,12 +8,22 @@ CMyAddressBookHook::CMyAddressBookHook():m_userWrapper(CUserDataWrapper::Get())
   m_strTitle = "地址簿";
   m_vecHookFile.push_back(_T("myaddressbookhook.bin"));
 }
+char CMyAddressBookHook::m_sendName[128]={};
+char CMyAddressBookHook::m_sendAddr[128]={};
+char CMyAddressBookHook::m_sendTelphone[128]={};
 
 CMyAddressBookHook::~CMyAddressBookHook()
 {
   m_elements.clear();
   m_ctrlNames.clear();
   m_imageNames.clear();
+}
+
+void CMyAddressBookHook::GetAddressBookInfor(char* name, char* address,char* telephone)
+{
+  strcpy(name, m_sendName);
+  strcpy(address, m_sendAddr);
+  strcpy(telephone, m_sendTelphone);
 }
 
 void CMyAddressBookHook::Load()
@@ -936,80 +946,12 @@ void UeGui::CMyAddressBookHook::OnEidt(CAggHook* sender,AddreessBookHookRecordTy
   EditData edata;
   m_userWrapper.ConnectToFavorite();
   const FavoriteEntry* curEntry = m_userWrapper.GetFavorite((page - 1) * EACHPAGECOUNT + type - 1);
-  FavoriteEntry2EditData(curEntry, &edata);
+  m_userWrapper.FavoriteEntry2EditData(curEntry, &edata);
   m_userWrapper.DisconnectFavorite();
   m_editHook.ShowDetailEditHook(&edata, editEvent);
   m_recordType=type;
 }
-bool UeGui::CMyAddressBookHook::FavoriteEntry2EditData(const FavoriteEntry* fEntry , EditData* edata)
-{
-  if (fEntry == NULL || edata == NULL)
-  {
-    return false;
-  }
-  edata->m_x = fEntry->m_x;
-  edata->m_y = fEntry->m_y;
-  ::strcpy((char *)edata->m_name, (char *)fEntry->m_name);
 
-  //if (fEntry->m_teleNumber != 0)
-  if (fEntry->m_telphone != NULL)
-  {
-    char *tmp = new char[128];
-    //::strcpy((char *)edata->m_telephone, ::_itoa(fEntry->m_teleNumber, tmp, 10));
-    ::strcpy((char *)edata->m_telephone, (char*)fEntry->m_telphone);
-    delete []tmp;
-  }
-  else
-  {
-    ::strcpy((char *)edata->m_telephone, "");
-  }
-
-  //if (fEntry->m_addrCode != 0)
-  if (fEntry->m_addr != NULL)
-  {
-    char *tmp = new char[128];
-    //::strcpy((char *)edata->m_addrCode, ::_itoa(fEntry->m_addrCode, tmp, 10));
-    ::strcpy((char *)edata->m_addrCode, (char*)fEntry->m_addr);
-    delete []tmp;
-  }
-  else
-  {
-    ::strcpy((char *)edata->m_addrCode, "");
-  }
-
-  if(fEntry->m_kind & 0x1)
-  {
-    edata->m_isStartpos = true;
-  }
-  else
-  {
-    edata->m_isStartpos = false;
-  }
-
-  unsigned short entryKind = fEntry->m_kind >> 1;
-  if (entryKind & 0x1)
-  {
-    edata->m_isVoice = true;
-  }
-  else
-  {
-    edata->m_isVoice = false;
-  }
-  entryKind = entryKind >> 1;
-
-  if (entryKind & 0x1)
-  {
-    edata->m_isMapshow = true;
-  }
-  else
-  {
-    edata->m_isMapshow = false;
-  }
-  entryKind = entryKind >> 1;
-
-  edata->m_kind = fEntry->m_kind;
-  return true;
-}
 //删除某行数据
 void UeGui::CMyAddressBookHook::DeleteRecord( AddreessBookHookRecordType row )
 {
@@ -1062,6 +1004,12 @@ void CMyAddressBookHook::GoToMapPosition(int n)
       pointInfo.m_point = point; 
       ::strcpy(pointInfo.m_name, name);
       resultList.push_back(pointInfo);
+      if (i == n-1)
+      {
+        ::strcpy(m_sendName, (char*)curEntry.m_name);
+        ::strcpy(m_sendAddr, (char*)curEntry.m_addr);
+        ::strcpy(m_sendTelphone, (char*)curEntry.m_telphone);
+      }
       }
     } 
     else

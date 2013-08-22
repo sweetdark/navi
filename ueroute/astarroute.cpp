@@ -730,6 +730,60 @@ unsigned int CAStarRoute::DoPlan()
   return Prepare(false);
 }
 
+// TODO:...
+// Only RePlan one pair.
+unsigned int CAStarRoute::RePlan()
+{
+  // Reserve prev prompts.
+  GuidanceIndicator **indicators[MAXPOSNUM-1];
+  GuidanceStatus dirInfo;
+  m_guider->GetCurrent(dirInfo); 
+  int onePair = dirInfo.m_curPair; 
+  int indicatorNum = m_guider->GetIndicatorNum(onePair);
+  indicators[onePair] = reinterpret_cast<GuidanceIndicator **>(m_memBasic.Alloc(sizeof(unsigned int*) * indicatorNum));
+  if(!indicators[onePair])
+  {
+    return PEC_NotEnoughMemoryForGuidance;
+  }
+  m_guider->ReservePrompts(onePair, indicators[onePair]);
+
+  // Reset start position
+  PlanPosition pos;
+  pos.m_type = PT_Start;
+  unsigned int result = m_parent->GetPosition(pos);
+  m_parent->RemovePosition(false);
+  m_parent->SetPosition(pos);
+  
+  // Reset dest position
+  float dist = 0;
+  int endOrder = 0;
+  GuidanceIndicator **curIndicators = indicators[dirInfo.m_curPair];
+  indicatorNum = m_guider->GetIndicatorNum(dirInfo.m_curPair);
+  for(int order = dirInfo.m_curIndicator; order < indicatorNum; order++)
+  {
+    GuidanceIndicator *oneIndicator = curIndicators[order];
+    if((dist > 1000 && oneIndicator->m_roadClass > UeModel::RC_ImportantLocal) 
+      || (order == indicatorNum - 1))
+    {
+      endOrder = order;
+      break;
+    }
+    dist += oneIndicator->m_curDist;
+  }
+  pos.m_type = PT_End;
+  pos.m_pos = curIndicators[endOrder]->m_vtxs[0];
+  m_parent->SetPosition(pos);
+
+  //
+  DoPlan();
+  
+  // Merge prompts.
+  m_guider->MergePrompts(indicators[onePair], indicatorNum, endOrder);
+
+  m_memBasic.Free(indicators[onePair]);
+  return PEC_Success;
+}
+
 /**
 *
 **/

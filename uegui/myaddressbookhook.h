@@ -23,6 +23,11 @@ namespace UeGui
   class UEGUI_CLASS CMyAddressBookHook : public CMenuBackgroundHook
   {
   public:
+    static char m_sendName[128];
+    static char m_sendAddr[128];
+    static char m_sendTelphone[128];
+
+    static void GetAddressBookInfor(char* , char*, char*);
     enum myaddressbookhookCtrlType
     {
       myaddressbookhook_Begin = MenuBackgroundHook_End,
@@ -233,7 +238,6 @@ namespace UeGui
 
     void OnEidt(CAggHook* sender,AddreessBookHookRecordType type,int page);
     
-    bool FavoriteEntry2EditData(const FavoriteEntry* fEntry , EditData* edata);
 
     //删除某行数据并弹出消息框给用户选择是否删除
     void DeleteRecord(AddreessBookHookRecordType row);

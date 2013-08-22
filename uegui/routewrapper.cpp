@@ -10,7 +10,6 @@ UeGui::CRouteWrapper::CRouteWrapper() : m_view(IView::GetView()), m_route(IRoute
 
 UeGui::CRouteWrapper::~CRouteWrapper()
 {
-
 }
 
 CRouteWrapper& UeGui::CRouteWrapper::Get()
@@ -34,7 +33,7 @@ void UeGui::CRouteWrapper::GetPassedRouteList( RouteList& routeList )
   if (m_route)
   {
     int totalPairs = m_route->GetPairs();
-    for (unsigned int pairs = 0; pairs < totalPairs; pairs++)
+    for (unsigned int pairs = 0; pairs < (unsigned int)totalPairs; pairs++)
     {
       int total = m_route->GetRoute()->GetIndicatorNum(pairs);
       UeRoute::GuidanceIndicator *curIndicator = NULL;
@@ -228,7 +227,12 @@ unsigned int UeGui::CRouteWrapper::RoutePlan()
 {
   if (m_route)
   {
-    return m_route->RoutePlan();
+    unsigned int rt = m_route->RoutePlan();
+    if (PEC_Success == rt)
+    {
+      BackupCurrentRoute();
+    }
+    return rt;
   }
   return PEC_OtherError;
 }
@@ -237,7 +241,12 @@ unsigned int UeGui::CRouteWrapper::RoutePlan( bool isPlayVoice )
 {
   if (m_route)
   {
-    return m_route->RoutePlan(isPlayVoice);
+    unsigned int rt = m_route->RoutePlan(isPlayVoice);
+    if (PEC_Success == rt)
+    {
+      BackupCurrentRoute();
+    }
+    return rt;
   }
   return PEC_OtherError;
 }
@@ -246,9 +255,66 @@ unsigned int UeGui::CRouteWrapper::MultiRoutePlan()
 {
   if (m_route)
   {
-    return m_route->MultiRoutePlan();
+    unsigned int rt = m_route->MultiRoutePlan();
+    if (PEC_Success == rt)
+    {
+      BackupCurrentRoute();
+    }
+    return rt;
   }
   return PEC_OtherError;
+}
+
+unsigned int UeGui::CRouteWrapper::BackTrackingPlan()
+{
+  unsigned int rt = PEC_Success;
+  if (m_route)
+  {
+    //如果已经规划了路线则清空旧路线
+    UeRoute::PlanResultDesc desc;
+    if (m_route->GetPlanState() != UeRoute::PS_None && m_route->GetPlanResultDesc(desc))
+    {
+      m_route->SetBlock(true);
+      m_route->Prepare();
+    }
+
+    if (m_planPositionList.size() > 0)
+    {
+      POIDataList::reverse_iterator iter = m_planPositionList.rbegin();
+      for (; iter != m_planPositionList.rend(); iter++)
+      {
+        UeRoute::PlanPosition planPosition = *iter;
+        if (UeRoute::PT_Start == planPosition.m_type)
+        {
+          planPosition.m_type = UeRoute::PT_End;
+        }
+        else
+        if (UeRoute::PT_End == planPosition.m_type)
+        {
+          planPosition.m_type = UeRoute::PT_Start;
+        }
+        rt = m_route->SetPosition(planPosition);
+        if (PEC_Success != rt)
+        {
+          return rt;
+        }
+      }
+      rt = m_route->RoutePlan(true);
+      if (PEC_Success == rt)
+      {
+        BackupCurrentRoute();
+      }
+    }
+    else
+    {
+      rt = PEC_NoEndPos;
+    }
+  }
+  else
+  {
+    rt = PEC_OtherError;
+  }
+  return rt;
 }
 
 unsigned int UeGui::CRouteWrapper::SetMethod( unsigned int method )
@@ -267,6 +333,38 @@ unsigned int UeGui::CRouteWrapper::GetMethod()
     return m_route->GetMethod();
   }
   return MT_Max;
+}
+
+UeRoute::MethodType UeGui::CRouteWrapper::GetPlanMethodType()
+{
+  if (m_route)
+  {
+    unsigned int planMethod = m_route->GetMethod();
+    if (planMethod & UeRoute::RW_Fast)
+    {
+      return UeRoute::MT_Fast;
+    }
+    else if (planMethod & UeRoute::RW_Short)
+    {
+      return UeRoute::MT_Short;
+    }
+    else if (planMethod & UeRoute::RW_Economic)
+    {
+      return UeRoute::MT_Economic;
+    }
+    else if (planMethod & UeRoute::RW_Optimal)
+    {
+      return UeRoute::MT_Optimal;
+    }
+    else
+    {
+      return UeRoute::MT_Max;
+    }
+  }
+  else
+  {
+    return UeRoute::MT_Max;
+  }
 }
 
 bool UeGui::CRouteWrapper::GetPlanResultDesc( PlanResultDesc &desc )
@@ -363,30 +461,42 @@ unsigned int UeGui::CRouteWrapper::SetPosition( PositionType posType )
     return UeRoute::PEC_SetError;
   }
 
-  if (PT_End == posType)
+  if (PT_Start == posType)
   {
-    //重新设目的地，去除原先规避的影响
-    m_route->SetBlock(true);
+    //如果已经规划了路线则清空旧路线
+    UeRoute::PlanResultDesc desc;
+    if (m_route->GetPlanState() != UeRoute::PS_None && m_route->GetPlanResultDesc(desc))
+    {
+      m_route->SetBlock(true);
+      m_route->Prepare();
+    }
+  }
+  else if (PT_End == posType)
+  {
     //判断是否设置了起点
     PlanPosition startPos;
     startPos.m_type = UeRoute::PT_Start;
-    m_route->GetPosition(startPos);
+    unsigned int rt = m_route->GetPosition(startPos);
     //判断是否设置了起点，没有则以当前车标位置为起点
-    if ((UeRoute::PT_Invalid == startPos.m_type) || (!startPos.IsValid())) 
+    if ((UeRoute::PEC_Success != rt) || (UeRoute::PT_Invalid == startPos.m_type) || (!startPos.IsValid()))
     {
       const GpsCar &carInfo = m_view->GetGpsCar();
       startPos.m_type = UeRoute::PT_Start;
       startPos.m_pos.m_x = carInfo.m_curPos.m_x;
       startPos.m_pos.m_y = carInfo.m_curPos.m_y;
-      unsigned int rt = m_route->SetPosition(startPos);
-      if (UeRoute::PEC_Success != rt)
-      {
-        return rt;
-      }
+    }
+    //移除所有途径点
+    m_route->RemovePosition();
+    //重新设目的地，去除原先规避的影响
+    m_route->SetBlock(true);
+    //重新设置起点
+    rt = m_route->SetPosition(startPos);
+    if (UeRoute::PEC_Success != rt)
+    {
+      return rt;
     }
   }
-
-  //以前选择点设起点或目的地
+  //以当前选择点设起点或目的地
   CGeoPoint<long> pickPos;
   m_view->GetPickPos(pickPos);
   PlanPosition position;
@@ -507,6 +617,21 @@ unsigned int UeGui::CRouteWrapper::StopGuidance()
   return UeRoute::PEC_OtherError;
 }
 
+unsigned int UeGui::CRouteWrapper::EraseRoute()
+{
+  if (m_route)
+  {
+    //判断当前是否已经规划了路线
+    UeRoute::PlanResultDesc desc;
+    if ((m_route->GetPlanState() != UeRoute::PS_None) && (m_route->GetPlanResultDesc(desc)))
+    {
+      m_route->SetBlock(true);
+      return m_route->Prepare();
+    }
+  }
+  return UeRoute::PEC_OtherError;
+}
+
 bool UeGui::CRouteWrapper::GetCurElecEye( EEyeProp &elecEye, double& distance )
 {
   bool rt = false;
@@ -614,6 +739,24 @@ bool UeGui::CRouteWrapper::GetHighwayOutlets( HighwayOutletList &dataList )
   return false;
 }
 
+unsigned char UeGui::CRouteWrapper::GetSideProp( unsigned char type, int code, int xCoord, int yCoord, char *prop )
+{
+  if (m_route)
+  {
+    m_route->GetSideProp(type, code, xCoord, yCoord, prop);
+  }
+  return UeRoute::PEC_OtherError;
+}
+
+const char * UeGui::CRouteWrapper::GetSideProp( unsigned char type )
+{
+  if (m_route)
+  {
+    return m_route->GetSideProp(type);
+  }
+  return NULL;
+}
+
 void UeGui::CRouteWrapper::FormatDistance( char* pBuffer, int distance )
 {
   if (pBuffer)
@@ -632,4 +775,80 @@ void UeGui::CRouteWrapper::FormatDistance( char* pBuffer, int distance )
       ::sprintf(pBuffer, "%dm", distance);
     }
   }
+}
+
+void UeGui::CRouteWrapper::BackupCurrentRoute()
+{
+  m_planPositionList.clear();
+  if (m_route)
+  {
+    unsigned int planState = m_route->GetPlanState();
+    if ((UeRoute::PS_Ready == planState) || (UeRoute::PS_DemoGuidance == planState) || (UeRoute::PS_RealGuidance == planState))
+    {
+      unsigned int rt = UeRoute::PEC_Success;
+      //保存起点
+      PlanPosition position;
+      position.m_type = UeRoute::PT_Start;
+      rt = m_route->GetPosition(position);
+      if ((UeRoute::PEC_Success == rt) && (position.IsValid()))
+      {
+        m_planPositionList.push_back(position);
+      }
+      //保存在经由点
+      unsigned int posCount = m_route->GetPosCount();
+      if (posCount > 2)
+      {
+        for (unsigned int i = 1; i < posCount - 1; ++i)
+        {
+          ::memset(&position, 0, sizeof(PlanPosition));
+          position.m_type = UeRoute::PT_Middle;
+          rt = m_route->GetPosition(position, i);
+          if ((UeRoute::PEC_Success == rt) && (position.IsValid()))
+          {
+            m_planPositionList.push_back(position);
+          }
+        }
+
+      }
+      //保存终点
+      ::memset(&position, 0, sizeof(PlanPosition));
+      position.m_type = UeRoute::PT_End;
+      rt = m_route->GetPosition(position);
+      if ((UeRoute::PEC_Success == rt) && (position.IsValid()))
+      {
+        m_planPositionList.push_back(position);
+      }
+    }
+  }
+}
+
+
+bool CRouteWrapper::IsRoundAbout(const GuidanceStatus &dirInfo)
+{
+  GuidanceIndicator *indicator = m_route->GetIndicator(dirInfo.m_curPair, dirInfo.m_curIndicator);
+  if (indicator &&  indicator->m_roadForm == RF_Roundabout || indicator->m_snd.m_infoCode == IVT_ExitRoundAbout)
+  {
+    return true;
+  }
+  return false;
+}
+
+float CRouteWrapper::GetCurRoundAboutDist(const GuidanceStatus &dirInfo)
+{
+  if (IsRoundAbout(dirInfo))
+  {
+    float dist = GetCurIndicatorLeftDist(dirInfo);
+    int curIndicator = dirInfo.m_curIndicator;
+    GuidanceIndicator *indicator = m_route->GetIndicator(dirInfo.m_curPair, dirInfo.m_curIndicator);
+    if (indicator)
+    {
+      while (indicator->m_snd.m_infoCode !=IVT_ExitRoundAbout)
+      {
+        indicator = m_route->GetIndicator(dirInfo.m_curPair, --curIndicator);
+        dist += indicator->m_curDist;
+      }
+    }
+    return dist;
+  }
+  return -1;
 }

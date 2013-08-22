@@ -37,7 +37,7 @@
 #include "userinfohook.h"
 #include "navisettinghook.h"
 //#include "crosspicsettinghook.h"
-//#include "eyesettinghook.h"
+#include "eeyesettinghook.h"
 //#include "promptsettinghook.h"
 #include "systemsettinghook.h"
 #include "mapscanhook.h"
@@ -114,6 +114,7 @@
 #include "itemselecthook.h"
 #include "distselecthook.h"
 //#include "startuphook.h"
+#include "eeyelisthook.h"
 
 #if __FOR_FPC__
 #include "caphook.h"
@@ -200,7 +201,6 @@ void CGuiImpl::Update(short type, void *para)
   case CViewHook::UHT_FillGuidanceInfo:
   case CViewHook::UHT_FillGpsInfo:
   case CViewHook::UHT_UpdateMapHook:
-  case CViewHook::UHT_SplitMapHook:
   case CViewHook::UHT_UpdateLocationMapHook:
     {
       CMapHook *mapHook = (CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook));
@@ -208,11 +208,6 @@ void CGuiImpl::Update(short type, void *para)
       {
         mapHook->Update(type);
       }
-    }
-    break;
-  case CViewHook::UHT_UpdateGPSHook:
-    {
-      ((CGpsHook*)(m_view->GetHook(CViewHook::DHT_GPSHook)))->Update();
     }
     break;
   case CViewHook::UHT_UpdateKeyboardHook:
@@ -527,11 +522,11 @@ void CGuiImpl::MakeHooks()
   //view->AddHook(CViewHook::DHT_CrossPicSettingHook, viewHook);
 
   //导航设置界面里的电子眼界面
-//  viewHook = new CEEyeSettingHook();
-//  viewHook->SetHelpers(net, view, route, gps, query);
-//  viewHook->LoadGUI();  
-//  view->AddHook(CViewHook::DHT_EEyeSettingHook, viewHook);
-//
+ viewHook = new CEEyeSettingHook();
+ viewHook->SetHelpers(net, view, route, gps, query);
+ viewHook->LoadGUI();  
+ view->AddHook(CViewHook::DHT_EEyeSettingHook, viewHook);
+
   //导航设置界面里的提示设置界面
   /*viewHook = new CPromptSettingHook();
   viewHook->SetHelpers(net, view, route, gps, query);
@@ -941,6 +936,12 @@ void CGuiImpl::MakeHooks()
   viewHook->SetHelpers(net, view, route, gps, query);
   viewHook->LoadGUI();
   view->AddHook(CViewHook::DHT_ItemSelectHook, viewHook);
+  
+  //电子眼编辑列表界面
+  viewHook = new CEEyeListHook();
+  viewHook->SetHelpers(net, view, route, gps, query);
+  viewHook->LoadGUI();
+  view->AddHook(CViewHook::DHT_EEyeListHook, viewHook);
 
 #if __FOR_TRUCK__
   //货车导航

@@ -8,6 +8,11 @@ using namespace UeGui;
 CSystemLeftHook::CSystemLeftHook()
 {
   MakeGUI();
+
+  m_mapSetting = NULL;
+  m_carSetting = NULL;
+  m_soundSetting = NULL;
+  m_otherSetting = NULL;
 }
 
 

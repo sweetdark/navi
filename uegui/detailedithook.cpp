@@ -197,25 +197,8 @@ void UeGui::CDetailEditHook::DoMouseUp(HandleType resultType)
           FavoriteEntry curEntry;
           if (CUserDataWrapper::Get().EditData2FavoriteEntry(&eData, &curEntry))
           {
-            const FavoriteEntry& curEntry1 = curEntry;
+            FavoriteEntry& curEntry1 = curEntry;
             m_userWrapper.RemoveFavorite(m_recpos);
-            int icount = m_userWrapper.GetFavoriteCount();
-            if(curEntry1.m_kind & 0x1)
-            {
-              const FavoriteEntry *curFavor;
-              FavoriteEntry curFavorite;
-              for(int order = 0;order < icount;order++)
-              {
-                curFavor = m_userWrapper.GetFavorite(order);
-                if(curFavor->m_kind & 0x1)
-                {
-                  curFavorite = *curFavor;
-                  curFavorite.m_kind--;
-                  m_userWrapper.UpdateFavorite(curFavorite, order);
-                  break;
-                }
-              }
-            }
             //
             m_userWrapper.AddFavorite(curEntry1);
             CMyAddressBookHook::MyAddressBookCallBack();
@@ -230,7 +213,8 @@ void UeGui::CDetailEditHook::DoMouseUp(HandleType resultType)
           {
             if (SaveFavoriteEntryData(curEntry))
             {
-              CViewHook::m_curHookType = CViewHook::DHT_MapHook;
+              //CViewHook::m_curHookType = CViewHook::DHT_MapHook;
+              Return(false);
               Refresh();
             }                        
           }     
@@ -300,6 +284,8 @@ bool UeGui::CDetailEditHook::DoShowDetailEditHook(const EditData* caption, CDeta
   m_telephoneCtrl.SetCaption((char *)caption->m_telephone);
 
   m_markPicCtrl.SetVisible(true);
+  m_markLabel.SetVisible(true);
+  m_markCtrl.SetVisible(true);
   //在详情-->编辑界面，标记处设置默认的标记图标，而非空显示
   int markPicBegin = MARKPICBEGIN;
   int markPicEnd = MARKPICEND;
@@ -356,38 +342,6 @@ void CDetailEditHook::DoEditHookTelephoneCallBack(const char *pResult)
 {
   m_telephoneCtrl.SetCaption(pResult);
   Return();
-}
-
-bool UeGui::CDetailEditHook::EditData2FavoriteEntry(EditData* edata, FavoriteEntry* fEntry)
-{
-  if (edata == NULL || fEntry == NULL)
-  {
-    return false;
-  }
-  fEntry->m_x = edata->m_x;
-  fEntry->m_y = edata->m_y;
-  ::strcpy((char *)fEntry->m_name, (char *)edata->m_name);
-  fEntry->m_teleNumber = ::atoi((char *)edata->m_telephone);
-  //fEntry->m_addrCode=::atoi((char *)edata->m_addrCode);
-  ::strcpy((char*)fEntry->m_addr, (char *)edata->m_addrCode);
-  ::strcpy((char*)fEntry->m_telphone, (char *)edata->m_telephone);
-
-  //三个标志位的增加
-  edata->m_kind = edata->m_kind<<3;
-  if (edata->m_isMapshow)
-  {
-    edata->m_kind |= 0x4;
-  }
-  if(edata->m_isVoice)
-  {
-    edata->m_kind |= 0x2;
-  }
-  if(edata->m_isStartpos)
-  {
-    edata->m_kind |= 0x1;
-  }
-  fEntry->m_kind = edata->m_kind;
-  return true;
 }
 
 //记录被编辑的地址簿数据位置的回调函数

@@ -4,11 +4,12 @@
 using namespace UeGui;
 
 CMapRouteCalcMenuHook::CMapRouteCalcMenuHook() : m_parentHook(NULL), m_routeWrapper(CRouteWrapper::Get()),
-m_viewWrapper(CViewWrapper::Get())
+m_viewWrapper(CViewWrapper::Get()), m_autoGuidanceTimerInterval(0)
 {
   //地图界面渲染完成后不需要释放图片资源，提高效率
   m_needReleasePic = false;
-  ::memset(&m_planResult[0], 0, UeRoute::MT_Max * sizeof(UeRoute::PlanResultDesc));
+  ::memset(m_planResult, 0, UeRoute::MT_Max * sizeof(UeRoute::PlanResultDesc));
+  ::memset(m_guidanceCaption, 0, sizeof(m_guidanceCaption));
 }
 
 CMapRouteCalcMenuHook::~CMapRouteCalcMenuHook()
@@ -91,6 +92,11 @@ void CMapRouteCalcMenuHook::MakeControls()
   m_routeDistLabel3.SetLabelElement(GetGuiElement(MapRouteCalcMenuHook_RouteDistLabel3));
   m_routeDistLabel4.SetLabelElement(GetGuiElement(MapRouteCalcMenuHook_RouteDistLabel4));
   m_startGuidanceBtn.SetCenterElement(GetGuiElement(MapRouteCalcMenuHook_StartGuidanceBtn));
+  char* caption = m_startGuidanceBtn.GetCaption();
+  if (caption)
+  {
+    ::strcpy(m_guidanceCaption, caption);
+  }
 }
 
 bool CMapRouteCalcMenuHook::operator ()()
@@ -107,6 +113,12 @@ void UeGui::CMapRouteCalcMenuHook::Show( bool show /*= true */ )
     mapHook->HideAllCtrl();
     mapHook->ShowMapScalingBtn();
     GetPlanResult();
+    m_autoGuidanceTimerInterval = TIMER_INTERVAL_10S;
+    TimerRefresh();
+  }
+  else
+  {
+    m_autoGuidanceTimerInterval = 0;
   }
 }
 
@@ -121,6 +133,33 @@ void UeGui::CMapRouteCalcMenuHook::Update()
   {
     CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
     mapHook->HideAllCtrl();
+  }
+}
+
+void UeGui::CMapRouteCalcMenuHook::Timer()
+{
+  //自动开始导航倒计时
+  if (m_autoGuidanceTimerInterval > 0)
+  {
+    --m_autoGuidanceTimerInterval;
+    TimerRefresh();
+    Refresh();
+    if (0 == m_autoGuidanceTimerInterval)
+    {
+      StartGuidance();    
+    }
+  }
+}
+
+void UeGui::CMapRouteCalcMenuHook::TimerRefresh()
+{
+  //因为计时器是500毫秒计一次，所以这里要做处理
+  if (m_autoGuidanceTimerInterval % 2 == 0)
+  {
+    char buffer[12] = {};
+    int interval = m_autoGuidanceTimerInterval / 2;
+    ::sprintf(buffer, "%s(%d)", m_guidanceCaption, interval);
+    m_startGuidanceBtn.SetCaption(buffer);    
   }
 }
 
@@ -220,8 +259,15 @@ short CMapRouteCalcMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
   //是否需要刷新
   bool needRefresh = false;
   short ctrlType = CAggHook::MouseUp(scrPoint);
-  switch(ctrlType)
+  switch(m_downElementType)
   {
+  case CT_Unknown:
+    {
+      needRefresh = true;
+      m_autoGuidanceTimerInterval = 0;
+      m_startGuidanceBtn.SetCaption(m_guidanceCaption);
+    }
+    break;
   case MapRouteCalcMenuHook_Button1:
   case MapRouteCalcMenuHook_Button1Label:
   case MapRouteCalcMenuHook_Button1Left:
@@ -312,12 +358,7 @@ short CMapRouteCalcMenuHook::MouseUp(CGeoPoint<short> &scrPoint)
     {
       needRefresh = true;
       m_startGuidanceBtn.MouseUp();
-      //开始导航
-      if (m_parentHook)
-      {
-        CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
-        mapHook->StartGuidance();
-      }
+      StartGuidance();
     }
     break;
   default:
@@ -568,4 +609,14 @@ void UeGui::CMapRouteCalcMenuHook::ShowDistLabel( double dist, CUiLabel& label )
     ::sprintf(buf, "%dm", static_cast<int>(dist));
   }
   label.SetCaption(buf);
+}
+
+void UeGui::CMapRouteCalcMenuHook::StartGuidance()
+{
+  //开始导航
+  if (m_parentHook)
+  {
+    CMapHook* mapHook = dynamic_cast<CMapHook*>(m_parentHook);
+    mapHook->StartGuidance();
+  }
 }

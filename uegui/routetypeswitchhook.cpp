@@ -2,6 +2,7 @@
 #include "settingwrapper.h"
 #include "maphook.h"
 #include "messagedialoghook.h"
+#include "routewrapper.h"
 using namespace UeGui;
 
 RouteTypeCallBack CRouteTypeSwitchHook::m_callBackFun = NULL;
@@ -54,6 +55,10 @@ void CRouteTypeSwitchHook::MakeControls()
   m_popupListTopCtrl.SetCenterElement(GetGuiElement(routetypeswitchhook_PopupListTop));
   m_recommondBtnCtrl.SetCenterElement(GetGuiElement(routetypeswitchhook_RecommondBtn));
   m_recommondBtnCtrl.SetIconElement(GetGuiElement(routetypeswitchhook_RecommondBtnIcon));
+  m_economicWayIconCtrl.SetCenterElement(GetGuiElement(routetypeswitchhook_EconomicWayBtnIcon));
+  m_highWayIconCtrl.SetCenterElement(GetGuiElement(routetypeswitchhook_HighWayBtnIcon));
+  m_shortestIconCtr.SetCenterElement(GetGuiElement(routetypeswitchhook_ShortestBtnIcon));
+  m_recommondIconCtrl.SetCenterElement(GetGuiElement(routetypeswitchhook_RecommondBtnIcon));
 }
 
 short CRouteTypeSwitchHook::MouseDown(CGeoPoint<short> &scrPoint)
@@ -153,11 +158,35 @@ short CRouteTypeSwitchHook::MouseUp(CGeoPoint<short> &scrPoint)
 }
 
 
+void CRouteTypeSwitchHook::Load()
+{
+
+  InitIconStatus();
+
+  unsigned int planMethod  = CRouteWrapper::Get().GetMethod();
+  if(planMethod & UeRoute::RW_Optimal)
+  {
+    m_recommondIconCtrl.MouseDown(); 
+  }
+  else if(planMethod & UeRoute::RW_Short)
+  {
+    m_shortestIconCtr.MouseDown();
+  }
+  else if(planMethod & UeRoute::RW_Fast)
+  {
+    m_highWayIconCtrl.MouseDown();
+  }
+  else if (planMethod & UeRoute::RW_Economic)
+  {
+    m_economicWayIconCtrl.MouseDown();
+  }
+}
+
 void CRouteTypeSwitchHook::ChangeRouteType(unsigned int planMethod)
 {
   CSettingWrapper& setting = CSettingWrapper::Get();
   //获取道路规避类型
-  unsigned int planAvoidRouteType=setting.GetAvoidRoute();
+  unsigned int planAvoidRouteType = setting.GetAvoidRoute();
 
   //
   planMethod |= UeModel::VT_Car;
@@ -230,4 +259,12 @@ void CRouteTypeSwitchHook::DoCallBack()
     m_sender = NULL;
   }
   Return();
+}
+
+void CRouteTypeSwitchHook::InitIconStatus()
+{
+  m_recommondIconCtrl.MouseUp();
+  m_shortestIconCtr.MouseUp();
+  m_highWayBtnCtrl.MouseUp();
+  m_economicWayIconCtrl.MouseUp();
 }

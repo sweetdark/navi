@@ -267,6 +267,10 @@ short CTypeNoDistSelectionHook::MouseUp(CGeoPoint<short> &scrPoint)
       {
         m_index = listIndex + m_mainPageController.GetPageStartPosition();
         m_pCurItemCtrl->GetLeve2Item(m_vecMainListItem[m_index].m_uCode,m_vecSubListItem);
+        if (m_vecSubListItem.size() == 0)
+        {
+          m_pCurItemCtrl->GetLeve3Item(m_vecMainListItem[m_index].m_uCode,m_vecSubListItem);
+        }
         //暂时处理
         std::vector<TCodeEntry>::iterator iter = m_vecSubListItem.begin();
         m_vecSubListItem.erase(iter); //返回上一级

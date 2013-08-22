@@ -532,7 +532,7 @@ void CUsuallyHook::RefreshData()
 {
   m_usuallRecords.clear();
   UsuallyRecord fRecord; 
-  if(m_usuallyFile && m_usuallyFile->GetRecordCount()==5)
+  if (m_usuallyFile && m_usuallyFile->GetRecordCount() >= 5)
   {
     m_usuallyFile->GetRecord(1,&fRecord);
     m_usuallRecords.push_back(fRecord);
@@ -609,6 +609,7 @@ void CUsuallyHook::OnClickDeleteBtn(unsigned int row)
   m_selectRowNum = row;
   CMessageDialogEvent deleteUsuallyEvt(this, DHT_UsuallyHook, &UeGui::CUsuallyHook::DealDeleteUsuallyEvent);
   CMessageDialogHook::ShowMessageDialog(MB_WARNING, "所选记录将被删除！", deleteUsuallyEvt);
+  m_isNeedRefesh = false;
 }
 
 void CUsuallyHook::DealDeleteUsuallyEvent(CAggHook *sender, ModalResultType modalResult)

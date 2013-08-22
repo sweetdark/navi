@@ -7405,7 +7405,7 @@ void CAGGCanvas::RenderCursor(double skyLimit)
 void CAGGCanvas::RenderFlags(double skyLimit, short scaleLevel, bool isRaster /*= false*/, bool is3d /*= false*/ )
 {
   // 地址标识
-  //RenderMarkPic(scaleLevel, is3d);
+  RenderMarkPic(scaleLevel, is3d);
   // 天空图片
   RenderSky(skyLimit, isRaster);
   // 经由点标识
@@ -7827,6 +7827,7 @@ void CAGGCanvas::RenderSpecialText(short scaleLevel)
   if (scaleLevel > 7 && scaleLevel < 14 )
   {
     //南海
+    //TODO: Remove Magic Number
     const MapsText &textProp = m_setting.GetTextProp(45);
     const ScreenLayout& sreenLayout = m_view->GetScrLayout();
     CGeoPoint<long> mapPos(11347304,1371205);
@@ -7888,7 +7889,7 @@ void CAGGCanvas::RenderMarkPic(short scaleLevel, bool is3d)
   //if (VM_Browse == curView->GetViewOpeMode())
   {
     IQuery *query = IQuery::GetQuery();
-    CUePicture *centerPicture;
+    CUePicture *centerPicture = 0;
     UeQuery::SQLSetting setting;
     query->ConnectTo(UeQuery::DT_Favorite, setting);
     int count=query->GetFavoriteCount();
@@ -7896,8 +7897,8 @@ void CAGGCanvas::RenderMarkPic(short scaleLevel, bool is3d)
     for(int icount = 0;icount < count;icount++)
     {
       curFavor = query->GetFavorite(icount);
-      unsigned short entryKind = curFavor->m_kind >> 2; 
-      if(entryKind  & 0x1)
+      unsigned short entryKind = curFavor->m_kind; 
+      //if(entryKind  & 0x1)
       {
         //m_favoriteVec.push_back(*curFavor);
         CGeoPoint<long> mapPos;
@@ -7909,23 +7910,29 @@ void CAGGCanvas::RenderMarkPic(short scaleLevel, bool is3d)
         CGeoPoint<short> temPos(scrPos.m_x, scrPos.m_y);
         if (curView->GetScrLayout().m_extent.IsContain(temPos))
         {
-          unsigned short picId = curFavor->m_kind >> 3;
-          centerPicture = const_cast<CUePicture *>(m_view->GetUePicture( picId ));
-          const CPictureBasic::PictureBasic& picInfo = centerPicture->GetPicture(picId - 1);
-
-          //将图片中央点对应到需要画的坐标。
-          temPos.m_x = temPos.m_x - picInfo.m_width / 2;
-          temPos.m_y = temPos.m_y - picInfo.m_height / 2;
-          if(is3d)
+          unsigned short picId = curFavor->m_kind;
+          if (picId > 0)
           {
-            TransformScreenPoint(temPos);
+            centerPicture = const_cast<CUePicture *>(m_view->GetUePicture( picId ));
+            if (centerPicture)
+            {
+              const CPictureBasic::PictureBasic& picInfo = centerPicture->GetPicture(picId - 1);
+
+              //将图片中央点对应到需要画的坐标。
+              temPos.m_x = temPos.m_x - picInfo.m_width / 2;
+              temPos.m_y = temPos.m_y - picInfo.m_height / 2;
+              if(is3d)
+              {
+                TransformScreenPoint(temPos);
+              }
+              CPictureBasic::RenderingSpec spec;
+              spec.m_cx = 0;
+              spec.m_cy = 0;
+              spec.m_style = CPictureBasic::RS_Transparent;
+              int resIdx = picId;
+              centerPicture->DirectDraw(m_bits, m_rows, m_bufWidth, m_bufHeight, temPos.m_x, temPos.m_y, 0, 0, spec);
+            }
           }
-          CPictureBasic::RenderingSpec spec;
-          spec.m_cx = 0;
-          spec.m_cy = 0;
-          spec.m_style = CPictureBasic::RS_Transparent;
-          int resIdx = picId;
-          centerPicture->DirectDraw(m_bits, m_rows, m_bufWidth, m_bufHeight, temPos.m_x, temPos.m_y, 0, 0, spec);
         }
       }
     }
@@ -8184,7 +8191,9 @@ void CAGGCanvas::RenderRoundAboutNumber()
     CGeoPoint<int> temPos(m_roundAboutPoints[i].m_x, m_roundAboutPoints[i].m_y);
     TCHAR num[8] = {0,};
 
-    ::_stprintf(num, _T("%d"), i);
+    ::_stprintf(num, _T("%d"), i + 1);
+    const MapsText &textProp = m_setting.GetTextProp(45);
+    m_fontManager->SetGrayFontWidthAndHeight(textProp.m_width, textProp.m_height);
     TextOut(num, temPos, NULL, NULL, RGB(255, 0, 0), 0, true);
   }
 }

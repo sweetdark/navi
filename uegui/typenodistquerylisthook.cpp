@@ -102,6 +102,27 @@ void CTypeNoDistQueryListHook::MakeNames()
   m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_RadiusSelectBtn,	"RadiusSelectBtn"));
   m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_RadiusSelectBtnIcon,	"RadiusSelectBtnIcon"));
   m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_RadiusSelectBtnLabel,	"RadiusSelectBtnLabel"));
+
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List1PoiTelBox,	"List1PoiTelBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List2PoiTelBox,	"List2PoiTelBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List3PoiTelBox,	"List3PoiTelBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List4PoiTelBox,	"List4PoiTelBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List1PoiFarBox,	"List1PoiFarBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List2PoiFarBox,	"List2PoiFarBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List3PoiFarBox,	"List3PoiFarBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List4PoiFarBox,	"List4PoiFarBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_Cursor1,	"Cursor1"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_Cursor2,	"Cursor2"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_Cursor3,	"Cursor3"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_Cursor4,	"Cursor4"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_Cursor5,	"Cursor5"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_Cursor6,	"Cursor6"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_Cursor7,	"Cursor7"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_Cursor8,	"Cursor8"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List1PoiCursorBox,	"List1PoiCursorBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List2PoiCursorBox,	"List2PoiCursorBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List3PoiCursorBox,	"List3PoiCursorBox"));
+  m_ctrlNames.insert(GuiName::value_type(TypeNoDistQueryListHook_List4PoiCursorBox,	"List4PoiCursorBox"));
 }
 
 void CTypeNoDistQueryListHook::MakeControls()
@@ -141,6 +162,9 @@ void CTypeNoDistQueryListHook::MakeControls()
     m_infoBtn[i].SetIconElement(GetGuiElement(j++));
 
     m_addrLabel[i].SetLabelElement(GetGuiElement(j++));
+    m_telLabel[i].SetLabelElement(GetGuiElement(j++));
+    m_farLabel[i].SetLabelElement(GetGuiElement(j++));
+    m_cursorIcon[i].SetCenterElement(GetGuiElement(j++));
   }
 }
 
@@ -228,12 +252,12 @@ short CTypeNoDistQueryListHook::MouseDown(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    if (ctrlType >= TypeNoDistQueryListHook_List1Btn && ctrlType <= TypeNoDistQueryListHook_List4PoiDistBox)
+    if (ctrlType >= TypeNoDistQueryListHook_List1Btn && ctrlType <= TypeNoDistQueryListHook_List4PoiCursorBox)
     {
-      int index = (ctrlType-TypeNoDistQueryListHook_List1Btn)/4;
+      int index = (ctrlType-TypeNoDistQueryListHook_List1Btn)/7;
       m_infoBtn[index].MouseDown();
-      m_addrLabel[index].MouseDown();
       MOUSEDOWN_2RENDERCTRL(m_infoBtn[index], m_addrLabel[index]);
+      MOUSEDOWN_3RENDERCTRL(m_telLabel[index], m_farLabel[index], m_cursorIcon[index]);
     } 
     else
     {
@@ -367,11 +391,10 @@ short CTypeNoDistQueryListHook::MouseUp(CGeoPoint<short> &scrPoint)
     }
     break;
   default:
-    if (ctrlType >= TypeNoDistQueryListHook_List1Btn && ctrlType <= TypeNoDistQueryListHook_List4PoiDistBox)
+    if (ctrlType >= TypeNoDistQueryListHook_List1Btn && ctrlType <= TypeNoDistQueryListHook_List4PoiCursorBox)
     {
-      int index = (ctrlType-TypeNoDistQueryListHook_List1Btn)/4;
+      int index = (ctrlType-TypeNoDistQueryListHook_List1Btn)/7;
       m_infoBtn[index].MouseUp();
-      m_addrLabel[index].MouseUp();
       if(m_infoBtn[index].IsEnable())
       {
         CMapHook *pMapHook((CMapHook *)(m_view->GetHook(CViewHook::DHT_MapHook)));
@@ -432,19 +455,18 @@ void CTypeNoDistQueryListHook::SearchForResult()
 {
   CQueryWrapper &queryWrapper(CQueryWrapper::Get());
   queryWrapper.SetQueryKindInfo(m_tCodeEntry);
-  CGeoPoint<long> geoCurPos;
   switch (m_curRoundType)
   {
   case CRoundTypeSelectHook::RT_MapCenter:
-    geoCurPos = m_mapCenterPos;
+    m_curSelectedPos = m_mapCenterPos;
     break;
   case CRoundTypeSelectHook::RT_CurPos:
   case CRoundTypeSelectHook::RT_Route:
     if (m_gps!=0 && m_gps->IsLive())
     {
       const GpsCar &carInfo(m_view->GetGpsCar());
-      geoCurPos.m_x = carInfo.m_curPos.m_x;
-      geoCurPos.m_y = carInfo.m_curPos.m_y;
+      m_curSelectedPos.m_x = carInfo.m_curPos.m_x;
+      m_curSelectedPos.m_y = carInfo.m_curPos.m_y;
     }
     break;
   case CRoundTypeSelectHook::RT_EndPoint:
@@ -454,7 +476,7 @@ void CTypeNoDistQueryListHook::SearchForResult()
       onePos.m_type = PT_End;
       CRouteWrapper::Get().GetPosition(onePos);
       //
-      geoCurPos = onePos.m_pos;
+      m_curSelectedPos = onePos.m_pos;
     }
     break;
   }
@@ -470,9 +492,13 @@ void CTypeNoDistQueryListHook::SearchForResult()
 
   queryWrapper.SetMaxQueryRecordNum(500);
   queryWrapper.SetRoundQueryRadius(m_curRadius);
-  queryWrapper.SetCenterPosOfRound(geoCurPos);
+  queryWrapper.SetCenterPosOfRound(m_curSelectedPos);
   m_pRecord = queryWrapper.DoQueryGetRecord();
 
+  if (m_pRecord != NULL)
+  {
+    GetDistances();
+  }
   ResetResultList();
   Refresh();
   return;
@@ -490,6 +516,9 @@ void CTypeNoDistQueryListHook::ResetResultList()
       m_infoBtn[i].SetEnable(false);
       m_infoBtn[i].SetCaption("");
       m_addrLabel[i].SetCaption("");
+      m_telLabel[i].SetCaption("");
+      m_farLabel[i].SetCaption("");
+      m_cursorIcon[i].SetVisible(false);
     }
     m_pageUpBtn.SetEnable(false);
     m_pageDownBtn.SetEnable(false);
@@ -506,13 +535,40 @@ void CTypeNoDistQueryListHook::ResetResultList()
       m_infoBtn[i].SetEnable(false);
       m_infoBtn[i].SetCaption("");
       m_addrLabel[i].SetCaption("");
+      m_telLabel[i].SetCaption("");
+      m_farLabel[i].SetCaption("");
+      m_cursorIcon[i].SetVisible(false);
       continue;
     }
+    //poi名称
     m_infoBtn[i].SetEnable(true);
     m_infoBtn[i].SetCaption(oneRecord->m_uniName);
-
+    //地址
     CCodeIndexCtrl::GetDistCodeCtrl().GetItemNameByCode(oneRecord->m_addrCode,
       m_addrLabel[i].GetCaption());
+    if (oneRecord->m_pchAddrStr)
+    {
+      ::strcat(m_addrLabel[i].GetCaption(), oneRecord->m_pchAddrStr);
+    }
+    //电话
+    m_telLabel[i].SetCaption(oneRecord->m_pchTelStr);
+    if (oneRecord->m_pchTelStr == NULL)
+    {
+      m_telLabel[i].SetCaption("暂无电话");
+    }
+    //距离
+    int distance = ::sqrt(oneRecord->m_dist2th);
+    if (distance > 1000)
+    {
+      ::sprintf(m_farLabel[i].GetCaption(),"%.2f km",distance/1000.);
+    }
+    else
+    {
+      ::sprintf(m_farLabel[i].GetCaption(),"%d m",distance);
+    }
+    //方向
+    m_cursorIcon[i].SetVisible(true);
+    SetDirection(*oneRecord, i);
 
     PointInfo pointInfo;
     pointInfo.m_point.m_x = oneRecord->m_x;
@@ -572,19 +628,118 @@ void CTypeNoDistQueryListHook::SetRadiusLabel()
   switch(m_curRadius)
   {
   case RADIUS06:
-    m_radiusSelectBtn.SetCaption("范围: 50km");
+    m_radiusSelectBtn.SetCaption("范围: 50 km");
     break;
   case RADIUS07:
-    m_radiusSelectBtn.SetCaption("范围: 10km");
+    m_radiusSelectBtn.SetCaption("范围: 10 km");
     break;
   case RADIUS08:
-    m_radiusSelectBtn.SetCaption("范围: 5km");
+    m_radiusSelectBtn.SetCaption("范围: 5 km");
     break;
   case RADIUS09:
-    m_radiusSelectBtn.SetCaption("范围: 2km");
+    m_radiusSelectBtn.SetCaption("范围: 2 km");
     break;
   case RADIUS10:
-    m_radiusSelectBtn.SetCaption("范围: 1km");
+    m_radiusSelectBtn.SetCaption("范围: 1 km");
     break;
   }
+}
+
+void CTypeNoDistQueryListHook::SetDirection(const SQLRecord &oneRecord, int index)
+{
+  int iDir = TypeNoDistQueryListHook_Cursor5;
+  int iDistX(oneRecord.m_x-m_curSelectedPos.m_x),
+    iDistY(oneRecord.m_y-m_curSelectedPos.m_y);
+  if (iDistY == 0)
+  {
+    if (iDistX >= 0)
+    {
+      iDir = TypeNoDistQueryListHook_Cursor3;
+    }
+    else
+    {
+      iDir = TypeNoDistQueryListHook_Cursor7;
+    }
+  }
+  if (iDistX == 0)
+  {
+    if (iDistY >= 0)
+    {
+      iDir = TypeNoDistQueryListHook_Cursor1;
+    }
+    else
+    {
+      iDir = TypeNoDistQueryListHook_Cursor5;
+    }
+  }
+  //第一象限
+  if (iDistY>=0 && iDistX>=0)
+  {
+    if (iDistX/iDistY >= 5)
+    {
+      iDir = TypeNoDistQueryListHook_Cursor3;
+    }
+    else if (iDistY/iDistX >= 5)
+    {
+      iDir = TypeNoDistQueryListHook_Cursor1;
+    }
+    else
+    {
+      iDir = TypeNoDistQueryListHook_Cursor2;
+    }
+  }
+  //第二象限
+  if (iDistY>=0 && iDistX<=0)
+  {
+    if (iDistX/iDistY <= -5)
+    {
+      iDir = TypeNoDistQueryListHook_Cursor7;
+    }
+    else if (iDistY/iDistX <= -5)
+    {
+      iDir = TypeNoDistQueryListHook_Cursor1;
+    }
+    else
+    {
+      iDir = TypeNoDistQueryListHook_Cursor8;
+    }
+  }
+  //第三象限
+  if (iDistY<=0 && iDistX<=0)
+  {
+    if (iDistX/iDistY >= 5)
+    {
+      iDir = TypeNoDistQueryListHook_Cursor7;
+    }
+    else if (iDistY/iDistX >= 5)
+    {
+      iDir = TypeNoDistQueryListHook_Cursor5;
+    }
+    else
+    {
+      iDir = TypeNoDistQueryListHook_Cursor6;
+    }
+  }
+  //第四象限
+  if (iDistY<=0 && iDistX>=0)
+  {
+    if (iDistX/iDistY <= -5)
+    {
+      iDir = TypeNoDistQueryListHook_Cursor3;
+    }
+    else if (iDistY/iDistX <= -5)
+    {
+      iDir = TypeNoDistQueryListHook_Cursor5;
+    }
+    else
+    {
+      iDir = TypeNoDistQueryListHook_Cursor4;
+    }
+  }
+  m_cursorIcon[index].GetCenterElement()->m_backStyle = GetGuiElement(iDir)->m_bkNormal;
+}
+
+void CTypeNoDistQueryListHook::GetDistances()
+{
+  m_pRecord->InitPoiToPoiDist(m_curSelectedPos);
 }

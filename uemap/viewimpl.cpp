@@ -69,8 +69,6 @@ short CViewImpl::CCrossAssist::m_lastSndOrder2 = -1;
 short CViewImpl::CCrossAssist::m_lastSndOrder3 = -1;
 
 //Test
-static bool isFristTimeInCross = true;
-static double s_angle = 0.0;
 
 /**
 *
@@ -710,6 +708,25 @@ inline CViewState *CViewImpl::MainState()
   }
 
   return m_views[0];
+}
+
+CViewState * UeMap::CViewImpl::MainViewState()
+{
+  if(m_views.empty())
+  {
+    return NULL;
+  }
+
+  CViewState* mainView = GetState(VT_North);
+  if (!mainView)
+  {
+    mainView = GetState(VT_Heading);
+    if (!mainView)
+    {
+      mainView = GetState(VT_Perspective);
+    }
+  }
+  return mainView;
 }
 
 unsigned int UeMap::CViewImpl::GetSelectedViewType( const CGeoPoint<short> &scrPoint )
@@ -2099,9 +2116,13 @@ void CViewImpl::Update(short type)
     }
     else 
     {
-      if(m_layoutSchema != LS_Full && m_layoutSchema != LS_Fix_Split)
+      short planState = IRoute::GetRoute()->GetPlanState();
+      if ((UeRoute::PS_None == planState) || (UeRoute::PS_Ready == planState))
       {
-        SetFullViewPort(curView);
+        if(m_layoutSchema != LS_Full && m_layoutSchema != LS_Fix_Split)
+        {
+          SetFullViewPort(curView);
+        }
       }
 
       // If it also contain ST_RenderGuidance
@@ -2111,6 +2132,7 @@ void CViewImpl::Update(short type)
       if (type & ST_RenderLatest)
       {
         IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
+        SetFullViewPort(curView);
       }
 
       // If it re-route
@@ -2163,30 +2185,7 @@ void CViewImpl::Update(short type)
       }
 
       // 判断是否需要显示路口放大图
-      bool isHighway = (oneIndicator->m_roadClass == RC_MotorWay);
-      if ((dirInfo.m_curDistForSnd < UeRoute::CDT_Normal && !isHighway) 
-        || (dirInfo.m_curDistForSnd < UeRoute::CDT_Highway && isHighway))
-      {
-        if ((oneIndicator->m_snd.m_sideCode & SVT_VirtualCross) 
-          || (oneIndicator->m_snd.m_sideCode & SVT_RealCross))
-        {
-          // 显示真实路口放大图或虚拟路口放大图
-          m_needRenderGuidanceView = true;
-        }
-        else if ((oneIndicator->m_snd.m_infoCode != IVT_MeetDestination)
-          && (oneIndicator->m_snd.m_infoCode != IVT_EnterToll)
-          && (dirInfo.m_curSndCode > DVT_DirectGo || dirInfo.m_curSndCode < DVT_Maximum))
-        {
-          // 显示路口矢量路口放大图
-          m_needRenderGuidanceView = true;
-        }
-        else if (IsRoundAbout(dirInfo))
-        {
-          // 显示环岛矢量路口放大图
-          m_needRenderGuidanceView = true;
-        }
-      }
-
+      JudgeGuidanceViewStatus(dirInfo, *oneIndicator);
     }
 
     // Make a decision whether to step into zooming status
@@ -2220,24 +2219,28 @@ void CViewImpl::Update(short type)
     }
     else
     {
-      // 显示路口放大图
-      if ((m_needRenderGuidanceView) && (VM_Guidance == GetViewOpeMode()))
+      // 显示路口放大图      
+      ViewOpeMode viewMode = VM_Guidance;
+      CViewState* mainViewState = MainViewState();
+      if (mainViewState)
+      {
+        viewMode = mainViewState->GetViewOpeMode();
+      }
+      if ((m_needRenderGuidanceView) && (VM_Guidance == viewMode))
       {
         if (m_needShowGuidanceView && !m_isScallingMapLock)
         {
           ZoomInCross(type, curView, dirInfo, rt);
-          IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_SplitMapHook);
+          IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
         }
         else if (IsNeedShowEagle())
         {
           ShowEagle(curView, type);
-          isFristTimeInCross = true;
         }
         else
         {
           // 返回全屏模式
           curView = ZoomInFull(curView, dirInfo);
-          isFristTimeInCross = true;
           IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
           if (!curView)
           {
@@ -2248,13 +2251,11 @@ void CViewImpl::Update(short type)
       else if (IsNeedShowEagle())
       {
         m_needShowGuidanceView = true;
-        isFristTimeInCross = true;
         ShowEagle(curView, type);
       }
       else
       {
         m_needShowGuidanceView = true;
-        isFristTimeInCross = true;
         // 返回全屏模式
         curView = ZoomInFull(curView, dirInfo);
         IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
@@ -2359,14 +2360,6 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
 {
   // Prepare splitted view port and if it already in splitted mode, it no needs to ...
 
-  /*if(m_layoutSchema != LS_Split || m_layoutSchema != LS_Fix_Split)
-  {
-  const MapLayout &mapLayout = curView->GetMapLayout();
-  int curScaleLevel = curView->m_curScaleLevel;
-  m_layoutSchema = ((type & ST_RenderPathes) && m_layoutSchema == LS_Full) ? LS_Full : LS_Split;
-  SetViewPort(curView, mapLayout, curScaleLevel, m_layoutSchema);
-  }*/
-
   ChangeViewPort(curView, type);
   // TODO:
   // The size should be configed by one CFG file
@@ -2393,9 +2386,9 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
       if (rt == PEC_Success && dirInfo.m_curOrderForSnd >= 0)
       {
         //
-        guidanceView->m_distForSnd = dirInfo.m_curDistForSnd;
-        //if(guidanceView->m_orderForSnd != dirInfo.m_curOrderForSnd)
+        if(guidanceView->m_orderForSnd != dirInfo.m_curOrderForSnd)
         {
+          guidanceView->m_distForSnd = dirInfo.m_curDistForSnd;
 
           GuidanceIndicator *oneIndicator = IRoute::GetRoute()->GetIndicator(dirInfo.m_curPair, dirInfo.m_curOrderForSnd);
           CGeoPoint<long> basePos = oneIndicator->m_vtxs[0];
@@ -2407,7 +2400,7 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
 
           GetCurRoundAboutCenter(dirInfo, basePos);
           //判断车是否在转弯点的附近
-          MapLayout mapLayout;
+          MapLayout mapLayout = guidanceView->GetMapLayout();
           mapLayout.m_base = basePos;
           CGeoRect<long> &maxExtent = mapLayout.m_extent;
           maxExtent.m_minX = basePos.m_x - dirInfo.m_curDistForSnd - 5000;
@@ -2422,17 +2415,8 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
           start.m_y = dirInfo.m_curPos.m_y;
           end.m_x = basePos.m_x;
           end.m_y = basePos.m_y;
-          if (isFristTimeInCross)
-          {
-            double angle = CVectOP<double>::Angle(start, end);
-            mapLayout.m_angle = TWOPI + HALFPI - angle;
-            s_angle = mapLayout.m_angle; 
-          }
-          else
-          {
-            mapLayout.m_angle = s_angle;
-          }
-          //mapLayout的比例尺，与取的路网等数据有关
+          double angle = CVectOP<double>::Angle(start, end);
+          mapLayout.m_angle = TWOPI + HALFPI - angle;
           mapLayout.m_scale = curView->m_scales[1];  
           guidanceView->SetMapLayout(mapLayout);
           //
@@ -2442,8 +2426,6 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
           CGuidanceView::m_curIndicator = dirInfo.m_curIndicator;
           guidanceView->m_curScaleLevel = 1; //路口放大图的比例尺
 
-          //Test
-          isFristTimeInCross = false;
         }
         //else
         //{
@@ -2451,7 +2433,7 @@ void CViewImpl::ZoomInCross(short type, CViewState *curView, GuidanceStatus &dir
         //  MapLayout mapLayout = guidanceView->m_mapping.m_mapLayout;
         //  if (mapLayout.m_angle != m_carInfo.m_headingDegree)
         //  {
-        //    mapLayout.m_angle = m_carInfo.m_headingDegree;
+        //  //  mapLayout.m_angle = m_carInfo.m_headingDegree;
         //    guidanceView->SetMapLayout(mapLayout);
         //  }
         //}
@@ -3190,11 +3172,10 @@ void CViewImpl::CCrossAssist::AdjustScaleWhenCross(CViewState *curView, Guidance
     }
   }
 }
-bool CViewImpl::IsRoundAbout(GuidanceStatus &dirInfo)
+bool CViewImpl::IsRoundAbout(const GuidanceStatus &dirInfo)
 {
   GuidanceIndicator *indicator = IRoute::GetRoute()->GetIndicator(dirInfo.m_curPair, dirInfo.m_curIndicator);
-  if ((indicator->m_snd.m_infoCode == IVT_EnterRoundAbout) || indicator->m_roadForm == RF_Roundabout
-    || indicator->m_snd.m_infoCode == IVT_ExitRoundAbout)
+  if (indicator->m_roadForm == RF_Roundabout || indicator->m_snd.m_infoCode == IVT_ExitRoundAbout)
   {
     return true;
   }
@@ -3209,27 +3190,27 @@ bool CViewImpl::GetCurRoundAboutCenter(GuidanceStatus &dirInfo, CGeoPoint<long> 
     GuidanceIndicator *indicator = route->GetIndicator(dirInfo.m_curPair, dirInfo.m_curIndicator);
     CGeoPoint<long> startPos;
     CGeoPoint<long> endPos;
-    if (indicator->m_snd.m_infoCode == IVT_EnterRoundAbout) //刚要进入环岛
-    {
-      startPos = indicator->m_vtxs[0];
-      int i = dirInfo.m_curIndicator - 1;
-      if (i > 0)
-      {
-        while(indicator->m_snd.m_infoCode != IVT_ExitRoundAbout && i > 0)
-        {
-          indicator = route->GetIndicator(dirInfo.m_curPair, i);
-          i--;
-        }
-        if (i >= 0)
-        {
-          endPos = indicator->m_vtxs[0];
-          pos.m_x = (startPos.m_x + endPos.m_x) / 2;
-          pos.m_y = (startPos.m_y + endPos.m_y) / 2;
-          return true;
-        }
-      }
-    }
-    else if (indicator->m_roadForm == RF_Roundabout) //车已经在环岛路中间,向前找环岛入口点
+    //if (indicator->m_snd.m_infoCode == IVT_EnterRoundAbout) //刚要进入环岛
+    //{
+    //  startPos = indicator->m_vtxs[0];
+    //  int i = dirInfo.m_curIndicator - 1;
+    //  if (i > 0)
+    //  {
+    //    while(indicator->m_snd.m_infoCode != IVT_ExitRoundAbout && i > 0)
+    //    {
+    //      indicator = route->GetIndicator(dirInfo.m_curPair, i);
+    //      i--;
+    //    }
+    //    if (i >= 0)
+    //    {
+    //      endPos = indicator->m_vtxs[0];
+    //      pos.m_x = (startPos.m_x + endPos.m_x) / 2;
+    //      pos.m_y = (startPos.m_y + endPos.m_y) / 2;
+    //      return true;
+    //    }
+    //  }
+    //}
+    if (indicator->m_roadForm == RF_Roundabout) //车已经在环岛路中间,向前找环岛入口点
     {
       int i = dirInfo.m_curIndicator + 1;
       if (i < route->GetIndicatorNum(dirInfo.m_curPair))
@@ -3391,6 +3372,7 @@ void CViewImpl::InitGuidanceView(const CViewState *curView)
     guidanceView->m_style = VS_Floating;
     guidanceView->SetScrLayout(scrLayout);
     guidanceView->m_drawType = CGuidanceView::DT_Cross;
+    guidanceView->SetViewOpeMode(VM_Guidance);
     m_views.push_back(guidanceView);
   }
 }
@@ -3437,7 +3419,7 @@ void CViewImpl::ShowEagle(CViewState *curView, const short renderType)
         mapLayout.m_scale = curView->m_scales[eagleView->m_curScaleLevel];
         eagleView->SetMapLayout(mapLayout);
         m_views.push_back(eagleView);
-        IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_SplitMapHook);
+        IView::GetView()->GetMediator()->UpdateHooks(CViewHook::UHT_UpdateMapHook);
       }
     }
   }
@@ -3491,5 +3473,32 @@ void CViewImpl::DrawGui()
   {
     m_guiView->GetDC()->m_isRefresh = true;
     m_guiView->OnDraw();
+  }
+}
+
+void CViewImpl::JudgeGuidanceViewStatus(const GuidanceStatus &dirInfo, const GuidanceIndicator &oneIndicator)
+{
+  bool isHighway = (oneIndicator.m_roadClass == RC_MotorWay);
+  if ((dirInfo.m_curDistForSnd < UeRoute::CDT_Normal && !isHighway) 
+    || (dirInfo.m_curDistForSnd < UeRoute::CDT_Highway && isHighway))
+  {
+    if ((oneIndicator.m_snd.m_sideCode & SVT_VirtualCross) 
+      || (oneIndicator.m_snd.m_sideCode & SVT_RealCross))
+    {
+      // 显示真实路口放大图或虚拟路口放大图
+      m_needRenderGuidanceView = true;
+    }
+    else if ((oneIndicator.m_snd.m_infoCode != IVT_MeetDestination)
+      && (oneIndicator.m_snd.m_infoCode != IVT_EnterToll)
+      && (dirInfo.m_curSndCode > DVT_DirectGo || dirInfo.m_curSndCode < DVT_Maximum))
+    {
+      // 显示路口矢量路口放大图
+      m_needRenderGuidanceView = true;
+    }
+    else if (IsRoundAbout(dirInfo))
+    {
+      // 显示环岛矢量路口放大图
+      m_needRenderGuidanceView = true;
+    }
   }
 }

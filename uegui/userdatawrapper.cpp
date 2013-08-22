@@ -20,6 +20,8 @@ using namespace UeModel;
 using namespace UeGui;
 using namespace UeBase;
 
+#define DEFAULT_MARK_PIC 307
+
 const CUserDataWrapper& CUserDataWrapper::Get()
 {
   static CUserDataWrapper m_userDataWrapper;
@@ -182,7 +184,7 @@ void CUserDataWrapper::AddRecent() const
   //存在经由点
   if (posCount > 2)
   {
-    for (int i = 1; i < posCount - 1; ++i)
+    for (unsigned int i = 1; i < posCount - 1; ++i)
     {
       PlanPosition middlePos;
       middlePos.m_type = UeRoute::PT_Middle;
@@ -415,8 +417,12 @@ const FavoriteEntry* CUserDataWrapper::GetFavorite(int order) const
   return m_query->GetFavorite(order);
 }
 //添加新的地址信息
-unsigned int CUserDataWrapper::AddFavorite(const FavoriteEntry &curFavor) const
+unsigned int CUserDataWrapper::AddFavorite(FavoriteEntry &curFavor) const
 {
+  if (curFavor.m_kind <= 0)
+  {
+    curFavor.m_kind = DEFAULT_MARK_PIC;
+  }
   return m_query->AddFavorite(curFavor);
 }
 //更新索引为order的地址信息
@@ -583,7 +589,8 @@ bool CUserDataWrapper::FavoriteEntry2EditData(const FavoriteEntry* fEntry , Edit
     ::strcpy((char *)edata->m_addrCode, "");
   }
 
-  if(fEntry->m_kind & 0x1)
+  //目前只有一个图标的选项
+  /*if(fEntry->m_kind & 0x1)
   {
     edata->m_isStartpos = true;
   }
@@ -611,7 +618,7 @@ bool CUserDataWrapper::FavoriteEntry2EditData(const FavoriteEntry* fEntry , Edit
   {
     edata->m_isMapshow = false;
   }
-  entryKind = entryKind >> 1;
+  entryKind = entryKind >> 1;*/
 
   edata->m_kind = fEntry->m_kind;
   return true;
@@ -631,19 +638,19 @@ bool CUserDataWrapper::EditData2FavoriteEntry(EditData* edata, FavoriteEntry* fE
   ::strcpy((char*)fEntry->m_telphone, (char *)edata->m_telephone);
 
   //三个标志位的增加
-  edata->m_kind = edata->m_kind<<3;
-  if (edata->m_isMapshow)
-  {
-    edata->m_kind |= 0x4;
-  }
-  if(edata->m_isVoice)
-  {
-    edata->m_kind |= 0x2;
-  }
-  if(edata->m_isStartpos)
-  {
-    edata->m_kind |= 0x1;
-  }
+  //edata->m_kind = edata->m_kind<<3;
+  //if (edata->m_isMapshow)
+  //{
+  //  edata->m_kind |= 0x4;
+  //}
+  //if(edata->m_isVoice)
+  //{
+  //  edata->m_kind |= 0x2;
+  //}
+  //if(edata->m_isStartpos)
+  //{
+  //  edata->m_kind |= 0x1;
+  //}
   fEntry->m_kind = edata->m_kind;
   return true;
 }
@@ -720,7 +727,7 @@ bool UeGui::CUserDataWrapper::SaveLastRoute() const
     {
       ::memset(&poiItem, 0, sizeof(POIItem));
       poiItem.m_type = UeRoute::PT_Middle;
-      for(int i = 1; i < posCount - 1; i++)
+      for(unsigned int i = 1; i < posCount - 1; i++)
       {
         m_route->GetPosition(poiItem, i);
         if(poiItem.m_type != UeRoute::PT_Invalid)
@@ -757,7 +764,7 @@ bool UeGui::CUserDataWrapper::SaveLastRoute() const
     unsigned int dataCount = poiList.size();
     m_fileBasic.WriteFile(fileHandle, &dataCount, sizeof(dataCount), count);
     //写入路线各经由点
-    for (int i = 0; i < poiList.size(); ++i)
+    for (unsigned int i = 0; i < poiList.size(); ++i)
     {
       m_fileBasic.WriteFile(fileHandle, &poiList[i], sizeof(POIItem), count);
     }
@@ -801,7 +808,7 @@ bool UeGui::CUserDataWrapper::GetLastRoute( unsigned int& routeType, POIDataList
     buffer = &dataCount;
     m_fileBasic.ReadFile(fileHandle, &buffer, sizeof(unsigned int), count);
     POIItem poiItem;
-    for (int i = 0; i < dataCount; ++i)
+    for (unsigned int i = 0; i < dataCount; ++i)
     {
       ::memset(&poiItem, 0, sizeof(POIItem));
       buffer = &poiItem;
@@ -856,23 +863,354 @@ tstring UeGui::CUserDataWrapper::GetUserEEyeEntryFileName() const
   return fileName;
 }
 
-bool UeGui::CUserDataWrapper::ConnectToUserEEyeDataFile() const
+unsigned int UeGui::CUserDataWrapper::GetUserEEyeEntryDataCount() const
 {
- 
+  //索引文件是否存在
+  void *indexFileHandle = NULL;
+  tstring indexFileName = GetUserEEyeIndexFileName();
+  if(m_pathBasic.IsFileExist(indexFileName))
+  {
+    indexFileHandle = m_fileBasic.OpenFile(indexFileName, CFileBasic::UE_FILE_READ);
+  }
+  else
+  {
+    return 0;
+  }
+
+  if(!m_fileBasic.IsValidHandle(indexFileHandle))
+  {
+    m_fileBasic.CloseFile(indexFileHandle);
+    return 0;
+  }
+
+  //读取文件中的数据量
+  int count = 1;
+  //实体文件数据量
+  unsigned int entryDataCount = 0;
+  //索引文件数据量
+  unsigned int indexDataCount = 0;
+  void* readData = &indexDataCount;
+  unsigned int indexfileHeaderSize = sizeof(int);
+  //文件的前4个字节是文件的大小
+  m_fileBasic.SeekFile(indexFileHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+  m_fileBasic.ReadFile(indexFileHandle, &readData, indexfileHeaderSize, count);
+  
+  if (indexDataCount > 0)
+  {
+    unsigned int indexDataStructSize = sizeof(UserEEyeIndexData);
+    //一次将所有索引数据读取到内存中
+    UserEEyeIndexData* pIndexDatas = new UserEEyeIndexData[indexDataCount];
+    ::memset(pIndexDatas, 0, indexDataCount * indexDataStructSize);
+    readData = pIndexDatas;
+    m_fileBasic.SeekFile(indexFileHandle, indexfileHeaderSize, CFileBasic::UE_SEEK_BEGIN);
+    m_fileBasic.ReadFile(indexFileHandle, &readData, indexDataCount * indexDataStructSize, count);
+
+    UserEEyeIndexData* pData = NULL;
+    for (unsigned int i = 0; i < indexDataCount; ++i)
+    {
+      pData = pIndexDatas + i;
+      entryDataCount += pData->m_dataCount;
+    }
+    delete []pIndexDatas;
+  }
+  m_fileBasic.CloseFile(indexFileHandle);
+  return entryDataCount;
 }
 
-bool UeGui::CUserDataWrapper::DisconnectUserEEyeDataFile() const
+bool UeGui::CUserDataWrapper::GetUserEEyeEntryData( const unsigned int fromIndex, unsigned int count, UserEEyeEntryDataList& dataList ) const
 {
+  dataList.clear();
+  //索引文件是否存在
+  tstring indexFileName = GetUserEEyeIndexFileName();
+  if(!m_pathBasic.IsFileExist(indexFileName))
+  {
+    return false;    
+  } 
+  //数据文件是否存在
+  tstring entryFileName = GetUserEEyeEntryFileName();
+  if(!m_pathBasic.IsFileExist(entryFileName))
+  {
+    return false;
+  }
+  //打开文件
+  void *indexFileHandle = m_fileBasic.OpenFile(indexFileName, CFileBasic::UE_FILE_READ);
+  void *entryFileHandle = m_fileBasic.OpenFile(entryFileName, CFileBasic::UE_FILE_READ);
 
+  if (!m_fileBasic.IsValidHandle(indexFileHandle) && !m_fileBasic.IsValidHandle(entryFileHandle))
+  {
+    m_fileBasic.CloseFile(indexFileHandle);
+    m_fileBasic.CloseFile(entryFileHandle);
+    return false;
+  }
+
+  //读取文件中的数据量
+  int readCount = 1;
+  //实体文件数据量
+  int entryDataCount = 0;
+  //索引文件数据量
+  unsigned int indexDataCount = 0;  
+  unsigned int indexfileHeaderSize = sizeof(int);
+  void* readData = &indexDataCount;
+  //文件的前4个字节是文件的大小
+  m_fileBasic.SeekFile(indexFileHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+  m_fileBasic.ReadFile(indexFileHandle, &readData, indexfileHeaderSize, readCount);
+
+  unsigned int indexDataStructSize = sizeof(UserEEyeIndexData);
+  //一次将所有索引数据读取到内存中
+  UserEEyeIndexData* pIndexDatas = new UserEEyeIndexData[indexDataCount];
+  ::memset(pIndexDatas, 0, indexDataCount * indexDataStructSize);
+  readData = pIndexDatas;
+  m_fileBasic.SeekFile(indexFileHandle, indexfileHeaderSize, CFileBasic::UE_SEEK_BEGIN);
+  m_fileBasic.ReadFile(indexFileHandle, &readData, indexDataCount * indexDataStructSize, readCount);
+
+  int readIndex = -1;
+  unsigned int readPosition = 0;
+  UserEEyeIndexData* pIndexData = NULL;
+  UserEEyeEntryData entryData;
+  unsigned int entryDatastructSize = sizeof(UserEEyeEntryData); 
+  for (unsigned int i = 0; i < indexDataCount; ++i)
+  {
+    pIndexData = pIndexDatas + i;
+    for (unsigned int j = 0; j < pIndexData->m_dataCount; ++j)
+    {
+      readIndex++;
+      readPosition = pIndexData->m_offset + j * entryDatastructSize;
+      if ((unsigned int)readIndex >= fromIndex)
+      {
+        ::memset(&entryData, 0, entryDatastructSize);
+        readData = &entryData;
+        m_fileBasic.SeekFile(entryFileHandle, readPosition, CFileBasic::UE_SEEK_BEGIN);
+        m_fileBasic.ReadFile(entryFileHandle, &readData, entryDatastructSize, readCount);
+
+        //如果读满数据之后则退出
+        if (dataList.size() < count)
+        {
+          dataList.push_back(entryData);
+        }
+        else
+        {
+          break;
+        }
+      }
+    }
+    if (dataList.size() >= count)
+    {
+      break;
+    }
+  }
+  delete []pIndexDatas;
+
+  m_fileBasic.CloseFile(indexFileHandle);
+  m_fileBasic.CloseFile(entryFileHandle);
+  return dataList.size() > 0;
 }
 
-bool UeGui::CUserDataWrapper::AddUserEEyeData( int parcelID, const UserEEyeEntryData& entryData ) const
+bool UeGui::CUserDataWrapper::DeleteUserEEyeData( const unsigned int deleteIndex ) const
+{
+  //索引文件是否存在
+  tstring indexFileName = GetUserEEyeIndexFileName();
+  if(!m_pathBasic.IsFileExist(indexFileName))
+  {
+    return false;    
+  } 
+  //数据文件是否存在
+  tstring entryFileName = GetUserEEyeEntryFileName();
+  if(!m_pathBasic.IsFileExist(entryFileName))
+  {
+    return false;
+  }
+  //打开文件
+  void *indexFileHandle = m_fileBasic.OpenFile(indexFileName, CFileBasic::UE_FILE_ALL);
+  void *entryFileHandle = m_fileBasic.OpenFile(entryFileName, CFileBasic::UE_FILE_ALL);
+
+  if (!m_fileBasic.IsValidHandle(indexFileHandle) && !m_fileBasic.IsValidHandle(entryFileHandle))
+  {
+    m_fileBasic.CloseFile(indexFileHandle);
+    m_fileBasic.CloseFile(entryFileHandle);
+    return false;
+  }
+
+  //读取文件中的数据量
+  int count = 1;
+  //实体文件数据量
+  unsigned int entryDataCount = 0;
+  //索引文件数据量
+  unsigned int indexDataCount = 0;  
+  unsigned int indexfileHeaderSize = sizeof(int);
+  void* readData = &indexDataCount;
+  //文件的前4个字节是文件的大小
+  m_fileBasic.SeekFile(indexFileHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+  m_fileBasic.ReadFile(indexFileHandle, &readData, indexfileHeaderSize, count);
+
+  unsigned int indexDataStructSize = sizeof(UserEEyeIndexData);
+  //一次将所有索引数据读取到内存中
+  UserEEyeIndexData* pIndexDatas = new UserEEyeIndexData[indexDataCount];
+  ::memset(pIndexDatas, 0, indexDataCount * indexDataStructSize);
+  readData = pIndexDatas;
+  m_fileBasic.SeekFile(indexFileHandle, indexfileHeaderSize, CFileBasic::UE_SEEK_BEGIN);
+  m_fileBasic.ReadFile(indexFileHandle, &readData, indexDataCount * indexDataStructSize, count);
+
+  int entryIndex = -1;
+  bool bDeleteStatus = false;
+  unsigned int filePosition = 0;
+  UserEEyeIndexData* pIndexData = NULL;
+  UserEEyeEntryData entryData;
+  unsigned int entryDatastructSize = sizeof(UserEEyeEntryData); 
+  for (unsigned int i = 0; i < indexDataCount; ++i)
+  {
+    pIndexData = pIndexDatas + i;
+    for (unsigned int j = 0; j < pIndexData->m_dataCount; ++j)
+    {
+      entryIndex++;
+      if (deleteIndex == entryIndex)
+      {
+        //找到要删除的数据之后,将当前数据之后的数据统一前移一位
+        for (unsigned int k = j + 1; k < pIndexData->m_dataCount; ++k)
+        {
+          ::memset(&entryData, 0, entryDatastructSize);
+          readData = &entryData;
+          filePosition = pIndexData->m_offset + k * entryDatastructSize;
+          m_fileBasic.SeekFile(entryFileHandle, filePosition, CFileBasic::UE_SEEK_BEGIN);
+          m_fileBasic.ReadFile(entryFileHandle, &readData, entryDatastructSize, count);
+          //写回数据
+          filePosition -= entryDatastructSize;
+          m_fileBasic.SeekFile(entryFileHandle, filePosition, CFileBasic::UE_SEEK_BEGIN);
+          m_fileBasic.WriteFile(entryFileHandle, &entryData, entryDatastructSize, count);
+        }
+        bDeleteStatus = true;
+        //数量减一
+        if (pIndexData->m_dataCount > 0)
+        {
+          pIndexData->m_dataCount -= 1;
+        }
+        break;
+      }
+      if (bDeleteStatus)
+      {
+        break;
+      }
+    }
+  }
+  if (bDeleteStatus)
+  {
+    //如果删除成功,则更新索引文件
+    m_fileBasic.SeekFile(indexFileHandle, indexfileHeaderSize, CFileBasic::UE_SEEK_BEGIN);
+    m_fileBasic.WriteFile(indexFileHandle, pIndexDatas, indexDataCount * indexDataStructSize, count);
+  }
+  delete []pIndexDatas;
+
+  m_fileBasic.CloseFile(indexFileHandle);
+  m_fileBasic.CloseFile(entryFileHandle);
+  return bDeleteStatus;
+}
+
+bool UeGui::CUserDataWrapper::DeleteAllUserEEyeData() const
+{
+  //索引文件是否存在
+  tstring indexFileName = GetUserEEyeIndexFileName();
+  if(!m_pathBasic.IsFileExist(indexFileName))
+  {
+    return false;    
+  } 
+  //打开文件
+  void *indexFileHandle = m_fileBasic.OpenFile(indexFileName, CFileBasic::UE_FILE_WRITE);
+  if (!m_fileBasic.IsValidHandle(indexFileHandle))
+  {
+    m_fileBasic.CloseFile(indexFileHandle);
+    return false;
+  }
+  //读取文件中的数据量
+  int count = 1;
+  //索引文件数据量
+  unsigned int indexDataCount = 0;  
+  unsigned int indexfileHeaderSize = sizeof(int);
+  //文件的前4个字节是文件的大小
+  m_fileBasic.SeekFile(indexFileHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+  m_fileBasic.WriteFile(indexFileHandle, &indexDataCount, indexfileHeaderSize, count);
+  m_fileBasic.CloseFile(indexFileHandle);
+  return true;
+}
+
+bool UeGui::CUserDataWrapper::EditUserEEyeData( const unsigned int editIndex, const UserEEyeEntryData& entryData ) const
+{
+  //索引文件是否存在
+  tstring indexFileName = GetUserEEyeIndexFileName();
+  if(!m_pathBasic.IsFileExist(indexFileName))
+  {
+    return false;    
+  } 
+  //数据文件是否存在
+  tstring entryFileName = GetUserEEyeEntryFileName();
+  if(!m_pathBasic.IsFileExist(entryFileName))
+  {
+    return false;
+  }
+  //打开文件
+  void *indexFileHandle = m_fileBasic.OpenFile(indexFileName, CFileBasic::UE_FILE_READ);
+  void *entryFileHandle = m_fileBasic.OpenFile(entryFileName, CFileBasic::UE_FILE_ALL);
+
+  if (!m_fileBasic.IsValidHandle(entryFileHandle) && !m_fileBasic.IsValidHandle(entryFileHandle))
+  {
+    m_fileBasic.CloseFile(indexFileHandle);
+    m_fileBasic.CloseFile(entryFileHandle);
+    return false;
+  }
+
+  //编辑状态
+  bool bEdieStatus = false;
+  //读取文件中的数据量
+  int count = 1;
+  //索引文件数据量
+  unsigned int indexDataCount = 0;  
+  unsigned int indexfileHeaderSize = sizeof(int);
+  void* readData = &indexDataCount;
+  //文件的前4个字节是文件的大小
+  m_fileBasic.SeekFile(indexFileHandle, 0, CFileBasic::UE_SEEK_BEGIN);
+  m_fileBasic.ReadFile(indexFileHandle, &readData, indexfileHeaderSize, count);
+
+  if (indexDataCount > 0)
+  {
+    unsigned int indexDataStructSize = sizeof(UserEEyeIndexData);
+    //一次将所有索引数据读取到内存中
+    UserEEyeIndexData* pIndexDatas = new UserEEyeIndexData[indexDataCount];
+    ::memset(pIndexDatas, 0, indexDataCount * indexDataStructSize);
+    readData = pIndexDatas;
+    m_fileBasic.SeekFile(indexFileHandle, indexfileHeaderSize, CFileBasic::UE_SEEK_BEGIN);
+    m_fileBasic.ReadFile(indexFileHandle, &readData, indexDataCount * indexDataStructSize, count);
+
+    int curIndex = -1;
+    unsigned int editPosition = 0;
+    UserEEyeIndexData* pData = NULL;
+    unsigned int entryDatastructSize = sizeof(UserEEyeEntryData); 
+    for (unsigned int i = 0; i < indexDataCount; ++i)
+    {
+      pData = pIndexDatas + i;
+      for (unsigned int j = 0; j < pData->m_dataCount; ++j)
+      {
+        curIndex++;
+        editPosition = pData->m_offset + j * entryDatastructSize;
+        if (editIndex == curIndex)
+        {
+          m_fileBasic.SeekFile(entryFileHandle, editPosition, CFileBasic::UE_SEEK_BEGIN);
+          m_fileBasic.WriteFile(entryFileHandle, &entryData, entryDatastructSize, count);
+          bEdieStatus = true;
+        }
+      }
+    }
+    delete []pIndexDatas;
+  }
+  m_fileBasic.CloseFile(indexFileHandle);
+  m_fileBasic.CloseFile(entryFileHandle);
+  return bEdieStatus;
+}
+
+bool UeGui::CUserDataWrapper::AddUserEEyeData( const unsigned int parcelID, const UserEEyeEntryData& entryData ) const
 {
   //索引文件是否存在
   bool bIndexFileExist = false;
   void *indexFileHandle = NULL;
   tstring indexFileName = GetUserEEyeIndexFileName();
-  if(m_pathBasic.IsFileExist(indexFileName))
+  if (m_pathBasic.IsFileExist(indexFileName))
   {
     bIndexFileExist = true;
     indexFileHandle = m_fileBasic.OpenFile(indexFileName, CFileBasic::UE_FILE_ALL);
@@ -883,7 +1221,7 @@ bool UeGui::CUserDataWrapper::AddUserEEyeData( int parcelID, const UserEEyeEntry
     indexFileHandle = m_fileBasic.OpenFile(indexFileName, CFileBasic::UE_FILE_WRITE);
   }
 
-  if(!m_fileBasic.IsValidHandle(indexFileHandle))
+  if (!m_fileBasic.IsValidHandle(indexFileHandle))
   {
     m_fileBasic.CloseFile(indexFileHandle);
     return false;
@@ -893,7 +1231,7 @@ bool UeGui::CUserDataWrapper::AddUserEEyeData( int parcelID, const UserEEyeEntry
   bool bEntryFileExist = false;
   void *entryFileHandle = NULL;
   tstring entryFileName = GetUserEEyeEntryFileName();
-  if(m_pathBasic.IsFileExist(entryFileName))
+  if (m_pathBasic.IsFileExist(entryFileName))
   {
     bEntryFileExist = true;
     entryFileHandle = m_fileBasic.OpenFile(entryFileName, CFileBasic::UE_FILE_ALL);
@@ -904,15 +1242,15 @@ bool UeGui::CUserDataWrapper::AddUserEEyeData( int parcelID, const UserEEyeEntry
     entryFileHandle = m_fileBasic.OpenFile(entryFileName, CFileBasic::UE_FILE_WRITE);
   }
 
-  if(!m_fileBasic.IsValidHandle(entryFileHandle))
+  if (!m_fileBasic.IsValidHandle(entryFileHandle))
   {
     m_fileBasic.CloseFile(entryFileHandle);
     return false;
   }
 
   int count = 1;
-  int indexDataCount = 0;
-  int indexfileHeaderSize = sizeof(int);
+  unsigned int indexDataCount = 0;
+  unsigned int indexfileHeaderSize = sizeof(int);
   unsigned int indexDataStructSize = sizeof(UserEEyeIndexData);
   unsigned int entryDatastructSize = sizeof(UserEEyeEntryData); 
   void* readData = NULL;
@@ -937,6 +1275,7 @@ bool UeGui::CUserDataWrapper::AddUserEEyeData( int parcelID, const UserEEyeEntry
     pIndexDatas = new UserEEyeIndexData[indexDataCount];
     ::memset(pIndexDatas, 0, indexDataCount * indexDataStructSize);
     readData = pIndexDatas;
+    m_fileBasic.SeekFile(indexFileHandle, indexfileHeaderSize, CFileBasic::UE_SEEK_BEGIN);
     m_fileBasic.ReadFile(indexFileHandle, &readData, indexDataCount * indexDataStructSize, count);
 
     for (unsigned int i = 0; i < indexDataCount; ++i)
@@ -975,14 +1314,14 @@ bool UeGui::CUserDataWrapper::AddUserEEyeData( int parcelID, const UserEEyeEntry
       pFindIndexData->m_dataCount++;
       if (moveDataSize > 0)
       {
-        for (int i = findIndex + 1; i < indexDataCount; ++i)
+        for (unsigned int i = findIndex + 1; i < indexDataCount; ++i)
         {
           pIndexDatas[i].m_offset = pIndexDatas[i - 1].m_offset + pIndexDatas[i - 1].m_capacity * entryDatastructSize;
         }
       }
       //写索引文件
       m_fileBasic.SeekFile(indexFileHandle, indexfileHeaderSize, CFileBasic::UE_SEEK_BEGIN);
-      m_fileBasic.WriteFile(indexFileHandle, &pIndexDatas, indexDataCount * indexDataStructSize, count);
+      m_fileBasic.WriteFile(indexFileHandle, pIndexDatas, indexDataCount * indexDataStructSize, count);
       //新增一条实体数据并更新到之前已分配好的空间
       m_fileBasic.SeekFile(entryFileHandle, pFindIndexData->m_offset + (pFindIndexData->m_dataCount - 1) * entryDatastructSize, CFileBasic::UE_SEEK_BEGIN);
       m_fileBasic.WriteFile(entryFileHandle, &entryData, entryDatastructSize, count);
@@ -992,10 +1331,16 @@ bool UeGui::CUserDataWrapper::AddUserEEyeData( int parcelID, const UserEEyeEntry
         m_fileBasic.SeekFile(entryFileHandle, pFindIndexData->m_offset + pFindIndexData->m_capacity * entryDatastructSize, CFileBasic::UE_SEEK_BEGIN);
         m_fileBasic.WriteFile(entryFileHandle, moveDataBuf, moveDataSize, count);
       }
+      if (moveDataBuf)
+      {
+        delete []moveDataBuf;
+        moveDataBuf = NULL;
+      }
     }
     else
     {
       //如果当前网格不存在,则在文件最后一次新增10条记录
+      //将要找的数据只像最后一条，以便查找要添加的数据位置
       pFindIndexData = pIndexDatas + (indexDataCount - 1);
       //写数量
       indexDataCount += 1;
@@ -1014,6 +1359,11 @@ bool UeGui::CUserDataWrapper::AddUserEEyeData( int parcelID, const UserEEyeEntry
       entryDatas[0] = entryData;
       m_fileBasic.SeekFile(entryFileHandle, indexData.m_offset, CFileBasic::UE_SEEK_BEGIN);
       m_fileBasic.WriteFile(entryFileHandle, entryDatas, USER_EEYE_BLOCK_COUNT * entryDatastructSize, count);
+    }
+    //释放申请的内存
+    if (pIndexDatas)
+    {    
+      delete []pIndexDatas;
     }
   }
   else

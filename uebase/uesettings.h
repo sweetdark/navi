@@ -400,29 +400,29 @@ namespace UeBase
       SM_Warm,
       SM_Cold            
     };
-    unsigned char m_gpsStartMode; //1:正常启动 2:热启动 3:冷启动
+    unsigned char m_gpsStartMode;     //1:正常启动 2:热启动 3:冷启动
     unsigned char m_fixedStartMode;
 
-    unsigned char m_gpsPort; //端口号
+    unsigned char m_gpsPort;          //端口号
     unsigned char m_fixedGpsPort;
 
-    unsigned int m_gpsBaud; //波特率
+    unsigned int m_gpsBaud;           //波特率
     unsigned int m_fixedGpsBaud;
 
     //该参数移到VoiceSettings里面
-    unsigned int m_voice;//音量值0-0xFFFFFFFF
+    unsigned int m_voice;             //音量值0-0xFFFFFFFF
     unsigned int m_fixedVoice;    
 
     //-------------------------
     // 新增字段
-    unsigned char m_loudspeaker; //0：静音 1：非静音
-    unsigned char m_voicePrompt;//类型VoiceType 二进制低二位来表示：启用按键音，启用动态语音
-    unsigned char m_language;//语音类型:普通话-女， 普通话-男，四川话，广东话，东北话，台湾话等
-
-    unsigned short m_carIcon; //自车图标
-    unsigned short m_3DCarIcon; //俯视图的自车图标
-    unsigned char m_timeCalibration;//时间校准 OS_OFF, OS_ON
-    unsigned char m_startStatement;//启动声明
+    unsigned char m_loudspeaker;        //0：静音 1：非静音
+    unsigned char m_voicePrompt;        //类型VoiceType 二进制低二位来表示：启用按键音，启用动态语音
+    unsigned char m_language;           //语音类型:普通话-女， 普通话-男，四川话，广东话，东北话，台湾话等
+    unsigned short m_carIcon;           //自车图标
+    unsigned short m_3DCarIcon;         //俯视图的自车图标
+    unsigned char m_timeCalibration;    //时间校准 OS_OFF, OS_ON
+    unsigned char m_startStatement;     //是否开启启动声明 OS_OFF, OS_ON
+    unsigned char m_showShortcutPanel;  //是否开启启快捷面板 OS_OFF, OS_ON
     //-------------------------
     unsigned char m_reserved[242];
     /**
@@ -431,7 +431,7 @@ namespace UeBase
     SystemSettings() : m_gpsStartMode(SM_Cold), m_fixedStartMode(SM_Cold), m_gpsPort(0), m_fixedGpsPort(0), 
       m_gpsBaud(0), m_fixedGpsBaud(0), m_voice(0x7FFFFFFF), m_fixedVoice(0x7FFFFFFF),
       m_language(0), m_carIcon(DefaultCarIcon), m_3DCarIcon(Default3DCarIcon), m_loudspeaker(1), m_voicePrompt(OS_ON), m_timeCalibration(OS_ON),
-      m_startStatement(OS_ON)
+      m_startStatement(OS_ON), m_showShortcutPanel(OS_ON)
     {
       ::memset(m_reserved, 0, sizeof(m_reserved));
     }
@@ -453,6 +453,7 @@ namespace UeBase
       m_3DCarIcon = Default3DCarIcon;
       m_timeCalibration = OS_ON;
       m_startStatement = OS_ON;
+      m_showShortcutPanel = OS_ON;
       ::memset(m_reserved, 0, sizeof(m_reserved));
     }
   };

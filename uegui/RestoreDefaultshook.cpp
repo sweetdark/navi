@@ -70,19 +70,19 @@ void CRestoreDefaultshook::MakeControls()
 {
   m_historyCtrl.SetCenterElement(GetGuiElement(RestoreDefaultshook_HistoricalInfoCenter));
   m_historyCtrl.SetIconElement(GetGuiElement(RestoreDefaultshook_HistoricalInfoIcon));
-  m_historyCtrl.SetLabelElement(GetGuiElement(RestoreDefaultshook_HistoricalInfoLabel));
+  m_historyLabel.SetLabelElement(GetGuiElement(RestoreDefaultshook_HistoricalInfoLabel));
 
   m_addressBookCtrl.SetCenterElement(GetGuiElement(RestoreDefaultshook_AddressBookCenter));
   m_addressBookCtrl.SetIconElement(GetGuiElement(RestoreDefaultshook_AddressBookIcon));
-  m_addressBookCtrl.SetLabelElement(GetGuiElement(RestoreDefaultshook_AddressBookLabel));
+  m_addressBookLabel.SetLabelElement(GetGuiElement(RestoreDefaultshook_AddressBookLabel));
 
   m_myJourneyCtrl.SetCenterElement(GetGuiElement(RestoreDefaultshook_MyJourneyCenter));
   m_myJourneyCtrl.SetIconElement(GetGuiElement(RestoreDefaultshook_MyJourneyIcon));
-  m_myJourneyCtrl.SetLabelElement(GetGuiElement(RestoreDefaultshook_MyJourneyLabel));
+  m_myJourneyLabel.SetLabelElement(GetGuiElement(RestoreDefaultshook_MyJourneyLabel));
 
   m_elecEyeCtrl.SetCenterElement(GetGuiElement(RestoreDefaultshook_ElecEyeCenter));
   m_elecEyeCtrl.SetIconElement(GetGuiElement(RestoreDefaultshook_ElecEyeIcon));
-  m_elecEyeCtrl.SetLabelElement(GetGuiElement(RestoreDefaultshook_ElecEyeLabel));
+  m_elecEyeLabel.SetLabelElement(GetGuiElement(RestoreDefaultshook_ElecEyeLabel));
 
   m_textTwo.SetLabelElement(GetGuiElement(RestoreDefaultshook_TextTwo));
   m_textOne.SetLabelElement(GetGuiElement(RestoreDefaultshook_TextOne));
@@ -101,8 +101,9 @@ short CRestoreDefaultshook::MouseDown(CGeoPoint<short> &scrPoint)
   case RestoreDefaultshook_HistoricalInfoLabel:
     {
       m_historyCtrl.MouseDown();
+      m_historyLabel.MouseDown();
       AddRenderUiControls(&m_historyCtrl);
-      AddRenderElements(GetGuiElement(RestoreDefaultshook_HistoricalInfoLabel)); 
+      AddRenderUiControls(&m_historyLabel);
     }
     break;
   case RestoreDefaultshook_AddressBookCenter:
@@ -110,8 +111,9 @@ short CRestoreDefaultshook::MouseDown(CGeoPoint<short> &scrPoint)
   case RestoreDefaultshook_AddressBookLabel:
     {
       m_addressBookCtrl.MouseDown();
+      m_addressBookLabel.MouseDown();
       AddRenderUiControls(&m_addressBookCtrl);
-      AddRenderElements(GetGuiElement(RestoreDefaultshook_AddressBookLabel)); 
+      AddRenderUiControls(&m_addressBookLabel);
     }
     break;
   case RestoreDefaultshook_MyJourneyCenter:
@@ -119,8 +121,9 @@ short CRestoreDefaultshook::MouseDown(CGeoPoint<short> &scrPoint)
   case RestoreDefaultshook_MyJourneyLabel:
     {
       m_myJourneyCtrl.MouseDown();
+      m_myJourneyLabel.MouseDown();
       AddRenderUiControls(&m_myJourneyCtrl);
-      AddRenderElements(GetGuiElement(RestoreDefaultshook_MyJourneyLabel)); 
+      AddRenderUiControls(&m_myJourneyLabel);
     }
     break;
   case RestoreDefaultshook_ElecEyeCenter:
@@ -128,8 +131,9 @@ short CRestoreDefaultshook::MouseDown(CGeoPoint<short> &scrPoint)
   case RestoreDefaultshook_ElecEyeLabel:
     {
       m_elecEyeCtrl.MouseDown();
+      m_elecEyeLabel.MouseDown();
       AddRenderUiControls(&m_elecEyeCtrl);
-      AddRenderElements(GetGuiElement(RestoreDefaultshook_ElecEyeLabel)); 
+      AddRenderUiControls(&m_elecEyeLabel);
     }
     break;
   case RestoreDefaultshook_OnCance:
@@ -172,8 +176,7 @@ short CRestoreDefaultshook::MouseUp(CGeoPoint<short> &scrPoint)
   case RestoreDefaultshook_HistoricalInfoLabel:
     {
       m_historyCtrl.MouseUp();
-      AddRenderUiControls(&m_historyCtrl);
-      AddRenderElements(GetGuiElement(RestoreDefaultshook_HistoricalInfoLabel));
+      m_historyLabel.MouseUp();
     }
     break;
   case RestoreDefaultshook_AddressBookCenter:
@@ -181,8 +184,7 @@ short CRestoreDefaultshook::MouseUp(CGeoPoint<short> &scrPoint)
   case RestoreDefaultshook_AddressBookLabel:
     {
       m_addressBookCtrl.MouseUp();
-      AddRenderUiControls(&m_addressBookCtrl);
-      AddRenderElements(GetGuiElement(RestoreDefaultshook_HistoricalInfoLabel));
+      m_addressBookLabel.MouseUp();
     }
     break;
   case RestoreDefaultshook_MyJourneyCenter:
@@ -190,8 +192,7 @@ short CRestoreDefaultshook::MouseUp(CGeoPoint<short> &scrPoint)
   case RestoreDefaultshook_MyJourneyLabel:
     {
       m_myJourneyCtrl.MouseUp();
-      AddRenderUiControls(&m_myJourneyCtrl);
-      AddRenderElements(GetGuiElement(RestoreDefaultshook_HistoricalInfoLabel));
+      m_myJourneyLabel.MouseUp();
     }
     break;
   case RestoreDefaultshook_ElecEyeCenter:
@@ -199,27 +200,24 @@ short CRestoreDefaultshook::MouseUp(CGeoPoint<short> &scrPoint)
   case RestoreDefaultshook_ElecEyeLabel:
     {
       m_elecEyeCtrl.MouseUp();
-      AddRenderUiControls(&m_elecEyeCtrl);
-      AddRenderElements(GetGuiElement(RestoreDefaultshook_HistoricalInfoLabel));
+      m_elecEyeLabel.MouseUp();
     }
     break;
   case RestoreDefaultshook_OnCance:
     {
       m_onCanceCtrl.MouseUp();
-      CViewHook::m_curHookType = CViewHook::DHT_SystemSettingHook;      
+      Return(false);
       AddRenderUiControls(&m_onCanceCtrl);
-      AddRenderElements(GetGuiElement(RestoreDefaultshook_HistoricalInfoLabel));
     }
     break;
   case RestoreDefaultshook_OnOk:
     {
       m_onOkCtrl.MouseUp();
       UpdateSettings();
-      CViewHook::m_curHookType = CViewHook::DHT_SystemSettingHook;
+      Return(false);
       CSystemSettingHook* systemSetting = (CSystemSettingHook*)(m_view->GetHook(CViewHook::DHT_SystemSettingHook));
       systemSetting->DoReturn();
       AddRenderUiControls(&m_onOkCtrl);
-      AddRenderElements(GetGuiElement(RestoreDefaultshook_HistoricalInfoLabel));
     }
     break;
   default:
@@ -258,13 +256,16 @@ void CRestoreDefaultshook::ClearMyJourneyData()
 }
 void CRestoreDefaultshook::ClearElecEyeData()
 {
-  //清除常用点信息
-  CUsuallyFile favorite;
-  favorite.RemoveRecord(RT_HOME);
-  favorite.RemoveRecord(RT_COMPANY);
-  favorite.RemoveRecord(RT_ONE);
-  favorite.RemoveRecord(RT_TWO);
-  favorite.RemoveRecord(RT_THREE);
+  const CUserDataWrapper& userWrapper = CUserDataWrapper::Get();
+  userWrapper.DeleteAllUserEEyeData();
+  ////清除常用点信息
+  //CUsuallyFile favorite;
+  //favorite.RemoveRecord(RT_HOME);
+  //favorite.RemoveRecord(RT_COMPANY);
+  //favorite.RemoveRecord(RT_ONE);
+  //favorite.RemoveRecord(RT_TWO);
+  //favorite.RemoveRecord(RT_THREE);
+  /*favorite.RemoveRecord(RT_STARTPOS);*/
 }
 void CRestoreDefaultshook::Restore()
 {
@@ -297,10 +298,12 @@ void CRestoreDefaultshook::UpdateSettings()
     }
     if (m_myJourneyCtrl.Checked())
     {
+      //清除我的行程
       ClearMyJourneyData();
     }
     if (m_elecEyeCtrl.Checked())
     {
+      //清除电子眼
       ClearElecEyeData();
     }
     //初始化设置

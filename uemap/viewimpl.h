@@ -222,9 +222,14 @@ namespace UeMap
     virtual void EraseState(short type);
 
     /**
-    *
+    * 读取当前焦点视图
     */
     virtual CViewState *MainState();
+
+    /**
+    * 读取当前地图主视图
+    */
+    virtual CViewState *MainViewState();
 
     /**
     * 根据屏幕点获取当前点属于那个视图范围内
@@ -825,7 +830,7 @@ namespace UeMap
     **/
     unsigned int GetPlanMethodType();
 
-    bool IsRoundAbout(GuidanceStatus &dirInfo);
+    bool IsRoundAbout(const GuidanceStatus &dirInfo);
 
     bool GetCurRoundAboutCenter(GuidanceStatus &dirInfo, CGeoPoint<long> &pos);
     /**
@@ -860,6 +865,8 @@ namespace UeMap
 
     
     void InitGuiState();
+
+    void JudgeGuidanceViewStatus(const GuidanceStatus &dirInfo, const GuidanceIndicator &oneIndicator);
   protected:
     // Belonged window
     void *m_wnd;

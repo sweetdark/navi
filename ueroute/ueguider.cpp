@@ -451,6 +451,49 @@ unsigned int CUeGuider::MakePrompts(PlannedLink *curES, PlannedLink *curSE, Plan
   return PEC_Success;
 }
 
+unsigned int CUeGuider::ReservePrompts(int pair, GuidanceIndicator **indicators)
+{
+  if(m_indicators[m_curPlan][pair])
+  {
+    int i = 0;
+    int count = m_indicatorNum[m_curPlan][pair];
+    for(; i < count; i++)
+    {
+      //m_memBasic.Free(m_indicators[m_curPlan][pair][i]->m_vtxs);
+      //m_memBasic.Free(m_indicators[m_curPlan][pair][i]);
+      indicators[i] = m_indicators[m_curPlan][pair][i];
+      m_indicators[m_curPlan][pair][i] = 0;
+    }
+    //m_memBasic.Free(m_indicators[m_curPlan][pair]);
+    m_indicators[m_curPlan][pair] = 0;
+    m_indicatorNum[m_curPlan][pair] = 0;
+  }
+
+  return PEC_Success;
+}
+
+unsigned int CUeGuider::MergePrompts(GuidanceIndicator **indicators, int indicatorNum, int startOrder)
+{
+  if(m_indicators[m_curPlan][m_curPair])
+  {
+    int i = 0;
+    int count = m_indicatorNum[m_curPlan][m_curPair];
+    GuidanceIndicator ** newIndicators = reinterpret_cast<GuidanceIndicator **>(m_memBasic.Alloc(sizeof(unsigned int*) * indicatorNum + count));
+    ::memcpy(newIndicators, m_indicators[m_curPlan][m_curPair], sizeof(unsigned int *) * count);
+
+    // TODO: infocode = IVT_MeetDestination
+    for(i = startOrder; i < indicatorNum; i++)
+    {
+      newIndicators[(count - 1) + (i - startOrder)] = indicators[i];
+    }
+
+    m_memBasic.Free(m_indicators[m_curPlan][m_curPair]);
+    m_indicators[m_curPlan][m_curPair] = newIndicators;
+  }
+
+  return PEC_Success;
+}
+
 /**
 * Deprated function since there define a cyclic decorator for erasing cyclic path
 **/
@@ -2205,6 +2248,7 @@ unsigned int CUeGuider::PlayPrompt(const MatchResult &curPos)
     // Exception
     if(!curIndicator->m_snd.IsValid())
     {
+      m_parent->Notify(ST_RenderFull);
       return PEC_NotHaveSndPrompt;
     }
 
@@ -2345,8 +2389,8 @@ unsigned int CUeGuider::PlayPrompt(const MatchResult &curPos)
 
   // TODO:
   // Remove magic number
-  short delays = 3;
-  short dist = 30;
+  short delays = 5;
+  short dist = 50;
   if(curPos.m_speed > 80)
   {
     delays = 10;

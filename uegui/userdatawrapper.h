@@ -24,6 +24,7 @@ using namespace UeBase;
 
 #include "usuallyfile.h"
 #include "uebase/customerfilereader.h"
+#include "uebase/memvector.h"
 
 
 
@@ -92,10 +93,10 @@ namespace UeGui
   //用户电子眼数据索引结构
   struct UserEEyeIndexData
   {
-    int m_parcelId;  //网格索引
-    int m_capacity;  //当前网格对应的电子眼数据容量：采用增量递增，默认有10条数据，写满后再增10条
-    int m_dataCount; //当前已存数据量
-    int m_offset;    //数据在文件中的位置偏移量
+    unsigned int m_parcelId;  //网格索引
+    unsigned int m_capacity;  //当前网格对应的电子眼数据容量：采用增量递增，默认有10条数据，写满后再增10条
+    unsigned int m_dataCount; //当前已存数据量
+    unsigned int m_offset;    //数据在文件中的位置偏移量
     UserEEyeIndexData() : m_parcelId(0), m_capacity(0), m_dataCount(0), m_offset(0)
     {
     }
@@ -118,6 +119,8 @@ namespace UeGui
       ::memset(m_address, 0x00, 128);
     }
   };
+  //数据列表
+  typedef std::vector<UserEEyeEntryData> UserEEyeEntryDataList;
 
   class CUserDataWrapper 
   {
@@ -181,7 +184,7 @@ namespace UeGui
     const FavoriteEntry *GetFavorite(int order) const;
 
     //添加新的地址信息
-    unsigned int AddFavorite(const FavoriteEntry &curFavor) const;
+    unsigned int AddFavorite(FavoriteEntry &curFavor) const;
 
     //更新索引为order的地址信息
     unsigned int UpdateFavorite(const FavoriteEntry &curFavor,int order) const;
@@ -271,17 +274,40 @@ namespace UeGui
     bool ClearLastRoute() const;
 
     /*
-    * \brief 内存映射用户的电子眼数据文件
+    * \brief 读取用户电子眼数据量
     */
-    bool ConnectToUserEEyeDataFile() const;
+    unsigned int GetUserEEyeEntryDataCount() const;
+
     /*
-    * \brief 内存映射用户的电子眼数据文件
+    * \brief 读取用户电子眼数据
+    * \ param: fromIndex 从第几条数据下标开始读取 从0开始
+    * \ param: count 要读取的数据量
     */
-    bool DisconnectUserEEyeDataFile() const;
+    bool GetUserEEyeEntryData(const unsigned int fromIndex, unsigned int count, UserEEyeEntryDataList& dataList) const;
+
+    /*
+    * \brief 编辑用户电子眼数据
+    * \param: editIndex 下标 从0开始
+    */
+    bool EditUserEEyeData(const unsigned int editIndex, const UserEEyeEntryData& entryData) const;
+
+    /*
+    * \brief 删除用户电子眼数据
+    * \param: deleteIndex 下标 从0开始
+    */
+    bool DeleteUserEEyeData(const unsigned int deleteIndex) const;
+
+    /*
+    * \brief 删除用户电子眼数据
+    * \param: deleteIndex 下标 从0开始
+    */
+    bool DeleteAllUserEEyeData() const;
+
     /*
     * \brief 添加用户电子眼数据
+    * \param: parcelID : 对应的网格ID
     */
-    bool AddUserEEyeData(int parcelID, const UserEEyeEntryData& entryData) const;
+    bool AddUserEEyeData(const unsigned int parcelID, const UserEEyeEntryData& entryData) const;
   private:
     //设置地址名称
     void SetAddrName(const PlanPosition& planPos, char *addrName) const;

@@ -30,26 +30,31 @@ namespace UeGui
       TypeInDistQueryListHook_List1PoiNameBox,
       TypeInDistQueryListHook_List1CursorBox,
       TypeInDistQueryListHook_List1PoiDistBox,
+      TypeInDistQueryListHook_List1PoiTelBox,
 
       TypeInDistQueryListHook_List2Btn,
       TypeInDistQueryListHook_List2PoiNameBox,
       TypeInDistQueryListHook_List2CursorBox,
       TypeInDistQueryListHook_List2PoiDistBox,
+      TypeInDistQueryListHook_List2PoiTelBox,
 
       TypeInDistQueryListHook_List3Btn,
       TypeInDistQueryListHook_List3PoiNameBox,
       TypeInDistQueryListHook_List3CursorBox,
       TypeInDistQueryListHook_List3PoiDistBox,
+      TypeInDistQueryListHook_List3PoiTelBox,
 
       TypeInDistQueryListHook_List4Btn,
       TypeInDistQueryListHook_List4PoiNameBox,
       TypeInDistQueryListHook_List4CursorBox,
       TypeInDistQueryListHook_List4PoiDistBox,
+      TypeInDistQueryListHook_List4PoiTelBox,
 
       TypeInDistQueryListHook_List5Btn,
       TypeInDistQueryListHook_List5PoiNameBox,
       TypeInDistQueryListHook_List5CursorBox,
       TypeInDistQueryListHook_List5PoiDistBox,
+      TypeInDistQueryListHook_List5PoiTelBox,
 
       TypeInDistQueryListHook_PageUpBtn,
       TypeInDistQueryListHook_PageUpBtnIcon,
@@ -107,6 +112,7 @@ namespace UeGui
 
     CUiBitButton m_InfoBtn[5];
     CUiLabel m_AddrLabel[5];
+    CUiLabel m_telLabel[5];
 
     CUiBitButton m_pageUpBtn;
     CUiBitButton m_pageDownBtn;

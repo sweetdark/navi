@@ -7,6 +7,10 @@ using namespace UeGui;
 CNavigationLeftHook::CNavigationLeftHook()
 {
   MakeGUI();
+
+  m_naviMapSetting = NULL;
+  m_promptSetting = NULL;
+  m_routeSetting = NULL;
 }
 
 CNavigationLeftHook::~CNavigationLeftHook()

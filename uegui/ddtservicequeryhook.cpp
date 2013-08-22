@@ -904,7 +904,6 @@ void CDdtServiceQueryHook::DoDistSwitchCallBack(void *pDoCallBackObj,const SQLRe
     ::strcpy(codeEntry.m_chName, pResult->m_asciiName);
     CQueryWrapper::Get().SetQueryAdmInfo(codeEntry);
   }
-  CViewHook::m_curHookType = CViewHook::DHT_DdtServiceQueryHook;
 }
 
 void CDdtServiceQueryHook::AddServiceData(const char* value1, const char* value2, CGeoPoint<long> point)

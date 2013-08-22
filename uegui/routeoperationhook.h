@@ -104,6 +104,9 @@ namespace UeGui
 
     void OnClickNavigation();
 
+		void DoRouteTypeSelect();
+
+		static void OnSelectRouteType(CAggHook* senderHook, unsigned int routeType);
   private:
     CUiBitButton m_startNavigationBtnCtrl;
     CUiBitButton m_deleteRouteBtnCtrl;
